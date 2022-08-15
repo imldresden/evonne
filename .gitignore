@@ -1,0 +1,12 @@
+.vscode
+node_modules
+package-lock.json
+.DS_Store
+**/.DS_Store
+externalTools/*
+**/*.pyc
+**/ocrs.txt
+**.log
+**/repairs/*.txt
+
+frontend/public/data/*
