@@ -1,0 +1,40 @@
+.container-split {
+    border: 1px solid #cbd5e0;
+    height: 100%;
+}
+
+.resizer[data-direction='horizontal'] {
+    background-color: #cbd5e0;
+    cursor: ew-resize;
+    height: 100%;
+    width: 10px;
+}
+
+.resizer[data-direction='vertical'] {
+    background-color: #cbd5e0;
+    cursor: ns-resize;
+    height: 5px;
+    width: 100%;
+}
+
+.container-left {
+    width: 60%;
+    display: flex;
+}
+
+.container-right {
+    width:1% ;
+    flex: 1;
+    display: flex;
+}
+
+.container-top {
+    height: 12rem;
+    display: flex;
+}
+
+.container-bottom {
+    flex: 1;
+    display: flex;
+}
+

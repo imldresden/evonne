@@ -1,0 +1,23 @@
+.contextMenu {
+    fill: #f2f2f2;
+    filter: drop-shadow( 2px 2px 2px rgba(0, 0, 0, .5));
+}
+
+.menuEntry.button {
+    cursor: pointer;
+}
+
+.menuEntry.section {
+    fill: #bdbdbd
+}
+
+.menuEntry.button:hover {
+    fill: #dddddd;
+}
+
+.menuEntry text {
+    font-size: 0.8em;
+    font-family: Roboto;
+    font-weight: 300;
+    fill: rgba(0,0,0,0.87);;
+}

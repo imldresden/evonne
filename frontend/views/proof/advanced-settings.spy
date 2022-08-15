@@ -1,0 +1,32 @@
+<section id="settingsAppearance" class="modal-section">
+  <h4>Compactness Configuration</h4>
+  <div class="modal-option modal-option-number">
+    <div class="input-field">
+      <input id="minHorizontalCompactness" type="number" value="0.5" min="0.01" max="0.99" step="0.01">
+      <label for="minHorizontalCompactness">Horizontal Minimum</label>
+    </div>
+    <span>x Screen Width</span>
+  </div>
+  <div class="modal-option modal-option-number">
+    <div class="input-field">
+      <input id="maxHorizontalCompactness" type="number" value="2" min="1">
+      <label for="maxHorizontalCompactness">Horizontal Maximum</label>
+    </div>
+    <span>x Screen Width</span>
+  </div>
+  <div class="modal-option modal-option-number">
+    <div class="input-field">
+      <input id="minVerticalCompactness" type="number" value="0.5" min="0.01" max="0.99" step="0.01">
+      <label for="minVerticalCompactness">Vertical Minimum</label>
+    </div>
+    <span>x Screen Height</span>
+  </div>
+  <div class="modal-option modal-option-number">
+    <div class="input-field">
+      <input id="maxVerticalCompactness" type="number" value="2" min="1">
+      <label for="maxVerticalCompactness">Vertical Maximum</label>
+    </div>
+    <span>x Screen Height</span>
+  </div>
+</section>
+

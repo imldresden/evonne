@@ -1,0 +1,42 @@
+:root {
+	--minimap-height: 15vh;
+	--minimap-width: 20vh;
+}
+
+.minimap {
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07), 0 3px 1px -2px rgba(0, 0, 0, 0.06),
+		0 1px 5px 0 rgba(0, 0, 0, 0.1);
+	border-radius: 2px;
+	position: absolute;
+	top: calc(5px);
+	right: 0;
+	left: 5px;
+	bottom: 0;
+	width: var(--minimap-width);
+	height: var(--minimap-height);
+	overflow: hidden;
+}
+
+.scope {
+	fill: var(--color-primary);
+	fill-opacity: 0.1;
+	stroke: var(--color-primary);
+	stroke-width: 1px;
+}
+
+.minimap-view-container {
+	position: absolute;
+	width: var(--minimap-width);
+	height: var(--minimap-height);
+	margin-bottom: 16px;
+	/* width: calc(100% - var(--sidebar-toggle-width)); */
+}
+
+.minimap-view {
+	z-index: 110;
+	background: white;
+}
+
+.scope-container {
+	z-index: 120;
+}

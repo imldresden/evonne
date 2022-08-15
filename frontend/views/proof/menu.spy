@@ -1,0 +1,29 @@
+<li>
+  <a class="dropdown dropdown-trigger tooltipped" data-target="submenu-proof" data-tooltip="Proof">
+    <i class="material-icons">filter_list</i>
+  </a>
+</li>
+
+<ul id="submenu-proof" class="dropdown-content">
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Upload Proof">
+      <a id="uploadProofTrigger">
+        <i class="large material-icons" style="font-size: x-large">upload_file</i>
+      </a>
+    </div>
+  </li>
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Open Linked Ontology View">
+      <a id="openOntologyInNew">
+        <i class="material-icons">open_in_new</i>
+      </a>
+    </div>
+  </li>
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Toggle Minimap">
+      <a class="toggle-map" target="proof">
+        <i class="material-icons">map</i>
+      </a>
+    </div>
+  </li>
+</ul>

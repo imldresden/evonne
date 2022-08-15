@@ -1,0 +1,15 @@
+<!-- Global settings modal -->
+<div id="settingsModal" class="modal settings-modal">
+  <div class="modal-content">
+    <header>
+      <h2>Application Settings</h2>
+      <p>Adjust the settings of this application using the following options</p>
+    </header>
+    
+    {{ advanced_settings_specific }}
+
+    <footer class="modal-footer modal-section">
+      <button class="modal-close waves-effect waves-purple btn-flat">close</button>
+    </footer>
+  </div>
+</div>

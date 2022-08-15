@@ -1,0 +1,44 @@
+/* Tooltip style */
+.tooltip-explanation {
+    position: absolute;
+    display: inline-block;
+}
+
+.positionLT {
+    left: 10px;
+    top: 10px;
+}
+
+.positionLB {
+    left: 10px;
+    bottom: 10px;
+}
+
+.positionRT {
+    right: 20px; /*for the right menu button*/
+    top: 10px;
+}
+
+.positionRB {
+    right: 20px; /*for the right menu button*/
+    bottom: 10px;
+}
+
+.tooltip-explanation > .tooltiptext {
+    background-color: #fafafa;
+    color: black;
+    text-align: center;
+    border-radius: 2px;
+    padding: 5px 0;
+    display: block;
+}
+
+.tooltiptext h2 {
+    font-size: 1.5em;
+    margin: 8px 10px 10px 10px;
+}
+
+.tooltip-light {
+    background: transparent;
+    color: var(--color-gray);
+}

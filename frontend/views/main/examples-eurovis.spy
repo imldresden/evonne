@@ -1,0 +1,26 @@
+<div class="collection" id="examples">
+  <div onclick="loadExample('spicy-ice-cream', '{{ uuid }}')" class="collection-item">
+    1. There is no spicy ice cream 
+    (From "Modified Pizza Ontology")
+  </div>
+  <div onclick="loadExample('15D', '{{ uuid }}')" class="collection-item">
+    2. Every sebaceous gland is a holocrine gland
+    (From "Skin Phisiology Ontology")
+  </div>
+  <div onclick="loadExample('15G', '{{ uuid }}')" class="collection-item">
+    3. Sebaceous glands are entities
+    (From "Skin Phisiology Ontology")
+  </div>
+  <div onclick="loadExample('9DW', '{{ uuid }}')" class="collection-item">
+    4. Every pathological process of urinary tract is a non-canonical processual entity
+    (From "Dispedia Core Ontology")
+  </div>
+  <div onclick="loadExample('9DWG', '{{ uuid }}')" class="collection-item">
+    5. Every ventilator associated pneumonia process is a non-canonical processual entity
+    (From "Dispedia Core Ontology")
+  </div>
+  <div onclick="loadExample('7D', '{{ uuid }}')" class="collection-item">
+    6. Every Transcription corepressor is a continuant
+    (From "Gene Regulation Ontology")
+  </div>
+</div>

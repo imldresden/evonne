@@ -1,0 +1,61 @@
+:root {
+    --pan-zoom-control-spacing-x: 120px;
+    --pan-zoom-control-spacing-y: 100px;
+}
+
+#svg-pan-zoom-controls {
+    transform: translate(
+            calc(100% - var(--pan-zoom-control-spacing-x)),
+            calc(100vh - var(--pan-zoom-control-spacing-y))
+        )
+        scale(0.75);
+}
+
+.svg-pan-zoom-control {
+    cursor: pointer;
+    fill: var(--color-primary);
+}
+
+.svg-pan-zoom-control:hover {
+    fill: var(--color-primary-light);
+}
+
+.svg-pan-zoom-control-background {
+    fill: white;
+    fill-opacity: 1;
+}
+
+#proof-view #svg-pan-zoom-zoom-in path,
+#ontology-view #svg-pan-zoom-zoom-in path {
+    d: path("M767.791,-0C1191.55,-0 1535.58,344.036 1535.58,767.791C1535.58,1191.55 1191.55,1535.58 767.791,1535.58C344.036,1535.58 0,1191.55 0,767.791C0,344.036 344.036,-0 767.791,-0ZM871.914,663.877L871.914,382.343L664.086,382.343L664.086,663.877L382.552,663.877L382.552,871.706L664.086,871.706L664.086,1153.24L871.914,1153.24L871.914,871.706L1153.45,871.706L1153.45,663.877L871.914,663.877Z");
+}
+
+#proof-view #svg-pan-zoom-reset-pan-zoom,
+#ontology-view #svg-pan-zoom-reset-pan-zoom {
+    transform: scale(0.025) translate(3800px, 0);
+}
+
+#proof-view #svg-pan-zoom-reset-pan-zoom rect,
+#ontology-view #svg-pan-zoom-reset-pan-zoom rect {
+    transform: translate(0, 0);
+}
+
+#proof-view #svg-pan-zoom-zoom-out,
+#ontology-view #svg-pan-zoom-zoom-out {
+    transform: scale(0.025) translate(0, 0);
+}
+
+#proof-view #svg-pan-zoom-zoom-out rect,
+#ontology-view #svg-pan-zoom-zoom-out rect {
+    transform: translateX(1700px);
+}
+
+#proof-view #svg-pan-zoom-reset-pan-zoom path,
+#ontology-view #svg-pan-zoom-reset-pan-zoom path {
+    d: path("M768,0c423.871,0 768,344.129 768,768c0,423.871 -344.129,768 -768,768c-423.871,0 -768,-344.129 -768,-768c0,-423.871 344.129,-768 768,-768Zm-0.209,432.775l0,-191.438l-239.297,239.298l239.297,239.297l0,-191.438c158.415,0 287.157,128.742 287.157,287.157c-0,158.414 -128.742,287.156 -287.157,287.156c-158.415,0 -287.156,-128.742 -287.156,-287.156l-95.719,-0c-0,211.538 171.336,382.875 382.875,382.875c211.539,0 382.876,-171.337 382.876,-382.875c-0,-211.539 -171.337,-382.876 -382.876,-382.876Z");
+}
+
+#proof-view #svg-pan-zoom-zoom-out path,
+#ontology-view #svg-pan-zoom-zoom-out path {
+    d: path("M2453.63,-0C2877.38,-0 3221.42,344.036 3221.42,767.791C3221.42,1191.55 2877.38,1535.58 2453.63,1535.58C2029.87,1535.58 1685.84,1191.55 1685.84,767.791C1685.84,344.036 2029.87,-0 2453.63,-0ZM2839.28,663.877L2068.39,663.877L2068.39,871.706L2839.28,871.706L2839.28,663.877Z");
+}

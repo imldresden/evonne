@@ -1,0 +1,166 @@
+:root {
+    --sidebar-width: 350px;
+    --sidebar-toggle-width: 16px;
+    --sidebar-toggle-width-enlarged: 36px;
+    --nav-height: 50px;
+}
+
+#sidebar {
+    z-index: 1;  
+    position: fixed !important; 
+    right: calc(0px - var(--sidebar-width));  
+    top: var(--nav-height);
+
+    width: var(--sidebar-width);
+    height: calc(100% - var(--nav-height));
+    
+    background-color: white;
+    box-sizing: border-box;
+}
+
+.sidebar-content {
+    padding: 0px 10px 0px 5px;
+    display:block;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.sidebar-content h2 {
+    font-size: 36px;
+    font-weight: 400;
+}
+
+.sidebar-content h3 {
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.sidebar-content h4 {
+    font-size: 18px;
+}
+
+.tab {
+	display: inline-block;
+	margin-right: 40px;
+}
+
+.tabs {
+    display: none; /* opened only through the navbar*/    
+    margin-bottom: 1em;
+}
+
+.tabs .tab {
+    flex: 1;
+}
+
+.tabs .tab a {
+    color: var(--color-primary-transparent-70);
+}
+
+.tabs .tab a:focus,
+.tabs .tab a:focus.active {
+    background-color: var(--color-primary-transparent-20);
+    outline: none;
+}
+
+.tabs .tab a:hover,
+.tabs .tab a.active {
+    color: var(--color-primary);
+}
+
+.tabs .indicator {
+    background-color: var(--color-primary-light);
+}
+
+.bar-sliding-in {
+    animation: var(--anim-long) ease-in-out 0s 1 normal both running
+        sideBarSlideIn;
+}
+
+.bar-sliding-out {
+    animation: var(--anim-long) ease-in-out 0s 1 normal both running
+        sideBarSlideOut;
+}
+
+@keyframes sideBarSlideIn {
+    from {
+        right: calc(0px - var(--sidebar-width));;
+    }
+
+    to {
+        right: 0;
+    }
+}
+@keyframes sideBarSlideOut {
+    from {
+        right: 0;
+    }
+
+    to {
+        right: calc(0px - var(--sidebar-width));
+    }
+}
+
+.btn-side-toggle,
+.btn-side-toggle:focus,
+.btn-side-toggle:active {
+    position: absolute;
+    left: -16px;
+    height: 100%;
+    width: 16px;
+    padding: 0;
+    margin: 0;
+    top: 0;
+    color: black;
+    background-color: white;
+    border: none;
+    border-radius: 0;
+    transition: var(--anim-short) all ease-in-out;
+    box-shadow: -1px 0 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-side-toggle:hover {
+    background-color: whitesmoke;
+    color: black;
+    left: calc(0px - var(--sidebar-toggle-width-enlarged));
+    height: 100%;
+    width: var(--sidebar-toggle-width-enlarged);
+}
+
+#iconToggleSideBar {
+    transform: rotate(0deg);
+    font-size: 12px;
+    transition: var(--anim-short) all ease-in-out;
+}
+
+.btn-side-toggle:hover #iconToggleSideBar {
+    font-size: 24px;
+}
+
+.icon-sliding-in {
+    animation: var(--anim-long) ease-in-out 0s 1 normal both running iconSlideIn;
+}
+
+.icon-sliding-out {
+    animation: var(--anim-long) ease-in-out 0s 1 normal both running
+        iconSlideOut;
+}
+
+@keyframes iconSlideIn {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(180deg);
+    }
+}
+@keyframes iconSlideOut {
+    from {
+        transform: rotate(180deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}

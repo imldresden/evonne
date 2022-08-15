@@ -1,0 +1,15 @@
+<li>
+  <a class="dropdown dropdown-trigger tooltipped" data-target="submenu-ontology" data-tooltip="Project">
+    <i class="material-icons">create_new_folder</i>
+  </a>
+</li>
+
+<ul id="submenu-ontology" class="dropdown-content">
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="New Project: Upload Ontology">
+      <a class="uploadOntologyTrigger">
+        <i class="large material-icons" style="font-size: x-large">upload_file</i>
+      </a>
+    </div>
+  </li>
+</ul>

@@ -1,0 +1,53 @@
+
+<li>
+  <a class="dropdown dropdown-trigger tooltipped" data-target="submenu-ontology" data-tooltip="Ontology">
+    <i class="material-icons">timeline</i>
+  </a>
+</li>
+
+<ul id="submenu-ontology" class="dropdown-content">
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Upload Atomic Decomposition">
+      <a id="uploadOntologyADTrigger">
+        <i class="large material-icons" style="font-size: x-large">upload_file</i>
+      </a>
+    </div>
+  </li>
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Upload Layout">
+      <a id="uploadLayoutTrigger">
+        <i class="large material-icons" style="font-size: x-large">upload</i>
+      </a>
+    </div>
+  </li>
+  <li>
+    <div  type="button" class="menu-entry tooltipped" data-tooltip="Save Layout">
+      <a id="saveLayoutButton"><i class="material-icons">download</i></a>
+    </div>
+  </li>
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Reset Layout">
+      <a id="resetLayoutButton"><i class="material-icons">refresh</i></a>
+    </div>
+  </li>
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Open Linked Proof View">
+      <a id="openProofInNew">
+        <i class="material-icons">open_in_new</i>
+      </a>
+    </div>
+  </li>
+  <li>
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Toggle Minimap">
+      <a class="toggle-map" target="ontology">
+        <i class="material-icons">map</i>
+      </a>
+    </div>
+  </li>
+</ul>
+
+<li>
+  <a id="showRepairsMenuButton" class="tooltipped" type="button" data-tooltip="Diagnoses">
+    <i class="material-icons">build</i>
+  </a>
+</li>

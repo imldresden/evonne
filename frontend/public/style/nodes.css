@@ -1,0 +1,229 @@
+@import "./widgets/general.css";
+
+:root {
+	--color-node-rule-fill: var(--color-gray-light);
+	--color-node-rule-stroke: var(--color-gray);
+	--color-node-axiom-fill: var(--color-blue-light);
+	--color-node-axiom-stroke: var(--color-blue);
+	--color-node-axiom-asserted-fill: var(--color-teal-light);
+	--color-node-axiom-asserted-stroke: var(--color-teal);
+	--color-node-axiom-conclusion-fill: var(--color-purple-light);
+	--color-node-axiom-conclusion-stroke: var(--color-purple);
+	--color-node-mrule-fill: var(--color-lime-light);
+	--color-node-mrule-stroke: var(--color-lime);
+	--color-node-krule-fill: var(--color-gray-light); /*var(--color-gray);*/
+	--color-node-krule-stroke: var(--color-gray); /*var(--color-gray-dark);*/
+	--color-btn-highlight: var(--color-teal);
+	--color-btn-repairs: var(--color-orange-dark);
+	--color-remove-link: var(--color-red-dark)
+}
+
+.node {
+	font-size: smaller;
+	font-family: Roboto;
+}
+
+.node.rule text {
+	fill: #696969;
+}
+
+.node.rest * {
+	fill: var(--color-node-axiom-conclusion-fill);
+	stroke: var(--color-node-axiom-conclusion-stroke);
+	stroke-width: 1;
+}
+.node.rest *:not(circle:first-of-type) {
+	display: none;
+}
+
+svg g.node > rect.bg-box {
+	fill: var(--color-node-rule-fill);
+	stroke: var(--color-node-rule-stroke);
+	stroke-width: 1;
+	rx: 3px;
+	ry: 3px;
+}
+
+svg g.node:hover > rect.bg-box {
+	stroke-width: 3;
+	animation: none !important;
+}
+
+svg g.node.hovered > rect.bg-box {
+	stroke-width: 3;
+	animation: none !important;
+}
+
+svg g.node.fixed-repairs > rect.bg-box {
+	stroke-width: 5;
+	stroke: var(--color-node-rule-stroke) !important;
+}
+
+.lock-sign {
+	display: none;
+}
+.lock-sign text {
+	font-size: 16px;
+	fill: white !important;
+}
+svg g.node.fixed-repairs > .lock-sign {
+	display: inline-block;
+}
+
+svg g.node.axiom > rect.bg-box {
+	fill: var(--color-node-axiom-fill);
+	stroke: var(--color-node-axiom-stroke);
+}
+
+svg g.node.axiom.asserted > rect.bg-box {
+	fill: var(--color-node-axiom-asserted-fill);
+	stroke: var(--color-node-axiom-asserted-stroke);
+}
+
+svg g.node.axiom.conclusion > rect.bg-box {
+	fill: var(--color-node-axiom-conclusion-fill);
+	stroke: var(--color-node-axiom-conclusion-stroke);
+}
+
+svg g.node.mrule > rect.bg-box {
+	fill: var(--color-node-mrule-fill);
+	stroke: var(--color-node-mrule-stroke);
+}
+
+svg g.node.krule > rect.bg-box {
+	fill: var(--color-node-krule-fill);
+	stroke: var(--color-node-krule-stroke);
+}
+
+svg g.node text.linear-icon {
+	font-family: "Linearicons-Free";
+	font-size: 1em;
+}
+
+svg g.node text.material-icon {
+	font-family: "Material Icons";
+	font-size: 1em;
+}
+
+svg g.node > g.btn-extend > text {
+	text-anchor: end;
+	font-size: 0.8em;
+}
+
+svg g.node > text.shiftLeft {
+	animation-duration: 0.2s;
+	animation-name: shiftLeft;
+	animation-fill-mode: forwards;
+	animation-timing-function: ease-in-out;
+}
+
+svg g.node > text.shiftRight {
+	animation-duration: 0.2s;
+	animation-name: shiftRight;
+	animation-fill-mode: forwards;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes shiftRight {
+	0% {
+		transform: translateX(0em);
+	}
+	100% {
+		transform: translateX(0.5em);
+	}
+}
+@keyframes shiftLeft {
+	0% {
+		transform: translateX(0.5em);
+	}
+	100% {
+		transform: translateX(0em);
+	}
+}
+
+svg g.node > g.btn-extend > rect {
+	fill: transparent !important;
+}
+
+svg g.node > g.btn-round > text {
+	color: white;
+	fill: white !important;
+	text-anchor: middle;
+	dominant-baseline: central;
+	font-size: 0.9em;
+}
+
+text.rotated {
+	transform: rotate(180deg);
+}
+
+text.rotated-90 {
+	transform: rotate(90deg);
+}
+
+@supports (-moz-appearance:none) {
+    text.rotated-90 {
+        transform: translateX(0.3px) rotate(90deg);
+    }
+}
+
+text.rotated-270 {
+	transform: rotate(270deg);
+}
+
+svg g.node > g.btn-view > text {
+	color: white;
+	fill: black !important;
+	text-anchor: middle;
+	font-size: 1em;
+}
+
+.conclusion .axiomButton {
+	fill: var(--color-purple-dark);
+}
+.asserted .axiomButton {
+	fill: #36afa3;
+}
+.axiom:not(.asserted, .conclusion) .axiomButton {
+	fill: #2196f3;
+}
+
+.axiomButton.btn-highlight.active {
+	fill: var(--color-btn-highlight);
+}
+.axiomButton.btn-repairs.active {
+	fill: var(--color-btn-repairs);
+}
+.axiomButton.btn-repairs.spinning text {
+	animation: processing 1s linear 0s infinite normal forwards;
+}
+
+.axiomButton.btn-set-axiom-string.activeFormat{
+	filter: brightness(100%)
+}
+
+.axiomButton.btn-set-axiom-string.inactiveFormat{
+	filter: brightness(85%)
+}
+
+@keyframes processing {
+	0% {
+		transform: rotate(0) translateY(-0.5px);
+	}
+
+	100% {
+		transform: rotate(360deg) translateY(-0.5px);
+	}
+}
+
+.link {
+	stroke: darkgrey;
+	stroke-opacity: 0.7;
+	stroke-width: 2px;
+	fill: none;
+}
+
+#proof-view .link.from-axiom:hover {
+	stroke-width: 5px !important;
+	stroke: var(--color-remove-link);
+}

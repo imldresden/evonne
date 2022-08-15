@@ -1,0 +1,217 @@
+@import "./nodes.css";
+
+:root {
+	--color-node-fill: hsl(205, 87%, 94%);
+	--color-node-stroke: hsl(207, 89%, 68%);
+	--color-node-fill-highlighted-repair: var(--color-orange-light);
+	--color-node-stroke-highlighted-repair: var(--color-orange-dark);
+	--color-node-fill-highlighted: var(--color-teal-light);
+	--color-node-stroke-highlighted: var(--color-teal);
+	--color-node-text-fill-highlighted: var(--color-text-green);
+}
+
+body {
+	width: 100vw;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+#ontology-view {
+	flex: 1;
+}
+
+#ontology-view rect.bg-box {
+	fill: var(--color-node-fill);
+	stroke: var(--color-node-stroke);
+}
+
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 60px;
+	height: 34px;
+}
+
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 26px;
+	width: 26px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+
+input:checked + .slider {
+	background-color: #2196f3;
+}
+
+input:focus + .slider {
+	box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+	-webkit-transform: translateX(26px);
+	-ms-transform: translateX(26px);
+	transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+	border-radius: 34px;
+}
+
+.slider.round:before {
+	border-radius: 50%;
+}
+
+/* Style the tab */
+.tab-repair {
+	position: relative;
+	float: right;
+	border: 1px solid #ccc;
+	background-color: #f1f1f1;
+	width: 100%;
+	transition: 0.4s;
+	overflow-x: hidden;
+}
+
+/* Style the buttons inside the tab */
+.repair-entry {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	width: 100%;
+	overflow-x: hidden;
+	box-sizing: border-box;
+	padding: 8px 16px;
+
+	border: 2px solid transparent;
+	border-radius: 4px;
+	background-color: #fafafa;
+	text-align: left;
+	cursor: pointer;
+	font-size: 12px;
+	font-weight: lighter;
+}
+.repair-entry:focus {
+	background-color: #fafafa;
+	border: 2px solid #efefef;
+}
+.repair-entry.locked > .lock-sign {
+	display: inline-block;
+	color: var(--color-orange-dark);
+}
+.repair-lines {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.repair-line {
+	font-weight: 300;
+}
+
+.closebutton {
+	position: relative;
+	top: 0;
+	right: 10px;
+	font-size: 15px;
+	float: right;
+	overflow: hidden;
+	transition: 0.4s;
+	display: block;
+	background-color: inherit;
+	cursor: pointer;
+}
+
+.title {
+	position: relative;
+	top: 0;
+	left: 10px;
+	font-size: 15px;
+	float: left;
+	overflow: hidden;
+	transition: 0.4s;
+	display: block;
+	background-color: inherit;
+}
+
+/* Change background color of buttons on hover */
+.repair-entry.hovered {
+	background-color: var(--color-orange-light);
+	border: 2px solid var(--color-orange-dark);
+}
+
+.closebutton:hover {
+	color: black;
+}
+
+/* Accordion effect for repairs*/
+.accordion {
+	color: #444;
+	cursor: pointer;
+	background-color: #f5f5f5;
+	text-align: left;
+	width: 100%;
+	border: none;
+	font-size: 12px;
+	overflow: hidden;
+	padding: 8px 16px;
+	margin-bottom: 8px;
+	border-radius: 4px;
+}
+.accordion:focus {
+	background-color: #f5f5f5;
+}
+.accordion:hover {
+	background-color: #e6e6e6;
+}
+.accordion::after {
+	content: "+";
+	color: black;
+	float: right;
+}
+.accordion.active::after {
+	content: "-";
+}
+
+.panel {
+	overflow-x: hidden;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.accordion.active + .panel {
+	display: flex;
+}
+
+.accordion:not(.active) + .panel {
+	display: none;
+}
+
+#repairsDiv {
+	margin-bottom: 5%;
+}

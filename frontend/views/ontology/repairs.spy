@@ -1,0 +1,15 @@
+<div class="sidebar-content" id="sidebarRepairs">
+  <header class="modal-section-header">
+    <h3 class="modal-section-heading no-bottom-margin" id="diagnoses-title">Diagnoses </h3>
+    <br>
+    
+  </header>
+  <p id="diagnoses-axiom"></p>  
+  <div id="repairsDiv">
+    <label id="closeRepairsMenuButton"></label>
+    <div id="notificationDiv">
+      <text>Double click on an axiom in Proof-View, then select Show Diagnoses.</text>
+    </div>
+  </div>
+  
+</div>

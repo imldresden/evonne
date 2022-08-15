@@ -1,0 +1,66 @@
+{
+	"Class Hierarchy": {
+						"RulePremise":["A ⊑ B" , "B ⊑ C"],
+						"RuleConclusion":"A ⊑ C",
+						"PremiseHighlight":["B"],
+						"ConclusionHighlight":[],
+						"RuleText":"Let \"A\", \"B\" and \"C\" be either concepts or roles. Since we know that every \"A\" is a \"B\" and every \"B\" is a \"C\", then this means than every \"A\" is a \"C\"."
+						},
+
+	"Asserted Conclusion":{
+						"RulePremise":[],
+						"RuleConclusion":"A ⊑ B",
+						"PremiseHighlight":[],
+						"ConclusionHighlight":[],
+						"RuleText":"Let \"A\" and \"B\" be either concepts or roles. It is asserted in the terminological knowledge that every \"A\" is a \"B\"."
+						},
+
+	"Existential Property Expansion": {
+						"RulePremise":["R ⊑ S"],
+						"RuleConclusion":"∃R.⊤ ⊑ ∃S.⊤",
+						"PremiseHighlight":[],
+						"ConclusionHighlight":["∃",".","⊤"],
+						"RuleText":"Let \"R\" and \"S\" be roles. Since we know that every role \"R\" edge is a role \"S\", then if an \"R\" edge exists, it must be also an \"S\" edge."
+						},
+
+	"Property Domain Translation":{
+						"RulePremise":["domain(r) = A"],
+						"RuleConclusion":"∃r.⊤ ⊑ A",
+						"PremiseHighlight":[],
+						"ConclusionHighlight":[],
+						"RuleText":"Let \"A\" be a concept and \"r\" be role name. This is a syntactic translation declaring the concept \"A\" as the domain of \"r\"."
+						},
+
+	"Intersection Decomposition":{
+						"RulePremise":["A ⊓ B"],
+						"RuleConclusion":"A ⊓ B ⊑ A",
+						"PremiseHighlight":[],
+						"ConclusionHighlight":[],
+						"RuleText":"Let \"A\" and \"B\" be concepts. Every element that satisfies \"A\" and \"B\"  satisfies \"A\"."
+						},
+
+	"Intersection Composition":{
+						"RulePremise":["A ⊑ B", "A ⊑ C"],
+						"RuleConclusion":"A ⊑ B ⊓ C ",
+						"PremiseHighlight":[],
+						"ConclusionHighlight":[],
+						"RuleText":"Let \"A\", \"B\" and \"C\" be concepts. Since every \"A\" is \"B\", and every \"A\" is \"C\" then every \"A\" is \"B\" and \"C\"."
+						},
+
+	"Equivalent Classes Decomposition":{
+						"RulePremise":["X ≡ Y"],
+						"RuleConclusion":"X ⊑ Y",
+						"PremiseHighlight":[],
+						"ConclusionHighlight":[],
+						"RuleText":"Let \"X\" and \"Y\" be either concepts or roles. Since \"X\" is eqivalent to \"Y\" then \"X\" is contained in \"Y\"."
+						},
+
+	"Existential Filler Expansion":{
+						"RulePremise":["A ⊑ B"],
+						"RuleConclusion":"∃r.A ⊑ ∃r.B",
+						"PremiseHighlight":[],
+						"ConclusionHighlight":["∃","r","."],
+						"RuleText":"Let \"A\" and \"B\" be concepts. Since every \"A\" is \"B\", if there exists an \"r\" edge to and element from \"A\", then there exists an \"r\" edge to an element from \"B\"."
+						}
+
+}

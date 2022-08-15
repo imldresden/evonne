@@ -1,0 +1,34 @@
+<nav>
+  <div class="nav-wrapper">
+    <div class="brand-logo">
+      <img src="/favicon.svg" style="margin-top: 10px;margin-left:10px;" width="30" height="30">
+    </div>  
+    <div class="brand-logo" style="
+      margin-left:50px;
+      text-align:center;
+      line-height: 15px;
+      padding: 0.45em 0em 0.4em 0em;
+      display: inline;"
+    >
+      <a href="/" > {{ title }} </a>
+    </div>  
+    <div>
+      <span class="white-text text-darken-2" id="project-id-span">Project ID: </span>  
+      <div class="input-field" id="project-id-div">
+        <input class="white-text" disabled placeholder="Project ID" id="uuid" type="text" value="{{ uuid }}">
+        
+      </div>
+    </div>
+    <ul id="nav-mobile" class="right">
+
+      {{ menu_specific }}
+      
+      <li>
+        <a id="showSettingsMenuButton" class="tooltipped" type="button" data-tooltip="Settings">
+          <i class="large material-icons">settings</i>
+        </a>
+      </li>
+
+    </ul>
+  </div>
+</nav>

@@ -1,0 +1,20 @@
+<!-- <script src="//d3js.org/d3.v5.min.js"></script>
+<script src="//d3js.org/d3-selection-multi.v1.js"></script>
+<script src="//d3js.org/d3-dsv.v1.min.js"></script>
+<script src="//cdn.jsdelivr.net/g/filesaver.js"></script>
+<script src="//cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="//marvl.infotech.monash.edu/webcola/cola.min.js"></script> --> 
+
+<script src="/js/lib/d3.v5.min.js"></script>
+<script src="/js/lib/d3-selection-multi.v1.js"></script>
+<script src="/js/lib/d3-dsv.v1.min.js"></script>
+<script src="/js/lib/filesaver.js"></script>
+<script src="/js/lib/svg-pan-zoom.min.js"></script>
+<script src="/js/lib/materialize.min.js"></script>
+<script src="/js/lib/cola.min.js"></script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/utils/controls.js"></script>
+<script src="/js/utils/session-id.js"></script>
+<script src="/js/utils/upload-file.js" type="module"></script>

@@ -1,0 +1,100 @@
+<div id="selectAxiomModal" class="modal settings-modal">
+  <div class="modal-content">
+    <i class="material-icons right modal-close">close</i>
+    <header>
+      <h2>Specify Input</h2>
+      <p>Please indicate the following options to generate a proof and an atomic decomposition.</p>
+    </header>
+
+    <h4>Select Axiom Concepts</h4>
+    <div class="row" style="display:table">
+      <div class="col vert-centered">
+        <div class="modal-option modal-option-select">
+          <select id="lhsConcepts" class="browser-default">
+            
+          </select>
+        </div>
+      </div>
+      <div class="vert-centered" style="margin: 0 5px 0 5px">
+        ⊑
+      </div>
+      <div class="col vert-centered">
+        <div class="modal-option modal-option-select">
+          <select id="rhsConcepts" class="browser-default">
+            <option disabled>Please select a left hand side concept first</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <h4>Select Proof Generation Method</h4>
+    <div class="row">
+      <div class="modal-option modal-option-select">
+        <select id="methodsList" class="browser-default">
+          <option value="1">ELK Size Minimal Proof</option>
+          <option value="2">ELK Depth Minimal Proof</option>
+          <option value="3">ELK Weighted Size Minimal Proof</option>
+          <option value="4">LETHE Forgetting-Based Proof</option>
+          <option value="5">LETHE Forgetting-Based Symbol-Minimal Proof</option>
+          <option value="6">LETHE Forgetting-Based Size-Minimal Proof</option>
+          <option value="7">LETHE Forgetting-Based Weighted-Size-Minimal Proof</option>
+          <option value="8">Detailed Proof (LETHE)</option>
+          <option value="9">FAME Forgetting-Based Proof</option>
+          <option value="10">FAME Forgetting-Based Symbol-Minimal Proof</option>
+          <option value="11">FAME Forgetting-Based Size-Minimal Proof</option>
+          <option value="12">FAME Forgetting-Based Weighted-Size-Minimal Proof</option>
+        </select>
+      </div>
+    </div>
+    
+    << main/progress >>
+
+    <h4>Select Signature File (optional)</h4>
+    <div class="container-flex">
+      
+      <div class="col-11 file-field input-field">
+        
+        <div class="btn btn-primary">
+          <i class="material-icons">upload</i>
+          <input id="uploadSignatureTrigger" type="file" accept=".txt">
+        </div>
+        
+        <div class="file-path-wrapper">
+          <input id=signatureFilePath class="file-path validate" type="text" placeholder="Upload a signature...">
+        </div>
+      </div>
+      <i class="col-1 material-icons suffix right" style="margin-top:25px;color:gray" id="clearSignatureFile" title="Clear selection">clear</i>    
+    </div>
+
+    <h4>Natural Language Translation</h4>
+    <div class="container-flex">
+      <label>
+        <input id="checkboxT2NL" type="checkbox" class="filled-in" checked="checked" />
+        <span>Every axiom in a proof need to be translated to natural language</span>
+      </label>
+    </div>
+  </div>
+
+  <div>
+    <button id="computeAxiomPairBtn" class="btn btn-primary  right" style="margin:2%"> Explain </button>
+    <img id="computingGif" src=..//..//gif/computing.gif  class = "left" style="display:none; transform:rotate(90deg); margin:2%;" width="40px" height="40px">
+  </div>
+
+  <!--- Not implemented yet
+  <br><br><hr>
+  <div class="modal-content">
+    
+    <h4>Or select one of the available axioms in this project</h4>
+    <div class="modal-option modal-option-select">
+      <select id="concept2" class="browser-default">
+        <option value="1">Some axiom</option>
+        <option value="2">Another axiom</option>
+      </select>
+    </div>
+
+    
+  </div>
+  <button id="loadAxiomPairBtn" class="btn right" style="margin:2%"> Load </button>
+  --->
+  
+</div>

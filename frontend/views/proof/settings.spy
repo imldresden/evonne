@@ -1,0 +1,136 @@
+<header class="modal-section-header toggles-content"  target="proof-settings">
+  <h3 class="modal-section-heading">Proof Settings</h3> <i class="material-icons">arrow_drop_up</i>
+</header>
+
+<div class="slidering" id="proof-settings">
+  <fieldset>
+    <h4> Shortening </h4>
+    <!-- Shortening option for rule names-->
+    <div class="modal-option">
+      <label>Shorten Rules Names</label>
+      <div class="switch">
+        <label>
+          <input id="toggleRuleNamesShortening" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+    <button class="btn-small btn-primary" id="shortenAllInProofBtn" title="Shorten all text in the proof">
+      Shorten All
+    </button>
+  </fieldset>
+
+  <fieldset>
+    <h4>Compactness</h4> 
+
+    <div class="modal-option">
+      <label class="label-toggle">Overlap Allowed</label>
+      <div class="switch">
+        <label>
+          <input id="toggleAllowOverlap" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+
+    <div id="proof-overlap-allowing-settings">
+      <!-- Proof width range-->
+      <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
+        <label>Horizontal</label>
+        <div>
+          <button class="btn btn-small btn-primary btn-range-reset waves-effect waves-light tooltipped"
+            data-position="right" data-tooltip="Reset Proof Width" id="proofWidthRangeReset">
+            <i class="material-icons">replay</i>
+          </button>
+          <form action="#">
+            <span class="new badge" data-badge-caption="px">4</span>
+            <p class="range-field">
+              <input type="range" id="proofWidthRange" style="border-color: transparent" />
+            </p>
+          </form>
+        </div>
+
+      </div>
+      <!-- Proof height range-->
+      <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
+        <label>Vertical</label>
+        <div>
+          <button class="btn btn-small btn-primary btn-range-reset waves-effect waves-light tooltipped"
+            data-position="right" data-tooltip="Reset Proof Height" id="proofHeightRangeReset">
+            <i class="material-icons">replay</i>
+          </button>
+          <form action="#">
+            <span class="new badge" data-badge-caption="px">4</span>
+            <p class="range-field">
+              <input type="range" id="proofHeightRange" style="border-color: transparent" />
+            </p>
+          </form>
+        </div>
+      </div>
+
+      
+      <a class="modal-trigger advanced-settings-link" data-target="settingsModal" type="button">
+        More settings...
+      </a>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <h4>Behavior</h4>
+
+    <!-- Form for selecting the position of the rule explanation tooltip -->
+    <label>Tooltip Position</label>
+    <div class="modal-option modal-option-select">
+      <select id="toolTipPosition" class="browser-default">
+        <option value="leftBottom">Left Bottom Corner</option>
+        <!-- <option value="rightBottom">Right Bottom Corner</option>
+        <option value="rightTop">Right Top Corner</option>
+        <option value="leftTop">Left Top Corner</option> -->
+        <option value="mousePosition">Pointer Location</option>
+      </select>
+    </div>
+
+    <div class="modal-option">
+      <label class="label-toggle">Linear Proof</label>
+      <div class="switch">
+        <label>
+          <input id="toggleLayoutMode" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class = "planar-div-wrapper">
+        <div class="modal-option">
+            <label class="label-toggle">Optimize premise distance</label>
+            <div class="switch">
+              <label>
+                <input id="togglePlanar" type="checkbox">
+                <span class="lever"></span>
+              </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-option">
+      <label class="label-toggle">Stepwise Mode</label>
+      <div class="switch">
+        <label>
+          <input id="toggleNavMode" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Magic option -->
+    <div class="modal-option">
+      <label class="label-toggle">Magic Mode</label>
+      <div class="switch">
+        <label>
+          <input id="toggleMagicMode" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+  </fieldset>
+</div>

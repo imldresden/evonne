@@ -1,0 +1,20 @@
+<!-- File upload modal -->
+<div id="uploadFileModal" class="modal upload-file-modal">
+  
+  <div class="modal-content">
+    <i class="material-icons right modal-close">close</i>
+    <header>
+      <h4>File Upload</h4>
+      <p>Select a file containing a<span id="what-is-uploaded"> </span> </p>
+    </header>
+    <div class="file-field input-field">
+      <div class="btn btn-primary">
+        <i class="material-icons">upload</i>
+        <input id=browseButton type="file" accept=".xml">
+      </div>
+      <div class="file-path-wrapper">
+        <input id=browseFilePath class="file-path validate" type="text">
+      </div>
+    </div>
+  </div>
+</div>

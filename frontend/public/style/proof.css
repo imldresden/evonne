@@ -1,0 +1,82 @@
+@import "./nodes.css";
+
+:root {
+	--color-conn-rule: var(--color-gray);
+	--color-conn-inferred-axiom: var(--color-blue);
+	--color-conn-asserted-axiom: var(--color-teal);
+	--color-conn-conclusion: var(--color-purple);
+	--color-conn-mrule: var(--color-lime);
+	--color-conn-krule: var(--color-gray-dark);
+	--color-text-green: var(--color-teal-darker);
+	--color-text-red: var(--color-red-darker);
+	--color-text-black: black;
+	--color-text-white: white;
+}
+
+svg#proof-view {
+	flex: 1;
+}
+
+.connector.ruleConnector {
+	fill: var(--color-conn-rule);
+}
+
+.connector.inferredAxiomConnector {
+	fill: var(--color-conn-inferred-axiom);
+}
+
+.connector.assertedAxiomConnector {
+	fill: var(--color-conn-asserted-axiom);
+}
+
+.connector.conclusionConnector {
+	fill: var(--color-conn-conclusion);
+}
+
+.connector.mRuleConnector {
+	fill: var(--color-conn-mrule);
+}
+
+.connector.kRuleConnector {
+	fill: var(--color-conn-krule);
+}
+
+.link.torest {
+	stroke-dasharray: 5;
+}
+
+.separator {
+	border: 1px solid lightgrey;
+}
+
+.mid {
+	border: 1px solid lightgrey;
+	border-radius: 5px;
+	margin: 0 0 0 0;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.text-green {
+	color: var(--color-text-green);
+	font-weight: bold;
+	background-color: transparent !important;
+}
+
+.text-black {
+	color: var(--color-text-black);
+	font-weight: normal;
+	background-color: transparent !important;
+}
+
+.text-white {
+	color: var(--color-text-white);
+	font-weight: normal;
+	background-color: transparent !important;
+}
+
+.text-red {
+	color: var(--color-text-red);
+	font-weight: bold;
+	background-color: transparent !important;
+}
