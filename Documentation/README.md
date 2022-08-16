@@ -100,7 +100,7 @@ In the top right corner, the *menu bar* is located. Buttons from left to right a
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/top_menu.png"  style="width:150px"/>
+	  <img src="resources/top_menu.png"  style="width:200px"/>
 	  <figcaption align = "center">Evonne - Menu Bar Buttons</figcaption>
 	</kbd>
 </p>
@@ -112,7 +112,7 @@ In the top right corner, the *menu bar* is located. Buttons from left to right a
 5. Settings Menu
 
 By default, the *proof* and *ontology* views are displayed side-by-side in the same tab (as shown in the overview screenshot).
-Exporting a proof (similarly an ontology) graph to a separate tab can be achieved by clicking <img src="resources/export_graph.png"  style="width:1.2em"/> which is located in the proof (ontology) menu. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:1.2em"/>.
+Exporting a proof (similarly an ontology) graph to a separate tab can be achieved by clicking <img src="resources/export_graph.png"  style="width:10px"/> which is located in the proof (ontology) menu. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:10px"/>.
 
 ---
 
