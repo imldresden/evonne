@@ -121,6 +121,7 @@ app.get('/project', (req, res) => {
     ontology: '',
     names: {},
     proofs: [],
+    reasoner:'',
   };
 
   const files = readdirSync(target);
@@ -177,6 +178,8 @@ app.get('/project', (req, res) => {
   if (sessions[id]) {
     status.status = 'busy';
   }
+
+  status.reasoner = readFileSync(path.join(target, 'reasoner.txt')).toString();
 
   // delete sessions[id]
   res.status(200).send(status);
@@ -248,7 +251,7 @@ app.get('/extract-names', (req, res) => {
     '-jar', 'externalTools/extractNames.jar',
     '-o', ontPath,
     '-od', projPath,
-    '-r', 'hermit',
+    '-r', req.query.reasoner,
   ], { encoding: 'utf-8' });
   printOutput(names);
 
@@ -570,8 +573,8 @@ function generateProofs(ontPath,axiom, projPath,sigPath,genMethod,translate2NL) 
     axiom = axiom.replace("owl:Nothing","BOTTOM")
 
   //LETHE Forgetting-Based Proof
-  let generator = 'externalTools/forgetting-based-proofs-lethe.jar';
-  let cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedKBProofGeneratorSkippingSteps';
+  let generator = 'externalTools/evee-elimination-proofs-lethe.jar';
+  let cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedHeuristicProofGenerator';
 
   //LETHE Forgetting-Based Symbol Minimal Proof
   if (genMethod === "5"){
@@ -596,25 +599,25 @@ function generateProofs(ontPath,axiom, projPath,sigPath,genMethod,translate2NL) 
 
   //FAME Forgetting-Based Proof
   if(genMethod === "9") {
-    generator = 'externalTools/forgetting-based-proofs-fame.jar';
+    generator = 'externalTools/evee-elimination-proofs-fame.jar';
     cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedHeuristicProofGenerator';
   }
 
   //FAME Forgetting-Based Symbol Minimal Proof
   if (genMethod === "10"){
-    generator = 'externalTools/forgetting-based-proofs-fame.jar';
+    generator = 'externalTools/evee-elimination-proofs-fame.jar';
     cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSymbolMinimalProofGenerator';
   }
 
   //FAME Forgetting-Based Size Minimal Proof
   if (genMethod === "11"){
-    generator = 'externalTools/forgetting-based-proofs-fame.jar';
+    generator = 'externalTools/evee-elimination-proofs-fame.jar';
     cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSizeMinimalProofGenerator';
   }
 
   //FAME Forgetting-Based Weighted Size Minimal Proof
   if (genMethod === "12"){
-    generator = 'externalTools/forgetting-based-proofs-fame.jar';
+    generator = 'externalTools/evee-elimination-proofs-fame.jar';
     cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedWeightedSizeMinimalProofGenerator';
   }
 
