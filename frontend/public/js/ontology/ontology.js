@@ -573,7 +573,8 @@ export function loadOntology(e) {
     progress('Ontology uploaded.');
     progress('Extracting concept names...');
     
-    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + ontology.name)
+    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + ontology.name + '&reasoner=' +
+        document.getElementById('classificationReasoner').value)
     .then(computed => {
       console.log('concepts extracted: ', computed);
       progress('Concepts extracted.');

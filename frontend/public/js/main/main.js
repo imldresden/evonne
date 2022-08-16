@@ -12,7 +12,6 @@ const clearSigFilePath = document.getElementById("clearSignatureFile");
 const computeAxiomsBtn = document.getElementById('computeAxiomPairBtn');
 
 window.onload = function () {
-
   //Mapping elements with click event to their functions
   let thingsWithClickListeners = new Map();
   thingsWithClickListeners.set(clearSigFilePath,clearSigFilePathFunction);
@@ -54,7 +53,7 @@ window.onload = function () {
     browseFilePathText.classList.remove("valid");
     app.proofFile = undefined;
   }
-  
+
   init_views();
 }
 
@@ -62,7 +61,7 @@ function createConceptDropdowns(concepts) {
   const lhs = document.getElementById('lhsConcepts');
   lhs.innerHTML = '';
 
-  Object.entries(concepts).sort(([,s1], [,s2]) => sortNames(s1,s2)).forEach(
+  Object.entries(concepts).sort(([,s1], [,s2]) => sortNames(s1.conceptNameShort,s2.conceptNameShort)).forEach(
       entry => {
     if (entry[0]!== "owl:Nothing" && entry[1].rhs && entry[1].rhs.length > 0) {
       const concept = document.createElement('option');
@@ -77,11 +76,10 @@ function createConceptDropdowns(concepts) {
     rhs.innerHTML = '';
 
     const key = lhs.options[lhs.selectedIndex].value;
-    concepts[key].rhs.forEach(rhsName => {
+    Object.entries(concepts[key].rhs).sort(([,s1], [,s2]) => sortNames(s1,s2)).forEach(rhsName => {
       const rhsC = document.createElement('option');
-      rhsC.value = rhsName;
-      rhsC.innerHTML = concepts[rhsName].conceptNameShort;
-
+      rhsC.value = rhsName[1];
+      rhsC.innerHTML = concepts[rhsName[1]].conceptNameShort;
       rhs.appendChild(rhsC);
     });
   }
@@ -108,6 +106,8 @@ function init_views(loop = false) {
         clearInterval(interval);
         throw Error('This project is beyond salvation');
       }
+
+      blockProofMethods(res.reasoner);
 
       if (!loop) {
         if (res.names && Object.keys(res.names).length > 0) {
@@ -166,8 +166,8 @@ if (clearSigFilePath) {
 }
 
 function sortNames (c1, c2) {
-  let arg1 = c1.conceptNameShort.substring(c1.conceptNameShort.indexOf("#") + 1).toLowerCase();
-  let arg2 = c2.conceptNameShort.substring(c2.conceptNameShort.indexOf("#") + 1).toLowerCase();
+  let arg1 = c1.substring(c1.indexOf("#") + 1).toLowerCase();
+  let arg2 = c2.substring(c2.indexOf("#") + 1).toLowerCase();
 
   if (arg1 < arg2){
     return -1;
@@ -177,6 +177,7 @@ function sortNames (c1, c2) {
   }
   return 0;
 }
+
 
 function clearSigFilePathFunction () {
   signaturePathText.value = "";
@@ -214,4 +215,26 @@ function computeAxiomsBtnFunction(){
       .catch(error => {
         console.error('Error:', error);
       });
+}
+
+function blockProofMethods(reasoner) {
+  const options = document.getElementById("methodsList").getElementsByTagName("option");
+  let valuesToBlock;
+
+  if (!reasoner)
+    return;
+
+  if (reasoner.toLowerCase() === "hermit"){
+     valuesToBlock = ["1","2","3"];
+     options[3].selected = true;
+  }
+
+  else if(reasoner.toLowerCase() === "elk"){
+     valuesToBlock = ["4","5","6","7","8","9","10","11","12"];
+     options[0].selected = true;
+  }
+
+  for (let i = 0; i < options.length; i++) {
+    options[i].disabled =  valuesToBlock.includes((i + 1).toString());
+  }
 }

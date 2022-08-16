@@ -35,14 +35,14 @@
           <option value="2">ELK Depth Minimal Proof</option>
           <option value="3">ELK Weighted Size Minimal Proof</option>
           <option value="4">LETHE Forgetting-Based Proof</option>
-          <option value="5">LETHE Forgetting-Based Symbol-Minimal Proof</option>
-          <option value="6">LETHE Forgetting-Based Size-Minimal Proof</option>
-          <option value="7">LETHE Forgetting-Based Weighted-Size-Minimal Proof</option>
+          <option value="5">LETHE Forgetting-Based Symbol Minimal Proof</option>
+          <option value="6">LETHE Forgetting-Based Size Minimal Proof</option>
+          <option value="7">LETHE Forgetting-Based Weighted Size Minimal Proof</option>
           <option value="8">Detailed Proof (LETHE)</option>
           <option value="9">FAME Forgetting-Based Proof</option>
-          <option value="10">FAME Forgetting-Based Symbol-Minimal Proof</option>
-          <option value="11">FAME Forgetting-Based Size-Minimal Proof</option>
-          <option value="12">FAME Forgetting-Based Weighted-Size-Minimal Proof</option>
+          <option value="10">FAME Forgetting-Based Symbol Minimal Proof</option>
+          <option value="11">FAME Forgetting-Based Size Minimal Proof</option>
+          <option value="12">FAME Forgetting-Based Weighted Size Minimal Proof</option>
         </select>
       </div>
     </div>
