@@ -75,7 +75,7 @@ The tool also comes with some precomputed examples that can be accessed from the
 
 Once an ontology is loaded, a new menu will appear. There, the following input can be specified:
 
-* A *concept inclusion* that needs to be proven,
+* a *concept inclusion* that needs to be proven,
 * the *method* that should be used to generate the proof, and
 * an optional *signature file* for specifying known terms.
 
@@ -143,13 +143,13 @@ Every axiom node in a proof is equipped with its own buttons and are the followi
 
 * *Navigation Buttons* (Buttons 3, 4 and 5) which manipulate the structure of a proof (available on *hover*)
 	
-	* **Show Previous** (Button 3): Clicking this button hides all inferences in the corresponding subtree except the immediate inference.
-	* **Show All Previous** (Button 4): Clicking this button shows all inferences in the corresponding subtree.
-	* **Hide All Previous** (Button 5): Clicking this button hides all inferences in the corresponding subtree.
+	* **Show Previous** (Button 3): clicking this button hides all inferences in the corresponding subtree except the immediate inference.
+	* **Show All Previous** (Button 4): clicking this button shows all inferences in the corresponding subtree.
+	* **Hide All Previous** (Button 5): clicking this button hides all inferences in the corresponding subtree.
 
 * *Communication Buttons* (Buttons 1 and 2) which trigger functionalities displayed in the *ontology* view (available on *double click*)
 
-	* **Compute Diagnoses** (Button 1): Clicking this button triggers the computation of all minimal diagnoses of the corresponding axiom. These diagnoses are grouped by size and displayed in the *diagnoses menu* located in the ontology view.
+	* **Compute Diagnoses** (Button 1): clicking this button triggers the computation of all minimal diagnoses of the corresponding axiom. These diagnoses are grouped by size and displayed in the *diagnoses menu* located in the ontology view.
 	
 	<p align="center">
 		<kbd align="center">
@@ -158,17 +158,17 @@ Every axiom node in a proof is equipped with its own buttons and are the followi
 		</kbd>
 	</p>
 	
-	* **Highlight Justification** (Button 2): Clicking this button highlights the ontology axioms used to generate the current proof as well as the nodes that contain them in the *ontology* view. 
+	* **Highlight Justification** (Button 2): clicking this button highlights the ontology axioms used to generate the current proof as well as the nodes that contain them in the *ontology* view. 
 
-* *Format Buttons*
+Axiom nodes are also equipped with a *context menu*. In addition to the functionalities of the previously mentioned buttons, this menu gives access to the following *formatting functions*:
 	
-	* **Show Original** (Button 6): Clicking this button restores the axiom to its default format (*Description Logic* syntax).
-	* **Shorten Axiom** (Button 7): Clicking this button shortens all concepts appearing in the corresponding axiom according to the selected *shortening method*. Currently, there are two shortening methods available and can be selected from the *general* section in the *settings menu*. The available methods are:
-		
-		* *Camel Case Shortening* (The default shortening method). This method abbreviate words based on capitalized letter
-		* *Fixed Length Shortening*. This method shortens all concepts to certain number of characters. The number of characters can be adjusted by the user.
-		Note that when shortening two or more concepts leads to identical results, unique *numbers* will be appended to them as suffixes.
-	* **Textualize Axiom** (Button 8): Clicking this button translate the axiom into simple *natural language* text.
+* **Shorten Axiom**: this shortens all concepts appearing in the corresponding axiom according to the selected *shortening method*. Currently, there are two shortening methods available and can be selected from the *general* section in the *settings menu*. The available methods are:
+	
+	* *Camel Case Shortening* (The default shortening method). This method abbreviate words based on capitalized letter
+	* *Fixed Length Shortening*. This method shortens all concepts to certain number of characters. The number of characters can be adjusted by the user.
+	Note that when shortening two or more concepts leads to identical results, unique *numbers* will be appended to them as suffixes.
+* **Textualize Axiom**: this translates the axiom into a simple *natural language* text.
+* **Show Original**: this restores the axiom to its default format (*Description Logic* syntax).
 
 By default, proofs are displayed using a standard *tree layout*. There are two other layout options (*Linear Proof* and *Magic Mode*) that can be found in the proof section of the *settings menu*.
 
@@ -202,15 +202,15 @@ The *Navigation Buttons* of axiom nodes get replaced by the following buttons:
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/node_buttons_magic.png"  style="width:250px"/>
+	  <img src="resources/node_buttons_magic.png"  style="width:300px"/>
 	  <figcaption align = "center">Proof - Axiom Node Buttons</figcaption>
 	</kbd>
 </p>
 
-* **Pull Down** (Button 1): Clicking this button *pulls* an inference out of a *magic* box located *above* the current node. This inference has the current node as a **conclusion**.
-* **Pull Up** (Button 2): Clicking this button *pulls* an inference out of a *magic* box located *below* the current node. This inference has the current node as a **premise**.
-* **Push Up** (Button 3): Clicking this button *pushes* an inference in a *magic* box located *above* the current node. This inference has the current node as a **premise**.
-* **Push Down** (Button 4): Clicking this button *pushes* an inference in a *magic* box located *below* the current node. This inference has the current node as a **conclusion**.
+* **Pull Down** (Button 1): clicking this button *pulls* an inference out of a *magic* box located *above* the current node. This inference has the current node as a **conclusion**.
+* **Pull Up** (Button 2): clicking this button *pulls* an inference out of a *magic* box located *below* the current node. This inference has the current node as a **premise**.
+* **Push Up** (Button 3): clicking this button *pushes* an inference in a *magic* box located *above* the current node. This inference has the current node as a **premise**.
+* **Push Down** (Button 4): clicking this button *pushes* an inference in a *magic* box located *below* the current node. This inference has the current node as a **conclusion**.
 
 <p align="center">
 	<kbd align="center">
@@ -233,10 +233,10 @@ In this view, an ontology is represented as an acyclic directed graph that illus
 <p align="center">
 	<kbd align="center">
 		<kbd align="center">
-		  <img src="resources/ontology_node_signature.png"  style="width:75px"/>
+		  <img src="resources/ontology_node_signature.png"  style="width:100px"/>
 	  	</kbd>
 	  	<kbd align="center">
-		  <img src="resources/ontology_node_axioms.png"  style="width:150px"/>
+		  <img src="resources/ontology_node_axioms.png"  style="width:200px"/>
 		</kbd>
 		<figcaption align = "center">Ontology - Same Node, Signature (left), Full Axioms (right) </figcaption>
 	</kbd>
@@ -277,7 +277,7 @@ Note: by default, the computation of diagnoses depends on the reasoner that was 
 
 ---
 
-Feel free to contact us regarding any issue you encounter. It would be great if you could also include the server output log! If you would like to do so please follow these steps:
+Feel free to contact us regarding any issue you encounter. It would be great if you could also include the server output log! If you would like to do so, please follow these steps.
 
 1. Go to Docker app, and locate the **Containers / Apps** menu.
 2. Select the container that shows next to its label **[your username] / evonne**.
