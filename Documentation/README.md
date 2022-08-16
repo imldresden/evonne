@@ -2,7 +2,7 @@
 
 ----
 
-#####Table of contents
+####Table of contents
 - [Description](#description)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
@@ -32,17 +32,17 @@
 	<details>
   		<summary>Show more!</summary>
 
-		######Issues related to Hyper-V
+		###### Issues related to Hyper-V
 		* Docker will not run if **Virtualization** is disabled. To check its status go to *Task Manager* (Ctrl+Shift+Esc), *Performance* and then *Virtualization*.		
 		* Make sure that the following Windows features (open *Start Menu*, and type *"Turn Windows features on or off"*) are enabled:
 		
-				* Virtual Machine Platform
-				* Hyper-V
+				- Virtual Machine Platform
+				- Hyper-V
 		
 		* If *Virtualization* is disabled, please restart the PC and access the BIOS (usually F11 or F12).
 		Different manufacturers use different labels (VT-x, SVM, etc.). Usually, this can be found in a CPU-related settings menu.
 
-		######Issues related to WSL2
+		###### pleaseIssues related to WSL2
 		* If Docker shows a warning that the installation of WSL2 is not complete, please [downolad](https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package) and install the latest Linux kernel update package as shown in Step 4.
 		
 		If there are other issues related to Docker not starting properly, please check the [troubleshooting](https://docs.docker.com/desktop/windows/troubleshoot/) information.
