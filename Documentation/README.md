@@ -62,8 +62,7 @@
 
 ### Getting Started
 
-To start using **Evonne**, you can either create a new project, or load an already existing one. To create a new project an ontology file need to be selected!
-
+To start using **Evonne**, you can either create a new project, or load an already existing one. To create a new project, the following two arguments need to be specified: an ontology file (.owl or .xml), and a reasoner (ELK or Hermit).
 
 <p align="center">
 	<kbd>
@@ -74,7 +73,7 @@ To start using **Evonne**, you can either create a new project, or load an alrea
 
 The tool also comes with some precomputed examples that can be accessed from the *Play Around* section in the main menu.
 
-One an ontology is loaded, a new menu will appear. There, the following input can be specified:
+Once an ontology is loaded, a new menu will appear. There, the following input can be specified:
 
 * A *concept inclusion* that needs to be proven,
 * the *method* that should be used to generate the proof, and
@@ -88,6 +87,8 @@ One an ontology is loaded, a new menu will appear. There, the following input ca
 </p>
 
 By clicking the *explain* button, both the proof and the ontology views will be populated with the computed structures.
+
+Note: concepts and proof generation methods that are available in this menu depend on the reasoner selection in the previous step.
 
 <p align="center">
 	<kbd align="center">
@@ -270,7 +271,9 @@ When a **Compute Diagnoses** button is clicked, the *diagnoses menu* in the onto
 	</kbd>
 </p> 
  
-The list of diagnoses can be filtered by *locking* nodes (right click) in the ontology graph. Locking means that all axioms of a node must not be changed, hence removing all diagnoses that affect these axioms. 
+The list of diagnoses can be filtered by *locking* nodes (right click) in the ontology graph. Locking means that all axioms of a node must not be changed, hence removing all diagnoses that affect these axioms.
+
+Note: by default, the computation of diagnoses depends on the reasoner that was selected when the project was first created. However, this can be changed from the diagnoses subsection in the ontology section of the *settings menu*.
 
 ---
 
