@@ -10,3 +10,9 @@ externalTools/*
 **/repairs/*.txt
 
 frontend/public/data/*
+
+frontend/public/examples
+frontend/public/js/lib
+
+examples.zip
+tools.zip

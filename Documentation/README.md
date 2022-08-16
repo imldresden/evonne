@@ -1,15 +1,15 @@
 # Evonne
 
----
+----
 
-#### Table of contents 
-1. [Description] (#description)
-1. [Installation] (#installation)
-2. [Getting Started] (#getting-started)
-3. [Proof View] (#proof-view)
-4. [Ontology View] (#ontology-view)
+#####Table of contents
+- [Description](#description)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Proof View](#proof-view)
+- [Ontology View](#ontology-view)
 
----
+----
 
 ### Description
 
