@@ -15,7 +15,7 @@
 
 **Evonne** is a web-application for explaining Description Logic reasoning and ontology debugging.
 
---
+---
 
 ### Installation
 
@@ -58,7 +58,7 @@
 		
 		http://localhost:7007
 
---
+---
 
 ### Getting Started
 
@@ -82,7 +82,7 @@ One an ontology is loaded, a new menu will appear. There, the following input ca
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/input_menu.png" />
+	  <img src="resources/input_menu.png" style="width:500px"/>
 	  <figcaption align = "center">Evonne - Input Menu</figcaption>
 	</kbd>
 </p>
@@ -114,7 +114,7 @@ In the top right corner, the *menu bar* is located. Buttons from left to right a
 By default, the *proof* and *ontology* views are displayed side-by-side in the same tab (as shown in the overview screenshot).
 Exporting a proof (similarly an ontology) graph to a separate tab can be achieved by clicking <img src="resources/export_graph.png"  style="width:1.2em"/> which is located in the proof (ontology) menu. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:1.2em"/>.
 
---
+---
 
 ### Proof View
 
@@ -223,7 +223,7 @@ Basically, a *push* action hides an inference, whereas a *pull* action shows an 
 
 By default, Evonne fits the entirety of a proof inside the proof view which can lead to an overlap of nodes. Adjusting the *hight* and *width* of a proof can be done from the compactness subsection in the *settings menu*. However, by toggling off the *overlap allowed* option in the setting menu, Evonne disregards the borders of a proof graph and place all nodes without having them overlap.
 
---
+---
   
 ### Ontology View
 
