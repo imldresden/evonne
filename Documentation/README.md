@@ -100,7 +100,7 @@ In the top right corner, the *menu bar* is located. Buttons from left to right a
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/top_menu.png"  style="width:350px"/>
+	  <img src="resources/top_menu.png"  style="width:150px"/>
 	  <figcaption align = "center">Evonne - Menu Bar Buttons</figcaption>
 	</kbd>
 </p>
