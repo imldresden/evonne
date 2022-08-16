@@ -2,7 +2,7 @@
 
 ----
 
-####Table of contents
+#### Table of contents
 - [Description](#description)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
@@ -136,7 +136,7 @@ Every axiom node in a proof is equipped with its own buttons and are the followi
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/node_buttons.png"  style="width:250px"/>
+	  <img src="resources/node_buttons.png"  style="width:500px"/>
 	  <figcaption align = "center">Proof - Axiom Node Buttons</figcaption>
 	</kbd>
 </p>
@@ -202,7 +202,7 @@ The *Navigation Buttons* of axiom nodes get replaced by the following buttons:
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/node_buttons_magic.png"  style="width:300px"/>
+	  <img src="resources/node_buttons_magic.png"  style="width:500px"/>
 	  <figcaption align = "center">Proof - Axiom Node Buttons</figcaption>
 	</kbd>
 </p>
