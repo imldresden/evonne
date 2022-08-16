@@ -112,7 +112,7 @@ In the top right corner, the *menu bar* is located. Buttons from left to right a
 5. Settings Menu
 
 By default, the *proof* and *ontology* views are displayed side-by-side in the same tab (as shown in the overview screenshot).
-Exporting a proof (similarly an ontology) graph to a separate tab can be achieved by clicking <img src="resources/export_graph.png"  style="width:15px"/> which is located in the proof (ontology) menu. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:15px"/>.
+Exporting a proof (similarly an ontology) graph to a separate tab can be achieved by clicking <img src="resources/export_graph.png"  style="width:16px"/> which is located in the proof (ontology) menu. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:16px"/>.
 
 ---
 
@@ -122,20 +122,20 @@ Every proof has exactly one *purple* node representing the final conclusion. *Gr
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/intersection_composition_instatnce.png"  style="width:350px"/>
+	  <img src="resources/intersection_composition_instatnce.png"  style="width:250px"/>
 	  <figcaption align = "center">Proof - Intersection Composition</figcaption>
 	</kbd>
 </p>
 
 Currently, this feature is only available for proofs generated using a method that uses the *ELK reasoner*. lastly, *dark gray* nodes, labelled with "*Known*", represent the condensed parts of a proof due to the uploaded *signature* file.
 
-Clicking on an edge that has an axiom node as its source *cuts* the subproof (subtree) from the original structure and displays it on its own. Clicking on the newly added root node <img src="resources/artificial_root_node.png"  style="width:1.2em"/> restores the original proof.
+Clicking on an edge that has an axiom node as its source *cuts* the subproof (subtree) from the original structure and displays it on its own. Clicking on the newly added root node <img src="resources/artificial_root_node.png" style="width:16px"/> restores the original proof.
 
 Every axiom node in a proof is equipped with its own buttons and are the following:
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/node_buttons.png"  style="width:350px"/>
+	  <img src="resources/node_buttons.png"  style="width:250px"/>
 	  <figcaption align = "center">Proof - Axiom Node Buttons</figcaption>
 	</kbd>
 </p>
@@ -171,7 +171,7 @@ Every axiom node in a proof is equipped with its own buttons and are the followi
 
 By default, proofs are displayed using a standard *tree layout*. There are two other layout options (*Linear Proof* and *Magic Mode*) that can be found in the proof section of the *settings menu*.
 
-Nodes are ordered vertically in a linear proof, and gray nodes are dropped. instead, the **Highlight Inference** button <img src="resources/button_highlight_inference.png"  style="width:1.2em"/> is added to axiom nodes. Clicking this button triggers the same functionality of gray nodes in the standard tree proof, and in addition, it highlights nodes and edges that correspond to the current inference in the proof graph.
+Nodes are ordered vertically in a linear proof, and gray nodes are dropped. instead, the **Highlight Inference** button <img src="resources/button_highlight_inference.png"  style="width:16px"/> is added to axiom nodes. Clicking this button triggers the same functionality of gray nodes in the standard tree proof, and in addition, it highlights nodes and edges that correspond to the current inference in the proof graph.
 
 By default, nodes in a linear Proof are arranged in a way that prevents edges from intersecting. This can lead to large distance between nodes that constitute an inference. By toggling *optimize premise distance*, the nodes are rearranged in a fashion that minimizes that distance.
 
@@ -201,7 +201,7 @@ The *Navigation Buttons* of axiom nodes get replaced by the following buttons:
 
 <p align="center">
 	<kbd align="center">
-	  <img src="resources/node_buttons_magic.png"  style="width:350px"/>
+	  <img src="resources/node_buttons_magic.png"  style="width:250px"/>
 	  <figcaption align = "center">Proof - Axiom Node Buttons</figcaption>
 	</kbd>
 </p>
@@ -232,10 +232,10 @@ In this view, an ontology is represented as an acyclic directed graph that illus
 <p align="center">
 	<kbd align="center">
 		<kbd align="center">
-		  <img src="resources/ontology_node_signature.png"  style="width:155px"/>
+		  <img src="resources/ontology_node_signature.png"  style="width:75px"/>
 	  	</kbd>
 	  	<kbd align="center">
-		  <img src="resources/ontology_node_axioms.png"  style="width:300px"/>
+		  <img src="resources/ontology_node_axioms.png"  style="width:150px"/>
 		</kbd>
 		<figcaption align = "center">Ontology - Same Node, Signature (left), Full Axioms (right) </figcaption>
 	</kbd>
