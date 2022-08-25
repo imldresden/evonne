@@ -3,17 +3,16 @@ node_modules
 package-lock.json
 .DS_Store
 **/.DS_Store
-externalTools/*
 **/*.pyc
 **/ocrs.txt
 **.log
 **/repairs/*.txt
 
 frontend/public/data/*
-
 frontend/public/examples
+
 frontend/public/js/lib
 frontend/public/style/lib
-
+externalTools/*
 examples.zip
 tools.zip
