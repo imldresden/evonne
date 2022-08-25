@@ -8,9 +8,7 @@
 
 <link rel="stylesheet" href="/style/lib/normalize.css">
 <link rel="stylesheet" href="/style/lib/materialize.min.css">
-
-<link rel="stylesheet" href="/style/lib/material-icons.css">  
-<link rel="stylesheet" href="/style/lib/roboto-latin.css">
-
+<link rel="stylesheet" href="/style/font/material-icons.css">  
+<link rel="stylesheet" href="/style/font/roboto-latin.css">
 
 <link rel="stylesheet" href="/style/widgets/general.css">
