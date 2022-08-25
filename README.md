@@ -28,7 +28,7 @@
 
 ## Heroku deployment:
 * The Procfile defines the only command that will be run explicitly in the heroku container
-* The heroku container is linked to the `heroku` branch. To deploy a current version: `git push heroku master`
+* The heroku container is linked to the `heroku` branch. To deploy a current version: `git push heroku main`
 * To set up a different container, use: 
   `heroku create` creates the heroku app with the linked heroku account in the terminal 
   `heroku buildpacks:set heroku/nodejs` to run the main node js app. 
