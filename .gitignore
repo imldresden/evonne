@@ -13,7 +13,7 @@ frontend/public/data/*
 
 frontend/public/examples
 frontend/public/js/lib
-frontend/public/css/lib
+frontend/public/style/lib
 
 examples.zip
 tools.zip
