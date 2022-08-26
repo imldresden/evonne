@@ -24,7 +24,8 @@
         "uuid": "^8.3.2"
     },
     "scripts": {
-        "start": "npm run download-libs && npm run download-jars && npm run download-examples && node server.js",
+        "download-all": "npm run download-libs && npm run download-jars && npm run download-examples",
+        "start": "npm run download-all && node server.js",
         "dev": "node server.js",
         "start-ci": "PORT=7007 forever start server.js",
         "stop-ci": "forever stopall",

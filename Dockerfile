@@ -49,7 +49,7 @@ COPY .env ./
 COPY server.js ./
 
 ### 6. jars and external libs
-RUN npm run update 
+RUN npm run download-all 
 
 ### 7. ensure fs permissions
 USER root
