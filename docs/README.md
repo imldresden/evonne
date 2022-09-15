@@ -19,12 +19,11 @@
 
 To start using **Evonne**, you can either create a new project, or load an already existing one. To create a new project, the following two arguments need to be specified: an ontology file (.owl or .xml), and a reasoner (ELK or Hermit).
 
-<p align="center">
+
 	<figure>
 	  <img src="resources/main_menu.png" />
 	  <figcaption align = "center">Evonne - Main Menu</figcaption>
-	</figure>
-</p>
+	</figure
 
 The tool also comes with some precomputed examples that can be accessed from the *Play Around* section in the main menu.
 
@@ -34,32 +33,29 @@ Once an ontology is loaded, a new menu will appear. There, the following input c
 * the *method* that should be used to generate the proof, and
 * an optional *signature file* for specifying known terms.
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/input_menu.png" style="width:500px"/>
 	  <figcaption align = "center">Evonne - Input Menu</figcaption>
-	</figure>
-</p>
+	</figure
 
 By clicking the *explain* button, both the proof and the ontology views will be populated with the computed structures.
 
 Note: concepts and proof generation methods that are available in this menu depend on the reasoner selection in the previous step.
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/views_overview.png" />
 	  <figcaption align = "center">Evonne - Overview</figcaption>
-	</figure>
-</p>
+	</figure
 
 In the top right corner, the *menu bar* is located. Buttons from left to right are the following:
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/top_menu.png"  style="width:200px"/>
 	  <figcaption align = "center">Evonne - Menu Bar Buttons</figcaption>
-	</figure>
-</p>
+	</figure
 
 1. Input Menu 
 2. Proof Menu
@@ -76,12 +72,11 @@ Exporting a proof (similarly an ontology) graph to a separate tab can be achieve
 
 Every proof has exactly one *purple* node representing the final conclusion. *Green* nodes in a proof represent axioms asserted in the ontology and from which the final conclusion is derived. *Blue* nodes represent inferred axioms. *Gray* nodes represent the label of a logical inference. Clicking a gray node shows a "Rule Explanation" tooltip that contains more details about an inference. 
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/intersection_composition_instatnce.png"  style="width:250px"/>
 	  <figcaption align = "center">Intersection Composition - Rule Explanation Tooltip</figcaption>
-	</figure>
-</p>
+	</figure
 
 Currently, this feature is only available for proofs generated using a method that uses the *ELK reasoner*. lastly, *dark gray* nodes, labelled with "*Known*", represent the condensed parts of a proof due to the uploaded *signature* file.
 
@@ -89,12 +84,11 @@ Clicking on an edge that has an axiom node as its source *cuts* the subproof (su
 
 Every axiom node in a proof is equipped with its own buttons and are the following:
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/node_buttons.png"  style="width:500px"/>
 	  <figcaption align = "center">Proof - Axiom Node Buttons</figcaption>
-	</figure>
-</p>
+	</figure
 
 * *Navigation Buttons* (Buttons 3, 4 and 5) which manipulate the structure of a proof (available on *hover*)
 	
@@ -106,12 +100,11 @@ Every axiom node in a proof is equipped with its own buttons and are the followi
 
 	* **Compute Diagnoses** (Button 1): clicking this button triggers the computation of all minimal diagnoses of the corresponding axiom. These diagnoses are grouped by size and displayed in the *diagnoses menu* located in the ontology view.
 	
-	<p align="center">
+	
 		<figure align="center">
 		  <img src="resources/diagnoses_menu.png"  style="width:350px"/>
 		  <figcaption align = "center">Ontology - Diagnoses Menu</figcaption>
 		</figure>
-	</p>
 	
 	* **Highlight Justification** (Button 2): clicking this button highlights the ontology axioms used to generate the current proof as well as the nodes that contain them in the *ontology* view. 
 
@@ -131,7 +124,7 @@ Nodes are ordered vertically in a linear proof, and gray nodes are dropped. inst
 
 By default, nodes in a linear Proof are arranged in a way that prevents edges from intersecting. This can lead to large distance between nodes that constitute an inference. By toggling *optimize premise distance*, the nodes are rearranged in a fashion that minimizes that distance.
 
-<p align="center">
+
 	<figure align="center">
 		<figure align="center">
 		  <img src="resources/linear_proof1.png"  style="height:400px"/>
@@ -140,39 +133,35 @@ By default, nodes in a linear Proof are arranged in a way that prevents edges fr
 		  <img src="resources/linear_proof2.png"  style="height:400px"/>
 		</figure>
 		<figcaption align = "center">Linear Proof - Planar (left), Optimized Premise Distance (right) </figcaption>
-	</figure>
-</p>
+	</figure
 
 The proof layout in the *magic mode* is a special tree layout that allows the exploration of the proof in both directions (bottom-up and top-down). 
 The initial state a proof in this mode summarizes the entire proof to a single **Magic** inference.
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/magic_proof_init.png"  style="width:800px"/>
 	  <figcaption align = "center">Magic Proof - Initial State</figcaption>
-	</figure>
-</p>
+	</figure
 
 The *Navigation Buttons* of axiom nodes get replaced by the following buttons:
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/node_buttons_magic.png"  style="width:500px"/>
 	  <figcaption align = "center">Proof - Axiom Node Buttons</figcaption>
-	</figure>
-</p>
+	</figure
 
 * **Pull Down** (Button 1): clicking this button *pulls* an inference out of a *magic* box located *above* the current node. This inference has the current node as a **conclusion**.
 * **Pull Up** (Button 2): clicking this button *pulls* an inference out of a *magic* box located *below* the current node. This inference has the current node as a **premise**.
 * **Push Up** (Button 3): clicking this button *pushes* an inference in a *magic* box located *above* the current node. This inference has the current node as a **premise**.
 * **Push Down** (Button 4): clicking this button *pushes* an inference in a *magic* box located *below* the current node. This inference has the current node as a **conclusion**.
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/magic_actions.png"/>
 	  <figcaption align = "center">Magic Proof - Push and Pull Actions</figcaption>
-	</figure>
-</p>
+	</figure
 
 
 Basically, a *push* action hides an inference, whereas a *pull* action shows an inference. Note that *pull* actions can eliminate *magic rule* nodes, and *push* actions can create new ones.
@@ -185,7 +174,7 @@ By default, Evonne fits the entirety of a proof inside the proof view which can 
 
 In this view, an ontology is represented as an acyclic directed graph that illustrates a dependency between groups of ontology axioms (nodes). Initially, these groups are summarized by the **signature** of their axioms while taking the dependency of nodes into consideration.
 
-<p align="center">
+
 	<figure align="center">
 		<figure align="center">
 		  <img src="resources/ontology_node_signature.png"  style="width:100px"/>
@@ -194,8 +183,7 @@ In this view, an ontology is represented as an acyclic directed graph that illus
 		  <img src="resources/ontology_node_axioms.png"  style="width:200px"/>
 		</figure>
 		<figcaption align = "center">Ontology - Same Node, Signature (left), Full Axioms (right) </figcaption>
-	</figure>
-</p>
+	</figure
 
 This can be toggled of in the ontology section of the *settings menu* which reveals the axioms of all nodes in the ontology graph.
 
@@ -210,21 +198,19 @@ In the *layout simulation* subsection of the ontology view setting, the followin
 
 When a **Highlight Justification** button is clicked in the proof view, the axioms of the justification used to prove the axiom of that node, as well as the nodes of the justification axioms will be highlighted. 
 
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/justification_highlight.png"/>
 	  <figcaption align = "center">Ontology - Highlight Justification</figcaption>
-	</figure>
-</p> 
+	</figure 
 
 When a **Compute Diagnoses** button is clicked, the *diagnoses menu* in the ontology view is populated. *Clicking* or *Hovering* over a *diagnosis*, highlights the nodes that will be affected by modifying the axioms of this diagnosis in the ontology. 
  
-<p align="center">
+
 	<figure align="center">
 	  <img src="resources/diagnosis_highlight.png"/>
 	  <figcaption align = "center">Ontology - Diagnosis Impact</figcaption>
-	</figure>
-</p> 
+	</figure 
  
 The list of diagnoses can be filtered by *locking* nodes (right click) in the ontology graph. Locking means that all axioms of a node must not be changed, hence removing all diagnoses that affect these axioms.
 
