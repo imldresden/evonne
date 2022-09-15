@@ -50,7 +50,7 @@ Note: concepts and proof generation methods that are available in this menu depe
 	</kbd>
 </p>
 
-In the top right corner, the *menu bar* is located. Buttons from left to right are the following:
+In the top right corner, the *menu bar* is located. The buttons, from left to right are for the Input, Proof, Ontology, Diagnoses and Settings Menus:
 
 <p align="center">
 	<kbd align="center">
@@ -58,20 +58,14 @@ In the top right corner, the *menu bar* is located. Buttons from left to right a
 	</kbd>
 </p>
 
-1. Input Menu 
-2. Proof Menu
-3. Ontology Menu
-4. Diagnoses Menu
-5. Settings Menu
-
 By default, the *proof* and *ontology* views are displayed side-by-side in the same tab (as shown in the overview screenshot).
-Exporting a proof (similarly an ontology) graph to a separate tab can be achieved by clicking <img src="resources/export_graph.png"  style="width:16px"/> which is located in the proof (ontology) menu. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:16px"/>.
+Opening a linked *proof* or *ontology* view on a separate tab can be achieved by clicking <img src="resources/export_graph.png" style="width:16px"/> which are located in the *ontology* and *proof* menus respectively. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:16px"/>.
 
 ---
 
 ### Proof View
 
-Every proof has exactly one *purple* node representing the final conclusion. *Green* nodes in a proof represent axioms asserted in the ontology and from which the final conclusion is derived. *Blue* nodes represent inferred axioms. *Gray* nodes represent the label of a logical inference. Clicking a gray node shows a "Rule Explanation" tooltip that contains more details about an inference. 
+Every proof has exactly one *purple* node representing the final conclusion. *Green* nodes in a proof represent axioms asserted in the ontology and from which the final conclusion is derived. *Blue* nodes represent inferred axioms. *Gray* nodes represent the label of a logical inference. Clicking a gray node shows a "Rule Explanation" tooltip that contains more details about an inference, for example:
 
 <p align="center">
 	<kbd align="center">
@@ -79,7 +73,7 @@ Every proof has exactly one *purple* node representing the final conclusion. *Gr
 	</kbd>
 </p>
 
-Currently, this feature is only available for proofs generated using a method that uses the *ELK reasoner*. lastly, *dark gray* nodes, labelled with "*Known*", represent the condensed parts of a proof due to the uploaded *signature* file.
+Currently, this feature is only available for proofs generated using a method that uses the *ELK reasoner*. Lastly, *dark gray* nodes, with the label "*Known*" represent the condensed parts of a proof due to the uploaded *signature* file.
 
 Clicking on an edge that has an axiom node as its source *cuts* the subproof (subtree) from the original structure and displays it on its own. Clicking on the newly added root node <img src="resources/artificial_root_node.png" style="width:16px"/> restores the original proof.
 
