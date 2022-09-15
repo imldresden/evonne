@@ -1,4 +1,4 @@
-# Evonne: How to use it: 
+# Evonne
 
 ## Using Docker:
 * Install docker, run `docker build . -t <your username>/evonne`. 
@@ -18,7 +18,7 @@
 ## Deployment:
 ### Heroku: 
 * The files `Procfile`, `system.properties`, `requirements.txt` and `runtime.txt` are used by heroku. 
-* To deploy to heroku, create an app, link it as a remote (`git remote add heroku`) and deploy with: `git push heroku main`.
+* Create/connect your heroku app, run `git remote add heroku` and deploy with: `git push heroku main`.
 ### Gitlab: 
 * An example of continuous integration for gitlab, using docker: `evonne.gitlab-ci.yml`.
-* Add as a remote `git remote add deploy <the_gitlab_repo>`, then deploy with `git push deploy main`.
+* Add the remote `git remote add deploy <the_gitlab_repo>`, then deploy with `git push deploy main`.
