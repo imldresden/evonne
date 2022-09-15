@@ -74,9 +74,9 @@ Exporting a proof (similarly an ontology) graph to a separate tab can be achieve
 Every proof has exactly one *purple* node representing the final conclusion. *Green* nodes in a proof represent axioms asserted in the ontology and from which the final conclusion is derived. *Blue* nodes represent inferred axioms. *Gray* nodes represent the label of a logical inference. Clicking a gray node shows a "Rule Explanation" tooltip that contains more details about an inference. 
 
 <p align="center">
-	<figure align="center">
+	<kbd align="center">
 	  <img src="resources/intersection_composition_instatnce.png"  style="width:250px"/>
-	</figure>
+	</kbd>
 </p>
 
 Currently, this feature is only available for proofs generated using a method that uses the *ELK reasoner*. lastly, *dark gray* nodes, labelled with "*Known*", represent the condensed parts of a proof due to the uploaded *signature* file.
