@@ -103,8 +103,7 @@ Every axiom node in a proof is equipped with its own buttons and are the followi
 	
 	<p align="center">
 		<kbd align="center">
-		  <img src="resources/diagnoses_menu.png"  style="width:350px"/>
-
+		  <img src="resources/diagnoses_menu.png" style="width:350px"/>
 		</kbd>
 	</p>
 	
