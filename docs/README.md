@@ -213,12 +213,4 @@ Note: by default, the computation of diagnoses depends on the reasoner that was 
 
 ---
 
-Feel free to contact us regarding any issue you encounter. It would be great if you could also include the server output log! If you would like to do so, please follow these steps.
-
-1. Go to Docker app, and locate the **Containers / Apps** menu.
-2. Select the container that shows next to its label **[your username] / evonne**.
-3. Click the *copy to clipboard* button. 
-
-	![copy](resources/cpy2cb.png)
-
-4. Go to any text editor, past the copied text and save it to a new file. 
+Feel free to contact us regarding any issue you encounter. If possible, please incorporate the server output that is printed to the terminal where Evonne is running (either locally or on the docker container). 
