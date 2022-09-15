@@ -12,7 +12,7 @@
 
 ### Running the server:
 * Run `npm install`
-* Running `npm start` will download the necessary .jars and libs, then make the app available at: `https://localhost:3000`. 
+* Running `npm start` will download the necessary files and start the app at: `https://localhost:3000`. 
 * If you want to skip the downloads and only run, use `npm run dev` instead.
 
 ## Deployment:
@@ -22,13 +22,3 @@
 ### Gitlab: 
 * An example of continuous integration for gitlab, using docker: `evonne.gitlab-ci.yml`.
 * Add as a remote `git remote add deploy <the_gitlab_repo>`, then deploy with `git push deploy main`.
-
-## Jar commands: 
-* Extract names: `java -jar extractNames.jar -o <ontology> -od <outputDir>`, 
-  produces `cnsHierarchy.json` (class hierarchy) and `cnsOriginal.json` (concept names and URLs)
-* Generate proofs of an axiom: `java -jar explain.jar -o <ontology> -a <axiom> -m graph -od <outputDir> -po <proofFilesPrefix>`, 
-  produces proofs `<outputDir>/`, evonne uses `.t.xml` and `.ht.xml`
-* Compute atomic decomposition: `java -jar explain.jar -o <ontology> -a <axiom> -ad <atomicDecompositionName> -od <outputDir>`, 
-  produces `<outputDir>/ad_module.owl.xml`
-* Compute diagnoses: `java -jar explain.jar -o <ontology> -a <axiom> -mds <mdsID> -od <outputDir>`, 
-  produces `<outputDir>/mDs_<mds_id>.txt`
