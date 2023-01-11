@@ -333,6 +333,9 @@ function drawGraph() {
       );
       updateLabels = true;
       simulate();
+    })
+    .on("dblclick", function (d) {
+      socket.emit("euler view", {id: d.id, parent: d.parentId, axioms: d.axioms.split("\n")})
     });
 
   nodes
