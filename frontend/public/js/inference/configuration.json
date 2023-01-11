@@ -1,0 +1,93 @@
+{
+  "Operators": {
+    "Inclusion": {
+      "Symbol": "⊑",
+      "Read": "all A are B",
+      "FunctionIdentifier": "evaluateSubSums",
+      "Precedence": 2,
+      "Style": ""
+    },
+    "Equivalence": {
+      "Symbol": "≡",
+      "Read": "A is equivalent to D",
+      "FunctionIdentifier": "evaluateEquivalence",
+      "Precedence": 1,
+      "Style": ""
+    },
+    "Intersection": {
+      "Symbol": "⊓",
+      "Read": "A and B",
+      "FunctionIdentifier": "evaluateIntersection",
+      "Precedence": 3,
+      "Style": ""
+    },
+    "Union": {
+      "Symbol": "⊔",
+      "Read": "A or B",
+      "FunctionIdentifier": "evaluateUnion",
+      "Precedence": 3,
+      "Style": ""
+    },
+    "Disjoint": {
+      "Symbol": "disjoint",
+      "Read": "range",
+      "FunctionIdentifier": "evaluateDisjoint",
+      "Precedence": 3,
+      "Style": ""
+    },
+    "Domain": {
+      "Symbol": "domain",
+      "Read": "range",
+      "FunctionIdentifier": "evaluateSpecialOperator",
+      "Precedence": 3,
+      "Style": ""
+    },
+    "Range": {
+      "Symbol": "range",
+      "Read": "range",
+      "FunctionIdentifier": "evaluateSpecialOperator",
+      "Precedence": 3,
+      "Style": ""
+    }
+  },
+  "Colors": ["#4682b4",
+    "#a0522d",
+    "#483d8b",
+    "#556b2f",
+    "#800000",
+    "#00ff00",
+    "#808000",
+    "#008000",
+    "#3cb371",
+    "#008080",
+    "#bdb76b",
+    "#000080",
+    "#9acd32",
+    "#32cd32",
+    "#daa520",
+    "#7f007f",
+    "#9932cc",
+    "#ff4500",
+    "#00ced1",
+    "#ff8c00",
+    "#0000cd",
+    "#00fa9a",
+    "#e9967a",
+    "#dc143c",
+    "#00bfff",
+    "#adff2f",
+    "#ff7f50",
+    "#ff00ff",
+    "#1e90ff",
+    "#db7093",
+    "#ffff54",
+    "#dda0dd",
+    "#ff1493",
+    "#7b68ee",
+    "#afeeee",
+    "#ee82ee",
+    "#7fffd4",
+    "#ffe4c4",
+    "#ffc0cb"]
+}
+
