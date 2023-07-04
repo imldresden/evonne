@@ -28,6 +28,8 @@ export const APP_GLOBALS = {
   drawTime: 750,
   shorteningVarName: "shorteningMode",
   shorteningMethod: "camel",
+  shortenAllInProof:false,
+  shortenAllInOntology:false,
   isLinear: false,
   isDistancePriority: true,
 }

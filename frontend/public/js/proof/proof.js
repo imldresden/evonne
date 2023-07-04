@@ -388,9 +388,11 @@ function getFileName() {
 
 function updateShorteningButton(original, shortenAllInProofBtn){
   if (!original){
+    app.shortenAllInProof = true;
     shortenAllInProofBtn.textContent = "Undo shortening";
     shortenAllInProofBtn.title = "Undo shortening effect in the proof";
   }else{
+    app.shortenAllInProof = false;
     shortenAllInProofBtn.textContent = "Shorten all";
     shortenAllInProofBtn.title = "Shorten all text in the proof";
   }
