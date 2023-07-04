@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {response} from 'express';
 import sprightly from 'sprightly';
 import http from 'http';
 import io from 'socket.io';
@@ -96,6 +96,18 @@ app.get('/proof', (req, res) => {
       general_settings: '<< menus/shortening >>'
     });
   }
+});
+
+app.get('/euler', (request, response) => {
+  response.render('euler/euler.spy')
+});
+
+app.get('/inference', (request, response) => {
+  response.render('inference/inference.spy');
+});
+
+app.get("/counterexample", (request, response) => {
+  response.render("counterexample/counterexample.spy", {settings_specific: '<< counterexample/settings >>'});
 });
 
 // resources
@@ -427,6 +439,23 @@ io_.on('connection', function (socket) {
       delete sessions[id];
     }
   });
+
+  socket.on('euler view', function (data) {
+    console.log("Received the following for euler view!")
+    console.log(data);
+    console.log("Broadcasting...")
+  
+    io_.sockets.emit('euler view', data);
+  });
+
+  socket.on('inference view', function (data) {
+    console.log("Received the following for inference view!")
+    console.log(data);
+    console.log("Broadcasting...")
+  
+    io_.sockets.emit('inference view', data);
+  });
+
 });
 
 // 141.76.67.176
