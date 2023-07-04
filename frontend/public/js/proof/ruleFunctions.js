@@ -88,7 +88,7 @@ export class InferenceRulesHelper {
 				break;
 
 			case EXISTENTIAL_PROPERTY_EXPANSION:
-				this.existentialPropertyExpansion(premise, tooltip);
+				this.existentialPropertyExpansion(premise, conclusion, tooltip);
 				break;
 
 			case INTERSECTION_COMPOSITION:
@@ -429,11 +429,11 @@ export class InferenceRulesHelper {
 			.append("span").attr("class", "text-black").text(rHS2);
 	}
 
-	//TODO TEST THIS ONE
-
-	existentialPropertyExpansion(premise, tooltip) {
+	existentialPropertyExpansion(premise, conclusion, tooltip) {
 		let lHS = premise[0].split(subsumes)[0].trim();
 		let rHS = premise[0].split(subsumes)[1].trim();
+
+		let filler = conclusion.substring(conclusion.lastIndexOf(".") + 1);
 
 		displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
 			.attr("id", "explanationTextSpan");
@@ -460,11 +460,11 @@ export class InferenceRulesHelper {
 			.append("span")
 			.append("span").attr("class", "text-green").text(exists)
 			.append("span").attr("class", "text-black").text(lHS)
-			.append("span").attr("class", "text-green").text(dotTop)
+			.append("span").attr("class", "text-green").text(dot + filler)
 			.append("span").attr("class", "text-black").text(subsumesDisplay)
 			.append("span").attr("class", "text-green").text(exists)
 			.append("span").attr("class", "text-black").text(rHS)
-			.append("span").attr("class", "text-green").text(dotTop);
+			.append("span").attr("class", "text-green").text(dot + filler);
 	}
 
 	addExistentialPropertyExpansionAbstract(displayObject) {
@@ -480,11 +480,11 @@ export class InferenceRulesHelper {
 			.append("span")
 			.append("span").attr("class", "text-green").text(exists)
 			.append("span").attr("class", "text-black").text("R")
-			.append("span").attr("class", "text-green").text(dotTop)
+			.append("span").attr("class", "text-green").text(dot + c1)
 			.append("span").attr("class", "text-black").text(subsumesDisplay)
 			.append("span").attr("class", "text-green").text(exists)
 			.append("span").attr("class", "text-black").text("S")
-			.append("span").attr("class", "text-green").text(dotTop);
+			.append("span").attr("class", "text-green").text(dot + c1);
 	}
 
 	intersectionComposition(premise, tooltip) {
