@@ -2,7 +2,7 @@ import express, {response} from 'express';
 import sprightly from 'sprightly';
 import http from 'http';
 import io from 'socket.io';
-import { spawn, spawnSync } from 'child_process';
+import { spawn } from 'child_process';
 import {
   unlink,
   existsSync,
@@ -15,7 +15,6 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from "module";
 import * as path from 'path';
-
 
 const require = createRequire(import.meta.url);
 require('dotenv').config();
@@ -31,6 +30,7 @@ app.engine('spy', sprightly);
 app.set('views', './frontend/views');
 app.set('view engine', 'spy');
 app.use(express.static('./frontend/public')); // serve the "public" directory
+app.use('/libs', express.static('./node_modules'));
 app.use(upload());
 
 const http_ = http.createServer(app);
