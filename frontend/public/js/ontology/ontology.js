@@ -82,6 +82,166 @@ function createContent(data) {
 
   simulate();
   update(); 
+
+  /*
+  let elements = {
+    nodes: nodeData.map(d => { return { data: d }}),
+    edges: edgeData.map(d => { return { data: { source: d.source.id, target: d.target.id, rest: d } }})
+  }
+
+  let sample1_constraints = {
+    "fixedNodeConstraint": [
+        {
+            "nodeId": "f1",
+            "position": {
+                "x": -150,
+                "y": -100
+            }
+        },
+        {
+            "nodeId": "f2",
+            "position": {
+                "x": -50,
+                "y": -150
+            }
+        },
+        {
+            "nodeId": "f3",
+            "position": {
+                "x": 100,
+                "y": 150
+            }
+        }
+    ]
+  };
+
+  let defaultStylesheet = [
+    {
+        selector: 'node',
+        style: {
+            'background-color': '#bdd3d4',
+            'label': 'data(id)',
+            'text-valign': 'center',
+            'background-opacity': 0.7
+        }
+    },
+
+    {
+        selector: ':parent',
+        style: {
+            'background-color': '#e8e8e8',
+            'border-color': '#DADADA',
+            'text-valign': 'bottom'
+        }
+    },
+
+    {
+        selector: 'edge',
+        style: {
+            'curve-style': 'straight',
+            'line-color': '#bdd3d4'
+        }
+    },
+
+    {
+        selector: 'node:selected',
+        style: {
+            'background-color': '#33ff00',
+            'border-color': '#22ee00'
+        }
+    },
+
+    {
+        selector: 'node.fixed',
+        style: {
+            'shape': 'diamond',
+            'background-color': '#9D9696',
+        }
+    },
+
+    {
+        selector: 'node.fixed:selected',
+        style: {
+            'background-color': '#33ff00',
+        }
+    },
+
+    {
+        selector: 'node.alignment',
+        style: {
+            'shape': 'round-heptagon',
+            'background-color': '#fef2d1',
+        }
+    },
+
+    {
+        selector: 'node.alignment:selected',
+        style: {
+            'background-color': '#33ff00',
+        }
+    },
+
+    {
+        selector: 'node.relative',
+        style: {
+            'shape': 'rectangle',
+            'background-color': '#fed3d1',
+        }
+    },
+
+    {
+        selector: 'node.relative:selected',
+        style: {
+            'background-color': '#33ff00',
+        }
+    },
+
+    {
+        selector: 'edge:selected',
+        style: {
+            'line-color': '#33ff00'
+        }
+    }
+  ];
+
+  let constraints = {
+    fixedNodeConstraint: undefined,
+    alignmentConstraint: undefined,
+    relativePlacementConstraint: undefined
+  };
+
+  cytoscape({
+    container: document.getElementById('ontology-container'),
+    ready: function () {
+        this.layoutUtilities({
+            desiredAspectRatio: this.width() / this.height()
+        });
+  
+        this.nodes().forEach(function (node) {
+          let size = Math.random() * 40 + 30;
+          node.css({
+            "width": size,
+            "height": size
+          });
+        });
+
+        let initialLayout = this.layout({ 
+          name: 'fcose', 
+          step: 'all', 
+          animationEasing: 'ease-out', 
+          
+        });
+        initialLayout.pon('layoutstart').then(function (event) {
+            constraints.fixedNodeConstraint = JSON.parse(JSON.stringify(sample1_constraints.fixedNodeConstraint));
+        });
+        initialLayout.run();
+    },
+    layout: { name: 'preset', nodeSpacing: 15,},
+    style: defaultStylesheet,
+    elements: elements,
+    wheelSensitivity: 0.3
+  });
+  /**/
 }
 
 function simulate({
@@ -183,7 +343,6 @@ function simulate({
   
   if (nodes) {
     nodes.call(simulation.drag);
-    tick();
   }
 }
 
@@ -327,12 +486,13 @@ function drawGraph() {
     })
     .on("click", function (d) {
       d.revealed = !d.revealed;
+      d.fx = d.x;
+      d.fy = d.y;
       d3.select(this).select(".node-eye").attr(
         "href",
         d.revealed ? "../icons/eye-crossed.svg" : "../icons/eye.svg"
       );
       updateLabels = true;
-      simulate();
     })
     .on("dblclick", function (d) {
       socket.emit("euler view", {id: d.id, parent: d.parentId, axioms: d.axioms.split("\n")})
@@ -841,3 +1001,4 @@ function documentFunction(e){
   }
   simulate();
 }
+
