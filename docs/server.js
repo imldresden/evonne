@@ -1,10 +1,10 @@
 import express from 'express';
 import http from 'http';
 
+// minimal server for dev
 const PORT = process.env.PORT || 3000;
 const app = express();
-app.use(express.static('./public'));
-app.use('/libs', express.static('./node_modules'));
+app.use(express.static('./'));
 const http_ = http.createServer(app);
 
 http_.listen(PORT, function () {

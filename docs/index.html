@@ -3,8 +3,12 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title> Explaining Reasoning </title>
+	<title> Understanding OWL Reasoning </title>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.2/dist/semantic.min.css" rel="stylesheet" type="text/css">
+	<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.2/dist/semantic.min.js"></script>
 
 	<link rel="stylesheet" href="./css/style.css" />
 </head>
@@ -12,25 +16,231 @@
 <body>
 	<main>
 		<section id="intro">
-			<h1 class="intro__hed">Sticky Side Example</h1>
-			<p class="intro__dek">
-				Start scrolling to see how it works.
-			</p>
+			<div class="ui vertical stripe intro segment">
+				<div class="ui stackable very relaxed center aligned grid container">
+					<div class="row">
+						<h1 class="ui header"> Are Sound Explanations Enough? — Understanding OWL Reasoning </h1>
+						<p> Julián Méndez, Christian Alrabba, Franz Baader, Raimund Dachselt</p>
+					</div>
+				</div>
+			</div>
 		</section>
 
 		<section id="scrolly">
 			<article>
-				<div class="step" data-step="1">
-					<p>STEP 1</p>
+				<div class="step">
+					<div id="padding-block"> </div>
 				</div>
-				<div class="step" data-step="2">
-					<p>STEP 2</p>
-				</div>
-				<div class="step" data-step="3">
-					<p>STEP 3</p>
-				</div>
-				<div class="step" data-step="4">
-					<p>STEP 4</p>
+
+				<div class="stackable very relaxed ui grid container">
+					<div class="row step">
+
+						<p>
+							There are systems that use symbolic AI to make decisions.
+							Those decisions are based on already available knowledge through automated
+							reasoning.
+							Decisions are then either made based on information derived from the knowledge that
+							the system
+							has access to, or from the lack of it.
+							In other words, decisions are based on consequences and non-consequences of the
+							knowledge of the
+							system.
+						</p>
+
+					</div>
+					<div class="row step">
+
+						<p>
+							A way to explain the former is to show a proof that depicts the steps that the
+							system had to go
+							through to reach its conclusion.
+							And for expelling a non-consequence, one can show an example of the word that:
+						</p>
+
+						<ul>
+							<li>does not violate the system's knowledge</li>
+							<li>shows that the non-consequence is a possibility</li>
+						</ul>
+
+						<p>
+							However, these explanations can be hard to digest even for experts and this is where
+							visualization techniques can help.
+						</p>
+
+					</div>
+
+					<h2 class="ui header">Description Logic</h2>
+
+					<div class="row step">
+						<p>
+							Description Logics (DLs) are formal knowledge representation languages used in
+							artificial
+							intelligence to describe and reason about information of application domains.
+							With DLs, one can model several aspects about a given domain, for example let's
+							consider the
+							domain of vehicles.
+							A "Car", a "Plane" and a "Motorbike" are concepts in this domain.
+							Using roles (relations) we can describe more things about a vehicle such as having
+							an "Engine"
+							(∃hasPart.Engine) or all its tires are road legal (∀hasTires.RoadLeagal).
+						</p>
+					</div>
+
+					<div class="row step">
+						<p>
+							With concepts one can then build axioms (statements) about the domain such as
+							"trikes are
+							motorbikes with exactly three wheels" (Trike ⊑ Motorbike ⊓ =3.hasWheel).
+							A collection of such statements is called an ontology.
+							And finally, a knowledge base is an ontology extended with facts such as "Michelin
+							is a tyre
+							brand" (TyreBrand(Michelin)) and "a Tesla Model X weighs 2,554" (hasWeight(Model X,
+							2554)).
+						</p>
+
+					</div>
+					<div class="row step">
+						<p>
+							A DL reasoner uses the information specified in a knowledge base to infer new
+							implicit statements about the domain.
+							For example, let's take the following ontology:
+						</p>
+						<pre><code class="code">
+	O = {
+		Vehicle ⊑ ∃hasPart.Engine,
+		Car ⊑ Vehicle,
+		Car ⊑ =4.hasWheel
+		Trike ⊑ =3.hasWheel
+	}
+</code></pre>
+
+
+					</div>
+					<div class="row step">
+
+						<p>
+							A reasoner would then be able to infer that in any model (world) of this ontology,
+							anything that belongs to the concept Car must have at least one engine.
+							Such an inferred statement is what we call entailment.
+							This is a correct conclusion because we know from O that "(2) every can is a
+							vehicle" and "(1) every vehicle has an engine", which implies the conclusion (Car ⊑
+							∃hasPart.Engine).
+						</p>
+
+
+					</div>
+					<div class="row step">
+						<p>
+							On the other hand, a non-entailment is what we call a statement that is not true in
+							every model of the ontology.
+							For example, every vehicle has wheels (Car ⊑ ∃hasWheel), does not follow from the
+							knowledge specified in O, because there is a model of O with a vehicle that does not
+							have wheels (M = {Vehicle(Falcon Heavy), hasPart(Falcon Heavy, Merlin),
+							Engine(Merlin)}).
+						</p>
+					</div>
+
+					<h2 class="ui header"> Explanations with Proofs </h2>
+
+					<div class="row step">
+						<p>
+							An explanation of an entailment can be done by providing a proof of that entailment.
+							However, proofs can be large and not easy to understand, and this is where visualization
+							techniques can help users to better understand such explanations.
+						</p>
+					</div>
+
+					<div class="row step">
+
+						<p>
+							A proof can be seen as a directed acyclic hypertrees where every hyperedge represents a
+							logically sound inference that uses all the source nodes (premises) of a hyperedge to
+							derive its sink node (conclusion).
+							Color coding can be used in proof to convey the following information:
+						</p>
+
+						<ul>
+							<li>green nodes -> ontology axioms, </li>
+							<li>purple node -> final conclusion, </li>
+							<li>blue nodes -> intermediate conclusion, </li>
+							<li>gray nodes -> inference (hyperedge).</li>
+						</ul>
+
+						<p>
+							However, these explanations can be hard to digest even for experts and this is where
+							visualization techniques can help.
+						</p>
+
+					</div>
+
+					<div class="row step">
+						<p>
+							When reading a proof, the reader usually examines one inference at a time. However, the
+							direction of choosing the order of reading these inferences depends on the reader's
+							preferences. One can start from the final conclusion, and then inspect the proof of each
+							premise. Hiding the entire proof tree and then revealing inferences on demand can help
+							the reader focus on the current step in a proof.
+						</p>
+					</div>
+
+					<div class="row step">
+						<p>
+							Another way to read a proof is to start from the asserted axioms (ontology axioms), and
+							then inspect the intermediate conclusions that can be drawn from these axioms until the
+							final conclusion of the proof is reached. Allowing the reader to hide inferences that
+							have already been inspected which reduces the amount of information presented on the
+							screen.
+							Of course one can explore the proof in both directions at the same time. In this case,
+							allowing the user more control over showing/hiding inferences becomes essential.
+						</p>
+					</div>
+
+					<div class="row step">
+						<p>
+							Another way to approach a proof can be by dividing it into smaller subproofs and
+							examining each on its own. To achieve this, the user needs to be able to extract
+							semantically sound subproofs while being able ofcourse to navigate each of the subproofs
+							as discussed earlier.
+							Another source for difficulty in understanding a proof can simply be that individual
+							inferences are hard to understand for the user. In such cases, it would be beneficial to
+							provide the user with the ability to have more details about the inference in question.
+							In other words, an illustration of how a logical inference rule has been applied using
+							the information of the inspected proof step.
+						</p>
+					</div>
+
+					<div class="row step">
+						<p>
+							Size of the proof, as in the number of inferences, is not the only size that can add to
+							the complexity of a proof. The size of the axioms also contributes to that. This can be
+							mitigated by allowing the user to shorten and/or abbreviate concepts appearing in these
+							axioms. For users that are less familiar with the logical syntax used in a proof, a
+							natural language translation of concepts and axioms can help the users understand the
+							inferences and by extension the whole proof.
+						</p>
+					</div>
+
+					<h2 class="ui header"> Explanations with Counterexamples </h2>
+
+					<div class="row step">
+						<p>
+							As mentioned earlier, an entailment is a statement that is true in every interpretation
+							satisfying the knowledge base (model). Then, in order to explain a statement that is not
+							entailed by a knowledge base, one can provide a model of the knowledge base where the
+							statement is not true. We call such models counterexamples. For example, if we consider the
+							previous ontology O and want to explain why it is not the case that “every Vehicle is a
+							Trike”. We can provide a counterexample to this statement that satisfies all the axioms in O
+							and shows a Vehicle that is not a Trike. M_2 = {Vehicle(Model X), Car(Model X),
+							hasWheel(Model X, w1), hasWheel(Model X, w2), hasWheel(Model X, w3), hasWheel(Model X, w4),
+							hasEngine(Model X, e), Engine(e), Trike(Can-Am Ryker)}.
+						</p>
+					</div>
+
+
+					<div class="row">
+						<div class="padding-block"> </div>
+					</div>
+
 				</div>
 			</article>
 
@@ -39,13 +249,33 @@
 			</figure>
 		</section>
 
-		<section id="outro"></section>
+		<section id="outro">
+			<div class="ui center aligned container">
+				<h1 class="ui header"> Acknowledgements </h1>
+				<div class="row">
+					<p> This work was funded by DFG grant 389792660 as part of TRR~248 -- CPEC,
+						(see <a href="https://perspicuous-computing.science">cpec.science</a>)
+					</p>
+				</div>
+				<div class="row">
+					<p> The explorable was written using 
+						<a href="https://d3js.org/">d3.js</a> and 
+						<a href="https://github.com/russellsamora/scrollama">scrollama</a>.
+					</p>
+					<p> To check out and contribute to Evonne, please visit 
+						<a href="https://imld.de/evonne">the project's website</a> or the 
+						<a href="https://github.com/imldresden/evonne">tool's Github repository.</a>
+					</p>
+				</div>
+			</div>
+
+		</section>
 	</main>
 
 	<!-- <div class='debug'></div> -->
 	<script src="https://unpkg.com/d3@5.16.0/dist/d3.min.js"></script>
 	<script src="https://unpkg.com/scrollama"></script>
-	<script src="./js/scrolly.js"></script>
+	<script src="./js/main.js"></script>
 </body>
 
 </html>

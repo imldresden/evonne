@@ -16,7 +16,7 @@
 article {
     position: relative;
     padding: 0 1rem;
-    max-width: 35rem;
+    max-width: 40rem;
 }
 
 figure {
@@ -45,23 +45,18 @@ figure p {
     color: #fff;
 }
 
-.step {
-    margin: 0 auto 2rem auto;
-    background-color: #3b3b3b;
-    color: #fff;
-}
-
-.step:last-child {
-    margin-bottom: 0;
-}
-
 .step.is-active {
     background-color: goldenrod;
     color: #3b3b3b;
 }
 
 .step p {
-    text-align: center;
+    text-align: left;
     padding: 1rem;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+}
+
+#intro, #outro, .padding-block {
+    padding-top: 300px;
+    padding-bottom: 300px;
 }

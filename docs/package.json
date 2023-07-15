@@ -1,8 +1,6 @@
 {
   "type": "module",
   "dependencies": {
-    "scrollama": "3.2.0",
-    "d3": "7.8.4",
     "express": "^4.17.1"
   }
 }

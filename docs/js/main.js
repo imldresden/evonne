@@ -8,9 +8,6 @@ const step = article.selectAll(".step");
 const scroller = scrollama();
 
 function handleResize() {
-    const stepH = Math.floor(window.innerHeight * 0.75);
-    step.style("height", stepH + "px");
-
     const figureHeight = window.innerHeight - 200;
     const figureMarginTop = 100;
 
