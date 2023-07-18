@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title> Understanding OWL Reasoning </title>
+	<title> Understanding Logical Reasoning </title>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
@@ -19,8 +19,8 @@
 			<div class="ui vertical stripe intro segment">
 				<div class="ui stackable very relaxed center aligned grid container">
 					<div class="row">
-						<h1 class="ui header"> Are Sound Explanations Enough? — Understanding OWL Reasoning </h1>
-						<p> Julián Méndez, Christian Alrabba, Franz Baader, Raimund Dachselt</p>
+						<h1 class="ui header"> Are Sound Explanations Enough? — Understanding Logical Reasoning </h1>
+						<p> Julián Méndez, Christian Alrabbaa, Franz Baader, Raimund Dachselt</p>
 					</div>
 				</div>
 			</div>
@@ -36,35 +36,22 @@
 					<div class="row step">
 
 						<p>
-							There are systems that use symbolic AI to make decisions.
-							Those decisions are based on already available knowledge through automated
-							reasoning.
-							Decisions are then either made based on information derived from the knowledge that
-							the system
-							has access to, or from the lack of it.
-							In other words, decisions are based on consequences and non-consequences of the
-							knowledge of the
-							system.
+							Intelligent systems that are powered by <i>symbolic AI</i> have the distinct property of being explainable.
+							Unlike other AI approaches, symbolic AI systems utilize <i>automated reasoning</i> to perform tasks and make decisions, which allows users to scrutinize the inner machinery of such systems and understand the chain of logical deduction that leads to their outputs<span style="color: red"> [add citation]</span>.
+
+							These systems make their decisions based on information derived from the knowledge that they have access to, or from the lack of it. In other words, decisions are based on <i>logical consequences</i> and <i>non-consequences</i> of these systems' knowledge<span style="color: red"> [add citation]</span>.
 						</p>
 
 					</div>
 					<div class="row step">
 
 						<p>
-							A way to explain the former is to show a proof that depicts the steps that the
-							system had to go
-							through to reach its conclusion.
-							And for expelling a non-consequence, one can show an example of the word that:
-						</p>
+							One way to explain a logical consequence is to show a <i>proof</i> of it.
+							The advantage of such an explanation is that it depicts the steps that the system has to go through to reach its conclusion.
+							Regarding the other case, an explanation of a logical non-consequence can be done by showing an example of the world (<i>counterexample</i>) that
+							(1) does not violate the system's knowledge, and (2) shows that the non-consequence is a possibility. For instance, it is not true that <i>all mammals live on land</i>. Simply by pointing out that animals like dolphins are mammals that do not live on land is sufficient to invalidate the claim.
 
-						<ul>
-							<li>does not violate the system's knowledge</li>
-							<li>shows that the non-consequence is a possibility</li>
-						</ul>
-
-						<p>
-							However, these explanations can be hard to digest even for experts and this is where
-							visualization techniques can help.
+							While these types of explanations are logically sound and informative, they can sill be difficult to comprehend even for experts. Therefore, in this work, we demonstrate how visualization techniques can help mitigating the complexity of these explanations.
 						</p>
 
 					</div>
@@ -73,16 +60,10 @@
 
 					<div class="row step">
 						<p>
-							Description Logics (DLs) are formal knowledge representation languages used in
-							artificial
-							intelligence to describe and reason about information of application domains.
-							With DLs, one can model several aspects about a given domain, for example let's
-							consider the
-							domain of vehicles.
+							<i>Description Logics</i> (DLs) are formal knowledge representation languages used in artificial intelligence to describe and reason about information of application domains <span style="color: red">[cite DL handbook]</span>.
+							With DLs, one can model several aspects about a given domain, for example let's	consider the domain of vehicles.
 							A "Car", a "Plane" and a "Motorbike" are concepts in this domain.
-							Using roles (relations) we can describe more things about a vehicle such as having
-							an "Engine"
-							(∃hasPart.Engine) or all its tires are road legal (∀hasTires.RoadLeagal).
+							Using roles (relations) we can describe more things about a vehicle such as having an "Engine" (∃hasPart.Engine), or all its tires are road legal (∀hasTires.RoadLeagal).
 						</p>
 					</div>
 
@@ -93,8 +74,7 @@
 							motorbikes with exactly three wheels" (Trike ⊑ Motorbike ⊓ =3.hasWheel).
 							A collection of such statements is called an ontology.
 							And finally, a knowledge base is an ontology extended with facts such as "Michelin
-							is a tyre
-							brand" (TyreBrand(Michelin)) and "a Tesla Model X weighs 2,554" (hasWeight(Model X,
+							is a tire brand" (TyreBrand(Michelin)) and "a Tesla Model X weighs 2,554" (hasWeight(Model X,
 							2554)).
 						</p>
 
