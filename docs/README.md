@@ -1,5 +1,3 @@
-# Evonne
-
 ----
 
 #### Table of contents
