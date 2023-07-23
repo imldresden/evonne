@@ -1,6 +1,6 @@
-import {init_proof, removeListeners} from '../proof/proof.js';
+import { init_proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
-import { APP_GLOBALS as app } from "../shared-data.js";
+import { APP_GLOBALS as app, removeListeners } from "../shared-data.js";
 
 let status = {};
 let interval = undefined;
@@ -14,11 +14,11 @@ const computeAxiomsBtn = document.getElementById('computeAxiomPairBtn');
 window.onload = function () {
   //Mapping elements with click event to their functions
   let thingsWithClickListeners = new Map();
-  thingsWithClickListeners.set(clearSigFilePath,clearSigFilePathFunction);
-  thingsWithClickListeners.set(computeAxiomsBtn,computeAxiomsBtnFunction);
+  thingsWithClickListeners.set(clearSigFilePath, clearSigFilePathFunction);
+  thingsWithClickListeners.set(computeAxiomsBtn, computeAxiomsBtnFunction);
 
   //Remove listeners of types
-  removeListeners("click",thingsWithClickListeners);
+  removeListeners("click", thingsWithClickListeners);
 
   const projects = document.getElementById("current-projects");
   projects && fetch('/projects')
@@ -48,7 +48,7 @@ window.onload = function () {
     signaturePathFile.value = "";
     signaturePathText.classList.remove("valid");
     app.signatureFile = undefined;
-  
+
     browseFilePathText.value = "";
     browseFilePathText.classList.remove("valid");
     app.proofFile = undefined;
@@ -61,22 +61,22 @@ function createConceptDropdowns(concepts) {
   const lhs = document.getElementById('lhsConcepts');
   lhs.innerHTML = '';
 
-  Object.entries(concepts).sort(([,s1], [,s2]) => sortNames(s1.conceptNameShort,s2.conceptNameShort)).forEach(
-      entry => {
-    if (entry[0]!== "owl:Nothing" && entry[1].rhs && entry[1].rhs.length > 0) {
-      const concept = document.createElement('option');
-      concept.value = entry[0];
-      concept.innerHTML =  entry[1].conceptNameShort;
-      lhs.appendChild(concept);
-    }
-  });
+  Object.entries(concepts).sort(([, s1], [, s2]) => sortNames(s1.conceptNameShort, s2.conceptNameShort)).forEach(
+    entry => {
+      if (entry[0] !== "owl:Nothing" && entry[1].rhs && entry[1].rhs.length > 0) {
+        const concept = document.createElement('option');
+        concept.value = entry[0];
+        concept.innerHTML = entry[1].conceptNameShort;
+        lhs.appendChild(concept);
+      }
+    });
 
   const updateRHS = function () {
     const rhs = document.getElementById('rhsConcepts');
     rhs.innerHTML = '';
 
     const key = lhs.options[lhs.selectedIndex].value;
-    Object.entries(concepts[key].rhs).sort(([,s1], [,s2]) => sortNames(s1,s2)).forEach(rhsName => {
+    Object.entries(concepts[key].rhs).sort(([, s1], [, s2]) => sortNames(s1, s2)).forEach(rhsName => {
       const rhsC = document.createElement('option');
       rhsC.value = rhsName[1];
       rhsC.innerHTML = concepts[rhsName[1]].conceptNameShort;
@@ -139,15 +139,14 @@ function init_views(loop = false) {
           init_proof(res.proofs[0]);
         }
         if (document.getElementById('ontology-view')) {
-          if (app.svgOntologyRootLayer)
-            app.svgOntologyRootLayer.selectAll("*").remove();
-
+          if (app.svgOntology) {
+            app.svgOntology.innerHTML = "";
+          }
           init_ontology(res.ad, res.ontology);
         }
 
         //Hide computing indicator
         document.getElementById('computingGif').style.display = "none";
-
       }
     })
     .catch(error => {
@@ -165,28 +164,28 @@ if (clearSigFilePath) {
   clearSigFilePath.addEventListener("click", clearSigFilePathFunction);
 }
 
-function sortNames (c1, c2) {
+function sortNames(c1, c2) {
   let arg1 = c1.substring(c1.indexOf("#") + 1).toLowerCase();
   let arg2 = c2.substring(c2.indexOf("#") + 1).toLowerCase();
 
-  if (arg1 < arg2){
+  if (arg1 < arg2) {
     return -1;
   }
-  if (arg1 > arg2){
+  if (arg1 > arg2) {
     return 1;
   }
   return 0;
 }
 
 
-function clearSigFilePathFunction () {
+function clearSigFilePathFunction() {
   signaturePathText.value = "";
   signaturePathFile.value = "";
   signaturePathText.classList.remove("valid");
   app.signatureFile = undefined;
 }
 
-function computeAxiomsBtnFunction(){
+function computeAxiomsBtnFunction() {
 
   //Show computing indicator
   document.getElementById('computingGif').style.display = "inline-block";
@@ -197,24 +196,24 @@ function computeAxiomsBtnFunction(){
   body.append('rhs', document.getElementById('rhsConcepts').value);
   body.append('method', document.getElementById('methodsList').value);
   body.append('signaturePath', app.signatureFile
-      ? "frontend/public/data/" + getSessionId() + "/" + app.signatureFile.name
-      : "NoSignature");
+    ? "frontend/public/data/" + getSessionId() + "/" + app.signatureFile.name
+    : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 
   fetch('/axiom', {
     method: 'POST',
     body,
   })
-      .then(res => res.json())
-      .then(res => {
-        console.log(res)
-        interval = setInterval(() => {
-          init_views(true);
-        }, 2000)
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+    .then(res => res.json())
+    .then(res => {
+      console.log(res)
+      interval = setInterval(() => {
+        init_views(true);
+      }, 2000)
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
 }
 
 function blockProofMethods(reasoner) {
@@ -224,17 +223,17 @@ function blockProofMethods(reasoner) {
   if (!reasoner)
     return;
 
-  if (reasoner.toLowerCase() === "hermit"){
-     valuesToBlock = ["1","2","3"];
-     options[3].selected = true;
+  if (reasoner.toLowerCase() === "hermit") {
+    valuesToBlock = ["1", "2", "3"];
+    options[3].selected = true;
   }
 
-  else if(reasoner.toLowerCase() === "elk"){
-     valuesToBlock = ["4","5","6","7","8","9","10","11","12"];
-     options[0].selected = true;
+  else if (reasoner.toLowerCase() === "elk") {
+    valuesToBlock = ["4", "5", "6", "7", "8", "9", "10", "11", "12"];
+    options[0].selected = true;
   }
 
   for (let i = 0; i < options.length; i++) {
-    options[i].disabled =  valuesToBlock.includes((i + 1).toString());
+    options[i].disabled = valuesToBlock.includes((i + 1).toString());
   }
 }

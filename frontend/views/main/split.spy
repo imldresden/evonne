@@ -21,14 +21,14 @@
   <main>
     <div class="container container-split container-flex">
       <div class="container-left" id="proof-container">
-        <svg id="proof-view"> << defs >> </svg>
+        <svg id="proof-view"> </svg>
         << menus/thumbnail >>
       </div>
 
       <div class="resizer" data-direction="horizontal"></div>
       
       <div class="container-right" id="ontology-container">
-        <svg id="ontology-view"> << defs >> </svg>
+        <div id="ontology-view"> </div>
         << menus/thumbnail >>
       </div>
     </div>

@@ -82,7 +82,7 @@ nav a.sidenav-trigger {
 
 #project-id-div {
   width:350px;
-  margin-left:calc(25% + 80px);
+  margin-left:calc(30% + 80px);
   position:absolute;
 }
 
@@ -130,13 +130,13 @@ fieldset {
 
 /* Typography */
 body {
-	font-family: Roboto;
+	font-family: Hack, monospace;
 	font-size: 16px;
 	font-weight: 300;
 }
 
 button {
-	font-family: Roboto;
+	font-family: Hack, monospace;
 }
 
 .modal h2 {
@@ -277,7 +277,7 @@ section.modal-section:not(:last-of-type) {
 
 .select-wrapper input.select-dropdown {
 	margin: 0;
-	font-family: Roboto;
+	font-family: Hack, monospace;
 	padding-bottom: 8px;
 }
 .select-wrapper input.select-dropdown:focus {

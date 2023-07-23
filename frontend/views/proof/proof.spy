@@ -18,7 +18,7 @@
   << modals/axiom >>
   
   <main id="proof-container">
-    <svg id="proof-view"> << defs >> </svg>
+    <svg id="proof-view"> </svg>
     
     << menus/thumbnail >>
     << menus/settings >>

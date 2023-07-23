@@ -20,6 +20,7 @@ function adaptUploadFileModal(whatToUpload) {
 // for uploading the actual ontology, project menu 
 const uploadOntologyTriggers = Array.from(document.getElementsByClassName("uploadOntologyTrigger"));
 uploadOntologyTriggers.forEach(trigger => {
+  document.getElementById("reasoner-choice-upload").style.display = "block";
   trigger.addEventListener("click", () => {
     adaptUploadFileModal('n ontology for a new project');
     fileUploadInput.accept = '.xml, .owl';

@@ -61,13 +61,13 @@
     <label>Flow Direction</label>
     <div class="input-wrapper modal-option">
       <select id="flowDirection" class="browser-default">
-        <option value="y" selected>Vertical</option>
-        <option value="x">Horizontal</option>
+        <option value="y">Vertical</option>
+        <option value="x" selected>Horizontal</option>
       </select>
     </div>
 
     <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
-      <label>Flow Strength</label>
+      <label>Flow Separation</label>
       <div>
         <button class="btn btn-small btn-primary btn-range-reset waves-effect waves-light tooltipped"
           data-position="right" data-tooltip="Reset Flow Strength" id="flowStrengthReset">
@@ -82,28 +82,5 @@
       </div>
     </div>
 
-    <label>Link Length Function</label>
-    <div class="input-wrapper modal-option">
-      <select id="linkLengthFunction" class="browser-default">
-        <option value="symmetric-diff" selected>Symmetric Difference</option>
-        <option value="jaccard">Jaccard</option>
-      </select>
-    </div>
-
-    <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
-      <label>Link Ideal Length</label>
-      <div>
-        <button class="btn btn-small btn-primary btn-range-reset waves-effect waves-light tooltipped"
-          data-position="right" data-tooltip="Reset Link Ideal Length" id="linkLengthIdealValueReset">
-          <i class="material-icons">replay</i>
-        </button>
-        <form action="#">
-          <span class="new badge" data-badge-caption="">4</span>
-          <p class="range-field">
-            <input type="range" id="linkLengthIdealValue" style="border-color: transparent" />
-          </p>
-        </form>
-      </div>
-    </div>
   </fieldset>
 </div>
