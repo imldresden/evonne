@@ -2,7 +2,7 @@ import { APP_GLOBALS as app, SharedData, removeListeners } from "../shared-data.
 import { upload } from '../utils/upload-file.js';
 import { progress } from '../main/main.js';
 import { BasicSophisticatedShorteningFunctions } from "../shortening/sophisticatedBasic.js";
-import { stylesheet } from "../../style/cy-style.js";
+import { colors, stylesheet } from "../../style/cy-style.js";
 import { params } from "../layouts/cola.js";
 
 const socket = io();
@@ -98,13 +98,24 @@ async function initHTML() {
         let html = "";
 
         for (let i = 0; i < text.length; i++) {
-          html += `<text>${text[i]}</text> <br>`;
+          let color = 'black'; 
+          if (cy.justification && cy.justification.has(text[i])) {
+            color = colors.justNodeStroke;
+          } 
+          if (cy.diagnoses && cy.diagnoses.has(text[i])) {
+            color = colors.diagNodeStroke;
+          } 
+
+          html += `
+            <p style="color:${color};margin:0;padding:0">
+                ${text[i]}
+            </p>`;
         }
 
         const template = `
           <div class="cy-html node ontNode bg-box" id="${ontologyNodeId + data.id}"> 
-            <div id="frontRect" style="padding: 5px; white-space:nowrap;" class="">
-              <g class="label"> ${html} </g>
+            <div id="frontRect" style="padding: 5px; white-space:nowrap;">
+              ${html}
             </div>
           </div>
         `;

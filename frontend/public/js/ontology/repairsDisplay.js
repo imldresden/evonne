@@ -214,8 +214,12 @@ function showRepairs(repairs, cy) {
 
 //Highlight affected modules by the selected repair
 function highlightOntology(data, cy) {
+  restoreColor(true, cy);
+  cy.diagnoses = new Set();
+
   data.forEach((repairAxiom) => {
     const trimmedAxiom = repairAxiom.trim();
+    cy.diagnoses.add(trimmedAxiom);
     
     cy.nodes().forEach((n) => {
       const node = n.data();
@@ -224,17 +228,6 @@ function highlightOntology(data, cy) {
       }
 
       highlightDiagnosisEffect(node.id, cy);
-      /*currentNode
-        .selectAll("text")
-        .filter(function (d, i) {
-          let nodeText = d3.select(this).text();
-          return (
-            d.axiomsMap[trimmedAxiom] !== undefined && trimmedAxiom === nodeText
-          );
-        })
-        .style("fill", "var(--color-node-stroke-highlighted-repair)");
-      */
-      //Highlight only the circles of the predecessors
       highlightPredecessors(node.id, cy);
     });
   });
@@ -246,9 +239,10 @@ function restoreColor(resetButtons = false, cy) {
     document.querySelectorAll('.btn-highlight.active').forEach(button => button.classList.remove("active"));
   }
 
-  cy.nodes()
-    .removeClass("justification")
-    .removeClass("diagnoses");
+  cy.nodes().removeClass("justification").removeClass("diagnoses");
+  cy.diagnoses = undefined;
+  cy.justification = undefined;
+  
 }
 
 //Highlight all affected modules
@@ -268,9 +262,8 @@ function highlightPredecessors(id, cy) {
 //Highlight axioms and nodes of the justification
 function highlightNodesOf(data, cy) {
   
-  cy.nodes()
-    .removeClass("justification")
-    .removeClass("diagnoses");
+  restoreColor(true, cy)
+  cy.justification = new Set();
 
   data.forEach((axiom) => {
     const trimmedAxiom = axiom.trim()
@@ -281,19 +274,7 @@ function highlightNodesOf(data, cy) {
 
       if (node.axiomsMap[trimmedAxiom] !== undefined) {
         n.addClass("justification");
-
-        /*const currentNode = d3.select("#" + ontologyNodeId + node.id);
-        //Highlight the corresponding axiom
-        currentNode
-          .selectAll("text")
-          .filter(function () {
-            return d3.select(this).text() === trimmedAxiom;
-          })
-          .style("fill", "var(--color-node-text-fill-highlighted)");
-        currentNode.select("rect")
-          .style("fill", "var(--color-node-fill-highlighted)")
-          .style("stroke", "var(--color-node-stroke-highlighted)");
-          */
+        cy.justification.add(trimmedAxiom);
       }
     });
   });
