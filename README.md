@@ -1,5 +1,3 @@
-# Evonne
-
 ## Using Docker:
 * Install docker, run `docker build . -t <your username>/evonne`. 
 * Run `docker run -dp 7007:3000 <your username>/evonne:latest` then open `http://localhost:7007`.
