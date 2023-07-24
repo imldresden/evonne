@@ -45,6 +45,19 @@ svg g.node > rect.bg-box {
 	ry: 6px;
 }
 
+.lock-sign {
+	display: none;
+}
+
+.lock-sign text {
+	font-size: 16px;
+	fill: white !important;
+}
+
+svg g.node.fixed-repairs > .lock-sign {
+	display: inline-block;
+}
+
 svg g.node:hover > rect.bg-box {
 	stroke-width: 3;
 	animation: none !important;

@@ -29,7 +29,7 @@ const dotMax = 3;
 let repairGroups;
 
 //Main function to read and display the repairs
-function readRepairs({ axiom, file } = {}) {
+function readRepairs({ axiom, file, cy } = {}) {
   let repair;
   const repairs = [];
 
@@ -49,7 +49,7 @@ function readRepairs({ axiom, file } = {}) {
         repairs.push({ repair, size: repair.length });
       }
     });
-    showRepairs(repairs);
+    showRepairs(repairs, cy);
     document.getElementById("diagnoses-axiom").innerHTML = axiom;
     document.getElementById("diagnoses-title").innerHTML = "Diagnoses for";
   });
@@ -133,7 +133,7 @@ function getRepairGroupButtonID(key) {
 }
 
 //Classify the repairs into groups based on size and adding them to the repairs menu
-function showRepairs(repairs) {
+function showRepairs(repairs, cy) {
   let fixed = "";
   clearRepairs();
 
@@ -177,25 +177,25 @@ function showRepairs(repairs) {
             if (fixed !== "") {
               document.getElementById(fixed).classList.remove("hovered");
               document.getElementById(fixed).classList.remove("locked");
-              restoreColor(true);
+              restoreColor(true, cy);
             }
             fixed = buttonId;
             document.getElementById(buttonId).classList.add("hovered");
             document.getElementById(buttonId).classList.add("locked");
-            highlightOntology(repair);
+            highlightOntology(repair, cy);
           }
         })
         .on("mouseover", () => {
           if (fixed === "") {
             document.getElementById(buttonId).classList.add("hovered");
-            highlightOntology(repair);
+            highlightOntology(repair, cy);
           }
         })
         .on("mouseout", () => {
           if (fixed === "") {
             document.getElementById(buttonId).classList.remove("hovered");
             document.getElementById(buttonId).classList.remove("locked");
-            restoreColor(true);
+            restoreColor(true, cy);
           }
         })
       const lines = panel.append("div").attr("class", "repair-lines")
@@ -209,21 +209,22 @@ function showRepairs(repairs) {
     });
   });
 
-  filterRepairs();
+  filterRepairs(cy);
 }
 
 //Highlight affected modules by the selected repair
-function highlightOntology(data) {
+function highlightOntology(data, cy) {
   data.forEach((repairAxiom) => {
     const trimmedAxiom = repairAxiom.trim();
-    d3.select("#ontology-view").selectAll(".ontNode").each((node) => {
+    
+    cy.nodes().forEach((n) => {
+      const node = n.data();
       if (!node || node.axiomsMap[trimmedAxiom] === undefined) {
         return;
       }
 
-      const currentNode = d3.select("#" + ontologyNodeId + node.id);
-      highlightDiagnosisEffect(node.id);
-      currentNode
+      highlightDiagnosisEffect(node.id, cy);
+      /*currentNode
         .selectAll("text")
         .filter(function (d, i) {
           let nodeText = d3.select(this).text();
@@ -232,58 +233,56 @@ function highlightOntology(data) {
           );
         })
         .style("fill", "var(--color-node-stroke-highlighted-repair)");
-
+      */
       //Highlight only the circles of the predecessors
-      highlightPredecessors(node.id);
+      highlightPredecessors(node.id, cy);
     });
   });
 }
 
 //Reset colors of all components to default
-function restoreColor(resetButtons = false) {
+function restoreColor(resetButtons = false, cy) {
   if (resetButtons) {
     document.querySelectorAll('.btn-highlight.active').forEach(button => button.classList.remove("active"));
   }
 
-  d3.select("#ontology-view").selectAll(".node").each((node) => {
-    if (!node) {
-      return;
-    }
-    d3.select("#" + ontologyNodeId + node.id)
-      .selectAll("text")
-      .style("fill", (d) => !d.fixed ? "black" : "gray")
-      .select(function () {
-        return this.parentElement.parentElement;
-      })
-      .select("rect")
-      .each(d => {
-        d.tempRevealed = false;
-      })
-      .style("fill", "var(--color-node-fill)")
-      .style("stroke", "var(--color-node-stroke)");
-  });
+  cy.nodes()
+    .removeClass("justification")
+    .removeClass("diagnoses");
 }
 
 //Highlight all affected modules
-function highlightPredecessors(nodeID) {
-  highlightDiagnosisEffect(nodeID);
-  d3.selectAll(".ontLink").each(function (d) {
+function highlightPredecessors(id, cy) {
+  highlightDiagnosisEffect(id, cy);
+  cy.edges().forEach(function (edge) {
+    const d = edge.data();
     if (!d) {
       return;
     }
-    if (d.target.id === nodeID) {
-      highlightPredecessors(d.source.id);
+    if (d.target === id) {
+      highlightPredecessors(d.source, cy);
     }
   });
 }
 
 //Highlight axioms and nodes of the justification
-function highlightNodesOf(data) {
+function highlightNodesOf(data, cy) {
+  
+  cy.nodes()
+    .removeClass("justification")
+    .removeClass("diagnoses");
+
   data.forEach((axiom) => {
     const trimmedAxiom = axiom.trim()
-    d3.select("#ontology-view").selectAll(".ontNode").each((node) => {
+    console.log(cy.nodes())
+    
+    cy.nodes().forEach((n) => {
+      const node = n.data();
+
       if (node.axiomsMap[trimmedAxiom] !== undefined) {
-        const currentNode = d3.select("#" + ontologyNodeId + node.id);
+        n.addClass("justification");
+
+        /*const currentNode = d3.select("#" + ontologyNodeId + node.id);
         //Highlight the corresponding axiom
         currentNode
           .selectAll("text")
@@ -294,6 +293,7 @@ function highlightNodesOf(data) {
         currentNode.select("rect")
           .style("fill", "var(--color-node-fill-highlighted)")
           .style("stroke", "var(--color-node-stroke-highlighted)");
+          */
       }
     });
   });
@@ -333,21 +333,16 @@ function hideNotification() {
   clearInterval(computingInterval);
 }
 
-function highlightDiagnosisEffect(nodeID) {
-  d3.select("#" + ontologyNodeId + nodeID)
-    .select("rect")
-    .style("fill", "var(--color-node-fill-highlighted-repair)")
-    .style("stroke", "var(--color-node-stroke-highlighted-repair)")
-    .each(d => {
-      d.tempRevealed = true;
-    });
+function highlightDiagnosisEffect(id, cy) {
+  cy.nodes("#"+id).addClass("diagnoses");
 }
 
-function filterRepairs() {
+function filterRepairs(cy) {
   if (repairGroups) {
     const orderedKeys = Array.from(repairGroups).map(g => g[0]).slice().sort((a, b) => a - b);
     d3.selectAll(".repair-entry").classed("hidden", false);
-    d3.selectAll(".fixed-repairs").data().forEach(node => {
+    cy.nodes(".fixed-diagnosis").forEach(n => {
+      const node = n.data();
       orderedKeys.forEach((key) => {
         repairGroups.get(key).forEach((repair) => {
           repair.forEach(r => {
