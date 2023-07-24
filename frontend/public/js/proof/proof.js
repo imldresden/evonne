@@ -1,8 +1,6 @@
-import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
+import { APP_GLOBALS as app, SharedData, removeListeners } from "../shared-data.js";
 import { AxiomFunctionsHelper } from "./axiomFunctions.js";
-import { MagicNavigationHelper } from "./magicNavigation.js";
 import { LinkFunctionsHelper } from "./linkFunctions.js";
-import { LabelsShorteningHelper } from "../shortening/helper.js";
 import thumbnailViewer from "../utils/pan-zoom.js";
 import * as lP from "./linearProof/linearProofHelper.js";
 import { upload } from '../utils/upload-file.js';
@@ -14,7 +12,6 @@ function fixDecimals(num) {
 let original = true;
 
 const openOntology = document.getElementById('openOntologyInNew');
-
 const proofWidthRange = document.getElementById("proofWidthRange");
 const proofHeightRange = document.getElementById("proofHeightRange");
 
@@ -115,12 +112,9 @@ export function init_proof(proof_file_param) {
     console.log(data);
   });
 
-  // Configure Shared Data
+  // Configure Shared Data // TODO: this should not happen here, because the AD by itself never loads this js! 
   SharedData.axiomFunctionsHelper = new AxiomFunctionsHelper(socket);
   SharedData.linkFunctionsHelper = new LinkFunctionsHelper();
-  SharedData.magicNavigationHelper = new MagicNavigationHelper();
-  SharedData.nodesDisplayFormat =  new Map();
-  SharedData.nodesCurrentDisplayFormat =  new Map();
 
   //Remove listeners of types
   removeListeners("click",thingsWithClickListeners);
@@ -171,7 +165,7 @@ export function init_proof(proof_file_param) {
 
   //update the selection of the shortening method
   shorteningMethodSelection.value = app.shorteningMethod;
-  SharedData.labelsShorteningHelper = new LabelsShorteningHelper();
+  
 
   maxLengthInput.closest(".input-range-wrapper").style.display = "none";
   maxLengthInput.addEventListener("input", maxLengthInputFunction);
@@ -630,14 +624,4 @@ function documentFunction(){
       app.minimap.main.pan({ x: 0, y: 50 });
     }
   }
-}
-
-export function removeListeners(event, thingsWithClickListeners) {
-  thingsWithClickListeners.forEach((val,key)=>{
-    if (!key) {
-      delete thingsWithClickListeners[key]
-    } else {
-      key.removeEventListener(event, val);
-    }
-  });
 }

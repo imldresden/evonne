@@ -1,8 +1,19 @@
+<!-- cytoscape and layouts -->
+<script src="/libs/cytoscape/dist/cytoscape.min.js"></script>
+<script src="/libs/layout-base/layout-base.js"></script>
+<script src="/libs/cytoscape-layout-utilities/cytoscape-layout-utilities.js"></script>
+
+<!-- cola -->
+<script src="/libs/webcola/WebCola/cola.min.js"></script>
+<script src="/libs/cytoscape-cola/cytoscape-cola.js"></script>
+
+<!-- utils -->
+<script src="/libs/cytoscape-undo-redo/cytoscape-undo-redo.js"></script> <!-- undo/redo -->
+<script src="/libs/cytoscape-node-html-label/dist/cytoscape-node-html-label.js"></script> <!-- node html -->
+
 
 <script src="/libs/d3/dist/d3.min.js"></script>
 <script src="/libs/materialize-css/dist/js/materialize.min.js"></script>
-<script src="/libs/webcola/WebCola/cola.min.js"></script>
-<script src="/libs/file-saver/dist/FileSaver.min.js"></script>
 <script src="/libs/svg-pan-zoom/dist/svg-pan-zoom.min.js"></script>
 
 <script src="/socket.io/socket.io.js"></script>

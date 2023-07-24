@@ -1,10 +1,12 @@
 import { InferenceRulesHelper } from "./proof/ruleFunctions.js";
 import { APP_GLOBALS as app } from "./shared-data.js";
 import { nodeVisualsDefaults, NodeVisualsHelper } from "./proof/nodeVisualsHelper.js";
+import { MagicNavigationHelper } from "./proof/magicNavigation.js";
+import { LabelsShorteningHelper } from "./shortening/helper.js";
 import * as lP from "./proof/linearProof/linearProofHelper.js";
 import { ContextMenu } from "./utils/context-menu.js";
 
-export const APP_GLOBALS = {
+const APP_GLOBALS = {
   svgProof: undefined,
   svgProofRootLayer: undefined,
   svgOntology: undefined,
@@ -34,14 +36,17 @@ export const APP_GLOBALS = {
   isDistancePriority: true,
 }
 
-export const SharedData = {
+const SharedData = {
   nodeVisualsHelper: new NodeVisualsHelper(),
   inferenceRulesHelper: new InferenceRulesHelper(),
   contextMenu: new ContextMenu(),
+  labelsShorteningHelper: new LabelsShorteningHelper(),
+
+  // proof exclusive
   axiomFunctionsHelper: undefined,
   linkFunctionsHelper: undefined,
-  magicNavigationHelper: undefined,
-
+  magicNavigationHelper: new MagicNavigationHelper(),
+  
   hierarchy: undefined,
   nodes: undefined,
   links: undefined,
@@ -54,8 +59,8 @@ export const SharedData = {
   currentMagicAction: undefined,
 
   nodeWithVisibleButtons: {id: "nothing"},
-  nodesCurrentDisplayFormat: undefined,
-  nodesDisplayFormat: undefined,
+  nodesCurrentDisplayFormat: new Map(),
+  nodesDisplayFormat: new Map(),
 
   maxNodeWidth: 200, maxNodeHeight: 45,
   allowOverlap: true,
@@ -594,3 +599,16 @@ export const SharedData = {
   }
 
 }
+
+function removeListeners(event, thingsWithListeners) {
+  thingsWithListeners.forEach((val,key)=>{
+    if (!key) {
+      delete thingsWithListeners[key]
+    } else {
+      key.removeEventListener(event, val);
+    }
+  });
+}
+
+
+export { APP_GLOBALS, SharedData, removeListeners };

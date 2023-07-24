@@ -1,6 +1,6 @@
 <!-- File upload modal -->
 <div id="uploadFileModal" class="modal upload-file-modal">
-  
+
   <div class="modal-content">
     <i class="material-icons right modal-close">close</i>
     <header>
@@ -17,14 +17,16 @@
       </div>
     </div>
 
-    <p>Please select a reasoner to classify the ontology</p>
-    <div class="row">
+    <div id="reasoner-choice-upload" style="display:none">
+      <p>Please select a reasoner to classify the ontology</p>
+      <div class="row">
         <div class="input-wrapper modal-option">
           <select id="classificationReasoner" class="browser-default">
             <option value="elk" selected>Elk</option>
             <option value="hermit">Hermit</option>
           </select>
         </div>
+      </div>
     </div>
   </div>
 </div>

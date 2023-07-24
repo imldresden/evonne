@@ -23,6 +23,7 @@
   <li>
     <div  type="button" class="menu-entry tooltipped" data-tooltip="Save Layout">
       <a id="saveLayoutButton"><i class="material-icons">download</i></a>
+      <a id="download" style="display:none"></a>
     </div>
   </li>
   <li>

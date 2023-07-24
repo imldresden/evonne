@@ -2,6 +2,6 @@
 
 
 <link rel="stylesheet" href="/libs/materialize-css/dist/css/materialize.css">
-<link rel="stylesheet" href="/style/font/material-icons.css">  
-<link rel="stylesheet" href="/style/font/roboto-latin.css">
+<link rel="stylesheet" href="/libs/hack-font/build/web/hack.css">
+<link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">
 <link rel="stylesheet" href="/style/widgets/general.css">

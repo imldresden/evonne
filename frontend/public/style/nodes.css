@@ -20,7 +20,7 @@
 
 .node {
 	font-size: smaller;
-	font-family: Roboto;
+	font-family: Hack, monospace;
 }
 
 .node.rule text {
@@ -32,6 +32,7 @@
 	stroke: var(--color-node-axiom-conclusion-stroke);
 	stroke-width: 1;
 }
+
 .node.rest *:not(circle:first-of-type) {
 	display: none;
 }
@@ -40,8 +41,8 @@ svg g.node > rect.bg-box {
 	fill: var(--color-node-rule-fill);
 	stroke: var(--color-node-rule-stroke);
 	stroke-width: 1;
-	rx: 3px;
-	ry: 3px;
+	rx: 6px;
+	ry: 6px;
 }
 
 svg g.node:hover > rect.bg-box {
@@ -52,22 +53,6 @@ svg g.node:hover > rect.bg-box {
 svg g.node.hovered > rect.bg-box {
 	stroke-width: 3;
 	animation: none !important;
-}
-
-svg g.node.fixed-repairs > rect.bg-box {
-	stroke-width: 5;
-	stroke: var(--color-node-rule-stroke) !important;
-}
-
-.lock-sign {
-	display: none;
-}
-.lock-sign text {
-	font-size: 16px;
-	fill: white !important;
-}
-svg g.node.fixed-repairs > .lock-sign {
-	display: inline-block;
 }
 
 svg g.node.axiom > rect.bg-box {
@@ -97,11 +82,6 @@ svg g.node.krule > rect.bg-box {
 
 svg g.node text.linear-icon {
 	font-family: "Linearicons-Free";
-	font-size: 1em;
-}
-
-svg g.node text.material-icon {
-	font-family: "Material Icons";
 	font-size: 1em;
 }
 
@@ -181,9 +161,11 @@ svg g.node > g.btn-view > text {
 .conclusion .axiomButton {
 	fill: var(--color-purple-dark);
 }
+
 .asserted .axiomButton {
 	fill: #36afa3;
 }
+
 .axiom:not(.asserted, .conclusion) .axiomButton {
 	fill: #2196f3;
 }
@@ -191,9 +173,11 @@ svg g.node > g.btn-view > text {
 .axiomButton.btn-highlight.active {
 	fill: var(--color-btn-highlight);
 }
+
 .axiomButton.btn-repairs.active {
 	fill: var(--color-btn-repairs);
 }
+
 .axiomButton.btn-repairs.spinning text {
 	animation: processing 1s linear 0s infinite normal forwards;
 }
