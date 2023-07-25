@@ -20,7 +20,7 @@ export class BasicSophisticatedShorteningFunctions {
 
     resetIfNewMax() {
         const currentMaxLength = document.getElementById("maximumLength").value;
-        if (currentMaxLength!==this._maxLength){
+        if (currentMaxLength!==this._maxLength()){
             this.resetAll();
             return true;
         }
@@ -32,7 +32,9 @@ export class BasicSophisticatedShorteningFunctions {
         this._FullToCC = new Map();
         this._CCToCount = new Map();
 
-        this._maxLength = document.getElementById("maximumLength").value;
+        this._maxLength = function() {
+            return document.getElementById("maximumLength") ? document.getElementById("maximumLength").value : 10;
+        }
 
         this.resetForNewText();
     }
@@ -141,7 +143,7 @@ export class BasicSophisticatedShorteningFunctions {
         let current = undefined;
         concepts.forEach(concept => {
             concept = concept.trim();
-            current = concept.length > this._maxLength ? `${concept.substring(0, this._maxLength)}` : concept;
+            current = concept.length > this._maxLength() ? `${concept.substring(0, this._maxLength())}` : concept;
             fillMaps(current,concept,this);
             current = this._FullToCC.get(concept) !== concept ? this._FullToCC.get(concept) + "\u2026":
                 this._FullToCC.get(concept);
