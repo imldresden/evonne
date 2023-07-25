@@ -2,7 +2,7 @@ import { APP_GLOBALS as app, SharedData, removeListeners } from "../shared-data.
 import { upload } from '../utils/upload-file.js';
 import { progress } from '../main/main.js';
 import { BasicSophisticatedShorteningFunctions } from "../shortening/sophisticatedBasic.js";
-import { stylesheet } from "../../style/cy-style.js";
+import { colors, stylesheet } from "../../style/cy-style.js";
 import { params } from "../layouts/cola.js";
 
 const socket = io();
@@ -98,22 +98,28 @@ async function initHTML() {
         let html = "";
 
         for (let i = 0; i < text.length; i++) {
-          html += `<text text-anchor="left">${text[i]}</text> <br>`;
+          let color = 'black'; 
+          if (cy.justification && cy.justification.has(text[i])) {
+            color = colors.justNodeStroke;
+          } 
+          if (cy.diagnoses && cy.diagnoses.has(text[i])) {
+            color = colors.diagNodeStroke;
+          } 
+
+          html += `
+            <p style="color:${color};margin:0;padding:0">
+                ${text[i]}
+            </p>`;
         }
 
         const template = `
           <div class="cy-html node ontNode bg-box" id="${ontologyNodeId + data.id}"> 
-            <div id="frontRect" style="padding: 5px; white-space:nowrap;" class="">
-              <g class="lock-sign">
-                <circle r="10" fill="var(--color-node-rule-stroke)"></circle>
-                <text text-anchor="middle" font-size="5px" class="material-icons">${"\ue897"}</text>
-              </g>
-              <g class="label"> ${html} </g>
+            <div id="frontRect" style="padding: 5px; white-space:nowrap;">
+              ${html}
             </div>
           </div>
         `;
 
-        //<image class="node-eye" width="14" height="14" href="../icons/eye-crossed.svg" style="opacity: 0;"></image>
         return template;
       }
     },
@@ -195,51 +201,20 @@ function bindListeners() {
         n.preSelected = false;
       }
       n.json({ selected: true });
-
-      /*if (!showOriginal) {
-        d3.select(this).select(".node-eye").transition().style("opacity", 1);
-        d3.select(this)
-          .selectAll("text")
-          .transition()
-          .style("transform", "translate(8px, 0)");
-
-        d3.select(this).select(".node-eye").attr(
-          "href",
-          d.revealed ? "../icons/eye-crossed.svg" : "../icons/eye.svg"
-        );
-      }*/
     });
+    
     n.bind('mouseout', function (e) {
       if (!n.preSelected) {
         n.json({ selected: false });
       }
-
-      /*d3.select(this).select(".node-eye").transition().style("opacity", 0);
-      d3.select(this)
-        .select(".label")
-        .selectAll("text")
-        .transition()
-        .style("transform", "translate(0, 0)");*/
     });
-
+    
     n.on('cxttap', function (e) {
       n.toggleClass('fixed-diagnosis');
-      /* 
-      d3.event.preventDefault();
-      d.fixed = !d.fixed;
-      d3.select(this)
-        .classed("fixed-repairs", d.fixed);
-      restoreColor();
-      filterRepairs();
-      */
-    });
-
-    n.on('click', function (e) {
-      /*d.revealed = !d.revealed;
-      d3.select(this).select(".node-eye").attr(
-        "href",
-        d.revealed ? "../icons/eye-crossed.svg" : "../icons/eye.svg"
-      );*/
+      n.fixed = !n.fixed;
+      
+      restoreColor(true, cy);
+      filterRepairs(cy);
     });
 
     n.on('dblclick', function (e) {
@@ -368,9 +343,9 @@ function init_ontology(ad_file_name, ontology_file_param) {
   };
 
   socket.on("highlight axioms", (data) => {
-    restoreColor();
+    restoreColor(true, cy);
     if (data && data.id === getSessionId()) {
-      highlightNodesOf(data.pre);
+      highlightNodesOf(data.pre, cy);
     }
   });
 
@@ -395,7 +370,7 @@ function init_ontology(ad_file_name, ontology_file_param) {
   socket.on("read repairs", (data) => {
     if (data && data.id === getSessionId()) {
       if (data.msg === "mDs.txt is now available!") {
-        readRepairs({ axiom: data.axiom, file: "../data/" + data.id + "/mDs_" + data.id + ".txt" });
+        readRepairs({ axiom: data.axiom, file: "../data/" + data.id + "/mDs_" + data.id + ".txt", cy });
       } else {
         computingRepairsFailed(data.msg);
       }

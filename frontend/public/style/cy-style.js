@@ -49,6 +49,15 @@ const stylesheet = [
     "style": {
       'background-color': colors.fixedNodeFill,
       'border-color': colors.fixedNodeStroke,
+      'border-width': '3px',
+      'background-image': '../icons/mui-lock.svg',
+      'background-image-containment': 'over',
+      'bounds-expansion': '20px',
+      'background-clip': 'none',
+      'background-height': '15px',
+      'background-width': '15px',
+      'background-position-x': '50%',
+      'background-position-y': '-18px',
     }
   }, {
     "selector": "node:selected",
