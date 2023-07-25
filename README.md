@@ -12,7 +12,7 @@
 
 ### Running the server:
 * Run `npm install`
-* Running `npm start` will download the necessary files and start the app at: `https://localhost:3000`. 
+* Running `npm start` will download the necessary files and start the app at: `https://localhost:3030`. 
 * If you want to skip the downloads and only run, use `npm run dev` instead.
 
 ## Deployment:
