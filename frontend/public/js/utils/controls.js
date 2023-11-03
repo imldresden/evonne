@@ -128,6 +128,7 @@ function startRedrawCSS() {
 function finishRedrawCSS() {
   document.querySelectorAll('.svg-pan-zoom-control').forEach(e => e.classList.remove("redraw"));
   document.dispatchEvent(new CustomEvent("reinit-minimap"));
+  dispatchEvent(new CustomEvent("view_resize", {}));
 }
 
 function resizable(resizer) {

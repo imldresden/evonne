@@ -222,6 +222,7 @@ function bindListeners() {
       socket.emit("euler view", { id: d.id, parent: d.parentId, axioms: d.axioms.split("\n") })
     });
   });
+  addEventListener("view_resize", () => cy.resize(), true);
 }
 
 function labelNodes(layout = true) {
