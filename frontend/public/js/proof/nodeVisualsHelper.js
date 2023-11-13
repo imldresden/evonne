@@ -264,35 +264,36 @@ export class NodeVisualsHelper {
     // Mouse Events function     
     activeNodes = {};
     addShowHideMouseEvents() {
+        const nodes = d3.selectAll(".axiom").nodes();
         d3.selectAll(".axiom")
-            .on("dblclick", (d, i, nodes) => {
+            .on("dblclick", (e, d) => {
                 if (!app.isDrawing) {
-                    this.expandCollapseNode(nodes[i].id);
+                    this.expandCollapseNode(e.currentTarget.id);
                     this.updateEdge(d);
                 }
             })
-            .on("mouseenter", (d, i, nodes) => {
+            .on("mouseenter", (e, d) => {
                 this.activeNodes[d.id] && clearTimeout(this.activeNodes[d.id]);
-                this.shiftLabelShowButtons(nodes[i]);
+                this.shiftLabelShowButtons(e.currentTarget);
             })
-            .on("mouseleave", (d, i, nodes) => {
-                const { id } = nodes[i];
-                const inactive = d3.selectAll(`#${id} .axiomButton.active`).empty();
+            .on("mouseleave", (e, d) => {
+                const node = e.currentTarget;
+                const inactive = d3.selectAll(`#${node.id} .axiomButton.active`).empty();
                 if (inactive) {
                     this.activeNodes[d.id] = setTimeout(() => {
-                        this.shiftLabelHideButtons(nodes[i]);
+                        this.shiftLabelHideButtons(node);
                         if (!app.isDrawing) {
-                            if (d3.select(`#${id} .tray`).classed("expanded")) {
-                                this.expandCollapseNode(id);
+                            if (d3.select(`#${node.id} .tray`).classed("expanded")) {
+                                this.expandCollapseNode(node.id);
                                 this.updateEdge(d);
                             }
                         }
                     }, 1500);
                 }
             })
-            .on("contextmenu", (d, i, n) => {
+            .on("contextmenu", (e, d) => {
                 const menuItems = SharedData.axiomFunctionsHelper.menuItems;
-                SharedData.contextMenu.create({ d, i, n }, menuItems, '#proof-view');
+                SharedData.contextMenu.create(e, d, menuItems, '#proof-view');
             })
     }
 

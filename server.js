@@ -1,7 +1,7 @@
 import express, {response} from 'express';
 import sprightly from 'sprightly';
 import http from 'http';
-import io from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { spawn } from 'child_process';
 import {
   unlink,
@@ -34,7 +34,7 @@ app.use('/libs', express.static('./node_modules'));
 app.use(upload());
 
 const http_ = http.createServer(app);
-const io_ = io(http_);
+const io_ = new Server(http_);
 const title = "evonne";
 const sessions = {};
 const dataDir = './frontend/public/data/';

@@ -50,10 +50,10 @@ export class AxiomFunctionsHelper {
 
 		let group = this._inferredAxiomNodes
 			.filter(d => {
-				if (app.isLinear)
+				if (app.isLinear) 
 					return d._children;
-				return d._children[0]._children
-			})//remove tautologies
+				return d._children[0]._children;
+			}) //remove tautologies
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", (d, i, nodes) => {
@@ -61,7 +61,7 @@ export class AxiomFunctionsHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${rect.getAttribute("width") / 2}, ${BOX_HEIGHT})`;
 			})
-			.on("click", d => this.showPrevious(d))
+			.on("click", (_, d) => this.showPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
@@ -122,7 +122,7 @@ export class AxiomFunctionsHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${rect.getAttribute("width") / 2 - BTN_CIRCLE_SIZE - 1}, 0)`;
 			})
-			.on("click", d => this.hideAllPrevious(d))
+			.on("click", (_, d) => this.hideAllPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
@@ -162,7 +162,7 @@ export class AxiomFunctionsHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${rect.getAttribute("width") / 2}, 0)`;
 			})
-			.on("click", d => this.showAllPrevious(d))
+			.on("click", (_, d) => this.showAllPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
@@ -196,7 +196,7 @@ export class AxiomFunctionsHelper {
 			.attr("transform", () =>
 				`translate(${-BOTTOM_TRAY_WIDTH / 2 + 6*BOX_PADDING}, ${1.7*BOX_HEIGHT_Expanded})`
 			)
-			.on("click", d => this.showJustification(d))
+			.on("click", (_, d) => this.showJustification(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
@@ -220,7 +220,7 @@ export class AxiomFunctionsHelper {
 			.attr("id", "B02")
 			.attr("class", "axiomButton btn-round btn-repairs")
 			.attr("transform", `translate(${-BOTTOM_TRAY_WIDTH / 2 + 2 * BOX_PADDING}, ${1.7*BOX_HEIGHT_Expanded})`)
-			.on("click", d => this.showAxiomRepairs(d))
+			.on("click", (_, d) => this.showAxiomRepairs(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
@@ -243,8 +243,8 @@ export class AxiomFunctionsHelper {
 			.attr("id", "B06")
 			.attr("class", "axiomButton btn-round btn-set-axiom-string")
 			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3 }, ${-BOX_HEIGHT_Expanded/2})`)
-			.on("click", this.setAxiomOriginal)
-			.each((_,i,n)=>
+			.on("click", (_, d) => this.setAxiomOriginal(d))
+			.each((_,i,n) => 
 				this.switchStateOnDraw(n[i],"original"));
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -259,12 +259,12 @@ export class AxiomFunctionsHelper {
 			.text("Show original")
 	}
 
-	setAxiomOriginal (d,i,n) {
+	setAxiomOriginal (d) {
 		let nodeID = "N"+d.data.source.id;
 		SharedData.nodesCurrentDisplayFormat.set(nodeID,"original");
 		SharedData.nodesDisplayFormat.set(nodeID,"original");
 		SharedData.advancedUpdate();
-		this.switchStateOnClick(nodeID, n[i].id);
+		this.switchStateOnClick(nodeID, nodeID);
 	}
 	
 	addSetAxiomShortened() {
@@ -276,8 +276,8 @@ export class AxiomFunctionsHelper {
 			.attr("id", "B04")
 			.attr("class", "axiomButton btn-round btn-set-axiom-string")
 			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3 + 4 * BOX_PADDING}, ${-BOX_HEIGHT_Expanded/2})`)
-			.on("click", this.setAxiomShortened)
-			.each((_,i,n)=>
+			.on("click", (_, d) => this.setAxiomShortened(d))
+			.each((_,i,n)=> 
 				this.switchStateOnDraw(n[i],"shortened"));
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -292,12 +292,12 @@ export class AxiomFunctionsHelper {
 			.text("Show shortened")
 	}
 
-	setAxiomShortened (d,i,n) {
+	setAxiomShortened (d) {
 		let nodeID = "N"+d.data.source.id;
 		SharedData.nodesDisplayFormat.set(nodeID,"shortened");
 		SharedData.nodesCurrentDisplayFormat.set(nodeID,"shortened");
 		SharedData.advancedUpdate();
-		this.switchStateOnClick(nodeID, n[i].id);
+		this.switchStateOnClick(nodeID, nodeID);
 	}
 
 	addSetAxiomTextual() {
@@ -309,7 +309,7 @@ export class AxiomFunctionsHelper {
 			.attr("id", "B05")
 			.attr("class", "axiomButton btn-round btn-set-axiom-string")
 			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3 + 8 * BOX_PADDING}, ${-BOX_HEIGHT_Expanded/2})`)
-			.on("click", this.setAxiomTextual)
+			.on("click", (_, d) => this.setAxiomTextual(d))
 			.each((_,i,n)=>
 				this.switchStateOnDraw(n[i],"textual"));
 		group.append("circle")
@@ -325,18 +325,18 @@ export class AxiomFunctionsHelper {
 			.text("Show text")
 	}
 	
-	setAxiomTextual (d,i,n) {
+	setAxiomTextual (d) {
 		let nodeID = "N"+d.data.source.id;
 		SharedData.nodesCurrentDisplayFormat.set(nodeID,"textual");
 		SharedData.nodesDisplayFormat.set(nodeID,"textual");
 		SharedData.advancedUpdate();
-		this.switchStateOnClick(nodeID, n[i].id);
+		this.switchStateOnClick(nodeID, nodeID);
 	}
 	
 	addShowFullAxiom() {
 		const { BOX_HEIGHT, BOX_PADDING_BOTTOM, BOX_PADDING } = nodeVisualsDefaults;
 
-		let group = d3.selectAll(".axiom")
+		const group = d3.selectAll(".axiom")
 			.filter((d)=>d)
 			.filter((d)=>{
 				return 	SharedData.nodesDisplayFormat.get("N"+d.data.source.id) !== "original";
@@ -349,8 +349,8 @@ export class AxiomFunctionsHelper {
 				return `translate(${-rect.getAttribute("width") / 2 + BOX_PADDING}, 
 					${BOX_HEIGHT - BOX_PADDING_BOTTOM})`;
 			})
-			.on("click", (d, i, nodes) => {
-				this.showFullAxiom(nodes[i].parentNode);
+			.on("click", (e, d) => {
+				this.showFullAxiom(e.currentTarget.parentNode);
 				SharedData.advancedUpdate();
 				this.switchStateOnClick("N"+d.data.source.id,
 					this.getButton(SharedData.nodesDisplayFormat.get("N"+d.data.source.id)));
@@ -438,7 +438,7 @@ export class AxiomFunctionsHelper {
 
 	showConclusionOnly() {
 		d3.selectAll(".axiom")
-			.filter(d => {
+			.filter((d) => {
 				return d ? d.data.id === "L-1" : false;
 			})
 			.each(x => {
@@ -506,7 +506,7 @@ export class AxiomFunctionsHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${rect.getAttribute("width") / 2 - BTN_CIRCLE_SIZE - 1}, ${BOX_HEIGHT})`;
 			})
-			.on("click", d => this.highlightCurrentInference(d))
+			.on("click", (_, d) => this.highlightCurrentInference(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
@@ -610,21 +610,21 @@ export class AxiomFunctionsHelper {
 		{
 			title: 'Show previous',
 			type: 'button',
-			action: (d, i, n) => {
+			action: (_, d) => {
 				this.showPrevious(d);
 			}
 		},
 		{
 			title: 'Show all previous',
 			type: 'button',
-			action: (d, i, n) => {
+			action: (_, d) => {
 				this.showAllPrevious(d)
 			}
 		},
 		{
 			title: 'Hide all previous',
 			type: 'button',
-			action: (d, i, n) => {
+			action: (_, d) => {
 				this.hideAllPrevious(d)
 			}
 		},
@@ -635,22 +635,22 @@ export class AxiomFunctionsHelper {
 		{
 			title: 'Show original',
 			type: 'button',
-			action: (d, i, n) => {
-				this.setAxiomOriginal(d, i, n);
+			action: (_, d) => {
+				this.setAxiomOriginal(d);
 			}
 		},
 		{
 			title: 'Show shortened',
 			type: 'button',
-			action: (d, i, n) => {
-				this.setAxiomShortened(d, i, n);
+			action: (_, d) => {
+				this.setAxiomShortened(d);
 			}
 		},
 		{
 			title: 'Show textual',
 			type: 'button',
-			action: (d, i, n) => {
-				this.setAxiomTextual(d, i, n);
+			action: (_, d) => {
+				this.setAxiomTextual(d);
 			}
 		},
 		{
@@ -660,14 +660,14 @@ export class AxiomFunctionsHelper {
 		{
 			title: 'Compute Diagnoses',
 			type: 'button',
-			action: (d, i, n) => {
+			action: (_, d) => {
 				this.showAxiomRepairs(d);
 			}
 		},
 		{
-			title: 'Highlight Justification in Ontology',
+			title: 'Highlight Justification',
 			type: 'button',
-			action: (d, i, n) => {
+			action: (_, d) => {
 				this.showJustification(d);
 			}
 		}

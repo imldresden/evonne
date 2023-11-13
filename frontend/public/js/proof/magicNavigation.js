@@ -66,8 +66,8 @@ export class MagicNavigationHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${-(rect.getAttribute("width") / 2) - this.offsets}, -${this.offsets})`;
 			})
-			.on("click", (d) => this.pullDown(d))
-			.on("hover", (d) => this.pullDownHover(d));
+			.on("click", (_, d) => this.pullDown(d))
+			.on("hover", (_, d) => this.pullDownHover(d));
 
 		this.appendCircleAndText(group, "keyboard_capslock", "Pull down", "rotated"); //vertical_align_bottom, expand_more
 	}
@@ -86,8 +86,8 @@ export class MagicNavigationHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${rect.getAttribute("width") / 2 - this.offsets}, ${BOX_HEIGHT - this.offsets*2})`;
 			})
-			.on("click", d => this.pushDown(d))
-			.on("hover", (d) => this.pushDownHover(d));
+			.on("click", (_, d) => this.pushDown(d))
+			.on("hover", (_, d) => this.pushDownHover(d));
 
 
 		this.appendCircleAndText(group, "exit_to_app", "Push down", "rotated-90"); // file_download, vertical_align_bottom, system_update_alt
@@ -107,8 +107,8 @@ export class MagicNavigationHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${- (rect.getAttribute("width") / 2) - this.offsets}, ${BOX_HEIGHT + this.offsets})`;
 			})
-			.on("click", d => this.pullUp(d))
-			.on("hover", (d) => this.pullUpHover(d));
+			.on("click", (_, d) => this.pullUp(d))
+			.on("hover", (_, d) => this.pullUpHover(d));
 
 		this.appendCircleAndText(group, "keyboard_capslock", "Pull up"); //vertical_align_top, expand_less
 	}
@@ -125,8 +125,8 @@ export class MagicNavigationHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${rect.getAttribute("width") / 2 - this.offsets}, ${this.offsets})`;
 			})
-			.on("click", d => this.pushUp(d))
-			.on("hover", (d) => this.pushUpHover(d));
+			.on("click", (_, d) => this.pushUp(d))
+			.on("hover", (_, d) => this.pushUpHover(d));
 
 		this.appendCircleAndText(group, "exit_to_app", "Push up", "rotated-270"); //publish, vertical_align_top
 	}

@@ -586,7 +586,7 @@ const SharedData = {
   },
 
   advancedUpdate: function (drawTime = app.drawTime) {
-    this.update(0);
+    //this.update(0);
     this.update(drawTime);
   },
 
