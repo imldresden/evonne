@@ -124,7 +124,7 @@ export function init_proof(proof_file_param) {
   removeListeners("center-root",thingsWithCenterRootListeners);
 
   if (allowOverlapBtn) {
-    allowOverlapBtn.checked = true;
+    allowOverlapBtn.checked = false;
     allowOverlapBtn.addEventListener("click", allowOverlapBtnFunction);
   }
 

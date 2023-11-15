@@ -127,7 +127,7 @@ async function initHTML() {
 }
 
 function calcBoxWidth(longestString) {
-  return (longestString * 8.1 + 10) + "px";
+  return (longestString * app.fontCharacterWidth + 10) + "px";
 }
 
 function calcBoxHeight(stringList) {

@@ -264,7 +264,6 @@ export class NodeVisualsHelper {
     // Mouse Events function     
     activeNodes = {};
     addShowHideMouseEvents() {
-        const nodes = d3.selectAll(".axiom").nodes();
         d3.selectAll(".axiom")
             .on("dblclick", (e, d) => {
                 if (!app.isDrawing) {
@@ -283,10 +282,8 @@ export class NodeVisualsHelper {
                     this.activeNodes[d.id] = setTimeout(() => {
                         this.shiftLabelHideButtons(node);
                         if (!app.isDrawing) {
-                            if (d3.select(`#${node.id} .tray`).classed("expanded")) {
-                                this.expandCollapseNode(node.id);
-                                this.updateEdge(d);
-                            }
+                            this.collapseNode(d3.select("#" + node.id));
+                            this.updateEdge(d);
                         }
                     }, 1500);
                 }
@@ -304,32 +301,28 @@ export class NodeVisualsHelper {
         let expanded = node.select(".tray").classed("expanded");
         if (expanded) {
             this.collapseNode(node);
-            this.hideCommunicationButtons(node);
         } else {
             this.expandNode(node);
-            this.showCommunicationButtons(node);
         }
     }
 
     expandNode(node) {
         const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT_Expanded } = nodeVisualsDefaults;
-        let t = app.svgProof.transition()
+        app.svgProof.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
-            .on("start", () => console.log("start"))
-            .on("end", () => {
-                console.log("end");
-                this.addShowHideMouseEvents();
-            });
+            .on("start", () => {})
+            .on("end", () => { this.addShowHideMouseEvents(); });
         
         this.moveButtons(node, "expand");
+        this.showCommunicationButtons(node);
     }
 
     collapseNode(node) {
         const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT } = nodeVisualsDefaults;
         let t = app.svgProof.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
-            .on("start", () => { console.log("start"); })
-            .on("end", () => { console.log("end"); this.addShowHideMouseEvents(); });
+            .on("start", () => { })
+            .on("end", () => { this.addShowHideMouseEvents(); });
 
         //Collapse the trays
         node.selectAll(".tray")
@@ -341,6 +334,7 @@ export class NodeVisualsHelper {
         
         //Move right bottom buttons to new position
         this.moveButtons(node, "collapse", t);
+        this.hideCommunicationButtons(node);
     }
 
     shiftLabel(node, direction) {

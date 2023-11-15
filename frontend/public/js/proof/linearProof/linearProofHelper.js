@@ -36,7 +36,7 @@ function computeLinearLayout(hierarchy) {
     hierarchy.dy = app.proofWidth / (hierarchy.height + 1);
 
     let linearLayout = d3.tree().size([app.proofWidth, app.proofHeight])
-        .separation((a,b)=>a.width?(a.width+b.width)/2:1)(hierarchy);
+        .separation((a,b) => (a.width + b.width) / 2)(hierarchy);
 
     let orderedElements = [];
     if (!app.isDistancePriority)
@@ -48,7 +48,7 @@ function computeLinearLayout(hierarchy) {
 
     let itemY = app.proofHeight/(orderedElements.length<2?1:orderedElements.length-1);
     linearLayout.each(d => {
-        d.x = 0.7 * app.proofWidth - (d.width?d.width/2:0);
+        d.x = 0.7 * app.proofWidth - d.width/2;
         if (orderedElements.length<2)
             d.y = 0.01*app.proofHeight;
         else
@@ -176,9 +176,9 @@ function position(d, zero){
         sourceX = d.source.x;
         sourceY = d.source.y-0.01;
     }
-    x2 = targetX + (d.target.width ? .5*d.target.width : SharedData.estimateNodeWidth(d.target));
+    x2 = targetX + .5 * d.target.width;
     y2 = app.proofHeight - targetY + nodeVisualsDefaults.BOX_HEIGHT/2;
-    x1 = sourceX+ (d.source.width ? .5*d.source.width : SharedData.estimateNodeWidth(d.target));
+    x1 = sourceX+ .5 * d.source.width;
     y1 = app.proofHeight - sourceY + nodeVisualsDefaults.BOX_HEIGHT/2;
 
     let offset = Math.abs(y2-y1)/2;
@@ -230,7 +230,7 @@ function renderSideConnectorsByType() {
         connector = selection.append("circle");
         connector.attr("class", newClasses.join(" "));
         selection.select(".connector")
-            .attr("cx",(d)=>d.width?d.width/2:0)
+            .attr("cx",(d) => d.width/2)
             .attr("cy",nodeVisualsDefaults.BOX_HEIGHT/2)
             .attr("r",nodeVisualsDefaults.CONNECTOR_SIZE/2)
     });

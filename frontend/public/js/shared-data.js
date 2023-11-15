@@ -30,10 +30,11 @@ const APP_GLOBALS = {
   drawTime: 750,
   shorteningVarName: "shorteningMode",
   shorteningMethod: "camel",
-  shortenAllInProof:false,
-  shortenAllInOntology:false,
+  shortenAllInProof: false,
+  shortenAllInOntology: false,
   isLinear: false,
   isDistancePriority: true,
+  fontCharacterWidth: 8.1,
 }
 
 const SharedData = {
@@ -46,7 +47,7 @@ const SharedData = {
   axiomFunctionsHelper: undefined,
   linkFunctionsHelper: undefined,
   magicNavigationHelper: new MagicNavigationHelper(),
-  
+
   hierarchy: undefined,
   nodes: undefined,
   links: undefined,
@@ -58,20 +59,20 @@ const SharedData = {
   edgeData: undefined,
   currentMagicAction: undefined,
 
-  nodeWithVisibleButtons: {id: "nothing"},
+  nodeWithVisibleButtons: { id: "nothing" },
   nodesCurrentDisplayFormat: new Map(),
   nodesDisplayFormat: new Map(),
 
   maxNodeWidth: 200, maxNodeHeight: 45,
-  allowOverlap: true,
+  allowOverlap: false,
 
   //TODO for now I kept it as it is, but we might want to change the way we update _hierarchy and create the new hierarchy
   createHierarchy: function (data) {
 
     // Create the stratify function for our data
     let stratify = d3.stratify()
-        .id(d => d.source.id)
-        .parentId(d => d.target.id);
+      .id(d => d.source.id)
+      .parentId(d => d.target.id);
 
     // Stratify our data --> Conclusion is the root node, asserted axioms are the leaf nodes
     return stratify(data);
@@ -79,25 +80,26 @@ const SharedData = {
 
   estimateNodeWidth: function (node) {
     // estimation of the size of each character
-    if (!node.width) {
-      const display = this.nodesCurrentDisplayFormat.get(node.data.id)  
-      const label = !display || display === 'original' ? 
-        node.data.source.element :
-        250; // TODO get shortened node
-        
-      node.width = label.length * 6.5 + 20;
-    }
+    const display = this.nodesCurrentDisplayFormat.get(node.data.id)
+    let label = "";
+    label = node.data.source.element;
+
+
+    node.width = label.length * APP_GLOBALS.fontCharacterWidth + 16;
+
     return node.width;
   },
 
-  setMaxWidth: function (node) {
+  setNodeWidthsAndMax: function (node) {
+    // computes all widths, saves them per node and sets max
     if (node !== null) {
+      this.estimateNodeWidth(node);
       if (node.width > this.maxNodeWidth) {
         this.maxNodeWidth = node.width;
       }
 
       node.children ? node.children.forEach(a => {
-        this.setMaxWidth(a);
+        this.setNodeWidthsAndMax(a);
       }) : undefined;
     } else {
       console.error('received null node')
@@ -113,16 +115,15 @@ const SharedData = {
     if (this.allowOverlap) {
       // tries to fit to screen 
       tree_layout = d3.tree()
-          .size([app.proofWidth, app.proofHeight])
-          .separation((a, b) => this.separation(a, b))
-          (hierarchy);
+        .size([app.proofWidth, app.proofHeight])
+        .separation((a, b) => this.separation(a, b))
+        (hierarchy);
     } else {
-      this.setMaxWidth(hierarchy);
 
       tree_layout = d3.tree()
-          .nodeSize([this.maxNodeWidth, this.maxNodeHeight * 1.2])
-          .separation((a, b) => this.separation(a, b))
-          (hierarchy);
+        .nodeSize([this.maxNodeWidth, this.maxNodeHeight * 1.2])
+        .separation((a, b) => this.separation(a, b))
+        (hierarchy);
     }
 
     return tree_layout;
@@ -133,6 +134,8 @@ const SharedData = {
   },
 
   update: function (source, drawTime = app.drawTime) {
+    this.setNodeWidthsAndMax(this.hierarchy); 
+
     if (app.isLinear) {
       this.root = lP.computeLinearLayout(this.hierarchy);
     } else {
@@ -172,7 +175,7 @@ const SharedData = {
     if (d.data.source.element_short) {
       node.select("text").text(d.data.source.element);
       node.select(".backgroundRect")
-          .style("visibility", "visible");
+        .style("visibility", "visible");
       this.hideRest(d);
     }
   },
@@ -187,7 +190,7 @@ const SharedData = {
     //Hide the corresponding delink button, This requires a link button of id = detachButton + nodeID(N+num)
     others.each(x => {
       d3.select("#detachButtonN" + x.data.source.id)
-          .transition().duration(100).ease(d3.easeLinear).style("opacity", .1);
+        .transition().duration(100).ease(d3.easeLinear).style("opacity", .1);
     });
 
   },
@@ -203,18 +206,18 @@ const SharedData = {
 
   addMouseEvents: function () {
     this.nodes.selectAll("g")
-        .on("mouseover", (d, i, n) => {
-          this.expandLabel(d, n[i]);
-        })
-        .on("mouseout", (d, i, n) => {
-          this.collapseLabel(d, n[i]);
-        });
+      .on("mouseover", (d, i, n) => {
+        this.expandLabel(d, n[i]);
+      })
+      .on("mouseout", (d, i, n) => {
+        this.collapseLabel(d, n[i]);
+      });
   },
 
   removeMouseEvents: function () {
     this.nodes.selectAll("g")
-        .on("mouseover", null)
-        .on("mouseout", null);
+      .on("mouseover", null)
+      .on("mouseout", null);
   },
 
   collapseLabel: function (d, n) {
@@ -225,7 +228,7 @@ const SharedData = {
     if (d.data.source.element_short) {
       node.select("text").text(d.data.source.element_short);
       node.select(".backgroundRect")
-          .style("visibility", "hidden");
+        .style("visibility", "hidden");
       this.showRest(d);
     }
   },
@@ -243,16 +246,16 @@ const SharedData = {
     let others = d3.selectAll(".node").filter(d => d === data.closest_right_neighbor);
 
     others.transition()
-        .duration(100)
-        .ease(d3.easeLinear)
-        .style("opacity", 1);
+      .duration(100)
+      .ease(d3.easeLinear)
+      .style("opacity", 1);
     //Show the corresponding delink button, This requires a link button of id = detachButton + nodeID(N+num)
     others.each(x => {
       d3.select("#detachButtonN" + x.data.source.id)
-          .transition()
-          .duration(100)
-          .ease(d3.easeLinear)
-          .style("opacity", 1);
+        .transition()
+        .duration(100)
+        .ease(d3.easeLinear)
+        .style("opacity", 1);
     });
   },
 
@@ -265,246 +268,246 @@ const SharedData = {
 
     // Create a transition for blending in the tree
     let t = app.svgProof.transition()
-        .duration(drawTime)
-        .on("start", () => {
-          app.isDrawing = true;
-        })
-        .on("end", () => {
-          this.addFocusFunctionality();
-          app.isDrawing = false;
-          //this.addMouseEvents();
-          //lP.addHighlightCurrentInferenceEvent();
+      .duration(drawTime)
+      .on("start", () => {
+        app.isDrawing = true;
+      })
+      .on("end", () => {
+        this.addFocusFunctionality();
+        app.isDrawing = false;
+        //this.addMouseEvents();
+        //lP.addHighlightCurrentInferenceEvent();
 
-          /* if(!app.isMagic) {
-              this.linkFunctionsHelper.addFunctionButtonsToLinks(this.getRemovableEdges());
-          } else {
-              this.linkFunctionsHelper.removeFunctionButtonsToLinks();
-          } */
+        /* if(!app.isMagic) {
+            this.linkFunctionsHelper.addFunctionButtonsToLinks(this.getRemovableEdges());
+        } else {
+            this.linkFunctionsHelper.removeFunctionButtonsToLinks();
+        } */
 
-          document.dispatchEvent(new CustomEvent("drawend", {detail: {main: "proof-view"}}));
-          // this.addPulseEvents();
-        });
+        document.dispatchEvent(new CustomEvent("drawend", { detail: { main: "proof-view" } }));
+        // this.addPulseEvents();
+      });
 
     // Add the data
     this.nodes.selectAll("g")
-        .data(this.root.descendants(), d => "N" + d.data.source.id)
-        .join(
-            enter => {
-              const that = this;
+      .data(this.root.descendants(), d => "N" + d.data.source.id)
+      .join(
+        enter => {
+          const that = this;
 
-              enter.append("g")
-                  .attr("class", d => {
-                    let classStr = "node " + d.data.source.type;
-                    classStr = !d.parent && d.data.source.type !== "rest" ? classStr + " conclusion" : classStr;
-                    return classStr;
-                  })
-                  .attr("id", d => "N" + d.data.source.id)
-                  /*TODO change x0 to x of the parent/child magic box, same for y*/
-                  .attr("transform", d => `translate(${d.x0}, ${app.proofHeight - parseInt(d.y0)})`)
+          enter.append("g")
+            .attr("class", d => {
+              let classStr = "node " + d.data.source.type;
+              classStr = !d.parent && d.data.source.type !== "rest" ? classStr + " conclusion" : classStr;
+              return classStr;
+            })
+            .attr("id", d => "N" + d.data.source.id)
+            /*TODO change x0 to x of the parent/child magic box, same for y*/
+            .attr("transform", d => `translate(${d.x0}, ${app.proofHeight - parseInt(d.y0)})`)
 
-                  /*.each(function (d) {
-                    switch (that.currentMagicAction) {
-                      case "pullUp":
-                        console.log("pullUp", this);
-                        d3.select(this)
-                            .call(element => {
-                              const stops = [d];
-                              let nextParent = d.parent
-                              while (nextParent) {
-                                stops.push(nextParent);
-                                nextParent = nextParent.parent;
-                              }
-                              console.log(stops);
+            /*.each(function (d) {
+              switch (that.currentMagicAction) {
+                case "pullUp":
+                  console.log("pullUp", this);
+                  d3.select(this)
+                      .call(element => {
+                        const stops = [d];
+                        let nextParent = d.parent
+                        while (nextParent) {
+                          stops.push(nextParent);
+                          nextParent = nextParent.parent;
+                        }
+                        console.log(stops);
 
-                              function cat(index) {
-                                if (stops[index + 1] && !stops[index].data.id.startsWith("MN")) {
-                                  return cat(index + 1)
-                                      .transition()
-                                      .duration(drawTime)
-                                      .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${app.proofHeight - parseInt(stops[index].y)})`)
-                                } else {
-                                  return element
-                                      .transition()
-                                      .duration(drawTime)
-                                      .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${app.proofHeight - parseInt(stops[index].y)})`)
-                                }
-                              }
+                        function cat(index) {
+                          if (stops[index + 1] && !stops[index].data.id.startsWith("MN")) {
+                            return cat(index + 1)
+                                .transition()
+                                .duration(drawTime)
+                                .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${app.proofHeight - parseInt(stops[index].y)})`)
+                          } else {
+                            return element
+                                .transition()
+                                .duration(drawTime)
+                                .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${app.proofHeight - parseInt(stops[index].y)})`)
+                          }
+                        }
 
-                              cat(0)
-                            })
-                        break;
+                        cat(0)
+                      })
+                  break;
 
-                      default:
-                        break;
-                    }
-                  }) */
-                  .transition(t)
-                  .attr("transform", (d, i, n) => `translate(${d.x}, ${app.proofHeight - parseInt(d.y)})`)
-            },
-            update => {
-              update
-                  .transition(t)
-                  .attr("transform", d => `translate(${d.x}, ${app.proofHeight - parseInt(d.y)})`)
-            },
-            exit => {
-              exit
-                  .transition(t).ease(d3.easeLinear).style("opacity", 0)
-                  .remove()
-            }
-        );
+                default:
+                  break;
+              }
+            }) */
+            .transition(t)
+            .attr("transform", (d, i, n) => `translate(${d.x}, ${app.proofHeight - parseInt(d.y)})`)
+        },
+        update => {
+          update
+            .transition(t)
+            .attr("transform", d => `translate(${d.x}, ${app.proofHeight - parseInt(d.y)})`)
+        },
+        exit => {
+          exit
+            .transition(t).ease(d3.easeLinear).style("opacity", 0)
+            .remove()
+        }
+      );
     // Draw links
     if (!app.isLinear) {
       this.links.selectAll("line")
-          .data(this.root.links(), d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
-          //.join("line")
-          .join(
-              enter => {
-                const that = this;
-                const container = enter.append("line")
-                    .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
-                    //.attr("marker-mid", "url(#arrowhead)")
-                    .attr("class", d =>
-                        (d.source.data.source.type === "rest" ? "link torest" : "link") +
-                        (d.source.data.target.type === "axiom" && !app.isMagic ? " from-axiom " : "")
-                    )
-                    .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
-                    .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
-                    .on("click", d => {
-                      if (!app.isMagic && d.source.data.target.type === "axiom") {
-                        SharedData.linkFunctionsHelper.showSubTree(d.target);
-                      }
-                    })
-                    .attr("x1", d => d.target.x0)
-                    .attr("y1", d => app.proofHeight - d.target.y0 + nodeVisualsDefaults.BOX_HEIGHT + 1)
-                    .attr("x2", d => d.source.x0)
-                    .attr("y2", d => app.proofHeight - d.source.y0)
-                    /*.each(function (d) {
-                      switch (that.currentMagicAction) {
-                        case "pullUp":
-                          console.log("pullUp", this, d);
-                          d3.select(this)
-                              .call(element => {
-                                const stops = [d.target];
-                                let nextParent = d.target.parent
-                                while (nextParent) {
-                                  stops.push(nextParent);
-                                  nextParent = nextParent.parent;
-                                }
-                                console.log(stops);
+        .data(this.root.links(), d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
+        //.join("line")
+        .join(
+          enter => {
+            const that = this;
+            const container = enter.append("line")
+              .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
+              //.attr("marker-mid", "url(#arrowhead)")
+              .attr("class", d =>
+                (d.source.data.source.type === "rest" ? "link torest" : "link") +
+                (d.source.data.target.type === "axiom" && !app.isMagic ? " from-axiom " : "")
+              )
+              .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
+              .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
+              .on("click", d => {
+                if (!app.isMagic && d.source.data.target.type === "axiom") {
+                  SharedData.linkFunctionsHelper.showSubTree(d.target);
+                }
+              })
+              .attr("x1", d => d.target.x0)
+              .attr("y1", d => app.proofHeight - d.target.y0 + nodeVisualsDefaults.BOX_HEIGHT + 1)
+              .attr("x2", d => d.source.x0)
+              .attr("y2", d => app.proofHeight - d.source.y0)
+              /*.each(function (d) {
+                switch (that.currentMagicAction) {
+                  case "pullUp":
+                    console.log("pullUp", this, d);
+                    d3.select(this)
+                        .call(element => {
+                          const stops = [d.target];
+                          let nextParent = d.target.parent
+                          while (nextParent) {
+                            stops.push(nextParent);
+                            nextParent = nextParent.parent;
+                          }
+                          console.log(stops);
 
-                                function cat(index) {
-                                  if (index === 0 && stops[index + 1]) {
-                                    return cat(index + 1)
-                                        .transition()
-                                        .duration(10)
-                                        .attr("opacity", 1)
-                                        .transition()
-                                        .duration(drawTime)
-                                        .attr("x1", () => stops[index].x)
-                                        .attr("y1", () => app.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
-                                        .attr("x2", d => d.source.x)
-                                        .attr("y2", d => app.proofHeight - d.source.y)
-                                  } else if (stops[index + 1] && !stops[index].data.id.startsWith("MN")) {
-                                    return cat(index + 1)
-                                        .transition()
-                                        .duration(drawTime)
-                                        .attr("x1", d => stops[index].x)
-                                        .attr("y1", d => app.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
-                                        .attr("x2", d => d.source.x)
-                                        .attr("y2", d => app.proofHeight - d.source.y)
-                                  } else {
-                                    return element
-                                        .transition()
-                                        .duration(10)
-                                        .attr("opacity", 0)
-                                        .transition()
-                                        .duration(drawTime)
-                                        .attr("x1", d => d.source.x)
-                                        .attr("y1", d => app.proofHeight - d.source.y)
-                                        .attr("x2", d => d.source.x)
-                                        .attr("y2", d => app.proofHeight - d.source.y)
-                                  }
-                                }
+                          function cat(index) {
+                            if (index === 0 && stops[index + 1]) {
+                              return cat(index + 1)
+                                  .transition()
+                                  .duration(10)
+                                  .attr("opacity", 1)
+                                  .transition()
+                                  .duration(drawTime)
+                                  .attr("x1", () => stops[index].x)
+                                  .attr("y1", () => app.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
+                                  .attr("x2", d => d.source.x)
+                                  .attr("y2", d => app.proofHeight - d.source.y)
+                            } else if (stops[index + 1] && !stops[index].data.id.startsWith("MN")) {
+                              return cat(index + 1)
+                                  .transition()
+                                  .duration(drawTime)
+                                  .attr("x1", d => stops[index].x)
+                                  .attr("y1", d => app.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
+                                  .attr("x2", d => d.source.x)
+                                  .attr("y2", d => app.proofHeight - d.source.y)
+                            } else {
+                              return element
+                                  .transition()
+                                  .duration(10)
+                                  .attr("opacity", 0)
+                                  .transition()
+                                  .duration(drawTime)
+                                  .attr("x1", d => d.source.x)
+                                  .attr("y1", d => app.proofHeight - d.source.y)
+                                  .attr("x2", d => d.source.x)
+                                  .attr("y2", d => app.proofHeight - d.source.y)
+                            }
+                          }
 
-                                cat(0)
-                              })
-                          break;
+                          cat(0)
+                        })
+                    break;
 
-                        default:
-                          break;
-                      }
-                    })
-                    */
-                    .transition(t)
-                    .attr("x1", d => d.target.x)
-                    .attr("y1", d => app.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
-                    .attr("x2", d => d.source.x)
-                    .attr("y2", d => app.proofHeight - d.source.y);
+                  default:
+                    break;
+                }
+              })
+              */
+              .transition(t)
+              .attr("x1", d => d.target.x)
+              .attr("y1", d => app.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+              .attr("x2", d => d.source.x)
+              .attr("y2", d => app.proofHeight - d.source.y);
 
-                /*
-                container.append("g")
-                    .attr("class", "edge-button")
-                    .attr('id', d => 'detachButtonN' + d.target.data.source.id)
-                    .attr("cursor", "pointer")
-                    .attr("transform", d => {
-                        const { source: s, target: t } = d;
-                        return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
-                    })
-                    .transition(t)
-                    .attr("transform", d => {
-                        const { source: s, target: t } = d;
-                        return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
-                    })
+            /*
+            container.append("g")
+                .attr("class", "edge-button")
+                .attr('id', d => 'detachButtonN' + d.target.data.source.id)
+                .attr("cursor", "pointer")
+                .attr("transform", d => {
+                    const { source: s, target: t } = d;
+                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                })
+                .transition(t)
+                .attr("transform", d => {
+                    const { source: s, target: t } = d;
+                    return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                })
 
-                container
-                    .append("circle")
-                    .attr("cx", 0)
-                    .attr("cy", -8)
-                    .attr("r", 14)
-                    .attr("fill", "#ccc")
-                    .attr("transform", d => {
-                        const { source: s, target: t } = d;
-                        return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
-                    })
-                    .transition(t)
-                    .attr("transform", d => {
-                        const { source: s, target: t } = d;
-                        return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
-                    })
+            container
+                .append("circle")
+                .attr("cx", 0)
+                .attr("cy", -8)
+                .attr("r", 14)
+                .attr("fill", "#ccc")
+                .attr("transform", d => {
+                    const { source: s, target: t } = d;
+                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                })
+                .transition(t)
+                .attr("transform", d => {
+                    const { source: s, target: t } = d;
+                    return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                })
 
-                container
-                    .append("text")
-                    .attr('class', 'edgelabel material-icons')
-                    .style('font-size', '16px')
-                    .style('fill', 'white')
-                    .text('\ue14e')
-                    .attr("text-anchor", "middle")
-                    .on("click", d => {
-                        SharedData.linkFunctionsHelper.showSubTree(d.target);
-                    })
-                    .attr("transform", d => {
-                        const { source: s, target: t } = d;
-                        return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
-                    })
-                    .transition(t)
-                    .attr("transform", d => {
-                        const { source: s, target: t } = d;
-                        return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
-                    })
-                */
-              },
-              update => {
-                update
-                    .transition(t)
-                    .attr("x1", d => d.target.x)
-                    .attr("y1", d => app.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
-                    .attr("x2", d => d.source.x)
-                    .attr("y2", d => app.proofHeight - d.source.y)
-              },
-              exit => {
-                exit.remove()
-              }
-          );
+            container
+                .append("text")
+                .attr('class', 'edgelabel material-icons')
+                .style('font-size', '16px')
+                .style('fill', 'white')
+                .text('\ue14e')
+                .attr("text-anchor", "middle")
+                .on("click", d => {
+                    SharedData.linkFunctionsHelper.showSubTree(d.target);
+                })
+                .attr("transform", d => {
+                    const { source: s, target: t } = d;
+                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                })
+                .transition(t)
+                .attr("transform", d => {
+                    const { source: s, target: t } = d;
+                    return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                })
+            */
+          },
+          update => {
+            update
+              .transition(t)
+              .attr("x1", d => d.target.x)
+              .attr("y1", d => app.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+              .attr("x2", d => d.source.x)
+              .attr("y2", d => app.proofHeight - d.source.y)
+          },
+          exit => {
+            exit.remove()
+          }
+        );
     } else {
       lP.drawCurvedLinks(t);
     }
@@ -562,12 +565,12 @@ const SharedData = {
         let originalSource = common.find(x => x.data.target.id === d.data.source.id);
         let originalTarget = common.find(x => x.data.source.id === d.data.source.id);
         if (originalSource) {
-          const {x, y, id} = originalSource.parent;
+          const { x, y, id } = originalSource.parent;
           d.x0 = x;
           d.y0 = y;
           d.id = id;
         } else if (originalTarget) {
-          const {x, y, id} = originalTarget;
+          const { x, y, id } = originalTarget;
           d.x0 = x;
           d.y0 = y;
           d.id = id;
@@ -586,22 +589,17 @@ const SharedData = {
   },
 
   advancedUpdate: function (drawTime = app.drawTime) {
-    //this.update(0);
     this.update(drawTime);
   },
 
-  separation: function (a, b) {   
-    if (!(a.width && b.width)) {
-      return 1; // nodes have never been drawn before
-    }
-
+  separation: function (a, b) {
     return ((a.width + b.width) / 2) / this.maxNodeWidth + 0.03;
   }
 
 }
 
 function removeListeners(event, thingsWithListeners) {
-  thingsWithListeners.forEach((val,key)=>{
+  thingsWithListeners.forEach((val, key) => {
     if (!key) {
       delete thingsWithListeners[key]
     } else {
