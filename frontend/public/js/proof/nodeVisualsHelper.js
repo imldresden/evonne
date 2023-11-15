@@ -282,7 +282,8 @@ export class NodeVisualsHelper {
                     this.activeNodes[d.id] = setTimeout(() => {
                         this.shiftLabelHideButtons(node);
                         if (!app.isDrawing) {
-                            if (d3.select(`#${node.id} .tray`).classed("expanded")) {
+                            const tray = d3.select(`#${node.id} .tray`);
+                            if (tray && tray.classed("expanded")) {
                                 this.expandCollapseNode(node.id);
                                 this.updateEdge(d);
                             }
