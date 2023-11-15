@@ -1,3 +1,5 @@
+<div style="background-color:black; height:0.5px; width:90%;"></div>
+<br>
 <header class="modal-section-header toggles-content" target="ontology-settings">
   <h3 class="modal-section-heading">Ontology Settings</h3> <i class="material-icons">arrow_drop_down</i>
 </header>
