@@ -283,11 +283,8 @@ export class InferenceRulesHelper {
 
         console.log("conclusion after removing outer = " + conclusion)
 
-        let lHSRaw =  conclusion.split(subsumes)[0].trim();
-        lHSRaw.forEach(x=>{
-
-        });
-
+        //let lHSRaw =  conclusion.split(subsumes)[0].trim();
+        
         lHS = conclusion.substring(1, conclusion.indexOf(")")).split(subsumes)[0].trim();
         rHS = conclusion.split(subsumes)[1].trim();
         lHSConjuncts = lHS.split(and);
