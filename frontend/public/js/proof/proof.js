@@ -33,7 +33,7 @@ const magicToggleBtn = document.getElementById("toggleMagicMode");
 const layoutToggleBtn = document.getElementById("toggleLayoutMode");
 const shorteningRuleNamesBtn = document.getElementById("toggleRuleNamesShortening");
 const planarToggleBtn = document.getElementById("togglePlanar");
-const overlapAllowingSettings = document.getElementById("proof-overlap-allowing-settings")
+const overlapAllowingSettings = document.getElementById("proof-overlap-allowing-settings");
 
 //Buttons
 const shortenAllInProofBtn = document.getElementById("shortenAllInProofBtn");
@@ -127,6 +127,7 @@ export function init_proof(proof_file_param) {
     allowOverlapBtn.checked = false;
     allowOverlapBtn.addEventListener("click", allowOverlapBtnFunction);
   }
+  overlapAllowingSettings.style.display = SharedData.allowOverlap ? "block" : "none";
 
   // Configure Navigation Mode
   // -- Switch on to explore step-wise

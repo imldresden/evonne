@@ -140,8 +140,6 @@ const SharedData = {
 
   update: function (source, drawTime = app.drawTime) {
     this.setNodeWidthsAndMax(this.hierarchy); 
-    console.log(this.hierarchy.width)
-
 
     if (app.isLinear) {
       this.root = lP.computeLinearLayout(this.hierarchy);
@@ -379,7 +377,7 @@ const SharedData = {
               )
               .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
               .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
-              .on("click", d => {
+              .on("click", (_, d) => {
                 if (!app.isMagic && d.source.data.target.type === "axiom") {
                   SharedData.linkFunctionsHelper.showSubTree(d.target);
                 }
