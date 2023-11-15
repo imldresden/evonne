@@ -50,12 +50,12 @@ export class InferenceRulesHelper {
                 x.children.forEach(child => premise.push(child.data.source.element));
             }
 
-            proofView.select("#N" + x.data.source.id).on("click", () => {
+            proofView.select("#N" + x.data.source.id).on("click", (event, node) => {
                 tooltip.selectAll("*").remove();
                 if (x.data.source.id !== lastToolTipTriggerID) {
                     this.addExplanation(premise, conclusion, ruleName, tooltip);
                     app.ruleExplanationPosition === "mousePosition"
-                        ? this.setPositionRelativeToMouse(tooltip)
+                        ? this.setPositionRelativeToMouse(event, tooltip)
                         : tooltip.classed(this.getPositionClass(app.ruleExplanationPosition), true);
                     lastToolTipTriggerID = x.data.source.id;
                 } else {
@@ -760,19 +760,19 @@ export class InferenceRulesHelper {
         return "positionLB"
     }
 
-    setPositionRelativeToMouse(tooltip) {
+    setPositionRelativeToMouse(event, tooltip) {
         let element = document.getElementById("explanationTextSpan");
 
         if (element) {
             let width = element.offsetWidth;
             let height = element.offsetHeight - 35;
 
-            let x = d3.event.clientX + width > app.contentWidth
+            let x = event.clientX + width > app.contentWidth
                 ? app.contentWidth - width
-                : d3.event.pageX;
-            let y = d3.event.clientY + height > app.contentHeight
+                : event.pageX;
+            let y = event.clientY + height > app.contentHeight
                 ? app.contentHeight - height
-                : d3.event.pageY;
+                : event.pageY;
 
             tooltip.style("left", x + "px").style("top", y + "px");
         }

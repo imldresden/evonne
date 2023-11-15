@@ -506,7 +506,7 @@ export class AxiomFunctionsHelper {
 				const rect = document.querySelector(`#${id} #frontRect`);
 				return `translate(${rect.getAttribute("width") / 2 - BTN_CIRCLE_SIZE - 1}, ${BOX_HEIGHT})`;
 			})
-			.on("click", (_, d) => this.highlightCurrentInference(d))
+			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
@@ -523,7 +523,7 @@ export class AxiomFunctionsHelper {
 
 	inferenceRulesHelper = new InferenceRulesHelper();
 
-	highlightCurrentInference(nodeData) {
+	highlightCurrentInference(event, nodeData) {
 		d3.selectAll("body .tooltip-explanation").remove();
 		let btn = d3.select("#N" + nodeData.data.source.id).select("#H1 text");
 		let state = btn.text();
@@ -543,7 +543,7 @@ export class AxiomFunctionsHelper {
 
 			this.inferenceRulesHelper.addExplanation(premise, conclusion, ruleName, tooltip);
 			app.ruleExplanationPosition === "mousePosition"
-				? this.inferenceRulesHelper.setPositionRelativeToMouse(tooltip)
+				? this.inferenceRulesHelper.setPositionRelativeToMouse(event, tooltip)
 				: tooltip.classed(this.inferenceRulesHelper.getPositionClass(app.ruleExplanationPosition), true);
 
 			btn.text("\ue1b6");
