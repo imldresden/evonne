@@ -79,6 +79,8 @@ function computingRepairsFailed(msg) {
 //Notify the user that the repairs are being computed
 function computingRepairs() {
   notify(getComputingNotification());
+  document.getElementById("diagnoses-axiom").innerHTML = "";
+  document.getElementById("diagnoses-title").innerHTML = "Diagnoses";
   computingInterval = setInterval(function () {
     notificationDiv.text(getComputingNotification());
   }, 350);
