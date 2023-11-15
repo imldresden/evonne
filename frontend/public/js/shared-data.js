@@ -78,12 +78,17 @@ const SharedData = {
     return stratify(data);
   },
 
-  estimateNodeWidth: function (node) {
+  getNodeWidth: function (node) {
     // estimation of the size of each character
-    const display = this.nodesCurrentDisplayFormat.get(node.data.id)
+    const display = this.nodesCurrentDisplayFormat.get(`N${node.data.source.id}`)
     let label = "";
-    label = node.data.source.element;
-
+    if (!display || display === "original") {
+      label = node.data.source.element;
+    } else if (display === "shortened") {
+      label = SharedData.labelsShorteningHelper.shortenLabel(node.data.source.element, app.isRuleShort, app.shorteningMethod);
+    } else if (display === "textual") {
+      label = node.data.source.nlelement;
+    }
 
     node.width = label.length * APP_GLOBALS.fontCharacterWidth + 16;
 
@@ -93,7 +98,7 @@ const SharedData = {
   setNodeWidthsAndMax: function (node) {
     // computes all widths, saves them per node and sets max
     if (node !== null) {
-      this.estimateNodeWidth(node);
+      this.getNodeWidth(node);
       if (node.width > this.maxNodeWidth) {
         this.maxNodeWidth = node.width;
       }
@@ -135,6 +140,8 @@ const SharedData = {
 
   update: function (source, drawTime = app.drawTime) {
     this.setNodeWidthsAndMax(this.hierarchy); 
+    console.log(this.hierarchy.width)
+
 
     if (app.isLinear) {
       this.root = lP.computeLinearLayout(this.hierarchy);

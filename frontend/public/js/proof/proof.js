@@ -513,7 +513,7 @@ function shortenAllInProofBtnFunction(){
   });
 
   //Redraw
-  SharedData.advancedUpdate(SharedData.hierarchy, 0, app.drawTime / 2);
+  SharedData.advancedUpdate();
 }
 function proofWidthRangeResetBtnFunction(){
   app.proofWidth = app.contentWidth;
