@@ -18,7 +18,7 @@ export const nodeVisualsDefaults = {
     BTN_EYE_HORIZONTAL_PADDING: 10,
     BTN_EYE_VERTICAL_PADDING: 10,
     AXIOM_TEXT_BOTTOM_SHIFT: 30,
-    EXPANSION_COLLAPSING_DURATION: 70,
+    EXPANSION_COLLAPSING_DURATION: 200,
 }
 
 export class NodeVisualsHelper {
@@ -313,17 +313,19 @@ export class NodeVisualsHelper {
         app.svgProof.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .on("start", () => {})
-            .on("end", () => { this.addShowHideMouseEvents(); });
+            .on("end", () => { 
+                this.addShowHideMouseEvents(); 
+                this.showCommunicationButtons(node);
+        });
         
         this.moveButtons(node, "expand");
-        this.showCommunicationButtons(node);
     }
 
     collapseNode(node) {
         const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT } = nodeVisualsDefaults;
         let t = app.svgProof.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
-            .on("start", () => { })
+            .on("start", () => { this.hideCommunicationButtons(node); })
             .on("end", () => { this.addShowHideMouseEvents(); });
 
         //Collapse the trays
@@ -336,7 +338,6 @@ export class NodeVisualsHelper {
         
         //Move right bottom buttons to new position
         this.moveButtons(node, "collapse", t);
-        this.hideCommunicationButtons(node);
     }
 
     shiftLabel(node, direction) {
