@@ -40,7 +40,7 @@ export class AxiomFunctionsHelper {
 		SharedData.nodeVisualsHelper.initHideAllButtons();
 		//Double-clicking a button should not trigger the expand functionality of the node
 		d3.selectAll(".axiomButton")
-			.on("dblclick", () => d3.event.stopPropagation());
+			.on("dblclick", (e) => e.stopPropagation());
 		//Add pulse effect for unexplored nodes
 		this.addCollapsedIndicator();
 	}
@@ -536,15 +536,13 @@ export class AxiomFunctionsHelper {
 			let ruleName = nodeData.data.source.ruleName;
 			let conclusion = nodeData.data.source.element;
 			let premise = [];
+			let explanationData = nodeData.data.source.data; 
 
 			if (nodeData.children) {
 				nodeData.children.forEach(child => premise.push(child.data.source.element));
 			}
 
-			this.inferenceRulesHelper.addExplanation(premise, conclusion, ruleName, tooltip);
-			app.ruleExplanationPosition === "mousePosition"
-				? this.inferenceRulesHelper.setPositionRelativeToMouse(event, tooltip)
-				: tooltip.classed(this.inferenceRulesHelper.getPositionClass(app.ruleExplanationPosition), true);
+			this.inferenceRulesHelper.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: explanationData });
 
 			btn.text("\ue1b6");
 		} else {

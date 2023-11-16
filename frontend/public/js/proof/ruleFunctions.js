@@ -46,26 +46,20 @@ export class InferenceRulesHelper {
             let ruleName = x.data.source.element;
             let conclusion = x.parent.data.source.element;
             let premise = [];
+    
             if (x.children) {
                 x.children.forEach(child => premise.push(child.data.source.element));
             }
 
             proofView.select("#N" + x.data.source.id).on("click", (event, node) => {
-                tooltip.selectAll("*").remove();
-                if (x.data.source.id !== lastToolTipTriggerID) {
-                    this.addExplanation(premise, conclusion, ruleName, tooltip);
-                    app.ruleExplanationPosition === "mousePosition"
-                        ? this.setPositionRelativeToMouse(event, tooltip)
-                        : tooltip.classed(this.getPositionClass(app.ruleExplanationPosition), true);
-                    lastToolTipTriggerID = x.data.source.id;
-                } else {
-                    lastToolTipTriggerID = null;
-                }
+                this.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: node.data.source.data });
             });
         });
     }
 
-    addExplanation(premise, conclusion, ruleName, tooltip) {
+    showExplanation(event, tooltip, { premise, conclusion, ruleName, data }) {
+        tooltip.selectAll("*").remove();
+
         switch (ruleName) {
             case CLASS_HIERARCHY:
                 this.classHierarchy(premise, tooltip);
@@ -107,8 +101,15 @@ export class InferenceRulesHelper {
                 this.topSuperClass(conclusion, tooltip);
                 break;
             default:
+                if (data) {
+                    console.log(data);
+                }
                 break;
         }
+        
+        app.ruleExplanationPosition === "mousePosition"
+            ? this.setPositionRelativeToMouse(event, tooltip)
+            : tooltip.classed(this.getPositionClass(app.ruleExplanationPosition), true);
     }
 
     classHierarchy(premise, tooltip) {
@@ -128,7 +129,7 @@ export class InferenceRulesHelper {
             .attr("id", "explanationTextSpan");
 
         //Add a title for the explanation view
-        this.addTitle(CLASS_HIERARCHY, displayObject)
+        this.addTitle(CLASS_HIERARCHY, displayObject);
 
         //Add rule definition
         this.addClassHierarchyAbstract(displayObject);

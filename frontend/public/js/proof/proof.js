@@ -262,14 +262,72 @@ function getInitialMagicalHierarchy(data) {
   return result;
 }
 
+function extractNumbers(raw, processed) {
+  const result = {};
+  const numericals = raw.querySelectorAll("cdProofNode");
+
+  numericals.forEach((node) => {
+
+    const variables = new Set();
+    const eqs = {}; 
+
+    const equations = node.querySelectorAll("equation");
+    equations.forEach((equation) => {
+      const eq = {};
+      
+      const lhs = equation.querySelectorAll("lhs > term");
+      lhs.forEach((variable) => {
+        const coe = variable.getAttribute("coe");
+        let name = variable.getAttribute("var");
+        name = name.slice(name.indexOf('#') + 1, name.indexOf('>'));
+        eq[name] = coe;
+        variables.add(name);
+      });
+
+      const rhs = equation.querySelector("rhs > term").getAttribute("coe");
+      eq.rhs = rhs;
+
+      eqs[equation.getAttribute("id")] = eq;
+    });
+
+    const ops = {}; 
+    const rowOperations = node.querySelectorAll("cdRule");
+    rowOperations.forEach((operation) => {
+      const op = { 
+        premises: [], 
+        conclusion: operation.querySelector("conclusion").getAttribute("equation")
+      };
+      
+      const premises = operation.querySelectorAll("premise");
+      premises.forEach((premise) => {
+        op.premises.push({
+          coe: premise.getAttribute("coefficient"), 
+          eq: premise.getAttribute("equation")
+        });
+      });
+
+      ops[operation.getAttribute("id")] = op;
+    });
+    
+    result[node.getAttribute("linkedToNode")] = {
+      variables, ops, eqs 
+    };
+  });
+
+  return result;
+}
+
 function createContent(data) {
   // Generate nodes and edges from the raw data
   let processedData;
-  if (app.isLinear) processedData = lP.processData(data);
-  else processedData = processData(data);
+  if (app.isLinear) {
+    processedData = lP.processData(data, extractNumbers(data));
+  } else {
+    processedData = processData(data, extractNumbers(data));
+  }
+
   let nodeData = processedData.nodes;
   let edgeData = processedData.edges;
-  let originalEdgeData = edgeData;
 
   // add a custom link from the root node to.. nothing (needed for the stratify function)
   // This ID is also used in linkFunctions.js
@@ -281,6 +339,7 @@ function createContent(data) {
   });
   //Store original data
   SharedData.edgeData = edgeData;
+
   // initialize hierarchy depending on the navigation mode
   SharedData.hierarchy = app.isMagic
     ? SharedData.createHierarchy(getInitialMagicalHierarchy(edgeData))
@@ -304,7 +363,7 @@ function createContent(data) {
   SharedData.advancedUpdate();
 }
 
-function processData(data) {
+function processData(data, extras) {
   // Compute edges
   let edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
     let edgeId = d.getAttribute("id");
@@ -341,7 +400,7 @@ function processData(data) {
     let isRoot = false;
     if (outGoingEdges.length === 0) isRoot = true;
 
-    return { id, type, element, mselement, nlelement, isRoot };
+    return { id, type, element, mselement, nlelement, isRoot, data: extras[element] };
   });
 
   // Add the nodeData to the edgeData

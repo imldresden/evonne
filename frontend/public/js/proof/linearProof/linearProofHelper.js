@@ -1,8 +1,6 @@
 import { APP_GLOBALS as app, SharedData } from "../../shared-data.js";
 import {nodeVisualsDefaults} from "../nodeVisualsHelper.js";
 
-export{processData, computeLinearLayout, drawCurvedLinks, renderSideConnectorsByType,
-    addHighlightCurrentInferenceEvent, highlightCurrentInference, setFullOpacityToAll};
 
 function getDFOrder(hierarchy, orderedElements){
     hierarchy.children?.forEach(d=>{
@@ -58,7 +56,7 @@ function computeLinearLayout(hierarchy) {
     return linearLayout;
 }
 
-function processData(data) {
+function processData(data, extras) {
     // Compute edges
     let edgeData = [];
     [].map.call(data.querySelectorAll("hyperedge"), d => {
@@ -118,13 +116,13 @@ function processData(data) {
             isRoot = true;
         }
 
-        let ruleName = edgeData.filter(function (edge) {
+        const rule = edgeData.filter(function (edge) {
             return edge.target === idVar
-        })[0].ruleName
+        })[0];
 
         return {
             id: idVar, type: typeVar, element: elementVar, mselement: msElementVar, nlelement: nlElementVar,
-            isRoot: isRoot, ruleName:ruleName
+            isRoot: isRoot, ruleName:rule.ruleName, data:extras[rule.ruleName]
         };
     });
 
@@ -203,7 +201,6 @@ function renderSideConnectorsByType() {
     let newClasses = undefined;
     let selection = undefined;
     let connector = undefined;
-    let connectorType = undefined;
 
     //get axioms nodes
     let elements = SharedData.nodes.selectAll(".node");
@@ -274,3 +271,7 @@ function addHighlightCurrentInferenceEvent(){
         .on("mouseover", (d) => { highlightCurrentInference(d); })
         .on("mouseout", () => { setFullOpacityToAll(); });
 }
+
+
+export{processData, computeLinearLayout, drawCurvedLinks, renderSideConnectorsByType,
+    addHighlightCurrentInferenceEvent, highlightCurrentInference, setFullOpacityToAll};
