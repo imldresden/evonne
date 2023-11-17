@@ -536,13 +536,12 @@ export class AxiomFunctionsHelper {
 			let ruleName = nodeData.data.source.ruleName;
 			let conclusion = nodeData.data.source.element;
 			let premise = [];
-			let explanationData = nodeData.data.source.data; 
 
 			if (nodeData.children) {
 				nodeData.children.forEach(child => premise.push(child.data.source.element));
 			}
 
-			this.inferenceRulesHelper.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: explanationData });
+			this.inferenceRulesHelper.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: nodeData });
 
 			btn.text("\ue1b6");
 		} else {

@@ -5,3 +5,4 @@
 <link rel="stylesheet" href="/libs/hack-font/build/web/hack.css">
 <link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">
 <link rel="stylesheet" href="/style/widgets/general.css">
+<link rel="stylesheet" href="/style/widgets/parallel-coords.css">

@@ -6,6 +6,7 @@
 
 //TODO implement an option to choose between DL or OWL syntax
 
+import { parallelCoords } from "../parallel-coords/parallel-coords.js";
 import { APP_GLOBALS as app } from "../shared-data.js";
 
 const subsumes = "⊑", subsumesDisplay = " ⊑ ", exists = "∃", top = "⊤", bot = "⊥",
@@ -52,13 +53,25 @@ export class InferenceRulesHelper {
             }
 
             proofView.select("#N" + x.data.source.id).on("click", (event, node) => {
-                this.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: node.data.source.data });
+                this.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: node });
             });
         });
     }
 
     showExplanation(event, tooltip, { premise, conclusion, ruleName, data }) {
         tooltip.selectAll("*").remove();
+        
+        if (data.data.source.id !== lastToolTipTriggerID) {
+            lastToolTipTriggerID = data.data.source.id;
+            this.makeDraggable(document.getElementById("toolTipID"));
+        } else {
+            lastToolTipTriggerID = null;
+            return;
+        }
+
+        if (data.data.source.data) {
+            this.concreteDomain(data.data.source.data, tooltip);
+        }
 
         switch (ruleName) {
             case CLASS_HIERARCHY:
@@ -101,15 +114,42 @@ export class InferenceRulesHelper {
                 this.topSuperClass(conclusion, tooltip);
                 break;
             default:
-                if (data) {
-                    console.log(data);
-                }
                 break;
         }
         
         app.ruleExplanationPosition === "mousePosition"
             ? this.setPositionRelativeToMouse(event, tooltip)
             : tooltip.classed(this.getPositionClass(app.ruleExplanationPosition), true);
+    }
+
+    concreteDomain(data, tooltip) {
+        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
+            .attr("id", "explanationTextSpan");
+
+        //Add a title for the explanation view
+        this.addTitle("Numerical Logic", displayObject);
+
+        //Add visualization
+        tooltip.append("div")
+            .style("width", "700px")
+            .style("height", "300px")
+            .append("div")
+            .attr("class", "pcp-container")
+            .attr("id", "pcp-container")
+        
+        console.log(data);
+        const header = [...data.variables, "rhs"]; 
+        parallelCoords(
+            { id: "pcp", details: "pcp-container", width: 700, height: 300 }, 
+            [],
+            {
+                data_id: 'id',
+                nominals: [],
+                booleans: [],
+                numbers: header,
+                cols: header
+            }
+        );        
     }
 
     classHierarchy(premise, tooltip) {
@@ -775,5 +815,37 @@ export class InferenceRulesHelper {
             tooltip.style("left", x + "px").style("top", y + "px");
         }
     }
+
+    // https://www.w3schools.com/howto/howto_js_draggable.asp
+    makeDraggable(elmnt) {
+        
+        let x = 0, y = 0, clientX = 0, clientY = 0;
+        elmnt.onmousedown = dragMouseDown;
+        
+        function dragMouseDown(e) {
+          e.preventDefault();
+          clientX = e.clientX;
+          clientY = e.clientY;
+          document.onmouseup = releaseDrag;
+          document.onmousemove = drag;
+        }
+      
+        function drag(e) {
+          e.preventDefault();
+
+          x = clientX - e.clientX;
+          y = clientY - e.clientY;
+          clientX = e.clientX;
+          clientY = e.clientY;
+
+          elmnt.style.top = (elmnt.offsetTop - y) + "px";
+          elmnt.style.left = (elmnt.offsetLeft - x) + "px";
+        }
+      
+        function releaseDrag() {
+          document.onmouseup = null;
+          document.onmousemove = null;
+        }
+      }
 }
 

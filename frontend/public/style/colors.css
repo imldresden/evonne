@@ -1,0 +1,12 @@
+:root {
+    /* PCP */ 
+    --pcp-primary: #4887b9;
+    --pcp-secondary: #ee8c31;
+    --pcp-hover-stroke: #77c277;
+    --pcp-hover-width: 3px;
+    --pcp-bubble-cursor-color: #a3a3a3;
+    --pcp-bg-stroke: #c4c4c4ea;
+    --pcp-text-fill: #333333;
+    --pcp-axes-lines: #6b6b6b;
+    --pcp-bg: #fafafa;
+}

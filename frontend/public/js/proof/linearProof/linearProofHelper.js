@@ -273,5 +273,12 @@ function addHighlightCurrentInferenceEvent(){
 }
 
 
-export{processData, computeLinearLayout, drawCurvedLinks, renderSideConnectorsByType,
-    addHighlightCurrentInferenceEvent, highlightCurrentInference, setFullOpacityToAll};
+export {
+    processData, 
+    computeLinearLayout, 
+    drawCurvedLinks, 
+    renderSideConnectorsByType,
+    addHighlightCurrentInferenceEvent, 
+    highlightCurrentInference, 
+    setFullOpacityToAll
+}
