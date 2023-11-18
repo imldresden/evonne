@@ -137,19 +137,65 @@ export class InferenceRulesHelper {
             .attr("class", "pcp-container")
             .attr("id", "pcp-container")
         
-        console.log(data);
         const header = [...data.variables, "rhs"]; 
-        parallelCoords(
-            { id: "pcp", details: "pcp-container", width: 700, height: 300 }, 
-            [],
-            {
-                data_id: 'id',
-                nominals: [],
-                booleans: [],
-                numbers: header,
-                cols: header
-            }
-        );        
+        const pcp_data = {};
+
+        function getPolyline(data, id, color) {
+            const augmentedEq = data.eqs[id];
+            [...data.variables].forEach(v => {
+                if (!augmentedEq[v]) {
+                    augmentedEq[v] = "0"; 
+                }
+            });
+
+            const polyline = { id, color };
+            Object.keys(augmentedEq).forEach(k => {
+                polyline[k] = { value: eval(augmentedEq[k]), type: 'numbers' }
+            });
+            
+            return polyline;
+        }
+
+        Object.values(data.ops).forEach( (op, i) => {
+            pcp_data[i] = [];
+
+            op.premises.forEach(premise => {
+                pcp_data[i].push(getPolyline(data, premise.eq, '--pcp-primary'));
+            });
+            pcp_data[i].push(getPolyline(data, op.conclusion, '--pcp-secondary'));
+        });
+        
+        function makePCP(header, pcp_data) {
+            parallelCoords(
+                { id: "pcp", details: "pcp-container", width: 700, height: 300 }, 
+                pcp_data,
+                {
+                    data_id: 'id',
+                    nominals: [],
+                    booleans: [],
+                    numbers: header,
+                    cols: header
+                }
+            );
+        }
+
+        let current = 0;
+        tooltip.append("br");
+
+        const prev = tooltip.append("button");
+        prev.on("click", (e, d) => {
+            current = Math.max(0, current -1);
+            makePCP(header, pcp_data[current]);
+        })
+        prev.text("prev");
+
+        const next = tooltip.append("button");
+        next.on("click", (e, d) => {
+            current = Math.min(current + 1, Object.keys(pcp_data).length-1);
+            makePCP(header, pcp_data[current]);
+        })
+        next.text("next");
+        makePCP(header, pcp_data[current]);
     }
 
     classHierarchy(premise, tooltip) {
