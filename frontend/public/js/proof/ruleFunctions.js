@@ -27,7 +27,7 @@ const ASSERTED_CONCLUSION = "Asserted Conclusion",
 
 const regBetweenPar = /\([^)]+\)/g, regPar = /[()]/g;
 
-let displayObject, lastToolTipTriggerID;
+let tooltip, displayObject, lastToolTipTriggerID;
 
 export class InferenceRulesHelper {
 
@@ -37,7 +37,7 @@ export class InferenceRulesHelper {
         d3.selectAll("body .tooltip-explanation").remove();
 
         //create the tooltip
-        let tooltip = d3.select("body")
+        tooltip = d3.select("body")
             .append("div")
             .attr("class", "tooltip-explanation")
             .attr("id", "toolTipID");
@@ -53,14 +53,14 @@ export class InferenceRulesHelper {
             }
 
             proofView.select("#N" + x.data.source.id).on("click", (event, node) => {
-                this.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: node });
+                this.showExplanation(event, { premise, conclusion, ruleName, data: node });
             });
         });
     }
 
-    showExplanation(event, tooltip, { premise, conclusion, ruleName, data }) {
+    showExplanation(event, { premise, conclusion, ruleName, data }) {
         tooltip.selectAll("*").remove();
-        
+
         if (data.data.source.id !== lastToolTipTriggerID) {
             lastToolTipTriggerID = data.data.source.id;
             this.makeDraggable(document.getElementById("toolTipID"));
@@ -69,65 +69,66 @@ export class InferenceRulesHelper {
             return;
         }
 
+        displayObject = tooltip.append("div").attr("class", "tooltiptext")
+            .attr("id", "explanationTextSpan");
+
         if (data.data.source.data) {
-            this.concreteDomain(data.data.source.data, tooltip);
+            this.concreteDomain(data.data.source.data);
         }
 
         switch (ruleName) {
             case CLASS_HIERARCHY:
-                this.classHierarchy(premise, tooltip);
+                this.classHierarchy(premise);
                 break;
 
             case ASSERTED_CONCLUSION:
-                this.assertedConclusion(conclusion, tooltip);
+                this.assertedConclusion(conclusion);
                 break;
 
             case PROPERTY_DOMAIN_TRANSLATION:
-                this.propertyDomainTranslation(premise, tooltip);
+                this.propertyDomainTranslation(premise);
                 break;
 
             case INTERSECTION_DECOMPOSITION:
-                this.intersectionDecomposition(conclusion, tooltip);
+                this.intersectionDecomposition(conclusion);
                 break;
 
             case EQUIVALENT_CLASSES_DECOMPOSITION:
-                this.equivalentClassesDecomposition(premise, conclusion, tooltip);
+                this.equivalentClassesDecomposition(premise, conclusion);
                 break;
 
             case EXISTENTIAL_PROPERTY_EXPANSION:
-                this.existentialPropertyExpansion(premise, conclusion, tooltip);
+                this.existentialPropertyExpansion(premise, conclusion);
                 break;
 
             case INTERSECTION_COMPOSITION:
-                this.intersectionComposition(premise, tooltip);
+                this.intersectionComposition(premise);
                 break;
 
             case EXISTENTIAL_FILLER_EXPANSION:
-                this.existentialFillerExpansion(premise, conclusion, tooltip);
+                this.existentialFillerExpansion(premise, conclusion);
                 break;
 
             case DISJOINT_CLASSES_TRANSLATION:
-                this.disjointClassesTranslation(premise, conclusion, tooltip);
+                this.disjointClassesTranslation(premise, conclusion);
                 break;
 
             case Top_Super_Class:
-                this.topSuperClass(conclusion, tooltip);
+                this.topSuperClass(conclusion);
                 break;
             default:
                 break;
         }
         
         app.ruleExplanationPosition === "mousePosition"
-            ? this.setPositionRelativeToMouse(event, tooltip)
+            ? this.setPositionRelativeToMouse(event)
             : tooltip.classed(this.getPositionClass(app.ruleExplanationPosition), true);
     }
 
-    concreteDomain(data, tooltip) {
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
-
+    concreteDomain(data) {
+        
         //Add a title for the explanation view
-        this.addTitle("Numerical Logic", displayObject);
+        this.addTitle("Numerical Logic");
 
         //Add visualization
         tooltip.append("div")
@@ -198,7 +199,7 @@ export class InferenceRulesHelper {
         makePCP(header, pcp_data[current]);
     }
 
-    classHierarchy(premise, tooltip) {
+    classHierarchy(premise) {
         let leftAxiomLHS, commonPart, rightAxiomRHS;
 
         if (premise[0].split(subsumes)[1].trim() === premise[1].split(subsumes)[0].trim()) {
@@ -211,17 +212,14 @@ export class InferenceRulesHelper {
             rightAxiomRHS = premise[0].split(subsumes)[1];
         }
 
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
-
         //Add a title for the explanation view
-        this.addTitle(CLASS_HIERARCHY, displayObject);
+        this.addTitle(CLASS_HIERARCHY);
 
         //Add rule definition
-        this.addClassHierarchyAbstract(displayObject);
+        this.addClassHierarchyAbstract();
 
         let premiseLengths = [premise[0].length, premise[1].length];
-        this.addSeparator(displayObject, this.getLarger(premiseLengths, CLASS_HIERARCHY.length));
+        this.addSeparator(this.getLarger(premiseLengths, CLASS_HIERARCHY.length));
 
         //Add the current instantiation of the rule
         //Add the premise
@@ -236,14 +234,14 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(subsumesDisplay + rightAxiomRHS);
 
         //Add the line
-        this.addMidRule(displayObject, premiseLengths);
+        this.addMidRule(premiseLengths);
 
         //Add the conclusion
         displayObject
             .append("span").attr("class", "text-black").text(leftAxiomLHS + subsumesDisplay + rightAxiomRHS);
     }
 
-    addClassHierarchyAbstract(displayObject) {
+    addClassHierarchyAbstract() {
         displayObject
             .append("span").attr("class", "tab")
             .append("span").attr("class", "text-black").text(c1 + subsumesDisplay)
@@ -254,24 +252,22 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green").text(c2)
             .append("span").attr("class", "text-black").text(subsumesDisplay + c3);
 
-        this.addMidRule(displayObject, [5, 5]);
+        this.addMidRule([5, 5]);
 
         displayObject
             .append("span").attr("class", "text-black").text(c1 + subsumesDisplay + c3);
     }
 
-    assertedConclusion(conclusion, tooltip) {
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
+    assertedConclusion(conclusion) {
 
         //Add a title for the explanation view
-        this.addTitle(ASSERTED_CONCLUSION, displayObject);
+        this.addTitle(ASSERTED_CONCLUSION);
 
         //Add rule definition
-        this.addAssertedConclusionAbstract(displayObject);
+        this.addAssertedConclusionAbstract();
 
         let conclusionLength = [conclusion.length];
-        this.addSeparator(displayObject, this.getLarger(conclusionLength, ASSERTED_CONCLUSION.length));
+        this.addSeparator(this.getLarger(conclusionLength, ASSERTED_CONCLUSION.length));
 
         //Add the current instantiation of the rule
         //Add empty premise
@@ -279,43 +275,38 @@ export class InferenceRulesHelper {
             .append("p").style("margin-bottom", ".8cm");
 
         //Add the line
-        this.addMidRule(displayObject, conclusionLength);
+        this.addMidRule(conclusionLength);
 
         //Add the conclusion
         displayObject
             .append("span").attr("class", "text-black").text(conclusion);
     }
 
-    addAssertedConclusionAbstract(displayObject) {
+    addAssertedConclusionAbstract() {
         //Add empty premise
         displayObject
             .append("p").style("margin-bottom", ".8cm");
 
         //Add the line
-        this.addMidRule(displayObject, [6]);
+        this.addMidRule([6]);
 
         //Add the conclusion
         displayObject
             .append("span").attr("class", "text-black").text(c1 + subsumesDisplay + c2);
     }
 
-    propertyDomainTranslation(premise, tooltip) {
-        let roleName, concept;
-
-        roleName = premise[0].substring(premise[0].indexOf("(") + 1, premise[0].indexOf(")")).trim();
-        concept = premise[0].substring(premise[0].indexOf("=") + 1).trim();
-
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
+    propertyDomainTranslation(premise) {
+        let roleName = premise[0].substring(premise[0].indexOf("(") + 1, premise[0].indexOf(")")).trim();
+        let concept = premise[0].substring(premise[0].indexOf("=") + 1).trim();
 
         //Add a title for the explanation view
-        this.addTitle(PROPERTY_DOMAIN_TRANSLATION, displayObject)
+        this.addTitle(PROPERTY_DOMAIN_TRANSLATION)
 
         //Add rule definition
-        this.addPropertyDomainTranslationAbstract(displayObject);
+        this.addPropertyDomainTranslationAbstract();
 
         let premiseLength = [premise[0].length];
-        this.addSeparator(displayObject, this.getLarger(premiseLength, PROPERTY_DOMAIN_TRANSLATION.length));
+        this.addSeparator(this.getLarger(premiseLength, PROPERTY_DOMAIN_TRANSLATION.length));
 
         //Add the current instantiation of the rule
         //Add the premise
@@ -327,7 +318,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(" = " + concept);
 
         //Add the line
-        this.addMidRule(displayObject, premiseLength);
+        this.addMidRule(premiseLength);
 
         //Add the conclusion
         displayObject
@@ -338,7 +329,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(subsumesDisplay + concept);
     }
 
-    addPropertyDomainTranslationAbstract(displayObject) {
+    addPropertyDomainTranslationAbstract() {
         //Add the premise
         displayObject
             .append("span")
@@ -348,7 +339,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(" = " + c1);
 
         //Add the line
-        this.addMidRule(displayObject, [11]);
+        this.addMidRule([11]);
 
         //Add the conclusion
         displayObject
@@ -359,10 +350,9 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(subsumesDisplay + c1);
     }
 
-    intersectionDecomposition(conclusion, tooltip) {
+    intersectionDecomposition(conclusion) {
         let lHS, rHS, lHSConjuncts, indexOfMatch;
 
-        let originalConclusion = conclusion;
         // console.log(conclusion.replace(regPar, ""));
         if (conclusion[0] === "(" && conclusion[conclusion.length-1] === ")")
             // conclusion = conclusion.replace(regPar, "");
@@ -381,17 +371,14 @@ export class InferenceRulesHelper {
 
         //TODO cut t
 
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
-
         //Add a title for the explanation view
-        this.addTitle(INTERSECTION_DECOMPOSITION, displayObject);
+        this.addTitle(INTERSECTION_DECOMPOSITION);
 
         //Add rule definition
-        this.addIntersectionDecompositionAbstract(indexOfMatch, displayObject);
+        this.addIntersectionDecompositionAbstract(indexOfMatch);
 
         let conclusionLength = [conclusion.length];
-        this.addSeparator(displayObject, this.getLarger(conclusionLength, INTERSECTION_DECOMPOSITION.length));
+        this.addSeparator(this.getLarger(conclusionLength, INTERSECTION_DECOMPOSITION.length));
 
         //Add the current instantiation of the rule
         //Add empty premise
@@ -399,7 +386,7 @@ export class InferenceRulesHelper {
             .append("p").style("margin-bottom", ".8cm");
 
         //Add the line
-        this.addMidRule(displayObject, conclusionLength);
+        this.addMidRule(conclusionLength);
 
         //Add the conclusion
         let span = displayObject.append("span"), color;
@@ -421,13 +408,13 @@ export class InferenceRulesHelper {
         }
     }
 
-    addIntersectionDecompositionAbstract(indexOfMatch, displayObject) {
+    addIntersectionDecompositionAbstract(indexOfMatch) {
         //Add empty premise
         displayObject
             .append("p").style("margin-bottom", ".8cm");
 
         //Add the line
-        this.addMidRule(displayObject, [11]);
+        this.addMidRule([11]);
 
         //Add the conclusion
         let lHSConjuncts = [c1, c2],
@@ -452,14 +439,11 @@ export class InferenceRulesHelper {
         }
     }
 
-    equivalentClassesDecomposition(premise, conclusion, tooltip) {
+    equivalentClassesDecomposition(premise, conclusion) {
         let lHS = premise[0].split(equivalence)[0].trim();
         let rHS = premise[0].split(equivalence)[1].trim();
 
         let flip = lHS !== conclusion.split(subsumes)[0].trim();
-
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
 
         //Add a title for the explanation view
         this.addTitle(EQUIVALENT_CLASSES_DECOMPOSITION, displayObject)
@@ -468,7 +452,7 @@ export class InferenceRulesHelper {
         this.addEquivalentClassesDecompositionAbstract(flip, displayObject);
 
         let premiseLength = [premise[0].length];
-        this.addSeparator(displayObject, this.getLarger(premiseLength, EQUIVALENT_CLASSES_DECOMPOSITION.length));
+        this.addSeparator(this.getLarger(premiseLength, EQUIVALENT_CLASSES_DECOMPOSITION.length));
 
         //Add the current instantiation of the rule
         //Add the premise
@@ -479,7 +463,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(rHS);
 
         //Add the line
-        this.addMidRule(displayObject, premiseLength);
+        this.addMidRule(premiseLength);
 
         //Add the conclusion
         displayObject
@@ -489,7 +473,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(!flip?rHS:lHS);
     }
 
-    addEquivalentClassesDecompositionAbstract(flip, displayObject) {
+    addEquivalentClassesDecompositionAbstract(flip) {
         let lHS1 = c1;
         let lHS2 = flip ? c2 : c1;
         let rHS1 = c2;
@@ -503,7 +487,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(rHS1);
 
         //Add the line
-        this.addMidRule(displayObject, [5]);
+        this.addMidRule([5]);
 
         //Add the conclusion
         displayObject
@@ -513,23 +497,20 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(rHS2);
     }
 
-    existentialPropertyExpansion(premise, conclusion, tooltip) {
+    existentialPropertyExpansion(premise, conclusion) {
         let lHS = premise[0].split(subsumes)[0].trim();
         let rHS = premise[0].split(subsumes)[1].trim();
 
         let filler = conclusion.substring(conclusion.lastIndexOf(".") + 1);
 
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
-
         //Add a title for the explanation view
-        this.addTitle(EXISTENTIAL_PROPERTY_EXPANSION, displayObject)
+        this.addTitle(EXISTENTIAL_PROPERTY_EXPANSION)
 
         //Add rule definition
-        this.addExistentialPropertyExpansionAbstract(displayObject);
+        this.addExistentialPropertyExpansionAbstract();
 
         let premiseLength = [premise[0].length];
-        this.addSeparator(displayObject, this.getLarger(premiseLength, EXISTENTIAL_PROPERTY_EXPANSION.length));
+        this.addSeparator(this.getLarger(premiseLength, EXISTENTIAL_PROPERTY_EXPANSION.length));
 
         //Add the current instantiation of the rule
         //Add the premise
@@ -537,7 +518,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(premise[0]);
 
         //Add the line
-        this.addMidRule(displayObject, premiseLength);
+        this.addMidRule(premiseLength);
 
         //Add the conclusion
         displayObject
@@ -551,13 +532,13 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green").text(dot + filler);
     }
 
-    addExistentialPropertyExpansionAbstract(displayObject) {
+    addExistentialPropertyExpansionAbstract() {
         //Add the premise
         displayObject
             .append("span").attr("class", "text-black").text("R" + subsumesDisplay + "S");
 
         //Add the line
-        this.addMidRule(displayObject, [11]);
+        this.addMidRule([11]);
 
         //Add the conclusion
         displayObject
@@ -571,24 +552,21 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green").text(dot + c1);
     }
 
-    intersectionComposition(premise, tooltip) {
+    intersectionComposition(premise) {
         let lHS = premise[0].split(subsumes)[0];
 
         let rHSConjunct1 = premise[0].split(subsumes)[1];
         let rHSConjunct2 = premise[1].split(subsumes)[1];
 
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
-
         //Add a title for the explanation view
-        this.addTitle(INTERSECTION_COMPOSITION, displayObject)
+        this.addTitle(INTERSECTION_COMPOSITION)
 
         //Add rule definition
-        this.addIntersectionCompositionAbstract(displayObject);
+        this.addIntersectionCompositionAbstract();
 
         // let premiseLengths = [premise[0].length, premise[1].length];
         let premiseLengths = [lHS.length + rHSConjunct1.length + rHSConjunct2.length];
-        this.addSeparator(displayObject, this.getLarger(premiseLengths, INTERSECTION_COMPOSITION.length));
+        this.addSeparator(this.getLarger(premiseLengths, INTERSECTION_COMPOSITION.length));
 
         //Add the current instantiation of the rule
         //Add the premise
@@ -603,7 +581,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green").text(rHSConjunct2);
 
         //Add the line
-        this.addMidRule(displayObject, premiseLengths);
+        this.addMidRule(premiseLengths);
 
         //Add the conclusion
         displayObject
@@ -614,7 +592,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green").text(rHSConjunct2);
     }
 
-    addIntersectionCompositionAbstract(displayObject) {
+    addIntersectionCompositionAbstract() {
         //Add the premise
         displayObject
             .append("div")//.attr("class","tab")
@@ -627,7 +605,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green").text(c3);
 
         //Add the line
-        this.addMidRule(displayObject, [14]);
+        this.addMidRule([14]);
 
         //Add the conclusion
         displayObject
@@ -638,24 +616,21 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green").text(c3);
     }
 
-    existentialFillerExpansion(premise, conclusion, tooltip) {
+    existentialFillerExpansion(premise, conclusion) {
         let lHS, rHS, roleName;
 
         lHS = premise[0].split(subsumes)[0].trim();
         rHS = premise[0].split(subsumes)[1].trim();
         roleName = conclusion.substring(1, conclusion.indexOf("."));
 
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
-
         //Add a title for the explanation view
-        this.addTitle(EXISTENTIAL_FILLER_EXPANSION, displayObject)
+        this.addTitle(EXISTENTIAL_FILLER_EXPANSION);
 
         //Add rule definition
-        this.addExistentialFillerExpansionAbstract(displayObject);
+        this.addExistentialFillerExpansionAbstract();
 
         let conclusionLength = [conclusion.length];
-        this.addSeparator(displayObject, this.getLarger(conclusionLength, EXISTENTIAL_FILLER_EXPANSION.length));
+        this.addSeparator(this.getLarger(conclusionLength, EXISTENTIAL_FILLER_EXPANSION.length));
 
         //Add the current instantiation of the rule
         //Add the premise
@@ -663,7 +638,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(premise[0]);
 
         //Add the line
-        this.addMidRule(displayObject, conclusionLength);
+        this.addMidRule(conclusionLength);
 
         //Add the conclusion
         displayObject
@@ -676,13 +651,13 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text("." + rHS);
     }
 
-    addExistentialFillerExpansionAbstract(displayObject) {
+    addExistentialFillerExpansionAbstract() {
         //Add the premise
         displayObject
             .append("span").attr("class", "text-black").text(c1 + subsumesDisplay + c2);
 
         //Add the line
-        this.addMidRule(displayObject, [11]);
+        this.addMidRule([11]);
 
         //Add the conclusion
         displayObject
@@ -695,22 +670,19 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(dot + c2);
     }
 
-    disjointClassesTranslation(premise, conclusion, tooltip) {
+    disjointClassesTranslation(premise, conclusion) {
 
         let premiseRoleNames = premise[0].match(regBetweenPar)[0].replace(regPar, "").split(",").map(x => x.trim());
         let conclusionRoleNames = conclusion.match(regBetweenPar)[0].replace(regPar, "").split(and).map(x => x.trim());
 
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
-
         //Add a title for the explanation view
-        this.addTitle(DISJOINT_CLASSES_TRANSLATION, displayObject)
+        this.addTitle(DISJOINT_CLASSES_TRANSLATION)
 
         //Add rule definition
-        this.addDisjointClassesTranslationAbstract(displayObject);
+        this.addDisjointClassesTranslationAbstract();
 
         let premiseLengths = [premise[0].length];
-        this.addSeparator(displayObject, this.getLarger(premiseLengths, DISJOINT_CLASSES_TRANSLATION.length));
+        this.addSeparator(this.getLarger(premiseLengths, DISJOINT_CLASSES_TRANSLATION.length));
 
         //Add the current instantiation of the rule
         //Add the premise
@@ -728,7 +700,7 @@ export class InferenceRulesHelper {
         x.append("span").attr("class", "text-black").text(")");
 
         //Add the line
-        this.addMidRule(displayObject, premiseLengths);
+        this.addMidRule(premiseLengths);
 
         //Add the conclusion
         x = displayObject.append("span");
@@ -742,7 +714,7 @@ export class InferenceRulesHelper {
         x.append("span").attr("class", "text-black").text(")" + subsumesDisplay + bot);
     }
 
-    addDisjointClassesTranslationAbstract(displayObject) {
+    addDisjointClassesTranslationAbstract() {
         displayObject
             .append("span")//.attr("class", "tab")
             .append("span").attr("class", "text-black").text(`${disjoint}(${r1}, ... , `)
@@ -751,7 +723,7 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green ").text(r3)
             .append("span").attr("class", "text-black normal").text(`, ... , ${r4})`);
 
-        this.addMidRule(displayObject, [9, 9]);
+        this.addMidRule([9, 9]);
 
         displayObject
             .append("span").attr("class", "text-black").text("(")
@@ -761,18 +733,16 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-black").text(`)${subsumesDisplay}${bot}`);
     }
 
-    topSuperClass(conclusion, tooltip) {
-        displayObject = tooltip.append("span").attr("class", "tooltiptext card-panel")
-            .attr("id", "explanationTextSpan");
+    topSuperClass(conclusion) {
 
         //Add a title for the explanation view
-        this.addTitle(Top_Super_Class, displayObject);
+        this.addTitle(Top_Super_Class);
 
         //Add rule definition
-        this.addTopSuperClassAbstract(displayObject);
+        this.addTopSuperClassAbstract();
 
         let conclusionLength = [conclusion.length];
-        this.addSeparator(displayObject, this.getLarger(conclusionLength, ASSERTED_CONCLUSION.length));
+        this.addSeparator(this.getLarger(conclusionLength, ASSERTED_CONCLUSION.length));
 
         //Add the current instantiation of the rule
         //Add empty premise
@@ -780,7 +750,7 @@ export class InferenceRulesHelper {
             .append("p").style("margin-bottom", ".8cm");
 
         //Add the line
-        this.addMidRule(displayObject, conclusionLength);
+        this.addMidRule(conclusionLength);
 
         //Add the conclusion
         displayObject
@@ -788,13 +758,13 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green").text(conclusion.split(subsumes)[1]);
     }
 
-    addTopSuperClassAbstract(displayObject) {
+    addTopSuperClassAbstract() {
         //Add empty premise
         displayObject
             .append("p").style("margin-bottom", ".8cm");
 
         //Add the line
-        this.addMidRule(displayObject, [6]);
+        this.addMidRule([6]);
 
         //Add the conclusion
         displayObject
@@ -802,18 +772,24 @@ export class InferenceRulesHelper {
             .append("span").attr("class", "text-green ").text(top);
     }
 
-    addTitle(ruleName, displayObject) {
-        let title = displayObject.append("div").attr("class", "card-title")
-        title.append("span");//.attr("class", "close")
+    addTitle(ruleName) {
+        let title = displayObject.append("header")
+        title.append("i")
+            .attr("class", "material-icons right modal-close")
+            .html("close")
+            .on("click", () => {
+                tooltip.selectAll("*").remove();
+                lastToolTipTriggerID = null;
+            })
         title.append("h2").attr("align", "center").text(ruleName);
     }
 
-    addSeparator(displayObject, length) {
+    addSeparator() {
         displayObject.append("br")
         displayObject.append("br")
     }
 
-    addMidRule(displayObject, length) {
+    addMidRule(length) {
         displayObject
             .append("hr").attr("class", "mid").attr("width", this.getRuleLength(length));
     }
@@ -844,7 +820,7 @@ export class InferenceRulesHelper {
         return "positionLB"
     }
 
-    setPositionRelativeToMouse(event, tooltip) {
+    setPositionRelativeToMouse(event) {
         let element = document.getElementById("explanationTextSpan");
 
         if (element) {

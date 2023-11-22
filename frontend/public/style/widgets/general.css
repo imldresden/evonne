@@ -356,12 +356,15 @@ fieldset {
 	height: unset;
 	margin-bottom: 0;
 }
-.modal .modal-footer .modal-close {
+
+.modal-close {
 	margin: 0;
-	color: var(--color-primary);
+	color: var(--color-gray-darker);
 }
-.modal .modal-footer .modal-close:hover {
-	color: var(--color-primary-light);
+
+.modal-close:hover {
+	color: var(--color-gray-dark);
+	cursor: pointer;
 	background-color: transparent;
 	border-color: transparent;
 }
