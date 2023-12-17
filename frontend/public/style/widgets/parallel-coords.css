@@ -1,10 +1,8 @@
 @import '../colors.css';
 
 .pcp-container {
-    display: block;
-    background-color: var(--pcp-bg);
-    width: 700px;
-    height: 300px;
+  display: block;
+  background-color: var(--pcp-bg);
 }
 
 .pcp-container text {
@@ -20,16 +18,19 @@
   shape-rendering: optimizeQuality;
 }
 
-/*.foreground,*/
+.foreground path, 
+.background path {
+  stroke-width: 3px;
+}
+
 .foreground path {
   fill: none;
   opacity: 0.5;
-  /*stroke: var(--pcp-primary); /* set dynamically */
 }
 
 .cursor-area {
   opacity: 0.5;
-  fill: var(--pcp-bubble-cursor-color);
+  fill: var(--pcp-bubble-cursor-color); /*transparent*/
 }
 
 .selection-count-tooltip {
@@ -37,8 +38,7 @@
 }
 
 path.highlighted-path {
-  stroke: var(--pcp-hover);
-  stroke-width: var(--pcp-hover-width);
+  stroke-width: 7px;
 }
 
 .brush .extent {
@@ -70,4 +70,8 @@ path.highlighted-path {
 .pcp-container {
   position: absolute;
   display: inline-block;
+}
+
+line {
+  transition: 0.5s;
 }

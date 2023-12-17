@@ -6,7 +6,7 @@
 
 //TODO implement an option to choose between DL or OWL syntax
 
-import { parallelCoords } from "../parallel-coords/parallel-coords.js";
+import { parallelCoords } from "../parallel-coords/parallel-coords-svg.js";
 import { APP_GLOBALS as app } from "../shared-data.js";
 
 const subsumes = "⊑", subsumesDisplay = " ⊑ ", exists = "∃", top = "⊤", bot = "⊥",
@@ -149,54 +149,98 @@ export class InferenceRulesHelper {
                 }
             });
 
-            const polyline = { id, color };
-            Object.keys(augmentedEq).forEach(k => {
-                polyline[k] = { value: eval(augmentedEq[k]), type: 'numbers' }
-            });
+            const polyline = { id, color, nuid: "" };
+            Object.keys(augmentedEq)
+                .sort((a, b) => a.localeCompare(b))
+                .forEach(k => {
+                    polyline[k] = { value: eval(augmentedEq[k]), type: 'numbers' }
+                    polyline.nuid += 
+                        augmentedEq[k]
+                        .replaceAll(" ","")
+                        .replaceAll("-","min")
+                        .replaceAll("/","div")+k;
+                });
             
             return polyline;
         }
 
-        Object.values(data.ops).forEach( (op, i) => {
+        const style = getComputedStyle(document.querySelector('body'));
+        const colors = [
+            style.getPropertyValue('--color-blue'),
+            style.getPropertyValue('--color-lime'),
+            style.getPropertyValue('--color-purple-dark'),
+        ];
+
+        const ops = Object.values(data.ops);
+        const finalC = getPolyline(data, ops[ops.length-1].conclusion, colors[2]);
+
+        ops.forEach( (op, i) => {
             pcp_data[i] = [];
 
+            const conclusion = getPolyline(data, op.conclusion, colors[1]); 
             op.premises.forEach(premise => {
-                pcp_data[i].push(getPolyline(data, premise.eq, '--pcp-primary'));
+                const pr = getPolyline(data, premise.eq, colors[0]);
+                pcp_data[i].push(pr);
             });
-            pcp_data[i].push(getPolyline(data, op.conclusion, '--pcp-secondary'));
+            
+            if (conclusion.nuid !== finalC.nuid) {
+                pcp_data[i].push(conclusion);
+            }
+            pcp_data[i].push(finalC);
+        });
+
+        const domains = {};
+        
+        header.forEach(v => {
+            if (!domains[v]) {
+                domains[v] = d3.extent(Object.values(pcp_data).reduce((a, b)=> a.concat(b), []).map(d=> d[v].value)); 
+            }
         });
         
-        function makePCP(header, pcp_data) {
-            parallelCoords(
-                { id: "pcp", details: "pcp-container", width: 700, height: 300 }, 
-                pcp_data,
-                {
-                    data_id: 'id',
-                    nominals: [],
-                    booleans: [],
-                    numbers: header,
-                    cols: header
-                }
-            );
-        }
-
+        let pcp;
         let current = 0;
-        tooltip.append("br");
 
-        const prev = tooltip.append("button");
+        const prev = tooltip
+            .append("button")
+            .attr("class", "btn btn-primary");
+        
         prev.on("click", (e, d) => {
             current = Math.max(0, current -1);
-            makePCP(header, pcp_data[current]);
-        })
-        prev.text("prev");
+            pcp.update(pcp_data[current]);
+        });
+        
+        prev.append("i")
+            .attr("class", "material-icons")
+            .text("keyboard_arrow_left");
+        
+        const next = tooltip
+            .append("button")
+            .attr("class", "btn btn-primary");
 
-        const next = tooltip.append("button");
         next.on("click", (e, d) => {
             current = Math.min(current + 1, Object.keys(pcp_data).length-1);
-            makePCP(header, pcp_data[current]);
-        })
-        next.text("next");
-        makePCP(header, pcp_data[current]);
+            pcp.update(pcp_data[current]);
+        });
+
+        next.append("i")
+            .attr("class", "material-icons")
+            .text("keyboard_arrow_right");
+
+        tooltip.append("br");
+        tooltip.append("br");
+
+        pcp = parallelCoords(
+            { id: "pcp", details: "pcp-container", width: 700, height: 300 }, 
+            pcp_data[current],
+            {
+                data_id: 'id',
+                nominals: [],
+                booleans: [],
+                numbers: header,
+                cols: header,
+                domains: domains,
+            }
+        );
     }
 
     classHierarchy(premise) {

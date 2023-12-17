@@ -1,4 +1,4 @@
-// Adapted from: https://gist.github.com/syntagmatic/2409451 and https://gist.github.com/mbostock/1341021
+// Adapted from: https://gist.github.com/mbostock/1341021
 // d3v7 brushing example https://observablehq.com/@d3/brushable-parallel-coordinates
 
 const parallelCoords = function (pane, data, metadata) {
@@ -9,8 +9,9 @@ const parallelCoords = function (pane, data, metadata) {
     let dragging = {};
     let dimensions;
     let pcpHtml;
-    let resp, orient, svg;
-
+    let foreground, background, resp, orient, svg;
+    
+    const line = d3.line();
     const publicFunctions = {
         destroy: function () {
             Object.values(pcpHtml).forEach(l => {
@@ -37,8 +38,61 @@ const parallelCoords = function (pane, data, metadata) {
                 returnable.id = d.id;
                 return returnable;
             });
+        }, 
+        update(_data) {
+            update(_data)
+            //console.log(data.map(d => d.id + " " + Object.keys(d).map(k => d[k].value).join(" ")).join("\n"))
+            //console.log(_data.map(d => d.id + " " + Object.keys(d).map(k => d[k].value).join(" ")).join("\n"))
+            
         }
     };
+
+    function update(data) {
+        // background lines for context.
+        //d3.selectAll(".background path").remove()
+        pcpHtml.bg = background
+            .selectAll("path")
+            .data(data)
+            .join(
+                function(enter) {
+                    return enter
+                        .append("path")
+                        .attr("d", path);
+                },
+                function(update) {
+                    return update
+                        .attr("d", path);
+                },
+                function(exit) {
+                    return exit.remove();
+                }
+            )
+
+        //d3.selectAll(".foreground path").remove()
+
+        // foreground lines for focus.
+        pcpHtml.fg = foreground
+            .selectAll("path")
+            .data(data, k=> k.nuid)
+            .join(
+                function(enter) {
+                    return enter
+                        .append("path")
+                        .attr("d", path)
+                        .attr("stroke", d => d.color);
+                },
+                function(update) {
+                    return update
+                        .transition()
+                        .attr("d", path)
+                        .attr("stroke", d => d.color);
+                },
+                function(exit) {
+                    return exit.transition().attr("opacity", 0).remove();
+                }
+            )
+    }
+
     // applies effect over duration
     function transition(g, duration=500, delay=0) {
         return g.transition().delay(delay).duration(duration);
@@ -51,26 +105,17 @@ const parallelCoords = function (pane, data, metadata) {
     }
 
     // returns the path for a given data point - this maps the generated x/y function for each of the data points to every dimension
-    function path(d, ctx) {
-        ctx.beginPath();
+    function path(d) {
         if (orient) {
-            dimensions.map(function (p, i) {
-                if (i == 0) {
-                    ctx.moveTo(resp.scale(p), resp.axes[p](d[p].value));
-                } else {
-                    ctx.lineTo(resp.scale(p), resp.axes[p](d[p].value));
-                }
-            })
+            return line(
+                dimensions.map(p => [position(p), resp.axes[p](d[p].value)])
+            );
+
         } else {
-            dimensions.map(function (p, i) {
-                if (i == 0) {
-                    ctx.moveTo(resp.axes[p](d[p].value), resp.scale(p));
-                } else {
-                    ctx.lineTo(resp.axes[p](d[p].value), resp.scale(p));
-                }
-            });
+            return line(
+                dimensions.map(p => [resp.axes[p](d[p].value), position(p)])
+            );
         }
-        ctx.stroke();
     }
 
     function draw(pane, data) {
@@ -86,10 +131,6 @@ const parallelCoords = function (pane, data, metadata) {
 
         pcpHtml = {
             div: getPCPID("pcp"),
-            fg: getPCPID("foreground"),
-            bg: getPCPID("background"),
-            hl: getPCPID("highlight"),
-            interact: getPCPID("interaction")
         }
 
         d3.selectAll('#' + pcpHtml.div).remove();
@@ -139,39 +180,10 @@ const parallelCoords = function (pane, data, metadata) {
             Math.max(2, Math.trunc((resp.svg_dims[orient]) / 100, 0))
         );
 
-        const d3div = d3.select('#' + where.id)
-            .append('div')
-            .attr('id', pcpHtml.div);
-
-        d3div.append("canvas").attr("id", pcpHtml.bg);
-        d3div.append("canvas").attr("id", pcpHtml.hl);
-        d3div.append("canvas").attr("id", pcpHtml.fg);
-
-        const div = document.getElementById(pcpHtml.div);
-
-        d3.select('#' + where.id).selectAll("#" + pcpHtml.fg + ", #" + pcpHtml.bg + ", #" + pcpHtml.hl)
-            .attr("width", width + 10)
-            .attr("height", height + 10)
-            .style("padding", Object.values(margin).join("px ") + "px");
-
-        const foreground = div.querySelector('#' + pcpHtml.fg).getContext('2d');
-        const background = div.querySelector('#' + pcpHtml.bg).getContext('2d');
-        const highlight = div.querySelector('#' + pcpHtml.hl).getContext('2d');
-
-        foreground.globalAlpha = 0.5;
-        foreground.lineWidth = 1;
-
-        background.strokeStyle = getComputedStyle(div).getPropertyValue('--pcp-bg-stroke');
-        background.globalAlpha = 0.1;
-
-        highlight.strokeStyle = getComputedStyle(div).getPropertyValue('--pcp-hover-stroke');
-        highlight.lineWidth = 3;
-        highlight.globalAlpha = 1;
-
         // make the base svg for parallel coordinates
-        svg = d3div
+        svg = d3.select('#' + where.id)
             .append("svg")
-            .attr("id", pcpHtml.interact)
+            .attr("id", pcpHtml.div)
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
@@ -220,7 +232,7 @@ const parallelCoords = function (pane, data, metadata) {
                 return axis;
             } else if (metadata.data_id != d) { // numbers
                 const extent = metadata.domains ? metadata.domains[d] : d3.extent(data, function (p) { return +p[d].value; });
-
+                
                 if (extent[0] === extent[1]) {
                     extent[1] = extent[0] + 1;
                 }
@@ -240,17 +252,6 @@ const parallelCoords = function (pane, data, metadata) {
             }
         }));
 
-        function drawForeground(d) {
-            foreground.strokeStyle = d.color;
-            path(d, foreground);
-        }
-
-        // render full foreground and background
-        data.map(function (d) {
-            path(d, background);
-            drawForeground(d);
-        });
-
         // hover highlighting: background and cursor area visual indicator
         // both of these are before fg and bg to not interfere with other events
         svg.append("rect")
@@ -265,6 +266,9 @@ const parallelCoords = function (pane, data, metadata) {
         const count_tooltip = svg.append('text')
             .attr('class', 'selection-count-tooltip');
 
+        background = svg.append("g").attr("class", "background")
+        foreground = svg.append("g").attr("class", "foreground")
+        update(data);
 
         function checkIfActive(point) {
             return Array.from(selections).every(
@@ -303,20 +307,22 @@ const parallelCoords = function (pane, data, metadata) {
                 })
                 .on("start", function (e, d) {
                     dragging[d] = resp.scale(d);
+                    pcpHtml.bg.attr("visibility", "hidden");
                 })
                 .on("drag", function (e, d) {
                     dragging[d] = orient ?
                         e.subject.x = Math.min(width + margin.right, Math.max(-margin.left, e.x)) :
                         e.subject.y = Math.min(height + margin.bottom, Math.max(-margin.top, e.y));
+                        pcpHtml.fg.attr("d", path);
                     dimensions.sort(basic_sort);
                     resp.scale.domain(dimensions);
-                    drawBrushed();
                     g.attr("transform", function (d) { return resp.trans[orient] + position(d) + ")"; })
                 })
                 .on("end", function (e, d) {
                     delete dragging[d];
                     transition(d3.select(this)).attr("transform", resp.trans[orient] + resp.scale(d) + ")");
-                    drawBrushed();
+                    transition(pcpHtml.fg).attr("d", path);
+                    transition(pcpHtml.bg, 0, 500).attr("d", path).attr("visibility", null);
                 })
             );
 
@@ -330,7 +336,6 @@ const parallelCoords = function (pane, data, metadata) {
 
         // cursor logic
         svg.on("mousemove", function (e) {
-            highlight.clearRect(0, 0, width + 10, height + 10);
             const mouse = d3.pointer(e);  // [x, y]
             const cursor_pad = 20;
 
@@ -351,6 +356,7 @@ const parallelCoords = function (pane, data, metadata) {
                 !(mouse_scale_pos > Math.max(range[0], range[1]))
                 && mouse_scale_pos < Math.min(range[0], range[1])
             ) {
+                pcpHtml.bg.attr("class", null);
                 cursor_rect.attr(resp.w_h[orient], 0);
                 cursor_rect.attr(resp.w_h[1 - orient], 0);
                 count_tooltip.text('');
@@ -368,15 +374,16 @@ const parallelCoords = function (pane, data, metadata) {
             cursor_rect.attr(resp.x_y[orient], mouse[orient] - cursor_pad);
 
             // compare against mouse value only on closest dimension and within brush selections
-            data.map(function (point) {
+            pcpHtml.fg.attr("class", function (point) {
                 const active = checkIfActive(point);
 
                 const val = point[dim].type === 'numbers' ? point[dim].value : resp.axes[dim].mapping[point[dim].value];
                 if (active && val >= Math.min(mouse_lower_limit, mouse_upper_limit) && val <= Math.max(mouse_lower_limit, mouse_upper_limit)) {
                     highlighted.add(point.id);
-                    path(point, highlight);
+                    return "highlighted-path";
                 } else {
                     highlighted.delete(point.id);
+                    return null;
                 }
             });
 
@@ -397,9 +404,9 @@ const parallelCoords = function (pane, data, metadata) {
         const brushes = {};
         g.append("g")
             .attr("class", "brush")
-            .attr("id", (d) => "brush-" + getAxisId(d))
+            .attr("id", (d) => "brush-"+getAxisId(d))
             .each(function (d) {
-                brushes["brush-" + getAxisId(d)] = this;
+                brushes["brush-"+getAxisId(d)] = this;
                 if (orient) {
                     d3.select(this).call(
                         resp.axes[d].brush = d3.brushY()
@@ -470,18 +477,13 @@ const parallelCoords = function (pane, data, metadata) {
         }
 
         function drawBrushed() {
-            // clear all canvas
-            foreground.clearRect(0, 0, width + 10, height + 10);
-            background.clearRect(0, 0, width + 10, height + 10);
-            highlight.clearRect(0, 0, width + 10, height + 10);
-
             // get lines within extents
-            data.map(function (d) {
-                path(d, background);
-
+            pcpHtml.fg.style("display", function (d) {
                 if (checkIfActive(d)) {
-                    drawForeground(d);
                     selected[d.id] = d;
+                    return null;
+                } else {
+                    return "none";
                 }
             });
         }
