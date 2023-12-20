@@ -102,9 +102,9 @@ function processData(data, extras) {
                 typeVar = item.textContent;
             } else if (key === "element") {
                 elementVar = item.textContent;
-            } else if (key === "mselement") {
+            } else if (key === "mSElement") {
                 msElementVar = item.textContent;
-            } else if (key === "nlelement") {
+            } else if (key === "nLElement") {
                 nlElementVar = item.textContent;
             }
         });

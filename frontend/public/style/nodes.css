@@ -23,7 +23,9 @@
 	font-family: Hack, monospace;
 }
 
-.node.rule text {
+.node.rule text,
+.node.DLRule text,
+.node.CDRule text {
 	fill: #696969;
 }
 

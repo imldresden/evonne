@@ -387,9 +387,9 @@ function processData(data, extras) {
         type = item.textContent;
       } else if (key === "element") {
         element = item.textContent;
-      } else if (key === "mselement") {
+      } else if (key === "mSElement") {
         mselement = item.textContent;
-      } else if (key === "nlelement") {
+      } else if (key === "nLElement") {
       nlelement = item.textContent;
     }
     });
@@ -553,13 +553,14 @@ function shortenAllInProofBtnFunction(){
   }
 
   //Handle rules
-  if (!nodesClass.includes("rule"))
+  if (!nodesClass.includes("rule") && !nodesClass.includes("CDRule") && !nodesClass.includes("DLRule")) {
     d3.selectAll(".rule").filter(d=>d).each(d=>{
       nodeID = "N"+d.data.source.id;
       SharedData.nodesDisplayFormat.set(nodeID, "original");
       SharedData.nodesCurrentDisplayFormat.set(nodeID, "original");
     });
-
+  }
+    
   //Record the shortening
   d3.selectAll(nodesClass).filter(d=>d).each(d=>{
     nodeID = "N"+d.data.source.id;

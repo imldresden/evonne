@@ -203,8 +203,11 @@ const SharedData = {
   getRemovableEdges: function () {
     let res = [];
     this.root.links().forEach(link => {
-      if (link.source.data.source.type === "rule")
+      if (link.source.data.source.type === "rule" 
+      || link.source.data.source.type === "DLRule" 
+      || link.source.data.source.type === "CDRule") {
         res.push(link);
+      }
     });
     return res;
   },

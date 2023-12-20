@@ -429,7 +429,7 @@ export class AxiomFunctionsHelper {
 		}
 
 		treeRoot._children.forEach(child => {
-			if (child.data.source.type !== "rule") {
+			if (child.data.source.type !== "DLRule" && child.data.source.type !== "CDRule") {
 				axioms.push(child.data.source.element);
 			}
 			this.getAllPreviousAxioms(child, axioms);
@@ -540,7 +540,7 @@ export class AxiomFunctionsHelper {
 			if (nodeData.children) {
 				nodeData.children.forEach(child => premise.push(child.data.source.element));
 			}
-
+			
 			this.inferenceRulesHelper.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: nodeData });
 
 			btn.text("\ue1b6");
@@ -591,11 +591,10 @@ export class AxiomFunctionsHelper {
 
 	initializeMaps() {
 		d3.selectAll(".axiom,.rule").each(d=>{
-			if(d)
-				if (!SharedData.nodesDisplayFormat.has("N" + d.data.source.id)){
-					SharedData.nodesDisplayFormat.set("N" + d.data.source.id, "original");
-					SharedData.nodesCurrentDisplayFormat.set("N" + d.data.source.id, "original");
-				}
+			if (d && !SharedData.nodesDisplayFormat.has("N" + d.data.source.id)){
+				SharedData.nodesDisplayFormat.set("N" + d.data.source.id, "original");
+				SharedData.nodesCurrentDisplayFormat.set("N" + d.data.source.id, "original");
+			}
 		});
 	}
 

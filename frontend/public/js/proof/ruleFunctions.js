@@ -42,7 +42,7 @@ export class InferenceRulesHelper {
             .attr("class", "tooltip-explanation")
             .attr("id", "toolTipID");
 
-        proofView.selectAll(".rule").each(x => {
+        proofView.selectAll(".rule,.CDRule,.DLRule").each(x => {
 
             let ruleName = x.data.source.element;
             let conclusion = x.parent.data.source.element;
