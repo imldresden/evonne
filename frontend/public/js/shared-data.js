@@ -197,19 +197,6 @@ const SharedData = {
       d3.select("#detachButtonN" + x.data.source.id)
         .transition().duration(100).ease(d3.easeLinear).style("opacity", .1);
     });
-
-  },
-
-  getRemovableEdges: function () {
-    let res = [];
-    this.root.links().forEach(link => {
-      if (link.source.data.source.type === "rule" 
-      || link.source.data.source.type === "DLRule" 
-      || link.source.data.source.type === "CDRule") {
-        res.push(link);
-      }
-    });
-    return res;
   },
 
   addMouseEvents: function () {
@@ -283,17 +270,7 @@ const SharedData = {
       .on("end", () => {
         this.addFocusFunctionality();
         app.isDrawing = false;
-        //this.addMouseEvents();
-        //lP.addHighlightCurrentInferenceEvent();
-
-        /* if(!app.isMagic) {
-            this.linkFunctionsHelper.addFunctionButtonsToLinks(this.getRemovableEdges());
-        } else {
-            this.linkFunctionsHelper.removeFunctionButtonsToLinks();
-        } */
-
         document.dispatchEvent(new CustomEvent("drawend", { detail: { main: "proof-view" } }));
-        // this.addPulseEvents();
       });
 
     // Add the data
@@ -305,7 +282,12 @@ const SharedData = {
 
           enter.append("g")
             .attr("class", d => {
-              let classStr = "node " + d.data.source.type;
+              let classStr;
+              if (d.data.source.type.includes("rule") || d.data.source.type.includes("Rule")) {
+                classStr = "node rule";
+              } else {
+                classStr = "node " + d.data.source.type;
+              }
               classStr = !d.parent && d.data.source.type !== "rest" ? classStr + " conclusion" : classStr;
               return classStr;
             })

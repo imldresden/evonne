@@ -429,7 +429,7 @@ export class AxiomFunctionsHelper {
 		}
 
 		treeRoot._children.forEach(child => {
-			if (child.data.source.type !== "DLRule" && child.data.source.type !== "CDRule") {
+			if (!child.data.source.type.includes("Rule") && !child.data.source.type.includes("rule")) {
 				axioms.push(child.data.source.element);
 			}
 			this.getAllPreviousAxioms(child, axioms);

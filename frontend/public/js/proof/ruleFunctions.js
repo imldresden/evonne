@@ -4,8 +4,6 @@
 //Call "addTooltipToNodes()" to add an explanation to every rule name node in the proof
 //=====================================================================================
 
-//TODO implement an option to choose between DL or OWL syntax
-
 import { parallelCoords } from "../parallel-coords/parallel-coords-svg.js";
 import { APP_GLOBALS as app } from "../shared-data.js";
 
@@ -42,7 +40,7 @@ export class InferenceRulesHelper {
             .attr("class", "tooltip-explanation")
             .attr("id", "toolTipID");
 
-        proofView.selectAll(".rule,.CDRule,.DLRule").each(x => {
+        proofView.selectAll(".rule").each(x => {
 
             let ruleName = x.data.source.element;
             let conclusion = x.parent.data.source.element;
@@ -75,7 +73,6 @@ export class InferenceRulesHelper {
         if (data.data.source.data) {
             this.concreteDomain(data.data.source.data);
         }
-
         switch (ruleName) {
             case CLASS_HIERARCHY:
                 this.classHierarchy(premise);
