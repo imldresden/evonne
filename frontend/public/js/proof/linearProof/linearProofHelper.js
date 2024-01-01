@@ -1,5 +1,6 @@
 import { APP_GLOBALS as app, SharedData } from "../../shared-data.js";
 import {nodeVisualsDefaults} from "../nodeVisualsHelper.js";
+import { getNodes } from "../proof.js";
 
 
 function getDFOrder(hierarchy, orderedElements){
@@ -56,13 +57,16 @@ function computeLinearLayout(hierarchy) {
     return linearLayout;
 }
 
-function processData(data, extras) {
+function processData(data) {
     // Compute edges
     let edgeData = [];
     [].map.call(data.querySelectorAll("hyperedge"), d => {
         let edgeIDSuffix = 97;
         let edgeTarget;
-        let ruleName = d.querySelector("data").textContent;
+        let rule = {}; 
+        d.querySelectorAll("data").forEach(k => {
+            rule[k.getAttribute("key")] = k.textContent;
+        });
         d.querySelectorAll("endpoint").forEach(e => {
             if(e.getAttribute("type") === "in") {
                 edgeTarget = e.getAttribute("node");
@@ -74,7 +78,7 @@ function processData(data, extras) {
                 let edgeId = d.getAttribute("id");
                 let edgeSource = null;
                 edgeIDSuffix++;
-                edgeData.push({id: edgeId, source: edgeSource, target: edgeTarget, ruleName: ruleName});
+                edgeData.push({id: edgeId, source: edgeSource, target: edgeTarget, rule});
             });
         } else {
             endPoints.forEach(e => {
@@ -82,49 +86,13 @@ function processData(data, extras) {
                     let edgeId = d.getAttribute("id") + String.fromCharCode(edgeIDSuffix);
                     let edgeSource = e.getAttribute("node");
                     edgeIDSuffix++;
-                    edgeData.push({id: edgeId, source: edgeSource, target: edgeTarget, ruleName: ruleName});
+                    edgeData.push({id: edgeId, source: edgeSource, target: edgeTarget, rule});
                 }
             });
         }
     });
 
-    // Compute nodes
-    let nodeData = [].map.call(data.querySelectorAll("node"), d => {
-        let dataNodes, typeVar, elementVar, msElementVar, nlElementVar, idVar;
-
-        idVar = d.getAttribute("id");
-
-        dataNodes = d.querySelectorAll("data");
-
-        dataNodes.forEach(function (item) {
-            const key = item.getAttribute("key");
-            if (key === "type") {
-                typeVar = item.textContent;
-            } else if (key === "element") {
-                elementVar = item.textContent;
-            } else if (key === "mSElement") {
-                msElementVar = item.textContent;
-            } else if (key === "nLElement") {
-                nlElementVar = item.textContent;
-            }
-        });
-        let outGoingEdges = edgeData.filter(function (edge) {
-            return edge.source === idVar
-        });
-        let isRoot = false;
-        if (outGoingEdges.length===0) {
-            isRoot = true;
-        }
-
-        const rule = edgeData.filter(function (edge) {
-            return edge.target === idVar
-        })[0];
-
-        return {
-            id: idVar, type: typeVar, element: elementVar, mselement: msElementVar, nlelement: nlElementVar,
-            isRoot: isRoot, ruleName:rule.ruleName, data:extras[rule.ruleName]
-        };
-    });
+    let nodeData = getNodes(data, edgeData);
 
     //remove edges with a null source
     edgeData = edgeData.filter(d=>!!d.source)
@@ -213,7 +181,7 @@ function renderSideConnectorsByType() {
         // let hasChildren;
         // selection.each(d=>hasChildren = !!d.children || !!d._children);
         let inferredUsing;
-        selection.each(d=>inferredUsing = d.data.source.ruleName);
+        selection.each(d=>inferredUsing = d.data.source.rule.label);
         // if(!hasChildren)
         if (inferredUsing === "Asserted Conclusion")
             selection.attr("class", "node axiom asserted");

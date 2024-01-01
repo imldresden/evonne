@@ -1,7 +1,7 @@
 import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
 import { nodeVisualsDefaults } from "./nodeVisualsHelper.js";
 import * as lP from "./linearProof/linearProofHelper.js";
-import { InferenceRulesHelper } from "./ruleFunctions.js";
+import { InferenceRulesHelper, utils as ruleUtils } from "./rules/rules.js";
 
 export class AxiomFunctionsHelper {
 	constructor(socketIO) {
@@ -429,7 +429,7 @@ export class AxiomFunctionsHelper {
 		}
 
 		treeRoot._children.forEach(child => {
-			if (!child.data.source.type.includes("Rule") && !child.data.source.type.includes("rule")) {
+			if (!ruleUtils.isRule(child.data.source.type)) {
 				axioms.push(child.data.source.element);
 			}
 			this.getAllPreviousAxioms(child, axioms);
@@ -524,25 +524,29 @@ export class AxiomFunctionsHelper {
 	inferenceRulesHelper = new InferenceRulesHelper();
 
 	highlightCurrentInference(event, nodeData) {
-		d3.selectAll("body .tooltip-explanation").remove();
+		let conclusion = nodeData.data.source.element;
+		let premises = [];
+
+		if (nodeData.children) {
+			nodeData.children.forEach(child => premises.push(child.data.source.element));
+		}
+
+		this.inferenceRulesHelper.showExplanation(event, { 
+			premises, 
+			conclusion, 
+			data: { source: { 
+				id: nodeData.data.id,
+				element: nodeData.data.source.rule.label, 
+				type: nodeData.data.source.rule.type
+			}} 
+		});
+
 		let btn = d3.select("#N" + nodeData.data.source.id).select("#H1 text");
 		let state = btn.text();
 
 		if (state === "\ue1b7") {
 			d3.selectAll("#H1 text").text("\ue1b7");
 			lP.highlightCurrentInference(nodeData);
-
-			let tooltip = d3.select("body").append("div").attr("class", "tooltip-explanation").attr("id", "toolTipID");
-			let ruleName = nodeData.data.source.ruleName;
-			let conclusion = nodeData.data.source.element;
-			let premise = [];
-
-			if (nodeData.children) {
-				nodeData.children.forEach(child => premise.push(child.data.source.element));
-			}
-			
-			this.inferenceRulesHelper.showExplanation(event, tooltip, { premise, conclusion, ruleName, data: nodeData });
-
 			btn.text("\ue1b6");
 		} else {
 			lP.setFullOpacityToAll();

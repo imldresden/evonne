@@ -23,7 +23,7 @@ const minVerticalCompactnessInput = document.getElementById("minVerticalCompactn
 const maxVerticalCompactnessInput = document.getElementById("maxVerticalCompactness");
 
 //Selections
-const shorteningMethodSelection = document.getElementById(app.shorteningVarName);
+const shorteningMethodSelection = document.getElementById("shorteningMode");
 const tooltipPositionSelection = document.getElementById("toolTipPosition");
 
 //Toggle buttons
@@ -76,7 +76,7 @@ thingsWithResizeListeners.set(window,windowFunction);
 const thingsWithCenterRootListeners = new Map();
 thingsWithCenterRootListeners.set(document,documentFunction);
 
-export function init_proof(proof_file_param) {
+function init_proof(proof_file_param) {
   // Configure SVG
   if(!app.svgProof){
     app.svgProof = d3.select("#proof-view");
@@ -321,9 +321,9 @@ function createContent(data) {
   // Generate nodes and edges from the raw data
   let processedData;
   if (app.isLinear) {
-    processedData = lP.processData(data, extractNumbers(data));
+    processedData = lP.processData(data);
   } else {
-    processedData = processData(data, extractNumbers(data));
+    processedData = processData(data);
   }
 
   let nodeData = processedData.nodes;
@@ -363,7 +363,40 @@ function createContent(data) {
   SharedData.advancedUpdate();
 }
 
-function processData(data, extras) {
+function getNodes(data, edgeData) {
+    let extras = extractNumbers(data);
+    // Compute nodes
+    return [].map.call(data.querySelectorAll("node"), (d) => {
+    
+      let type, element, mselement, nlelement;
+      const id = d.id;
+      const dataNodes = d.querySelectorAll("data");
+  
+      dataNodes.forEach((item) => {
+        const key = item.getAttribute("key");
+        if (key === "type") {
+          type = item.textContent;
+        } else if (key === "element") {
+          element = item.textContent;
+        } else if (key === "mSElement") {
+          mselement = item.textContent;
+        } else if (key === "nLElement") {
+          nlelement = item.textContent;
+        }
+      });
+  
+      const outGoingEdges = edgeData.filter((edge) => edge.source === id);
+      const isRoot = outGoingEdges.length === 0;
+
+      let rule = edgeData.filter((edge) => edge.target === id)[0];
+      rule = rule ? rule.rule : rule;
+      const extraData = app.isLinear ? extras[rule] : extras[element]; 
+  
+      return { id, type, element, mselement, nlelement, isRoot, rule, data: extraData };
+    });
+}
+
+function processData(data) {
   // Compute edges
   let edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
     let edgeId = d.getAttribute("id");
@@ -373,35 +406,7 @@ function processData(data, extras) {
     return { id: edgeId, source: edgeSource, target: edgeTarget };
   });
 
-  // Compute nodes
-  let nodeData = [].map.call(data.querySelectorAll("node"), (d) => {
-    let type, element, mselement, nlelement;
-
-    let id = d.id;
-
-    let dataNodes = d.querySelectorAll("data");
-
-    dataNodes.forEach((item) => {
-      const key = item.getAttribute("key");
-      if (key === "type") {
-        type = item.textContent;
-      } else if (key === "element") {
-        element = item.textContent;
-      } else if (key === "mSElement") {
-        mselement = item.textContent;
-      } else if (key === "nLElement") {
-      nlelement = item.textContent;
-    }
-    });
-
-    let outGoingEdges = edgeData.filter(function (edge) {
-      return edge.source === id;
-    });
-    let isRoot = false;
-    if (outGoingEdges.length === 0) isRoot = true;
-
-    return { id, type, element, mselement, nlelement, isRoot, data: extras[element] };
-  });
+  let nodeData = getNodes(data, edgeData);
 
   // Add the nodeData to the edgeData
   edgeData.forEach((d) => {
@@ -686,3 +691,5 @@ function documentFunction(){
     }
   }
 }
+
+export { init_proof, getNodes }

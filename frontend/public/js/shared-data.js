@@ -1,10 +1,11 @@
-import { InferenceRulesHelper } from "./proof/ruleFunctions.js";
+import { InferenceRulesHelper } from "./proof/rules/rules.js";
 import { APP_GLOBALS as app } from "./shared-data.js";
 import { nodeVisualsDefaults, NodeVisualsHelper } from "./proof/nodeVisualsHelper.js";
 import { MagicNavigationHelper } from "./proof/magicNavigation.js";
 import { LabelsShorteningHelper } from "./shortening/helper.js";
 import * as lP from "./proof/linearProof/linearProofHelper.js";
 import { ContextMenu } from "./utils/context-menu.js";
+import { utils as ruleUtils } from "./proof/rules/rules.js";
 
 const APP_GLOBALS = {
   svgProof: undefined,
@@ -28,7 +29,6 @@ const APP_GLOBALS = {
   isDrawing: false,
   isDebug: true,
   drawTime: 750,
-  shorteningVarName: "shorteningMode",
   shorteningMethod: "camel",
   shortenAllInProof: false,
   shortenAllInOntology: false,
@@ -283,7 +283,7 @@ const SharedData = {
           enter.append("g")
             .attr("class", d => {
               let classStr;
-              if (d.data.source.type.includes("rule") || d.data.source.type.includes("Rule")) {
+              if (ruleUtils.isRule(d.data.source.type)) {
                 classStr = "node rule";
               } else {
                 classStr = "node " + d.data.source.type;

@@ -107,7 +107,7 @@ export class NodeVisualsHelper {
             } else {
                 connectorType = "rect";
                 attributes = rectangleAttributes;
-                if (selection.classed("rule") || selection.classed("DLRule") || selection.classed("CDRule")) {
+                if (selection.classed("rule")) {
                     newClasses.push("ruleConnector");
                 } else if (selection.classed("krule")) {
                     newClasses.push("kRuleConnector");
