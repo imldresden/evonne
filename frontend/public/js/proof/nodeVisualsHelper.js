@@ -199,7 +199,7 @@ export class NodeVisualsHelper {
                     if (displayFormat === "shortened")
                         return SharedData.labelsShorteningHelper.shortenLabel(d.data.source.element, app.isRuleShort, app.shorteningMethod);
                     else if (displayFormat === "textual")
-                        return d.data.source.nlelement;
+                        return d.data.source.nLElement;
                 })
                 .each((d, i, nodes) => {
                     d3.select(`#${nodes[i].parentNode.id} text`)

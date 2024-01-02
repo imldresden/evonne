@@ -42,43 +42,43 @@ const proofHeightRangeResetBtn = document.getElementById("proofHeightRangeReset"
 
 //Mapping elements with click event to their function
 const thingsWithClickListeners = new Map();
-thingsWithClickListeners.set(allowOverlapBtn,allowOverlapBtnFunction);
-thingsWithClickListeners.set(navigationToggleBtn,navigationToggleBtnFunction);
-thingsWithClickListeners.set(shorteningRuleNamesBtn,shorteningRuleNamesBtnFunction);
-thingsWithClickListeners.set(magicToggleBtn,magicToggleBtnFunction);
-thingsWithClickListeners.set(layoutToggleBtn,layoutToggleBtnFunction);
-thingsWithClickListeners.set(planarToggleBtn,planarToggleBtnFunction);
-thingsWithClickListeners.set(shortenAllInProofBtn,shortenAllInProofBtnFunction);
-thingsWithClickListeners.set(proofWidthRangeResetBtn,proofWidthRangeResetBtnFunction);
-thingsWithClickListeners.set(proofHeightRangeResetBtn,proofHeightRangeResetBtnFunction);
-thingsWithClickListeners.set(openOntology,openOntologyFunction);
+thingsWithClickListeners.set(allowOverlapBtn, allowOverlapBtnFunction);
+thingsWithClickListeners.set(navigationToggleBtn, navigationToggleBtnFunction);
+thingsWithClickListeners.set(shorteningRuleNamesBtn, shorteningRuleNamesBtnFunction);
+thingsWithClickListeners.set(magicToggleBtn, magicToggleBtnFunction);
+thingsWithClickListeners.set(layoutToggleBtn, layoutToggleBtnFunction);
+thingsWithClickListeners.set(planarToggleBtn, planarToggleBtnFunction);
+thingsWithClickListeners.set(shortenAllInProofBtn, shortenAllInProofBtnFunction);
+thingsWithClickListeners.set(proofWidthRangeResetBtn, proofWidthRangeResetBtnFunction);
+thingsWithClickListeners.set(proofHeightRangeResetBtn, proofHeightRangeResetBtnFunction);
+thingsWithClickListeners.set(openOntology, openOntologyFunction);
 
 //Mapping elements with input event to their functions
 const thingsWithInputListeners = new Map();
-thingsWithInputListeners.set(maxLengthInput,maxLengthInputFunction);
-thingsWithInputListeners.set(minHorizontalCompactnessInput,minHorizontalCompactnessInputFunction);
-thingsWithInputListeners.set(maxHorizontalCompactnessInput,maxHorizontalCompactnessInputFunction);
-thingsWithInputListeners.set(proofWidthRange,proofWidthRangeFunction);
-thingsWithInputListeners.set(minVerticalCompactnessInput,minVerticalCompactnessInputFunction);
-thingsWithInputListeners.set(maxVerticalCompactnessInput,maxVerticalCompactnessInputFunction);
-thingsWithInputListeners.set(proofHeightRange,proofHeightRangeFunction);
+thingsWithInputListeners.set(maxLengthInput, maxLengthInputFunction);
+thingsWithInputListeners.set(minHorizontalCompactnessInput, minHorizontalCompactnessInputFunction);
+thingsWithInputListeners.set(maxHorizontalCompactnessInput, maxHorizontalCompactnessInputFunction);
+thingsWithInputListeners.set(proofWidthRange, proofWidthRangeFunction);
+thingsWithInputListeners.set(minVerticalCompactnessInput, minVerticalCompactnessInputFunction);
+thingsWithInputListeners.set(maxVerticalCompactnessInput, maxVerticalCompactnessInputFunction);
+thingsWithInputListeners.set(proofHeightRange, proofHeightRangeFunction);
 
 //Mapping elements with change event to their functions
 const thingsWithChangeListeners = new Map();
-thingsWithChangeListeners.set(shorteningMethodSelection,shorteningMethodSelectionFunction);
-thingsWithChangeListeners.set(tooltipPositionSelection,tooltipPositionSelectionFunction);
+thingsWithChangeListeners.set(shorteningMethodSelection, shorteningMethodSelectionFunction);
+thingsWithChangeListeners.set(tooltipPositionSelection, tooltipPositionSelectionFunction);
 
 //Mapping elements with resize event to their functions
 const thingsWithResizeListeners = new Map();
-thingsWithResizeListeners.set(window,windowFunction);
+thingsWithResizeListeners.set(window, windowFunction);
 
 //Mapping elements with center-root event to their functions
 const thingsWithCenterRootListeners = new Map();
-thingsWithCenterRootListeners.set(document,documentFunction);
+thingsWithCenterRootListeners.set(document, documentFunction);
 
 function init_proof(proof_file_param) {
   // Configure SVG
-  if(!app.svgProof){
+  if (!app.svgProof) {
     app.svgProof = d3.select("#proof-view");
     app.BBox = app.svgProof.node().getBoundingClientRect();
     app.SVGwidth = app.BBox.width;
@@ -94,12 +94,12 @@ function init_proof(proof_file_param) {
         app.SVGheight,
       ])
       .style("user-select", "none");
-    app.svgProofRootLayer = app.svgProof.append('g').attr("id","pViewport");
+    app.svgProofRootLayer = app.svgProof.append('g').attr("id", "pViewport");
   }
 
   if (proof_file_param) {
     app.proofFile = {
-      name : proof_file_param,
+      name: proof_file_param,
     };
   }
   //TODO this should be uncommented after the study
@@ -117,11 +117,11 @@ function init_proof(proof_file_param) {
   SharedData.linkFunctionsHelper = new LinkFunctionsHelper();
 
   //Remove listeners of types
-  removeListeners("click",thingsWithClickListeners);
-  removeListeners("input",thingsWithInputListeners);
-  removeListeners("change",thingsWithChangeListeners);
-  removeListeners("resize",thingsWithResizeListeners);
-  removeListeners("center-root",thingsWithCenterRootListeners);
+  removeListeners("click", thingsWithClickListeners);
+  removeListeners("input", thingsWithInputListeners);
+  removeListeners("change", thingsWithChangeListeners);
+  removeListeners("resize", thingsWithResizeListeners);
+  removeListeners("center-root", thingsWithCenterRootListeners);
 
   if (allowOverlapBtn) {
     allowOverlapBtn.checked = false;
@@ -154,7 +154,7 @@ function init_proof(proof_file_param) {
   // -- Switch on to explore step-wise
   if (layoutToggleBtn) {
     layoutToggleBtn.checked = false;
-      layoutToggleBtn.addEventListener("click", layoutToggleBtnFunction);
+    layoutToggleBtn.addEventListener("click", layoutToggleBtnFunction);
   }
 
   // Configure planar (optimise premise distance) property of the linear layout mode
@@ -166,7 +166,7 @@ function init_proof(proof_file_param) {
 
   //update the selection of the shortening method
   shorteningMethodSelection.value = app.shorteningMethod;
-  
+
 
   maxLengthInput.closest(".input-range-wrapper").style.display = "none";
   maxLengthInput.addEventListener("input", maxLengthInputFunction);
@@ -190,9 +190,9 @@ function init_proof(proof_file_param) {
   minHorizontalCompactnessInput.addEventListener("input", minHorizontalCompactnessInputFunction);
   maxHorizontalCompactnessInput.addEventListener("input", maxHorizontalCompactnessInputFunction);
 
-    proofWidthRangeResetBtn.addEventListener("click", proofWidthRangeResetBtnFunction);
+  proofWidthRangeResetBtn.addEventListener("click", proofWidthRangeResetBtnFunction);
 
-    proofWidthRange.addEventListener("input", proofWidthRangeFunction);
+  proofWidthRange.addEventListener("input", proofWidthRangeFunction);
 
   //Update the height of the proof
   app.proofHeight = app.contentHeight;
@@ -262,55 +262,62 @@ function getInitialMagicalHierarchy(data) {
   return result;
 }
 
-function extractNumbers(raw, processed) {
+function extractEquations(node) {
+  const variables = new Set();
+  const eqs = {};
+
+  const equations = node.querySelectorAll("equation");
+  equations.forEach((equation) => {
+    const eq = {};
+
+    const lhs = equation.querySelectorAll("lhs > term");
+    lhs.forEach((variable) => {
+      const coe = variable.getAttribute("coe");
+      let name = variable.getAttribute("var");
+      if (name.indexOf('#') !== -1) {
+        name = name.slice(name.indexOf('#') + 1, name.indexOf('>'));
+      }
+      
+      eq[name] = coe;
+      variables.add(name);
+    });
+
+    const rhs = equation.querySelector("rhs > term").getAttribute("coe");
+    eq.rhs = rhs;
+
+    eqs[equation.getAttribute("id")] = eq;
+  });
+  return { eqs, variables };
+}
+
+function extractNumbers(raw) {
   const result = {};
   const numericals = raw.querySelectorAll("cdProofNode");
 
   numericals.forEach((node) => {
 
-    const variables = new Set();
-    const eqs = {}; 
-
-    const equations = node.querySelectorAll("equation");
-    equations.forEach((equation) => {
-      const eq = {};
-      
-      const lhs = equation.querySelectorAll("lhs > term");
-      lhs.forEach((variable) => {
-        const coe = variable.getAttribute("coe");
-        let name = variable.getAttribute("var");
-        name = name.slice(name.indexOf('#') + 1, name.indexOf('>'));
-        eq[name] = coe;
-        variables.add(name);
-      });
-
-      const rhs = equation.querySelector("rhs > term").getAttribute("coe");
-      eq.rhs = rhs;
-
-      eqs[equation.getAttribute("id")] = eq;
-    });
-
-    const ops = {}; 
+    const { eqs, variables } = extractEquations(node);
+    const ops = {};
     const rowOperations = node.querySelectorAll("cdRule");
     rowOperations.forEach((operation) => {
-      const op = { 
-        premises: [], 
+      const op = {
+        premises: [],
         conclusion: operation.querySelector("conclusion").getAttribute("equation")
       };
-      
+
       const premises = operation.querySelectorAll("premise");
       premises.forEach((premise) => {
         op.premises.push({
-          coe: premise.getAttribute("coefficient"), 
+          coe: premise.getAttribute("coefficient"),
           eq: premise.getAttribute("equation")
         });
       });
 
       ops[operation.getAttribute("id")] = op;
     });
-    
+
     result[node.getAttribute("linkedToNode")] = {
-      variables, ops, eqs 
+      variables, ops, eqs
     };
   });
 
@@ -359,41 +366,72 @@ function createContent(data) {
     .attr("id", "nodes");
 
   SharedData.labels = app.svgProof.selectAll("#nodes");
-
   SharedData.advancedUpdate();
 }
 
 function getNodes(data, edgeData) {
-    let extras = extractNumbers(data);
-    // Compute nodes
-    return [].map.call(data.querySelectorAll("node"), (d) => {
-    
-      let type, element, mselement, nlelement;
-      const id = d.id;
-      const dataNodes = d.querySelectorAll("data");
-  
-      dataNodes.forEach((item) => {
-        const key = item.getAttribute("key");
-        if (key === "type") {
-          type = item.textContent;
-        } else if (key === "element") {
-          element = item.textContent;
-        } else if (key === "mSElement") {
-          mselement = item.textContent;
-        } else if (key === "nLElement") {
-          nlelement = item.textContent;
-        }
-      });
-  
-      const outGoingEdges = edgeData.filter((edge) => edge.source === id);
-      const isRoot = outGoingEdges.length === 0;
+  let extras = extractNumbers(data);
 
-      let rule = edgeData.filter((edge) => edge.target === id)[0];
-      rule = rule ? rule.rule : rule;
-      const extraData = app.isLinear ? extras[rule] : extras[element]; 
-  
-      return { id, type, element, mselement, nlelement, isRoot, rule, data: extraData };
+  // Compute nodes
+  return [].map.call(data.querySelectorAll("node"), (d) => {
+
+    const node = {
+      id: d.id,
+    };
+
+    const dataNodes = d.querySelectorAll("data");
+
+    dataNodes.forEach((item) => {
+      const key = item.getAttribute("key");
+
+      if (key) {
+        node[key] = item.textContent;
+      } 
     });
+    
+    const ms = d.querySelectorAll("multiplication")
+    
+    if (ms.length > 0) {
+      const ops = {};
+      ops[d.id] = { 
+        premises: [].map.call(ms, m => { return { coe: m.getAttribute("coefficient"), eq: m.getAttribute("nodeID") }}), 
+        conclusion: edgeData.filter((edge) => edge.source === d.id)[0].target 
+      }
+
+      const eqs = {};
+      const _ce = extractEquations(data.getElementById(ops[d.id].conclusion));
+      const variables = _ce.variables;
+      eqs[ops[d.id].conclusion] = _ce.eqs[Object.keys(_ce.eqs)[0]];
+      ops[d.id].premises.forEach(p => {
+        const _e = extractEquations(data.getElementById(p.eq));
+        eqs[p.eq] = _e.eqs[Object.keys(_e.eqs)[0]];
+      });
+
+      node.data = { ops, eqs, variables }
+
+      /*const entries = item.querySelectorAll("entry");
+      
+      node.data = {};
+      entries.forEach(e => {
+        const { eqs, variables } = extractEquations(e);
+        node.data[e.querySelector("key").textContent] = { eq: eqs[Object.keys(eqs)[0]], vars: variables } ;
+      });*/
+    }
+
+    const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
+    node.isRoot = outGoingEdges.length === 0;
+
+    let rule = edgeData.filter((edge) => edge.target === d.id)[0];
+    rule = rule ? rule.rule : rule;
+    
+    if (Object.keys(extras).length !== 0) {
+      node.data = app.isLinear ? extras[rule] : extras[node.element];
+    }
+
+    console.log(node.data)
+
+    return node;
+  });
 }
 
 function processData(data) {
@@ -426,16 +464,16 @@ function getFileName() {
   let fileName = "proof";
   if (app.proofFile) {
     fileName = app.proofFile.name;
-  } else { 
+  } else {
     app.proofFile = {
-      name : fileName
+      name: fileName
     };
   }
 
-  fileName = fileName.indexOf(".ht.xml") !== -1 ? 
-    fileName.substring(0, fileName.indexOf(".ht.xml")) : 
-    fileName.indexOf(".t.xml") !== -1 ? 
-    fileName.substring(0, fileName.indexOf(".t.xml")) : fileName;
+  fileName = fileName.indexOf(".ht.xml") !== -1 ?
+    fileName.substring(0, fileName.indexOf(".ht.xml")) :
+    fileName.indexOf(".t.xml") !== -1 ?
+      fileName.substring(0, fileName.indexOf(".t.xml")) : fileName;
 
   if (app.isLinear) {
     fileName += ".ht.xml";
@@ -445,12 +483,12 @@ function getFileName() {
   return fileName;
 }
 
-function updateShorteningButton(original, shortenAllInProofBtn){
-  if (!original){
+function updateShorteningButton(original, shortenAllInProofBtn) {
+  if (!original) {
     app.shortenAllInProof = true;
     shortenAllInProofBtn.textContent = "Undo shortening";
     shortenAllInProofBtn.title = "Undo shortening effect in the proof";
-  }else{
+  } else {
     app.shortenAllInProof = false;
     shortenAllInProofBtn.textContent = "Shorten all";
     shortenAllInProofBtn.title = "Shorten all text in the proof";
@@ -461,7 +499,7 @@ export function loadProof(event) {
   app.proofFile = event.target.files[0];
   SharedData.nodeVisualsHelper.initVarsAxiomFunctions();
   // initVarsLinkFunctions();
-  
+
   upload(app.proofFile, result => {
     d3.xml("../data/" + getSessionId() + "/" + getFileName()).then((xml) => {
       app.svgProofRootLayer.selectAll("*").remove();
@@ -475,10 +513,10 @@ export function loadSignature(event) {
   upload(app.signatureFile);
 }
 
-function allowOverlapBtnFunction(){
-    SharedData.allowOverlap = this.checked;
-    overlapAllowingSettings.style.display = SharedData.allowOverlap ? "block" : "none";
-    SharedData.advancedUpdate(SharedData.hierarchy);
+function allowOverlapBtnFunction() {
+  SharedData.allowOverlap = this.checked;
+  overlapAllowingSettings.style.display = SharedData.allowOverlap ? "block" : "none";
+  SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
 function navigationToggleBtnFunction() {
@@ -527,8 +565,7 @@ function layoutToggleBtnFunction() {
     app.isMagic = false;
     planarToggleBtn.closest(".planar-div-wrapper").style.display = "block"
   }
-  else
-  {
+  else {
     planarToggleBtn.closest(".planar-div-wrapper").style.display = "none"
   }
   app.isLinear = this.checked;
@@ -544,7 +581,7 @@ function planarToggleBtnFunction() {
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
-function shortenAllInProofBtnFunction(){
+function shortenAllInProofBtnFunction() {
   original = !original
   let nodeID
 
@@ -552,27 +589,27 @@ function shortenAllInProofBtnFunction(){
   //Update shortening button
   updateShorteningButton(original, shortenAllInProofBtn);
 
-  if (original){
+  if (original) {
     //Restore all to original
     nodesClass = ".axiom,.rule";
   }
 
   //Handle rules
   if (!nodesClass.includes("rule") && !nodesClass.includes("CDRule") && !nodesClass.includes("DLRule")) {
-    d3.selectAll(".rule").filter(d=>d).each(d=>{
-      nodeID = "N"+d.data.source.id;
+    d3.selectAll(".rule").filter(d => d).each(d => {
+      nodeID = "N" + d.data.source.id;
       SharedData.nodesDisplayFormat.set(nodeID, "original");
       SharedData.nodesCurrentDisplayFormat.set(nodeID, "original");
     });
   }
-    
+
   //Record the shortening
-  d3.selectAll(nodesClass).filter(d=>d).each(d=>{
-    nodeID = "N"+d.data.source.id;
+  d3.selectAll(nodesClass).filter(d => d).each(d => {
+    nodeID = "N" + d.data.source.id;
     if (!original && SharedData.nodesDisplayFormat.get(nodeID) !== "textual") {
       SharedData.nodesDisplayFormat.set(nodeID, "shortened");
       SharedData.nodesCurrentDisplayFormat.set(nodeID, "shortened");
-    }else if (SharedData.nodesDisplayFormat.get(nodeID) !== "textual"){
+    } else if (SharedData.nodesDisplayFormat.get(nodeID) !== "textual") {
       SharedData.nodesDisplayFormat.set(nodeID, "original");
       SharedData.nodesCurrentDisplayFormat.set(nodeID, "original");
     }
@@ -581,7 +618,7 @@ function shortenAllInProofBtnFunction(){
   //Redraw
   SharedData.advancedUpdate();
 }
-function proofWidthRangeResetBtnFunction(){
+function proofWidthRangeResetBtnFunction() {
   app.proofWidth = app.contentWidth;
   proofWidthRange.value = app.proofWidth;
   SharedData.advancedUpdate(SharedData.hierarchy);
@@ -602,8 +639,8 @@ function maxLengthInputFunction() {
 
 function minHorizontalCompactnessInputFunction() {
   const clampedMin =
-      minHorizontalCompactnessInput.value * app.contentWidth >
-      proofWidthRange.value;
+    minHorizontalCompactnessInput.value * app.contentWidth >
+    proofWidthRange.value;
   proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * app.contentWidth);
 
   if (clampedMin) {
@@ -615,8 +652,8 @@ function minHorizontalCompactnessInputFunction() {
 
 function maxHorizontalCompactnessInputFunction() {
   const clampedMax =
-      maxHorizontalCompactnessInput.value * app.contentWidth <
-      proofWidthRange.value;
+    maxHorizontalCompactnessInput.value * app.contentWidth <
+    proofWidthRange.value;
   proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * app.contentWidth);
 
   if (clampedMax) {
@@ -631,10 +668,10 @@ function proofWidthRangeFunction() {
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
-function minVerticalCompactnessInputFunction(){
+function minVerticalCompactnessInputFunction() {
   const clampedMin =
-      minVerticalCompactnessInput.value * app.contentHeight >
-      proofHeightRange.value;
+    minVerticalCompactnessInput.value * app.contentHeight >
+    proofHeightRange.value;
   proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * app.contentHeight);
 
   if (clampedMin) {
@@ -644,10 +681,10 @@ function minVerticalCompactnessInputFunction(){
   }
 }
 
-function maxVerticalCompactnessInputFunction(){
+function maxVerticalCompactnessInputFunction() {
   const clampedMax =
-      maxVerticalCompactnessInput.value * app.contentHeight <
-      proofHeightRange.value;
+    maxVerticalCompactnessInput.value * app.contentHeight <
+    proofHeightRange.value;
 
   proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * app.contentHeight);
   if (clampedMax) {
@@ -662,11 +699,11 @@ function proofHeightRangeFunction() {
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
-function openOntologyFunction(){
+function openOntologyFunction() {
   window.open('/ontology?id=' + getSessionId())
 }
 
-function shorteningMethodSelectionFunction () {
+function shorteningMethodSelectionFunction() {
   maxLengthInput.closest(".input-range-wrapper").style.display = this.value === "basic" ? "block" : "none";
 
   app.shorteningMethod = this.value;
@@ -678,14 +715,14 @@ function tooltipPositionSelectionFunction() {
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
-function windowFunction(){
+function windowFunction() {
   SharedData.advancedUpdate();
 }
 
-function documentFunction(){
+function documentFunction() {
   if (app.minimap) {
     if (!SharedData.allowOverlap) {
-      app.minimap.main.pan({ x: app.proofWidth/2, y: 0 });
+      app.minimap.main.pan({ x: app.proofWidth / 2, y: 0 });
     } else {
       app.minimap.main.pan({ x: 0, y: 50 });
     }

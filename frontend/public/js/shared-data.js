@@ -87,7 +87,7 @@ const SharedData = {
     } else if (display === "shortened") {
       label = SharedData.labelsShorteningHelper.shortenLabel(node.data.source.element, app.isRuleShort, app.shorteningMethod);
     } else if (display === "textual") {
-      label = node.data.source.nlelement;
+      label = node.data.source.nLElement;
     }
 
     node.width = label.length * APP_GLOBALS.fontCharacterWidth + 16;

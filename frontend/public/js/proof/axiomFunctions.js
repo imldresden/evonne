@@ -395,7 +395,7 @@ export class AxiomFunctionsHelper {
 
 	showRepairs(axiom) {
 		this._socket.emit("get ontology", { 
-			axiom: axiom.mselement, 
+			axiom: axiom.mSElement, 
 			readableAxiom: axiom.element, 
 			id: getSessionId() 
 		});

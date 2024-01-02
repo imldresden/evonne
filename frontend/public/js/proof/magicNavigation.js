@@ -607,7 +607,7 @@ export class MagicNavigationHelper {
 			source: sourceObject,
 			target: TargetObject,
 			childrenIDs: [],
-			mselement: ""
+			mSElement: ""
 		};
 	}
 
