@@ -325,7 +325,7 @@ function extractNumbers(raw) {
 
   numericals.forEach((node) => {
 
-    const { eqs, variables } = extractEquations(node);
+    const { eqs, vars } = extractEquations(node);
     const ops = {};
     const rowOperations = node.querySelectorAll("cdRule");
     rowOperations.forEach((operation) => {
@@ -346,7 +346,7 @@ function extractNumbers(raw) {
     });
 
     result[node.getAttribute("linkedToNode")] = {
-      variables, ops, eqs
+      vars, ops, eqs
     };
   });
 
@@ -398,7 +398,7 @@ function createContent(data) {
   SharedData.advancedUpdate();
 }
 
-function buildCDRule(data, node) {
+function buildCDRule(data, d, node) {
   const ms = d.querySelectorAll("multiplication")
 
   function isNumber(str) {
@@ -421,7 +421,7 @@ function buildCDRule(data, node) {
       
       const eqs = {};
       const _ce = extractEquations(data.getElementById(ops[node.id].conclusion));
-      const variables = _ce.variables;
+      const vars = _ce.vars;
       eqs[ops[node.id].conclusion] = _ce.eqs[Object.keys(_ce.eqs)[0]];
 
       // TODO: not a single equation per node 
@@ -441,11 +441,11 @@ function buildCDRule(data, node) {
         eqs[p.eq] = _e.eqs[Object.keys(_e.eqs)[0]];
       });
 
-      node.data = { ops, eqs, variables, type: "linear" }
+      node.data = { ops, eqs, vars, type: "linear" }
     } else { // diff
       const ineqs = {};
       const _ce = extractInequations(data.getElementById(ops[node.id].conclusion));
-      const variables = _ce.variables;
+      const vars = _ce.vars;
       eqs[ops[node.id].conclusion] = _ce.eqs[Object.keys(_ce.eqs)[0]];
 
       // TODO: not a single equation per node 
@@ -465,7 +465,7 @@ function buildCDRule(data, node) {
         eqs[p.eq] = _e.eqs[Object.keys(_e.eqs)[0]];
       });
 
-      node.data = { ops, eqs, variables, type: "diff" }
+      node.data = { ops, eqs, vars, type: "diff" }
     }
   }
   return node;
@@ -502,7 +502,7 @@ function getNodes(data, edgeData) {
     });
 
     if (node["type"] === "CDRule") {
-      node = buildCDRule(data, node);
+      node = buildCDRule(data, d, node);
     }
     
     const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
