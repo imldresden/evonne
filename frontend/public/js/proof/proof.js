@@ -263,7 +263,7 @@ function getInitialMagicalHierarchy(data) {
 }
 
 function extractEquations(node) {
-  const variables = new Set();
+  const vars = new Set();
   const eqs = {};
 
   const equations = node.querySelectorAll("equation");
@@ -277,9 +277,9 @@ function extractEquations(node) {
       if (name.indexOf('#') !== -1) {
         name = name.slice(name.indexOf('#') + 1, name.indexOf('>'));
       }
-      
+
       eq[name] = coe;
-      variables.add(name);
+      vars.add(name);
     });
 
     const rhs = equation.querySelector("rhs > term").getAttribute("coe");
@@ -287,10 +287,39 @@ function extractEquations(node) {
 
     eqs[equation.getAttribute("id")] = eq;
   });
-  return { eqs, variables };
+  return { eqs, vars };
+}
+
+function extractInequations(node) {
+  const vars = new Set();
+  const ineqs = {};
+
+  const equations = node.querySelectorAll("inequation");
+  equations.forEach((equation) => {
+    const eq = {};
+
+    const lhs = equation.querySelectorAll("lhs > term");
+    lhs.forEach((variable) => {
+      const coe = variable.getAttribute("coe");
+      let name = variable.getAttribute("var");
+      if (name.indexOf('#') !== -1) {
+        name = name.slice(name.indexOf('#') + 1, name.indexOf('>'));
+      }
+
+      eq[name] = coe;
+      vars.add(name);
+    });
+
+    const rhs = equation.querySelector("rhs > term").getAttribute("coe");
+    eq.rhs = rhs;
+
+    ineqs[equation.getAttribute("id")] = eq;
+  });
+  return { ineqs, vars };
 }
 
 function extractNumbers(raw) {
+  // extracts a sequence of operations and their respective equations from cdProofNodes
   const result = {};
   const numericals = raw.querySelectorAll("cdProofNode");
 
@@ -369,16 +398,86 @@ function createContent(data) {
   SharedData.advancedUpdate();
 }
 
+function buildCDRule(data, node) {
+  const ms = d.querySelectorAll("multiplication")
+
+  function isNumber(str) {
+    return !isNaN(str) && !isNaN(parseFloat(str))
+  }
+
+  if (ms.length > 0) {
+
+    const ops = {};
+    ops[node.id] = {
+      premises: [].map.call(ms, m => { return { 
+        coe: m.getAttribute("coefficient"), 
+        eq: m.getAttribute("nodeID") } 
+      }),
+      conclusion: edgeData.filter((edge) => edge.source === node.id)[0].target
+    }
+
+    // TODO: distinguish between linear and diff in a better way
+    if (isNumber(ops[node.id].premises[0].coe)) { // linear 
+      
+      const eqs = {};
+      const _ce = extractEquations(data.getElementById(ops[node.id].conclusion));
+      const variables = _ce.variables;
+      eqs[ops[node.id].conclusion] = _ce.eqs[Object.keys(_ce.eqs)[0]];
+
+      // TODO: not a single equation per node 
+      if (Object.keys(_ce.eqs).length > 0) {
+        //console.log(_ce.eqs)
+      }
+
+      ops[node.id].premises.forEach(p => {
+        const _e = extractEquations(data.getElementById(p.eq));
+
+        // TODO: not a single equation per node 
+        if (Object.keys(_e.eqs).length > 0) {
+          //console.log(p.eq)
+          //console.log(_e)
+        }
+
+        eqs[p.eq] = _e.eqs[Object.keys(_e.eqs)[0]];
+      });
+
+      node.data = { ops, eqs, variables, type: "linear" }
+    } else { // diff
+      const ineqs = {};
+      const _ce = extractInequations(data.getElementById(ops[node.id].conclusion));
+      const variables = _ce.variables;
+      eqs[ops[node.id].conclusion] = _ce.eqs[Object.keys(_ce.eqs)[0]];
+
+      // TODO: not a single equation per node 
+      if (Object.keys(_ce.eqs).length > 0) {
+        //console.log(_ce.eqs)
+      }
+
+      ops[node.id].premises.forEach(p => {
+        const _e = extractInequations(data.getElementById(p.eq));
+
+        // TODO: not a single equation per node 
+        if (Object.keys(_e.eqs).length > 0) {
+          //console.log(p.eq)
+          //console.log(_e)
+        }
+
+        eqs[p.eq] = _e.eqs[Object.keys(_e.eqs)[0]];
+      });
+
+      node.data = { ops, eqs, variables, type: "diff" }
+    }
+  }
+  return node;
+}
+
 function getNodes(data, edgeData) {
   let extras = extractNumbers(data);
 
   // Compute nodes
   return [].map.call(data.querySelectorAll("node"), (d) => {
 
-    const node = {
-      id: d.id,
-    };
-
+    let node = { id: d.id };
     const dataNodes = d.querySelectorAll("data");
 
     dataNodes.forEach((item) => {
@@ -386,49 +485,35 @@ function getNodes(data, edgeData) {
 
       if (key) {
         node[key] = item.textContent;
-      } 
-    });
-    
-    const ms = d.querySelectorAll("multiplication")
-    
-    if (ms.length > 0) {
-      const ops = {};
-      ops[d.id] = { 
-        premises: [].map.call(ms, m => { return { coe: m.getAttribute("coefficient"), eq: m.getAttribute("nodeID") }}), 
-        conclusion: edgeData.filter((edge) => edge.source === d.id)[0].target 
+      } else {
+        // for nodes with number logic
+        const entries = item.querySelectorAll("entry");
+        node.data = {};
+        entries.forEach(e => {
+          const { eqs, vars } = extractEquations(e);
+          const allEqs = Object.values(eqs);
+          if (allEqs.length !== 1) {
+            console.error("malformed entry");
+          }
+
+          node.data[e.querySelector("key").textContent] = { eq: allEqs[0], vars };
+        });
       }
+    });
 
-      const eqs = {};
-      const _ce = extractEquations(data.getElementById(ops[d.id].conclusion));
-      const variables = _ce.variables;
-      eqs[ops[d.id].conclusion] = _ce.eqs[Object.keys(_ce.eqs)[0]];
-      ops[d.id].premises.forEach(p => {
-        const _e = extractEquations(data.getElementById(p.eq));
-        eqs[p.eq] = _e.eqs[Object.keys(_e.eqs)[0]];
-      });
-
-      node.data = { ops, eqs, variables }
-
-      /*const entries = item.querySelectorAll("entry");
-      
-      node.data = {};
-      entries.forEach(e => {
-        const { eqs, variables } = extractEquations(e);
-        node.data[e.querySelector("key").textContent] = { eq: eqs[Object.keys(eqs)[0]], vars: variables } ;
-      });*/
+    if (node["type"] === "CDRule") {
+      node = buildCDRule(data, node);
     }
-
+    
     const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
     node.isRoot = outGoingEdges.length === 0;
 
     let rule = edgeData.filter((edge) => edge.target === d.id)[0];
     rule = rule ? rule.rule : rule;
-    
+
     if (Object.keys(extras).length !== 0) {
       node.data = app.isLinear ? extras[rule] : extras[node.element];
     }
-
-    console.log(node.data)
 
     return node;
   });

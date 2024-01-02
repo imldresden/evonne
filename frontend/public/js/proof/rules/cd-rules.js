@@ -11,15 +11,13 @@ export class CDRules {
         "[Constant difference]": (p, c) => { console.log("diffing..") },
     }
 
-    draw({ ruleName, tooltip, premises, conclusion, data }) {
+    draw({ ruleName, tooltip, data }) {
         this.tooltip = tooltip;
 
-        console.log(premises)
-        console.log(conclusion)
         console.log(data)
         
         if (this.rules[ruleName]) {
-            this.rules[ruleName](premises, conclusion);
+            this.rules[ruleName](data);
         } else if (data) {
             this.linear(data);
         } else {

@@ -70,6 +70,7 @@ class InferenceRulesHelper {
     }
 
     showExplanation(event, { premises, conclusion, data }) {
+
         if (tooltip) {
             tooltip.selectAll("*").remove();
         }
@@ -95,16 +96,12 @@ class InferenceRulesHelper {
 
         const ruleName = data.source.element;
 
-        switch (data.source.type) {
-            case "DLRule":
-                rule_sets.dl.draw({ ruleName, div, premises, conclusion });
-                break;
-            case "CDRule":
-                rule_sets.cd.draw({ ruleName, tooltip, premises, conclusion, data: data.source.data });
-                break;
-            default:
-                console.error(`unknown rule type: "${data.source.type}"`);
-                break;
+        if (data.source.type === "rule" || data.source.type === "DLRule") {
+            rule_sets.dl.draw({ ruleName, div, premises, conclusion });
+        } else if (data.source.type === "CDRule") {
+            rule_sets.cd.draw({ ruleName, tooltip, data: data.source.data });
+        } else {
+            console.error(`unknown rule type: "${data.source.type}"`);
         }
 
         if (app.ruleExplanationPosition === "mousePosition") {
