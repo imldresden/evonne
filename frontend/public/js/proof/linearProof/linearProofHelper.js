@@ -1,7 +1,5 @@
 import { APP_GLOBALS as app, SharedData } from "../../shared-data.js";
 import {nodeVisualsDefaults} from "../nodeVisualsHelper.js";
-import { getNodes } from "../proof.js";
-
 
 function getDFOrder(hierarchy, orderedElements){
     hierarchy.children?.forEach(d=>{
@@ -55,58 +53,6 @@ function computeLinearLayout(hierarchy) {
     });
 
     return linearLayout;
-}
-
-function processData(data) {
-    // Compute edges
-    let edgeData = [];
-    [].map.call(data.querySelectorAll("hyperedge"), d => {
-        let edgeIDSuffix = 97;
-        let edgeTarget;
-        let rule = {}; 
-        d.querySelectorAll("data").forEach(k => {
-            rule[k.getAttribute("key")] = k.textContent;
-        });
-        d.querySelectorAll("endpoint").forEach(e => {
-            if(e.getAttribute("type") === "in") {
-                edgeTarget = e.getAttribute("node");
-            }
-        });
-        let endPoints = d.querySelectorAll("endpoint");
-        if (endPoints.length === 1) {
-            endPoints.forEach(e => {
-                let edgeId = d.getAttribute("id");
-                let edgeSource = null;
-                edgeIDSuffix++;
-                edgeData.push({id: edgeId, source: edgeSource, target: edgeTarget, rule});
-            });
-        } else {
-            endPoints.forEach(e => {
-                if (e.getAttribute("type") === "out") {
-                    let edgeId = d.getAttribute("id") + String.fromCharCode(edgeIDSuffix);
-                    let edgeSource = e.getAttribute("node");
-                    edgeIDSuffix++;
-                    edgeData.push({id: edgeId, source: edgeSource, target: edgeTarget, rule});
-                }
-            });
-        }
-    });
-
-    let nodeData = getNodes(data, edgeData);
-
-    //remove edges with a null source
-    edgeData = edgeData.filter(d=>!!d.source)
-
-    // Add the nodeData to the edgeData
-    edgeData.forEach(d => {
-        d.source = nodeData.find(b => b.id === d.source);
-        d.target = nodeData.find(b => b.id === d.target);
-    });
-
-    return {
-        nodes: nodeData,
-        edges: edgeData
-    };
 }
 
 function drawCurvedLinks(t){
@@ -240,9 +186,7 @@ function addHighlightCurrentInferenceEvent(){
         .on("mouseout", () => { setFullOpacityToAll(); });
 }
 
-
-export {
-    processData, 
+export { 
     computeLinearLayout, 
     drawCurvedLinks, 
     renderSideConnectorsByType,

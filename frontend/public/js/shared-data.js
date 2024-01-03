@@ -16,10 +16,8 @@ const APP_GLOBALS = {
   SVGwidth: undefined,
   SVGheight: undefined,
   margin: undefined,
-  contentWidth: undefined,
   proofWidth: undefined,
   proofHeight: undefined,
-  contentHeight: undefined,
   designModeIsNew: 0,
   isMagic: false,
   isRuleShort: false,
@@ -585,18 +583,6 @@ const SharedData = {
   separation: function (a, b) {
     return ((a.width + b.width) / 2) / this.maxNodeWidth + 0.03;
   }
-
 }
 
-function removeListeners(event, thingsWithListeners) {
-  thingsWithListeners.forEach((val, key) => {
-    if (!key) {
-      delete thingsWithListeners[key]
-    } else {
-      key.removeEventListener(event, val);
-    }
-  });
-}
-
-
-export { APP_GLOBALS, SharedData, removeListeners };
+export { APP_GLOBALS, SharedData };

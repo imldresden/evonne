@@ -1,8 +1,8 @@
-import { APP_GLOBALS as app, SharedData, removeListeners } from "../shared-data.js";
+import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
 import { AxiomFunctionsHelper } from "./axiomFunctions.js";
 import { LinkFunctionsHelper } from "./linkFunctions.js";
 import thumbnailViewer from "../utils/pan-zoom.js";
-import * as lP from "./linearProof/linearProofHelper.js";
+import { processData, processDataLinear } from "./data/process-data.js";
 import { upload } from '../utils/upload-file.js';
 
 function fixDecimals(num) {
@@ -41,40 +41,29 @@ const proofWidthRangeResetBtn = document.getElementById("proofWidthRangeReset");
 const proofHeightRangeResetBtn = document.getElementById("proofHeightRangeReset");
 
 //Mapping elements with click event to their function
-const thingsWithClickListeners = new Map();
-thingsWithClickListeners.set(allowOverlapBtn, allowOverlapBtnFunction);
-thingsWithClickListeners.set(navigationToggleBtn, navigationToggleBtnFunction);
-thingsWithClickListeners.set(shorteningRuleNamesBtn, shorteningRuleNamesBtnFunction);
-thingsWithClickListeners.set(magicToggleBtn, magicToggleBtnFunction);
-thingsWithClickListeners.set(layoutToggleBtn, layoutToggleBtnFunction);
-thingsWithClickListeners.set(planarToggleBtn, planarToggleBtnFunction);
-thingsWithClickListeners.set(shortenAllInProofBtn, shortenAllInProofBtnFunction);
-thingsWithClickListeners.set(proofWidthRangeResetBtn, proofWidthRangeResetBtnFunction);
-thingsWithClickListeners.set(proofHeightRangeResetBtn, proofHeightRangeResetBtnFunction);
-thingsWithClickListeners.set(openOntology, openOntologyFunction);
-
-//Mapping elements with input event to their functions
-const thingsWithInputListeners = new Map();
-thingsWithInputListeners.set(maxLengthInput, maxLengthInputFunction);
-thingsWithInputListeners.set(minHorizontalCompactnessInput, minHorizontalCompactnessInputFunction);
-thingsWithInputListeners.set(maxHorizontalCompactnessInput, maxHorizontalCompactnessInputFunction);
-thingsWithInputListeners.set(proofWidthRange, proofWidthRangeFunction);
-thingsWithInputListeners.set(minVerticalCompactnessInput, minVerticalCompactnessInputFunction);
-thingsWithInputListeners.set(maxVerticalCompactnessInput, maxVerticalCompactnessInputFunction);
-thingsWithInputListeners.set(proofHeightRange, proofHeightRangeFunction);
-
-//Mapping elements with change event to their functions
-const thingsWithChangeListeners = new Map();
-thingsWithChangeListeners.set(shorteningMethodSelection, shorteningMethodSelectionFunction);
-thingsWithChangeListeners.set(tooltipPositionSelection, tooltipPositionSelectionFunction);
-
-//Mapping elements with resize event to their functions
-const thingsWithResizeListeners = new Map();
-thingsWithResizeListeners.set(window, windowFunction);
-
-//Mapping elements with center-root event to their functions
-const thingsWithCenterRootListeners = new Map();
-thingsWithCenterRootListeners.set(document, documentFunction);
+const thingsWithListeners = [
+  { type: 'click', thing: allowOverlapBtn, fn: allowOverlapBtnFunction },
+  { type: 'click', thing: navigationToggleBtn, fn: navigationToggleBtnFunction },
+  { type: 'click', thing: shorteningRuleNamesBtn, fn: shorteningRuleNamesBtnFunction },
+  { type: 'click', thing: magicToggleBtn, fn: magicToggleBtnFunction },
+  { type: 'click', thing: layoutToggleBtn, fn: layoutToggleBtnFunction },
+  { type: 'click', thing: planarToggleBtn, fn: planarToggleBtnFunction },
+  { type: 'click', thing: shortenAllInProofBtn, fn: shortenAllInProofBtnFunction },
+  { type: 'click', thing: proofWidthRangeResetBtn, fn: proofWidthRangeResetBtnFunction },
+  { type: 'click', thing: proofHeightRangeResetBtn, fn: proofHeightRangeResetBtnFunction },
+  { type: 'click', thing: openOntology, fn: openOntologyFunction },
+  { type: 'input', thing: maxLengthInput, fn: maxLengthInputFunction },
+  { type: 'input', thing: minHorizontalCompactnessInput, fn: minHorizontalCompactnessInputFunction },
+  { type: 'input', thing: maxHorizontalCompactnessInput, fn: maxHorizontalCompactnessInputFunction },
+  { type: 'input', thing: proofWidthRange, fn: proofWidthRangeFunction },
+  { type: 'input', thing: minVerticalCompactnessInput, fn: minVerticalCompactnessInputFunction },
+  { type: 'input', thing: maxVerticalCompactnessInput, fn: maxVerticalCompactnessInputFunction },
+  { type: 'input', thing: proofHeightRange, fn: proofHeightRangeFunction },
+  { type: 'change', thing: shorteningMethodSelection, fn: shorteningMethodSelectionFunction },
+  { type: 'change', thing: tooltipPositionSelection, fn: tooltipPositionSelectionFunction },
+  { type: 'resize', thing: window, fn: windowFunction },
+  { type: 'center-root', thing: document, fn: documentFunction },
+];
 
 function init_proof(proof_file_param) {
   // Configure SVG
@@ -84,8 +73,8 @@ function init_proof(proof_file_param) {
     app.SVGwidth = app.BBox.width;
     app.SVGheight = app.BBox.height;
     app.margin = { top: 50, right: 50, bottom: 100, left: 50 };
-    app.contentWidth = app.SVGwidth - app.margin.left - app.margin.right;
-    app.contentHeight = app.SVGheight - app.margin.top - app.margin.bottom;
+    app.proofWidth = app.SVGwidth - app.margin.left - app.margin.right;
+    app.proofHeight = app.SVGheight - app.margin.top - app.margin.bottom;
     app.svgProof
       .attr("viewBox", [
         -app.margin.left,
@@ -115,109 +104,47 @@ function init_proof(proof_file_param) {
   // Configure Shared Data // TODO: this should not happen here, because the AD by itself never loads this js! 
   SharedData.axiomFunctionsHelper = new AxiomFunctionsHelper(socket);
   SharedData.linkFunctionsHelper = new LinkFunctionsHelper();
-
-  //Remove listeners of types
-  removeListeners("click", thingsWithClickListeners);
-  removeListeners("input", thingsWithInputListeners);
-  removeListeners("change", thingsWithChangeListeners);
-  removeListeners("resize", thingsWithResizeListeners);
-  removeListeners("center-root", thingsWithCenterRootListeners);
-
-  if (allowOverlapBtn) {
-    allowOverlapBtn.checked = false;
-    allowOverlapBtn.addEventListener("click", allowOverlapBtnFunction);
-  }
+  
+  // configure the html 
+  allowOverlapBtn.checked = false;
   overlapAllowingSettings.style.display = SharedData.allowOverlap ? "block" : "none";
+  navigationToggleBtn.checked = false;
+  shorteningRuleNamesBtn.checked = false;
 
-  // Configure Navigation Mode
-  // -- Switch on to explore step-wise
-  if (navigationToggleBtn) {
-    navigationToggleBtn.checked = false;
-    navigationToggleBtn.addEventListener("click", navigationToggleBtnFunction);
-  }
-
-  // Configure shortening of rule names
-  if (shorteningRuleNamesBtn) {
-    shorteningRuleNamesBtn.checked = false;
-    shorteningRuleNamesBtn.addEventListener("click", shorteningRuleNamesBtnFunction);
-  }
-
-  // Configure Magic Mode
   app.isMagic = false;
   SharedData.currentMagicAction = "";
-  if (magicToggleBtn) {
-    magicToggleBtn.checked = false;
-    magicToggleBtn.addEventListener("click", magicToggleBtnFunction);
-  }
-
-  // Configure Layout Mode
-  // -- Switch on to explore step-wise
-  if (layoutToggleBtn) {
-    layoutToggleBtn.checked = false;
-    layoutToggleBtn.addEventListener("click", layoutToggleBtnFunction);
-  }
-
-  // Configure planar (optimise premise distance) property of the linear layout mode
-  if (planarToggleBtn) {
-    planarToggleBtn.checked = true;
-    planarToggleBtn.closest(".planar-div-wrapper").style.display = "none"
-    planarToggleBtn.addEventListener("click", planarToggleBtnFunction);
-  }
-
-  //update the selection of the shortening method
+  magicToggleBtn.checked = false;
+  layoutToggleBtn.checked = false;
+  planarToggleBtn.checked = true;
+  planarToggleBtn.closest(".planar-div-wrapper").style.display = "none";
+  
   shorteningMethodSelection.value = app.shorteningMethod;
-
-
   maxLengthInput.closest(".input-range-wrapper").style.display = "none";
-  maxLengthInput.addEventListener("input", maxLengthInputFunction);
 
   updateShorteningButton(original, shortenAllInProofBtn);
-
-  shortenAllInProofBtn.addEventListener("click", shortenAllInProofBtnFunction);
-  shorteningMethodSelection.addEventListener("change", shorteningMethodSelectionFunction);
 
   //update the selection of the tooltip position
   app.ruleExplanationPosition = "leftBottom";
   tooltipPositionSelection.value = app.ruleExplanationPosition;
-  tooltipPositionSelection.addEventListener("change", tooltipPositionSelectionFunction);
+
   //Update the width of the proof
-  app.proofWidth = app.contentWidth;
-
-  proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * app.contentWidth);
-  proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * app.contentWidth);
-  proofWidthRange.value = fixDecimals(app.contentWidth);
-
-  minHorizontalCompactnessInput.addEventListener("input", minHorizontalCompactnessInputFunction);
-  maxHorizontalCompactnessInput.addEventListener("input", maxHorizontalCompactnessInputFunction);
-
-  proofWidthRangeResetBtn.addEventListener("click", proofWidthRangeResetBtnFunction);
-
-  proofWidthRange.addEventListener("input", proofWidthRangeFunction);
+  proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * app.proofWidth);
+  proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * app.proofWidth);
+  proofWidthRange.value = fixDecimals(app.proofWidth);
 
   //Update the height of the proof
-  app.proofHeight = app.contentHeight;
+  app.proofHeight = app.proofHeight;
 
-  proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * app.contentHeight);
-  proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * app.contentHeight);
-  proofHeightRange.value = fixDecimals(app.contentHeight);
+  proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * app.proofHeight);
+  proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * app.proofHeight);
+  proofHeightRange.value = fixDecimals(app.proofHeight);
 
-  minVerticalCompactnessInput.addEventListener("input", minVerticalCompactnessInputFunction);
-  maxVerticalCompactnessInput.addEventListener("input", maxVerticalCompactnessInputFunction);
+  // set listeners
+  thingsWithListeners.forEach(twl => {
+    twl.thing.removeEventListener(twl.type, twl.fn);
+    twl.thing.addEventListener(twl.type, twl.fn);
+  })
 
-  proofHeightRangeResetBtn.addEventListener("click", proofHeightRangeResetBtnFunction);
-  proofHeightRange.addEventListener("input", proofHeightRangeFunction);
-
-  openOntology.addEventListener('click', openOntologyFunction);
-
-  // Configure Windows resizing
-  window.addEventListener("resize", windowFunction);
-
-  // define arrowheads
-  let arrowPoints = [
-    [0, 0],
-    [0, 20],
-    [20, 10],
-  ];
   app.svgProof
     .append("defs")
     .append("marker")
@@ -230,7 +157,7 @@ function init_proof(proof_file_param) {
     .attr("markerUnits", "userSpaceOnUse")
     .attr("orient", "auto-start-reverse")
     .append("path")
-    .attr("d", d3.line()(arrowPoints))
+    .attr("d", d3.line()([[0, 0],[0, 20],[20, 10]]))
     .attr("fill", "darkgrey");
 
   // DEBUG: Read data at the beginning to avoid having to manually load data
@@ -262,102 +189,11 @@ function getInitialMagicalHierarchy(data) {
   return result;
 }
 
-function extractEquations(node) {
-  const vars = new Set();
-  const eqs = {};
-
-  const equations = node.querySelectorAll("equation");
-  equations.forEach((equation) => {
-    const eq = {};
-
-    const lhs = equation.querySelectorAll("lhs > term");
-    lhs.forEach((variable) => {
-      const coe = variable.getAttribute("coe");
-      let name = variable.getAttribute("var");
-      if (name.indexOf('#') !== -1) {
-        name = name.slice(name.indexOf('#') + 1, name.indexOf('>'));
-      }
-
-      eq[name] = coe;
-      vars.add(name);
-    });
-
-    const rhs = equation.querySelector("rhs > term").getAttribute("coe");
-    eq.rhs = rhs;
-
-    eqs[equation.getAttribute("id")] = eq;
-  });
-  return { eqs, vars };
-}
-
-function extractInequations(node) {
-  const vars = new Set();
-  const ineqs = {};
-
-  const equations = node.querySelectorAll("inequation");
-  equations.forEach((equation) => {
-    const eq = {};
-
-    const lhs = equation.querySelectorAll("lhs > term");
-    lhs.forEach((variable) => {
-      const coe = variable.getAttribute("coe");
-      let name = variable.getAttribute("var");
-      if (name.indexOf('#') !== -1) {
-        name = name.slice(name.indexOf('#') + 1, name.indexOf('>'));
-      }
-
-      eq[name] = coe;
-      vars.add(name);
-    });
-
-    const rhs = equation.querySelector("rhs > term").getAttribute("coe");
-    eq.rhs = rhs;
-
-    ineqs[equation.getAttribute("id")] = eq;
-  });
-  return { ineqs, vars };
-}
-
-function extractNumbers(raw) {
-  // extracts a sequence of operations and their respective equations from cdProofNodes
-  const result = {};
-  const numericals = raw.querySelectorAll("cdProofNode");
-
-  numericals.forEach((node) => {
-
-    const { eqs, vars } = extractEquations(node);
-    const ops = {};
-    const rowOperations = node.querySelectorAll("cdRule");
-    rowOperations.forEach((operation) => {
-      const op = {
-        premises: [],
-        conclusion: operation.querySelector("conclusion").getAttribute("equation")
-      };
-
-      const premises = operation.querySelectorAll("premise");
-      premises.forEach((premise) => {
-        op.premises.push({
-          coe: premise.getAttribute("coefficient"),
-          eq: premise.getAttribute("equation")
-        });
-      });
-
-      ops[operation.getAttribute("id")] = op;
-    });
-
-    result[node.getAttribute("linkedToNode")] = {
-      vars, ops, eqs
-    };
-  });
-
-  return result;
-}
-
 function createContent(data) {
   // Generate nodes and edges from the raw data
   let processedData;
   if (app.isLinear) {
-    processedData = lP.processData(data);
+    processedData = processDataLinear(data);
   } else {
     processedData = processData(data);
   }
@@ -398,153 +234,6 @@ function createContent(data) {
   SharedData.advancedUpdate();
 }
 
-function buildCDRule(data, d, node) {
-  const ms = d.querySelectorAll("multiplication")
-
-  function isNumber(str) {
-    return !isNaN(str) && !isNaN(parseFloat(str))
-  }
-
-  if (ms.length > 0) {
-
-    const ops = {};
-    ops[node.id] = {
-      premises: [].map.call(ms, m => { return { 
-        coe: m.getAttribute("coefficient"), 
-        eq: m.getAttribute("nodeID") } 
-      }),
-      conclusion: edgeData.filter((edge) => edge.source === node.id)[0].target
-    }
-
-    // TODO: distinguish between linear and diff in a better way
-    if (isNumber(ops[node.id].premises[0].coe)) { // linear 
-      
-      const eqs = {};
-      const _ce = extractEquations(data.getElementById(ops[node.id].conclusion));
-      const vars = _ce.vars;
-      eqs[ops[node.id].conclusion] = _ce.eqs[Object.keys(_ce.eqs)[0]];
-
-      // TODO: not a single equation per node 
-      if (Object.keys(_ce.eqs).length > 0) {
-        //console.log(_ce.eqs)
-      }
-
-      ops[node.id].premises.forEach(p => {
-        const _e = extractEquations(data.getElementById(p.eq));
-
-        // TODO: not a single equation per node 
-        if (Object.keys(_e.eqs).length > 0) {
-          //console.log(p.eq)
-          //console.log(_e)
-        }
-
-        eqs[p.eq] = _e.eqs[Object.keys(_e.eqs)[0]];
-      });
-
-      node.data = { ops, eqs, vars, type: "linear" }
-    } else { // diff
-      const ineqs = {};
-      const _ce = extractInequations(data.getElementById(ops[node.id].conclusion));
-      const vars = _ce.vars;
-      eqs[ops[node.id].conclusion] = _ce.eqs[Object.keys(_ce.eqs)[0]];
-
-      // TODO: not a single equation per node 
-      if (Object.keys(_ce.eqs).length > 0) {
-        //console.log(_ce.eqs)
-      }
-
-      ops[node.id].premises.forEach(p => {
-        const _e = extractInequations(data.getElementById(p.eq));
-
-        // TODO: not a single equation per node 
-        if (Object.keys(_e.eqs).length > 0) {
-          //console.log(p.eq)
-          //console.log(_e)
-        }
-
-        eqs[p.eq] = _e.eqs[Object.keys(_e.eqs)[0]];
-      });
-
-      node.data = { ops, eqs, vars, type: "diff" }
-    }
-  }
-  return node;
-}
-
-function getNodes(data, edgeData) {
-  let extras = extractNumbers(data);
-
-  // Compute nodes
-  return [].map.call(data.querySelectorAll("node"), (d) => {
-
-    let node = { id: d.id };
-    const dataNodes = d.querySelectorAll("data");
-
-    dataNodes.forEach((item) => {
-      const key = item.getAttribute("key");
-
-      if (key) {
-        node[key] = item.textContent;
-      } else {
-        // for nodes with number logic
-        const entries = item.querySelectorAll("entry");
-        node.data = {};
-        entries.forEach(e => {
-          const { eqs, vars } = extractEquations(e);
-          const allEqs = Object.values(eqs);
-          if (allEqs.length !== 1) {
-            console.error("malformed entry");
-          }
-
-          node.data[e.querySelector("key").textContent] = { eq: allEqs[0], vars };
-        });
-      }
-    });
-
-    if (node["type"] === "CDRule") {
-      node = buildCDRule(data, d, node);
-    }
-    
-    const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
-    node.isRoot = outGoingEdges.length === 0;
-
-    let rule = edgeData.filter((edge) => edge.target === d.id)[0];
-    rule = rule ? rule.rule : rule;
-
-    if (Object.keys(extras).length !== 0) {
-      node.data = app.isLinear ? extras[rule] : extras[node.element];
-    }
-
-    return node;
-  });
-}
-
-function processData(data) {
-  // Compute edges
-  let edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
-    let edgeId = d.getAttribute("id");
-    let edgeSource = d.getAttribute("source");
-    let edgeTarget = d.getAttribute("target");
-
-    return { id: edgeId, source: edgeSource, target: edgeTarget };
-  });
-
-  let nodeData = getNodes(data, edgeData);
-
-  // Add the nodeData to the edgeData
-  edgeData.forEach((d) => {
-    d.source = nodeData.find((b) => b.id === d.source);
-    d.target = nodeData.find((b) => b.id === d.target);
-  });
-
-  return {
-    nodes: nodeData,
-    edges: edgeData,
-  };
-}
-
-document.addEventListener("center-root", documentFunction);
-
 function getFileName() {
   let fileName = "proof";
   if (app.proofFile) {
@@ -580,7 +269,7 @@ function updateShorteningButton(original, shortenAllInProofBtn) {
   }
 }
 
-export function loadProof(event) {
+function loadProof(event) {
   app.proofFile = event.target.files[0];
   SharedData.nodeVisualsHelper.initVarsAxiomFunctions();
   // initVarsLinkFunctions();
@@ -593,7 +282,7 @@ export function loadProof(event) {
   });
 }
 
-export function loadSignature(event) {
+function loadSignature(event) {
   app.signatureFile = event.target.files[0];
   upload(app.signatureFile);
 }
@@ -703,14 +392,15 @@ function shortenAllInProofBtnFunction() {
   //Redraw
   SharedData.advancedUpdate();
 }
+
 function proofWidthRangeResetBtnFunction() {
-  app.proofWidth = app.contentWidth;
+  app.proofWidth = app.proofWidth;
   proofWidthRange.value = app.proofWidth;
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
 function proofHeightRangeResetBtnFunction() {
-  app.proofHeight = app.contentHeight;
+  app.proofHeight = app.proofHeight;
   proofHeightRange.value = app.proofHeight;
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
@@ -724,9 +414,9 @@ function maxLengthInputFunction() {
 
 function minHorizontalCompactnessInputFunction() {
   const clampedMin =
-    minHorizontalCompactnessInput.value * app.contentWidth >
+    minHorizontalCompactnessInput.value * app.proofWidth >
     proofWidthRange.value;
-  proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * app.contentWidth);
+  proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * app.proofWidth);
 
   if (clampedMin) {
     proofWidthRange.value = proofWidthRange.min;
@@ -737,9 +427,9 @@ function minHorizontalCompactnessInputFunction() {
 
 function maxHorizontalCompactnessInputFunction() {
   const clampedMax =
-    maxHorizontalCompactnessInput.value * app.contentWidth <
+    maxHorizontalCompactnessInput.value * app.proofWidth <
     proofWidthRange.value;
-  proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * app.contentWidth);
+  proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * app.proofWidth);
 
   if (clampedMax) {
     proofWidthRange.value = proofWidthRange.max;
@@ -755,9 +445,9 @@ function proofWidthRangeFunction() {
 
 function minVerticalCompactnessInputFunction() {
   const clampedMin =
-    minVerticalCompactnessInput.value * app.contentHeight >
+    minVerticalCompactnessInput.value * app.proofHeight >
     proofHeightRange.value;
-  proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * app.contentHeight);
+  proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * app.proofHeight);
 
   if (clampedMin) {
     proofHeightRange.value = proofHeightRange.min;
@@ -768,10 +458,10 @@ function minVerticalCompactnessInputFunction() {
 
 function maxVerticalCompactnessInputFunction() {
   const clampedMax =
-    maxVerticalCompactnessInput.value * app.contentHeight <
+    maxVerticalCompactnessInput.value * app.proofHeight <
     proofHeightRange.value;
 
-  proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * app.contentHeight);
+  proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * app.proofHeight);
   if (clampedMax) {
     proofHeightRange.value = proofHeightRange.max;
     app.proofHeight = proofHeightRange.max;
@@ -814,4 +504,4 @@ function documentFunction() {
   }
 }
 
-export { init_proof, getNodes }
+export { init_proof, loadProof, loadSignature }

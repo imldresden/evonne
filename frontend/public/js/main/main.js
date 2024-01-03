@@ -1,6 +1,6 @@
 import { init_proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
-import { APP_GLOBALS as app, removeListeners } from "../shared-data.js";
+import { APP_GLOBALS as app } from "../shared-data.js";
 
 let status = {};
 let interval = undefined;
@@ -12,13 +12,16 @@ const clearSigFilePath = document.getElementById("clearSignatureFile");
 const computeAxiomsBtn = document.getElementById('computeAxiomPairBtn');
 
 window.onload = function () {
-  //Mapping elements with click event to their functions
-  let thingsWithClickListeners = new Map();
-  thingsWithClickListeners.set(clearSigFilePath, clearSigFilePathFunction);
-  thingsWithClickListeners.set(computeAxiomsBtn, computeAxiomsBtnFunction);
+  //Mapping elements with events to their functions
+  const thingsWithListeners = [
+    { type: 'click', thing: clearSigFilePath, fn: clearSigFilePathFunction },
+    { type: 'click', thing: computeAxiomsBtn, fn: computeAxiomsBtnFunction },
+  ];
 
-  //Remove listeners of types
-  removeListeners("click", thingsWithClickListeners);
+  // Remove listeners
+  thingsWithListeners.forEach(twl => {
+    twl.thing.removeEventListener(twl.type, twl.fn);
+  });
 
   const projects = document.getElementById("current-projects");
   projects && fetch('/projects')
@@ -176,7 +179,6 @@ function sortNames(c1, c2) {
   }
   return 0;
 }
-
 
 function clearSigFilePathFunction() {
   signaturePathText.value = "";

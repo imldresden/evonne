@@ -37,12 +37,12 @@ export class CDRules {
             .attr("class", "pcp-container")
             .attr("id", "pcp-container")
         
-        const header = [...data.vars, "rhs"]; 
+        const header = [...data.variables, "_rhs"]; 
         const pcp_data = {};
 
         function getPolyline(data, id, color) {
-            const augmentedEq = data.eqs[id];
-            [...data.vars].forEach(v => {
+            const augmentedEq = data.constraints[id];
+            [...data.variables].forEach(v => {
                 if (!augmentedEq[v]) {
                     augmentedEq[v] = "0"; 
                 }

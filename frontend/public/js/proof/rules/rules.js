@@ -130,11 +130,11 @@ class InferenceRulesHelper {
             let width = element.offsetWidth;
             let height = element.offsetHeight - 35;
 
-            let x = event.clientX + width > app.contentWidth
-                ? app.contentWidth - width
+            let x = event.clientX + width > app.proofWidth
+                ? app.proofWidth - width
                 : event.pageX;
-            let y = event.clientY + height > app.contentHeight
-                ? app.contentHeight - height
+            let y = event.clientY + height > app.proofHeight
+                ? app.proofHeight - height
                 : event.pageY;
 
             tooltip.style("left", x + "px").style("top", y + "px");
