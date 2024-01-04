@@ -47,7 +47,7 @@ const utils = {
     }
 }
 
-class InferenceRulesHelper {
+class RulesHelper {
 
     addTooltipToNodes() {
         let proofView = d3.select("#proof-view");
@@ -173,4 +173,4 @@ class InferenceRulesHelper {
     }
 }
 
-export { InferenceRulesHelper, utils };
+export { RulesHelper, utils };

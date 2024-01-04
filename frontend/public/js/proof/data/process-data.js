@@ -190,7 +190,11 @@ function getNodes(data, edgeData) {
         let rule = edgeData.filter((edge) => edge.target === d.id)[0];
         rule = rule ? rule.rule : rule;
 
-        if (Object.keys(extras).length !== 0) {
+        if (Object.keys(extras).length === 0) {
+            if (proof.isLinear) {
+                node.data = { rule };
+            }
+        } else {
             node.data = proof.isLinear ? extras[rule] : extras[node.element];
         }
 
@@ -199,6 +203,10 @@ function getNodes(data, edgeData) {
 }
 
 function processData(data) {
+    if (proof.isLinear) {
+        return processDataLinear(data);
+    } 
+    
     // Compute edges
     let edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
         let edgeId = d.getAttribute("id");
@@ -228,12 +236,12 @@ function processDataLinear(data) {
     [].map.call(data.querySelectorAll("hyperedge"), d => {
         let edgeIDSuffix = 97;
         let edgeTarget;
-        let rule = {}; 
+        let rule = {};
         d.querySelectorAll("data").forEach(k => {
             rule[k.getAttribute("key")] = k.textContent;
         });
         d.querySelectorAll("endpoint").forEach(e => {
-            if(e.getAttribute("type") === "in") {
+            if (e.getAttribute("type") === "in") {
                 edgeTarget = e.getAttribute("node");
             }
         });
@@ -243,7 +251,7 @@ function processDataLinear(data) {
                 let edgeId = d.getAttribute("id");
                 let edgeSource = null;
                 edgeIDSuffix++;
-                edgeData.push({id: edgeId, source: edgeSource, target: edgeTarget, rule});
+                edgeData.push({ id: edgeId, source: edgeSource, target: edgeTarget, rule });
             });
         } else {
             endPoints.forEach(e => {
@@ -251,7 +259,7 @@ function processDataLinear(data) {
                     let edgeId = d.getAttribute("id") + String.fromCharCode(edgeIDSuffix);
                     let edgeSource = e.getAttribute("node");
                     edgeIDSuffix++;
-                    edgeData.push({id: edgeId, source: edgeSource, target: edgeTarget, rule});
+                    edgeData.push({ id: edgeId, source: edgeSource, target: edgeTarget, rule });
                 }
             });
         }
@@ -260,7 +268,7 @@ function processDataLinear(data) {
     let nodeData = getNodes(data, edgeData);
 
     //remove edges with a null source
-    edgeData = edgeData.filter(d=>!!d.source)
+    edgeData = edgeData.filter(d => !!d.source)
 
     // Add the nodeData to the edgeData
     edgeData.forEach(d => {
@@ -274,4 +282,36 @@ function processDataLinear(data) {
     };
 }
 
-export { processData, processDataLinear }
+function computeTreeLayout(hierarchy) {
+
+    if (proof.isLinear) {
+        return proof.linear.computeLinearLayout(hierarchy);
+    }
+
+    function separation(a, b) {
+        return ((a.width + b.width) / 2) / proof.nodeVisuals.maxNodeWidth + 0.03;
+    }
+
+    // Layout and draw the tree
+    hierarchy.dx = 50;
+    hierarchy.dy = proof.proofWidth / (hierarchy.height + 1);
+    let tree_layout;
+
+    if (proof.allowOverlap) {
+        // tries to fit to screen 
+        tree_layout = d3.tree()
+            .size([proof.proofWidth, proof.proofHeight])
+            .separation((a, b) => separation(a, b))
+            (hierarchy);
+    } else {
+
+        tree_layout = d3.tree()
+            .nodeSize([proof.nodeVisuals.maxNodeWidth, proof.nodeVisuals.maxNodeHeight * 1.2])
+            .separation((a, b) => separation(a, b))
+            (hierarchy);
+    }
+
+    return tree_layout;
+}
+
+export { processData, computeTreeLayout }

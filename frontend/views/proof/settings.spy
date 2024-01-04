@@ -69,16 +69,21 @@
           </form>
         </div>
       </div>
-
-      
-      <a class="modal-trigger advanced-settings-link" data-target="settingsModal" type="button">
-        More settings...
-      </a>
     </div>
+    <a class="modal-trigger advanced-settings-link" data-target="settingsModal" type="button">
+      More settings...
+    </a>
   </fieldset>
 
   <fieldset>
-    <h4>Behavior</h4>
+    <h4>Behavior
+
+      <div class="modal-option">
+        <button class="btn-small btn-primary" id="collapseAll" title="Collapse all nodes to show only proof root">
+          Collapse All
+        </button>
+      </div>
+    </h4>
 
     <!-- Form for selecting the position of the rule explanation tooltip -->
     <label>Tooltip Position</label>
@@ -92,8 +97,10 @@
       </select>
     </div>
 
+    
+
     <div class="modal-option">
-      <label class="label-toggle">Linear Proof</label>
+      <label class="label-toggle">Linear Mode</label>
       <div class="switch">
         <label>
           <input id="toggleLayoutMode" type="checkbox">
@@ -112,16 +119,6 @@
               </label>
             </div>
         </div>
-    </div>
-
-    <div class="modal-option">
-      <label class="label-toggle">Stepwise Mode</label>
-      <div class="switch">
-        <label>
-          <input id="toggleNavMode" type="checkbox">
-          <span class="lever"></span>
-        </label>
-      </div>
     </div>
 
     <!-- Magic option -->

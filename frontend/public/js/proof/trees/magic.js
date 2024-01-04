@@ -1,10 +1,10 @@
-import { nodeVisualsDefaults } from "./nodeVisualsHelper.js";
-import { proof } from "../proof/proof.js";
+import { nodeVisualsDefaults } from "../node-visuals.js";
+import { proof } from "../proof.js";
 
-let edges, allNodes, axiomNodesButConclusion, axiomNodes, inferredAxiomNodes;
+let axiomNodesButConclusion, axiomNodes, inferredAxiomNodes;
 let newMagicBoxCounter = 0, newEdgeIDCounter = 0;
 
-export class MagicNavigationHelper {
+export class MagicNavigation {
 	constructor() {
 		this._entireProofHierarchy = undefined;
 	}
@@ -13,9 +13,29 @@ export class MagicNavigationHelper {
 		this._entireProofHierarchy = originalHierarchy;
 	}
 
+	currentMagicAction = undefined;
+	offsets = 0;
+
+	getInitialMagicalHierarchy(data) {
+		let result = [];
+		let magicBox = this.getNewMagicBox();
+		let fake = data.find((x) => x.id === "L-1");
+		data
+			.filter((x) => x.source.element === "Asserted Conclusion")
+			.forEach((x) => {
+				result.push(x);
+				result.push(
+					this.getNewEdge(x.target, magicBox)
+				);
+			});
+		result.push(
+			this.getNewEdge(magicBox, fake.source)
+		);
+		result.push(fake);
+		return result;
+	}
+
 	addMagicNavButtonsToNodes() {
-		edges = d3.select('#proof-view').selectAll(".link");
-		allNodes = d3.select('#proof-view').selectAll(".node");
 		axiomNodes = d3.select('#proof-view').selectAll(".axiom");
 		axiomNodesButConclusion = d3.select('#proof-view').selectAll(".axiom:not(.conclusion)");
 		inferredAxiomNodes = d3.select('#proof-view').selectAll(".axiom:not(.asserted)");
@@ -32,28 +52,24 @@ export class MagicNavigationHelper {
 		//Add a button to push an axiom upwards (hide the premise)
 		this.addPushUp();
 		//Highlight the axiom's justification in the ontology
-		proof.axiomFunctionsHelper.addHighlightJustificationInOntology();
+		proof.axioms.addHighlightJustificationInOntology();
 		//Create and display repairs for the axiom that corresponds to the selected node
-		proof.axiomFunctionsHelper.addShowRepairs();
+		proof.axioms.addShowRepairs();
 		//Initializing format buttons
-		proof.axiomFunctionsHelper.initializeMaps();
+		proof.axioms.initializeMaps();
 		//Set axiom to be displayed in its original format
-		proof.axiomFunctionsHelper.addSetAxiomOriginal();
+		proof.axioms.addSetAxiomOriginal();
 		//Set axiom to be displayed in its shortened format
-		proof.axiomFunctionsHelper.addSetAxiomShortened();
+		proof.axioms.addSetAxiomShortened();
 		//Set axiom to be displayed in its textual format
-		proof.axiomFunctionsHelper.addSetAxiomTextual();
+		proof.axioms.addSetAxiomTextual();
 		//Extend the width of the button to show the full axiom
-		proof.axiomFunctionsHelper.addShowFullAxiom();
+		proof.axioms.addShowFullAxiom();
 		//Hide all buttons
-		proof.nodeVisualsHelper.initHideAllButtons();
+		proof.nodeVisuals.initHideAllButtons();
 	}
 
-	offsets = 0;
-
 	addPullDown() {
-		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
-
 		let group = inferredAxiomNodes.filter(d => {
 			return d ? d.children[0].data.source.type === "mrule" : false;
 		})
@@ -74,7 +90,7 @@ export class MagicNavigationHelper {
 
 	addPushDown() {
 		const { BOX_HEIGHT } = nodeVisualsDefaults;
-		
+
 		let group = axiomNodesButConclusion.filter(d => {
 			return d ? d.children[0].children : false;
 		})
@@ -84,7 +100,7 @@ export class MagicNavigationHelper {
 			.attr("transform", (d, i, nodes) => {
 				const id = nodes[i].parentNode.id;
 				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${rect.getAttribute("width") / 2 - this.offsets}, ${BOX_HEIGHT - this.offsets*2})`;
+				return `translate(${rect.getAttribute("width") / 2 - this.offsets}, ${BOX_HEIGHT - this.offsets * 2})`;
 			})
 			.on("click", (_, d) => this.pushDown(d))
 			.on("hover", (_, d) => this.pushDownHover(d));
@@ -94,8 +110,8 @@ export class MagicNavigationHelper {
 	}
 
 	addPullUp() {
-		const { BTN_CIRCLE_SIZE, BOX_HEIGHT } = nodeVisualsDefaults;
-		
+		const { BOX_HEIGHT } = nodeVisualsDefaults;
+
 		let group = axiomNodesButConclusion.filter(d => {
 			return d ? d.data.target.type === "mrule" : false;
 		})
@@ -133,13 +149,13 @@ export class MagicNavigationHelper {
 
 	//create the new hierarchy and update
 	updateAll(data, subRoot, action) {
-		let newHierarchy = proof.createHierarchy(this.orderStructure(data));
-		proof.updateHierarchyVars(newHierarchy, subRoot, action);
-		proof.hierarchy = newHierarchy;
+		let newHierarchy = proof.tree.createHierarchy(this.orderStructure(data));
+		proof.tree.updateHierarchyVars(newHierarchy, subRoot, action);
+		proof.tree.hierarchy = newHierarchy;
 
 		d3.select('#proof-view').selectAll(".node #frontRect").each((d, i, nodes) => { d["width"] = nodes[i].getBBox().width; })
-		proof.currentMagicAction = action;
-		proof.advancedUpdate();
+		this.currentMagicAction = action;
+		proof.tree.update();
 	}
 
 	//return True if every element of the premise of the current magic rule 
@@ -157,23 +173,27 @@ export class MagicNavigationHelper {
 		});
 
 		//if there are no rest in magic, then it is not needed
-		if (restMagicPremises.length === 0)
+		if (restMagicPremises.length === 0) {
 			return false;
-
+		}
 
 		//if the new conclusion is the magic conclusion, no magic is needed 
-		if (currentAtOriginal.parent.data.target.id === current.parent.data.target.id)
+		if (currentAtOriginal.parent.data.target.id === current.parent.data.target.id) {
 			return false;
+		}
 
 		//take a look ahead, if the new conclusion is a premise of for the next rule, and all that premise is 
 		//part of the rest of the premise of the magic rule, then it is not needed any more
 		newPremiseElement = this._entireProofHierarchy.descendants().find(x => x.data.source.id === currentAtOriginal.parent.data.target.id);
-		if (!newPremiseElement.parent)
+		if (!newPremiseElement.parent) {
 			return false;
+		}
+
 
 		//if looking head does not give the current magic conclusion, then magic is needed
-		if (newPremiseElement.parent.data.target.id !== current.parent.data.target.id)
+		if (newPremiseElement.parent.data.target.id !== current.parent.data.target.id) {
 			return true;
+		}
 
 		let newPremiseInOriginal = newPremiseElement.parent.children.filter(x => x !== newPremiseElement);
 		let tmp = [...restMagicPremises];
@@ -181,8 +201,8 @@ export class MagicNavigationHelper {
 		let found = null;
 		for (let i = 0; i < newPremiseInOriginal.length; i++) {
 			found = restMagicPremises.find(x => x.data.source.id === newPremiseInOriginal[i].data.source.id)
-			if (found){
-				tmp = tmp.filter(x=>x.data.source.id!==found.data.source.id)
+			if (found) {
+				tmp = tmp.filter(x => x.data.source.id !== found.data.source.id)
 			}
 		}
 		return tmp.length !== 0;
@@ -193,17 +213,18 @@ export class MagicNavigationHelper {
 		if (treeRoot.children == null) {
 			return false;
 		}
-		// if (treeRoot.children[0].data.source.type=="mrule")
-		// 	return false;
 
-		if (treeRoot.children[0].children == null)
+		if (treeRoot.children[0].children == null) {
 			return false;
+		}
 
 		let premise = treeRoot.children[0].children;
 		let toCheck, found;
 		for (let i = 0; i < premise.length; i++) {
-			if (mainRoot.descendants().some(x => x.data.source.id === premise[i].data.source.id))
+			if (mainRoot.descendants().some(x => x.data.source.id === premise[i].data.source.id)) {
 				continue;
+			}
+
 			if (premise[i].children != null && premise[i].children[0].children != null) {
 				toCheck = premise[i].children[0].children;
 				for (let j = 0; j < toCheck.length; j++) {
@@ -330,16 +351,18 @@ export class MagicNavigationHelper {
 			conclusion.children.forEach(x => {
 				//Add the entire relevant branch that already exist in the magical structure
 				// (relevant as part of the new current premise)
-				found = treeRoot.parent.children.find(y=>y.data.source.id === x.data.source.id);
-				if (found){
-					if (!newData.includes(x.data)){
-						newData.push(x.data);}
-					found.children[0].descendants().forEach(y=>{
-						if (!newData.includes(y.data)){
-							newData.push(y.data);}
+				found = treeRoot.parent.children.find(y => y.data.source.id === x.data.source.id);
+				if (found) {
+					if (!newData.includes(x.data)) {
+						newData.push(x.data);
+					}
+					found.children[0].descendants().forEach(y => {
+						if (!newData.includes(y.data)) {
+							newData.push(y.data);
+						}
 					})
 				}
-				else{
+				else {
 					//Add the branches that have some nodes which are not in the magical structures
 					this.incAdd(x, treeRoot.parent, newData);
 				}
@@ -482,8 +505,8 @@ export class MagicNavigationHelper {
 					//If there is no relevant premise, then it can be the case that the branch root is already a magic premise
 					if (relevantPremise.length === 0) {
 						console.assert(grandChild.children[0].data.source.type !== "mrule", "Must not be here!");
-						found = childrenOfMagic.find(y=>grandChild.data.source.id === y.data.source.id)
-						if (found){
+						found = childrenOfMagic.find(y => grandChild.data.source.id === y.data.source.id)
+						if (found) {
 							found.children[0].descendants().forEach(z => newData.push(z.data));
 							return;
 						}
@@ -497,7 +520,7 @@ export class MagicNavigationHelper {
 							console.log(y.data.source.element + " -> " + y.data.target.element)
 							newData.push(y.data)
 							found = treeRoot.descendants().find(z => z.data.source.id === y.data.source.id)
-							if (found){
+							if (found) {
 								console.log("found")
 								console.log(found.data.source.element + " -> " + found.data.target.element);
 								found.children[0].descendants().forEach(z => newData.push(z.data));
@@ -620,7 +643,7 @@ export class MagicNavigationHelper {
 		}
 	}
 
-	appendCircleAndText(group, text, tooltip, _class='') {
+	appendCircleAndText(group, text, tooltip, _class = '') {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -651,39 +674,42 @@ export class MagicNavigationHelper {
 	getDFOrder(structure, currentRootData, orderedStructure) {
 		orderedStructure.push(currentRootData);
 		structure.forEach(d => {
-			if (d.target.id === currentRootData.source.id)
+			if (d.target.id === currentRootData.source.id) {
 				this.getDFOrder(structure, d, orderedStructure);
+			}
 		});
 	}
 
-	incAdd(rootInOriginal,rootInCurrent, newData) {
-		if (!newData.includes(rootInOriginal.data))
+	incAdd(rootInOriginal, rootInCurrent, newData) {
+		if (!newData.includes(rootInOriginal.data)) {
 			newData.push(rootInOriginal.data)
+		}
 
-		if(rootInOriginal.children){
-			rootInOriginal.children.forEach(child=>{
-				if (!rootInCurrent.descendants().some(x=>x.data.source.id === child.data.source.id))
-					if(!this.isDerivableFromMagic(child, rootInCurrent, newData))
-						this.incAdd(child,rootInCurrent,newData)
+		if (rootInOriginal.children) {
+			rootInOriginal.children.forEach(child => {
+				if (!rootInCurrent.descendants().some(x => x.data.source.id === child.data.source.id)) {
+					if (!this.isDerivableFromMagic(child, rootInCurrent, newData)) {
+						this.incAdd(child, rootInCurrent, newData)
+					}
+				}
 			})
 		}
 	}
 
 	isDerivableFromMagic(child, rootInCurrent, newData) {
 		let cDesc = child.descendants();
-
 		let found;
-		for (let i = 0; i < cDesc.length; i++){
-			found = rootInCurrent.descendants().find(x=>cDesc[i].data.source.id === x.data.source.id);
-			if (found)
+
+		for (let i = 0; i < cDesc.length; i++) {
+			found = rootInCurrent.descendants().find(x => cDesc[i].data.source.id === x.data.source.id);
+			if (found) {
 				//just to make sure it is derivable from this branch! this works because so far
 				// the rest of the proof is not added yet to newData
-				if(newData.some(x=>found.data.source.id === x.source.id))
+				if (newData.some(x => found.data.source.id === x.source.id)) {
 					return true;
+				}
+			}
 		}
 		return false;
 	}
 }
-
-
-
