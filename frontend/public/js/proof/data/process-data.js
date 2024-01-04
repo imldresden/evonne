@@ -1,3 +1,5 @@
+import { conf as proof } from "../proof.js";
+
 function extractConstraints(node) {
     const variables = new Set();
     const constraints = {};
@@ -189,7 +191,7 @@ function getNodes(data, edgeData) {
         rule = rule ? rule.rule : rule;
 
         if (Object.keys(extras).length !== 0) {
-            node.data = /*app.isLinear ? extras[rule] :*/ extras[node.element];
+            node.data = proof.isLinear ? extras[rule] : extras[node.element];
         }
 
         return node;

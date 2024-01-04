@@ -1,7 +1,7 @@
 //import { LengthBasedShorteningFunctions } from "./length.js"
 import { BasicShorteningFunctions } from "./basic.js"
 import { camelCaseShorteningFunctions } from "./camel.js";
-import {BasicSophisticatedShorteningFunctions} from "./sophisticatedBasic.js";
+import { BasicSophisticatedShorteningFunctions } from "./sophisticatedBasic.js";
 
 export class LabelsShorteningHelper {
 

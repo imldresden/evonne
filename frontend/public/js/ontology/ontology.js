@@ -47,9 +47,11 @@ const thingsWithListeners = [
 
 // creates the content of the view based on the chosen/read data
 async function createContent(data) {
+  const container = document.getElementById('ontology-view');
+  container.innerHTML = "";
   const elements = processData(data);
   cy = cytoscape({
-    container: document.getElementById('ontology-view'),
+    container,
     style: stylesheet,
     layout: params,
     wheelSensitivity: 0.3
@@ -273,7 +275,6 @@ function loadAtomicDecomposition(e) {
   upload(adOntologyFile, result => {
     console.log('Success:', result);
     d3.xml("../data/" + getSessionId() + "/" + adOntologyFile.name).then((xml) => {
-      app.svgOntology.innerHTML = "";
       createContent(xml);
     });
   });
@@ -367,9 +368,7 @@ function init_ontology(ad_file_name, ontology_file_param) {
     }
   });
 
-  if (!app.svgOntology) {
-    app.svgOntology = document.getElementById("ontology-view");
-  }
+
 
   // CONTROLS ==========================================
 

@@ -1,6 +1,5 @@
-import { init_proof } from '../proof/proof.js';
+import { init_proof, conf as proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
-import { APP_GLOBALS as app } from "../shared-data.js";
 
 let status = {};
 let interval = undefined;
@@ -50,11 +49,11 @@ window.onload = function () {
     signaturePathText.value = "";
     signaturePathFile.value = "";
     signaturePathText.classList.remove("valid");
-    app.signatureFile = undefined;
+    proof.signatureFile = undefined;
 
     browseFilePathText.value = "";
     browseFilePathText.classList.remove("valid");
-    app.proofFile = undefined;
+    proof.proofFile = undefined;
   }
 
   init_views();
@@ -136,15 +135,9 @@ function init_views(loop = false) {
         modal.close();
 
         if (document.getElementById('proof-view')) {
-          if (app.svgProofRootLayer) {
-            app.svgProofRootLayer.selectAll("*").remove();
-          }
           init_proof(res.proofs[0]);
         }
         if (document.getElementById('ontology-view')) {
-          if (app.svgOntology) {
-            app.svgOntology.innerHTML = "";
-          }
           init_ontology(res.ad, res.ontology);
         }
 
@@ -184,7 +177,7 @@ function clearSigFilePathFunction() {
   signaturePathText.value = "";
   signaturePathFile.value = "";
   signaturePathText.classList.remove("valid");
-  app.signatureFile = undefined;
+  proof.signatureFile = undefined;
 }
 
 function computeAxiomsBtnFunction() {
@@ -197,8 +190,8 @@ function computeAxiomsBtnFunction() {
   body.append('lhs', document.getElementById('lhsConcepts').value);
   body.append('rhs', document.getElementById('rhsConcepts').value);
   body.append('method', document.getElementById('methodsList').value);
-  body.append('signaturePath', app.signatureFile
-    ? "frontend/public/data/" + getSessionId() + "/" + app.signatureFile.name
+  body.append('signaturePath', proof.signatureFile
+    ? "frontend/public/data/" + getSessionId() + "/" + proof.signatureFile.name
     : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 

@@ -1,4 +1,5 @@
-import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
+import { SharedData, APP_GLOBALS as app } from "../shared-data.js";
+import { conf as proof } from "../proof/proof.js";
 import * as lP from "./linearProof/linearProofHelper.js";
 
 export const nodeVisualsDefaults = {
@@ -45,7 +46,7 @@ export class NodeVisualsHelper {
     }
 
     renderNodes() {
-        if (app.isLinear) {
+        if (proof.isLinear) {
             lP.renderSideConnectorsByType();
         } else {
             this.renderConnectorsByType("Up");
@@ -197,7 +198,7 @@ export class NodeVisualsHelper {
                     if (!displayFormat || displayFormat === "original")
                         return d.data.source.element;
                     if (displayFormat === "shortened")
-                        return SharedData.labelsShorteningHelper.shortenLabel(d.data.source.element, app.isRuleShort, app.shorteningMethod);
+                        return SharedData.labelsShorteningHelper.shortenLabel(d.data.source.element, proof.isRuleShort, app.shorteningMethod);
                     else if (displayFormat === "textual")
                         return d.data.source.nLElement;
                 })
@@ -267,7 +268,7 @@ export class NodeVisualsHelper {
     addShowHideMouseEvents() {
         d3.selectAll(".axiom")
             .on("dblclick", (e, d) => {
-                if (!app.isDrawing) {
+                if (!proof.isDrawing) {
                     this.expandCollapseNode(e.currentTarget.id);
                     this.updateEdge(d);
                 }
@@ -282,7 +283,7 @@ export class NodeVisualsHelper {
                 if (inactive) {
                     this.activeNodes[d.id] = setTimeout(() => {
                         this.shiftLabelHideButtons(node);
-                        if (!app.isDrawing) {
+                        if (!proof.isDrawing) {
                             const tray = d3.select(`#${node.id} .tray`);
                             if (tray && tray.classed("expanded")) {
                                 this.expandCollapseNode(node.id);
@@ -312,7 +313,7 @@ export class NodeVisualsHelper {
 
     expandNode(node) {
         const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT_Expanded } = nodeVisualsDefaults;
-        app.svgProof.transition()
+        proof.svgProof.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .on("start", () => {})
             .on("end", () => { 
@@ -325,7 +326,7 @@ export class NodeVisualsHelper {
 
     collapseNode(node) {
         const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT } = nodeVisualsDefaults;
-        let t = app.svgProof.transition()
+        let t = proof.svgProof.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .on("start", () => { this.hideCommunicationButtons(node); })
             .on("end", () => { this.addShowHideMouseEvents(); });

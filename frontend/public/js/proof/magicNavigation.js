@@ -1,5 +1,6 @@
-import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
+import { SharedData } from "../shared-data.js";
 import { nodeVisualsDefaults } from "./nodeVisualsHelper.js";
+import { conf as proof } from "../proof/proof.js";
 
 let edges, allNodes, axiomNodesButConclusion, axiomNodes, inferredAxiomNodes;
 let newMagicBoxCounter = 0, newEdgeIDCounter = 0;
@@ -236,7 +237,7 @@ export class MagicNavigationHelper {
 
 	pullUp(treeRoot) {
 		const magicImpossible = treeRoot.parent == null || treeRoot.data.target.type !== "mrule";
-		if (app.isDrawing || magicImpossible)
+		if (proof.isDrawing || magicImpossible)
 			return;
 
 		let newData = [], usedMagicPremises = [], restMagicPremises = [];
@@ -371,7 +372,7 @@ export class MagicNavigationHelper {
 	pushUp(treeRoot) {
 		//when magic is not possible
 		const magicImpossible = treeRoot.children == null || treeRoot.children[0].children == null || treeRoot.parent == null;
-		if (app.isDrawing || magicImpossible)
+		if (proof.isDrawing || magicImpossible)
 			return;
 
 		let newData = [];
@@ -422,7 +423,7 @@ export class MagicNavigationHelper {
 	pullDown(treeRoot) {
 		//when magic is not possible
 		const magicImpossible = treeRoot.children == null || treeRoot.children[0].data.source.type !== "mrule";
-		if (app.isDrawing || magicImpossible)
+		if (proof.isDrawing || magicImpossible)
 			return;
 
 		let newData = [];
@@ -518,7 +519,7 @@ export class MagicNavigationHelper {
 		//when magic is not possible
 		const magicImpossible = treeRoot.children == null || treeRoot.children[0].children == null || treeRoot.parent == null;
 
-		if (app.isDrawing || magicImpossible) return;
+		if (proof.isDrawing || magicImpossible) return;
 
 		let newData = [], newMagicBox = this.getNewMagicBox();
 

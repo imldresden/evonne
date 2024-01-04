@@ -1,6 +1,5 @@
 import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
 import { AxiomFunctionsHelper } from "./axiomFunctions.js";
-import { LinkFunctionsHelper } from "./linkFunctions.js";
 import thumbnailViewer from "../utils/pan-zoom.js";
 import { processData, processDataLinear } from "./data/process-data.js";
 import { upload } from '../utils/upload-file.js';
@@ -65,34 +64,57 @@ const thingsWithListeners = [
   { type: 'center-root', thing: document, fn: documentFunction },
 ];
 
+const conf = {
+  svgProof: undefined,
+  svgProofRootLayer: undefined,
+  BBox: undefined,
+  SVGwidth: undefined,
+  SVGheight: undefined,
+  margin: undefined,
+  proofWidth: undefined,
+  proofHeight: undefined,
+  isMagic: false,
+  isRuleShort: false,
+  proofFile: undefined,
+  signatureFile: undefined,
+  ruleExplanationPosition: undefined,
+  isDrawing: false,
+  drawTime: 750,
+  shortenAllInProof: false,
+  isLinear: false,
+  isDistancePriority: true,
+}
+
 function init_proof(proof_file_param) {
+  if (conf.svgProofRootLayer) {
+    conf.svgProofRootLayer.selectAll("*").remove();
+  }
+
   // Configure SVG
-  if (!app.svgProof) {
-    app.svgProof = d3.select("#proof-view");
-    app.BBox = app.svgProof.node().getBoundingClientRect();
-    app.SVGwidth = app.BBox.width;
-    app.SVGheight = app.BBox.height;
-    app.margin = { top: 50, right: 50, bottom: 100, left: 50 };
-    app.proofWidth = app.SVGwidth - app.margin.left - app.margin.right;
-    app.proofHeight = app.SVGheight - app.margin.top - app.margin.bottom;
-    app.svgProof
+  if (!conf.svgProof) {
+    conf.svgProof = d3.select("#proof-view");
+    conf.BBox = conf.svgProof.node().getBoundingClientRect();
+    conf.SVGwidth = conf.BBox.width;
+    conf.SVGheight = conf.BBox.height;
+    conf.margin = { top: 50, right: 50, bottom: 100, left: 50 };
+    conf.proofWidth = conf.SVGwidth - conf.margin.left - conf.margin.right;
+    conf.proofHeight = conf.SVGheight - conf.margin.top - conf.margin.bottom;
+    conf.svgProof
       .attr("viewBox", [
-        -app.margin.left,
-        -app.margin.top,
-        app.SVGwidth,
-        app.SVGheight,
+        -conf.margin.left,
+        -conf.margin.top,
+        conf.SVGwidth,
+        conf.SVGheight,
       ])
       .style("user-select", "none");
-    app.svgProofRootLayer = app.svgProof.append('g').attr("id", "pViewport");
+    conf.svgProofRootLayer = conf.svgProof.append('g').attr("id", "pViewport");
   }
 
   if (proof_file_param) {
-    app.proofFile = {
+    conf.proofFile = {
       name: proof_file_param,
     };
   }
-  //TODO this should be uncommented after the study
-  //app.drawTime = app.isDebug ? 3000 : app.drawTime;
 
   // Configure Socket IO
   let socket = io();
@@ -103,7 +125,6 @@ function init_proof(proof_file_param) {
 
   // Configure Shared Data // TODO: this should not happen here, because the AD by itself never loads this js! 
   SharedData.axiomFunctionsHelper = new AxiomFunctionsHelper(socket);
-  SharedData.linkFunctionsHelper = new LinkFunctionsHelper();
   
   // configure the html 
   allowOverlapBtn.checked = false;
@@ -111,7 +132,7 @@ function init_proof(proof_file_param) {
   navigationToggleBtn.checked = false;
   shorteningRuleNamesBtn.checked = false;
 
-  app.isMagic = false;
+  conf.isMagic = false;
   SharedData.currentMagicAction = "";
   magicToggleBtn.checked = false;
   layoutToggleBtn.checked = false;
@@ -124,20 +145,20 @@ function init_proof(proof_file_param) {
   updateShorteningButton(original, shortenAllInProofBtn);
 
   //update the selection of the tooltip position
-  app.ruleExplanationPosition = "leftBottom";
-  tooltipPositionSelection.value = app.ruleExplanationPosition;
+  conf.ruleExplanationPosition = "leftBottom";
+  tooltipPositionSelection.value = conf.ruleExplanationPosition;
 
   //Update the width of the proof
-  proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * app.proofWidth);
-  proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * app.proofWidth);
-  proofWidthRange.value = fixDecimals(app.proofWidth);
+  proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * conf.proofWidth);
+  proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * conf.proofWidth);
+  proofWidthRange.value = fixDecimals(conf.proofWidth);
 
   //Update the height of the proof
-  app.proofHeight = app.proofHeight;
+  conf.proofHeight = conf.proofHeight;
 
-  proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * app.proofHeight);
-  proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * app.proofHeight);
-  proofHeightRange.value = fixDecimals(app.proofHeight);
+  proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * conf.proofHeight);
+  proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * conf.proofHeight);
+  proofHeightRange.value = fixDecimals(conf.proofHeight);
 
   // set listeners
   thingsWithListeners.forEach(twl => {
@@ -145,7 +166,7 @@ function init_proof(proof_file_param) {
     twl.thing.addEventListener(twl.type, twl.fn);
   })
 
-  app.svgProof
+  conf.svgProof
     .append("defs")
     .append("marker")
     .attr("id", "arrowhead")
@@ -160,14 +181,10 @@ function init_proof(proof_file_param) {
     .attr("d", d3.line()([[0, 0],[0, 20],[20, 10]]))
     .attr("fill", "darkgrey");
 
-  // DEBUG: Read data at the beginning to avoid having to manually load data
-  // d3.xml("../data/iceNCheeseIsBot_subPizza.xml").then(xml => {
-  if (app.isDebug) {
-    d3.xml("../data/" + getSessionId() + "/" + getFileName()).then((xml) => {
-      createContent(xml);
-      app.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: "#proof-container" });
-    });
-  }
+  d3.xml("../data/" + getSessionId() + "/" + getFileName()).then((xml) => {
+    createContent(xml);
+    conf.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: "#proof-container" });
+  });
 }
 
 function getInitialMagicalHierarchy(data) {
@@ -192,7 +209,7 @@ function getInitialMagicalHierarchy(data) {
 function createContent(data) {
   // Generate nodes and edges from the raw data
   let processedData;
-  if (app.isLinear) {
+  if (conf.isLinear) {
     processedData = processDataLinear(data);
   } else {
     processedData = processData(data);
@@ -213,33 +230,33 @@ function createContent(data) {
   SharedData.edgeData = edgeData;
 
   // initialize hierarchy depending on the navigation mode
-  SharedData.hierarchy = app.isMagic
+  SharedData.hierarchy = conf.isMagic
     ? SharedData.createHierarchy(getInitialMagicalHierarchy(edgeData))
     : SharedData.createHierarchy(edgeData);
 
   // update and draw the tree
   SharedData.updateHierarchyVars(SharedData.hierarchy);
 
-  SharedData.links = app.svgProofRootLayer
+  SharedData.links = conf.svgProofRootLayer
     .append("g")
     .attr("id", "links")
     .attr("cursor", "pointer")
     .attr("pointer-events", "all");
 
-  SharedData.nodes = app.svgProofRootLayer
+  SharedData.nodes = conf.svgProofRootLayer
     .append("g")
     .attr("id", "nodes");
 
-  SharedData.labels = app.svgProof.selectAll("#nodes");
+  SharedData.labels = conf.svgProof.selectAll("#nodes");
   SharedData.advancedUpdate();
 }
 
 function getFileName() {
   let fileName = "proof";
-  if (app.proofFile) {
-    fileName = app.proofFile.name;
+  if (conf.proofFile) {
+    fileName = conf.proofFile.name;
   } else {
-    app.proofFile = {
+    conf.proofFile = {
       name: fileName
     };
   }
@@ -249,7 +266,7 @@ function getFileName() {
     fileName.indexOf(".t.xml") !== -1 ?
       fileName.substring(0, fileName.indexOf(".t.xml")) : fileName;
 
-  if (app.isLinear) {
+  if (conf.isLinear) {
     fileName += ".ht.xml";
   } else {
     fileName += ".t.xml";
@@ -259,32 +276,32 @@ function getFileName() {
 
 function updateShorteningButton(original, shortenAllInProofBtn) {
   if (!original) {
-    app.shortenAllInProof = true;
+    conf.shortenAllInProof = true;
     shortenAllInProofBtn.textContent = "Undo shortening";
     shortenAllInProofBtn.title = "Undo shortening effect in the proof";
   } else {
-    app.shortenAllInProof = false;
+    conf.shortenAllInProof = false;
     shortenAllInProofBtn.textContent = "Shorten all";
     shortenAllInProofBtn.title = "Shorten all text in the proof";
   }
 }
 
 function loadProof(event) {
-  app.proofFile = event.target.files[0];
+  conf.proofFile = event.target.files[0];
   SharedData.nodeVisualsHelper.initVarsAxiomFunctions();
   // initVarsLinkFunctions();
 
-  upload(app.proofFile, result => {
+  upload(conf.proofFile, result => {
     d3.xml("../data/" + getSessionId() + "/" + getFileName()).then((xml) => {
-      app.svgProofRootLayer.selectAll("*").remove();
+      conf.svgProofRootLayer.selectAll("*").remove();
       createContent(xml);
     });
   });
 }
 
 function loadSignature(event) {
-  app.signatureFile = event.target.files[0];
-  upload(app.signatureFile);
+  conf.signatureFile = event.target.files[0];
+  upload(conf.signatureFile);
 }
 
 function allowOverlapBtnFunction() {
@@ -297,7 +314,7 @@ function navigationToggleBtnFunction() {
   if (this.checked) {
     // disable magic mode
     magicToggleBtn.checked = false;
-    app.isMagic = false;
+    conf.isMagic = false;
     SharedData.currentMagicAction = "";
     SharedData.resetHierarchy();
     SharedData.axiomFunctionsHelper.showConclusionOnly();
@@ -307,24 +324,24 @@ function navigationToggleBtnFunction() {
 }
 
 function shorteningRuleNamesBtnFunction() {
-  app.isRuleShort = this.checked;
+  conf.isRuleShort = this.checked;
 }
 
 function magicToggleBtnFunction() {
   // Clear the SVG content
-  app.svgProofRootLayer.selectAll("*").remove();
+  conf.svgProofRootLayer.selectAll("*").remove();
   if (this.checked) {
     navigationToggleBtn.checked = false;
     layoutToggleBtn.checked = false;
-    app.isLinear = false;
+    conf.isLinear = false;
   }
-  app.isMagic = this.checked;
-  if (!app.isMagic) {
+  conf.isMagic = this.checked;
+  if (!conf.isMagic) {
     SharedData.currentMagicAction = undefined;
   }
 
   d3.xml("../data/" + getSessionId() + "/" + getFileName()).then((xml) => {
-    app.svgProofRootLayer.selectAll("*").remove();
+    conf.svgProofRootLayer.selectAll("*").remove();
     createContent(xml);
   });
 }
@@ -332,26 +349,26 @@ function magicToggleBtnFunction() {
 function layoutToggleBtnFunction() {
 
   // Clear the SVG content
-  app.svgProofRootLayer.selectAll("*").remove();
+  conf.svgProofRootLayer.selectAll("*").remove();
   navigationToggleBtn.checked = false;
   if (this.checked) {
     magicToggleBtn.checked = false;
-    app.isMagic = false;
+    conf.isMagic = false;
     planarToggleBtn.closest(".planar-div-wrapper").style.display = "block"
   }
   else {
     planarToggleBtn.closest(".planar-div-wrapper").style.display = "none"
   }
-  app.isLinear = this.checked;
+  conf.isLinear = this.checked;
 
   d3.xml("../data/" + getSessionId() + "/" + getFileName()).then((xml) => {
-    app.svgProofRootLayer.selectAll("*").remove();
+    conf.svgProofRootLayer.selectAll("*").remove();
     createContent(xml);
   });
 }
 
 function planarToggleBtnFunction() {
-  app.isDistancePriority = this.checked;
+  conf.isDistancePriority = this.checked;
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
@@ -359,7 +376,7 @@ function shortenAllInProofBtnFunction() {
   original = !original
   let nodeID
 
-  let nodesClass = app.isRuleShort ? ".axiom,.rule" : ".axiom";
+  let nodesClass = conf.isRuleShort ? ".axiom,.rule" : ".axiom";
   //Update shortening button
   updateShorteningButton(original, shortenAllInProofBtn);
 
@@ -394,14 +411,14 @@ function shortenAllInProofBtnFunction() {
 }
 
 function proofWidthRangeResetBtnFunction() {
-  app.proofWidth = app.proofWidth;
-  proofWidthRange.value = app.proofWidth;
+  conf.proofWidth = conf.proofWidth;
+  proofWidthRange.value = conf.proofWidth;
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
 function proofHeightRangeResetBtnFunction() {
-  app.proofHeight = app.proofHeight;
-  proofHeightRange.value = app.proofHeight;
+  conf.proofHeight = conf.proofHeight;
+  proofHeightRange.value = conf.proofHeight;
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
@@ -414,63 +431,63 @@ function maxLengthInputFunction() {
 
 function minHorizontalCompactnessInputFunction() {
   const clampedMin =
-    minHorizontalCompactnessInput.value * app.proofWidth >
+    minHorizontalCompactnessInput.value * conf.proofWidth >
     proofWidthRange.value;
-  proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * app.proofWidth);
+  proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * conf.proofWidth);
 
   if (clampedMin) {
     proofWidthRange.value = proofWidthRange.min;
-    app.proofWidth = proofWidthRange.min;
+    conf.proofWidth = proofWidthRange.min;
     SharedData.advancedUpdate(SharedData.hierarchy);
   }
 }
 
 function maxHorizontalCompactnessInputFunction() {
   const clampedMax =
-    maxHorizontalCompactnessInput.value * app.proofWidth <
+    maxHorizontalCompactnessInput.value * conf.proofWidth <
     proofWidthRange.value;
-  proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * app.proofWidth);
+  proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * conf.proofWidth);
 
   if (clampedMax) {
     proofWidthRange.value = proofWidthRange.max;
-    app.proofWidth = proofWidthRange.max;
+    conf.proofWidth = proofWidthRange.max;
     SharedData.advancedUpdate(SharedData.hierarchy);
   }
 }
 
 function proofWidthRangeFunction() {
-  app.proofWidth = this.value;
+  conf.proofWidth = this.value;
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
 function minVerticalCompactnessInputFunction() {
   const clampedMin =
-    minVerticalCompactnessInput.value * app.proofHeight >
+    minVerticalCompactnessInput.value * conf.proofHeight >
     proofHeightRange.value;
-  proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * app.proofHeight);
+  proofHeightRange.min = fixDecimals(minVerticalCompactnessInput.value * conf.proofHeight);
 
   if (clampedMin) {
     proofHeightRange.value = proofHeightRange.min;
-    app.proofHeight = proofHeightRange.min;
+    conf.proofHeight = proofHeightRange.min;
     SharedData.advancedUpdate(SharedData.hierarchy);
   }
 }
 
 function maxVerticalCompactnessInputFunction() {
   const clampedMax =
-    maxVerticalCompactnessInput.value * app.proofHeight <
+    maxVerticalCompactnessInput.value * conf.proofHeight <
     proofHeightRange.value;
 
-  proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * app.proofHeight);
+  proofHeightRange.max = fixDecimals(maxVerticalCompactnessInput.value * conf.proofHeight);
   if (clampedMax) {
     proofHeightRange.value = proofHeightRange.max;
-    app.proofHeight = proofHeightRange.max;
+    conf.proofHeight = proofHeightRange.max;
     SharedData.advancedUpdate(SharedData.hierarchy);
   }
 }
 
 function proofHeightRangeFunction() {
-  app.proofHeight = this.value;
+  conf.proofHeight = this.value;
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
@@ -486,7 +503,7 @@ function shorteningMethodSelectionFunction() {
 }
 
 function tooltipPositionSelectionFunction() {
-  app.ruleExplanationPosition = this.value;
+  conf.ruleExplanationPosition = this.value;
   SharedData.advancedUpdate(SharedData.hierarchy);
 }
 
@@ -495,13 +512,13 @@ function windowFunction() {
 }
 
 function documentFunction() {
-  if (app.minimap) {
+  if (conf.minimap) {
     if (!SharedData.allowOverlap) {
-      app.minimap.main.pan({ x: app.proofWidth / 2, y: 0 });
+      conf.minimap.main.pan({ x: conf.proofWidth / 2, y: 0 });
     } else {
-      app.minimap.main.pan({ x: 0, y: 50 });
+      conf.minimap.main.pan({ x: 0, y: 50 });
     }
   }
 }
 
-export { init_proof, loadProof, loadSignature }
+export { init_proof, loadProof, loadSignature, conf }

@@ -1,49 +1,25 @@
 import { InferenceRulesHelper } from "./proof/rules/rules.js";
-import { APP_GLOBALS as app } from "./shared-data.js";
 import { nodeVisualsDefaults, NodeVisualsHelper } from "./proof/nodeVisualsHelper.js";
 import { MagicNavigationHelper } from "./proof/magicNavigation.js";
 import { LabelsShorteningHelper } from "./shortening/helper.js";
 import * as lP from "./proof/linearProof/linearProofHelper.js";
 import { ContextMenu } from "./utils/context-menu.js";
 import { utils as ruleUtils } from "./proof/rules/rules.js";
+import { conf as proof } from "./proof/proof.js";
 
 const APP_GLOBALS = {
-  svgProof: undefined,
-  svgProofRootLayer: undefined,
-  svgOntology: undefined,
-  svgOntologyRootLayer: undefined,
-  BBox: undefined,
-  SVGwidth: undefined,
-  SVGheight: undefined,
-  margin: undefined,
-  proofWidth: undefined,
-  proofHeight: undefined,
-  designModeIsNew: 0,
-  isMagic: false,
-  isRuleShort: false,
-  proofFile: undefined,
-  signatureFile: undefined,
-  ruleExplanationPosition: undefined,
-  isDrawing: false,
-  isDebug: true,
-  drawTime: 750,
   shorteningMethod: "camel",
-  shortenAllInProof: false,
-  shortenAllInOntology: false,
-  isLinear: false,
-  isDistancePriority: true,
   fontCharacterWidth: 8.1,
 }
 
 const SharedData = {
-  nodeVisualsHelper: new NodeVisualsHelper(),
-  inferenceRulesHelper: new InferenceRulesHelper(),
   contextMenu: new ContextMenu(),
   labelsShorteningHelper: new LabelsShorteningHelper(),
 
   // proof exclusive
+  nodeVisualsHelper: new NodeVisualsHelper(),
+  inferenceRulesHelper: new InferenceRulesHelper(),
   axiomFunctionsHelper: undefined,
-  linkFunctionsHelper: undefined,
   magicNavigationHelper: new MagicNavigationHelper(),
 
   hierarchy: undefined,
@@ -83,7 +59,7 @@ const SharedData = {
     if (!display || display === "original") {
       label = node.data.source.element;
     } else if (display === "shortened") {
-      label = SharedData.labelsShorteningHelper.shortenLabel(node.data.source.element, app.isRuleShort, app.shorteningMethod);
+      label = SharedData.labelsShorteningHelper.shortenLabel(node.data.source.element, proof.isRuleShort, APP_GLOBALS.shorteningMethod);
     } else if (display === "textual") {
       label = node.data.source.nLElement;
     }
@@ -112,13 +88,13 @@ const SharedData = {
   computeTreeLayout: function (hierarchy) {
     // Layout and draw the tree
     hierarchy.dx = 50;
-    hierarchy.dy = app.proofWidth / (hierarchy.height + 1);
+    hierarchy.dy = proof.proofWidth / (hierarchy.height + 1);
     let tree_layout;
 
     if (this.allowOverlap) {
       // tries to fit to screen 
       tree_layout = d3.tree()
-        .size([app.proofWidth, app.proofHeight])
+        .size([proof.proofWidth, proof.proofHeight])
         .separation((a, b) => this.separation(a, b))
         (hierarchy);
     } else {
@@ -136,10 +112,10 @@ const SharedData = {
     d3.selectAll(".node").style("opacity", 1);
   },
 
-  update: function (source, drawTime = app.drawTime) {
+  update: function (source, drawTime = proof.drawTime) {
     this.setNodeWidthsAndMax(this.hierarchy); 
 
-    if (app.isLinear) {
+    if (proof.isLinear) {
       this.root = lP.computeLinearLayout(this.hierarchy);
     } else {
       this.root = this.computeTreeLayout(this.hierarchy);
@@ -148,7 +124,7 @@ const SharedData = {
     this.drawTree(source, drawTime);
 
     // Add axiom buttons depending on the navigation mode (Normal vs Magic)
-    if (app.isMagic) {
+    if (proof.isMagic) {
       let originalHierarchy = SharedData.createHierarchy(SharedData.edgeData);
       SharedData.updateHierarchyVars(originalHierarchy);
       this.magicNavigationHelper.entireProofHierarchy = originalHierarchy;
@@ -159,11 +135,6 @@ const SharedData = {
 
     //add tooltips to rule names
     this.inferenceRulesHelper.addTooltipToNodes();
-
-    //FIXME: Link button in magic mode does not work with the new root
-    //add the link button
-    this.linkFunctionsHelper.svg = app.svgProof;
-    this.linkFunctionsHelper.sharedData = SharedData;
 
     // Enable collapsing
     // axioms.on("dblclick", d => {
@@ -252,6 +223,63 @@ const SharedData = {
     });
   },
 
+  restOfProofNode: { id: "r0", element: "", type: "rest" },
+
+  showSubTree(root) {
+		//extract the current data
+		let originalEdgeData = this.extractOriginalData(root);
+		//reset all children to show the entire subtree, defined in axiomFunctions.js
+		SharedData.axiomFunctionsHelper.resetAllChildren(root);
+		//extract the data of the subtree
+		let newEdgesData = this.extractData(root);
+		//create a new hierarchy
+		let newHierarchy = SharedData.createHierarchy(newEdgesData);
+		SharedData.updateHierarchyVars(newHierarchy);
+		//preserve previous sub-structure
+		let previousHierarchy = SharedData.createHierarchy(originalEdgeData);
+		SharedData.updateHierarchyVars(previousHierarchy);
+		let found;
+		newHierarchy.children[0].descendants().forEach(x => {
+			found = previousHierarchy.descendants().find(y => y.data.source.id === x.data.source.id);
+			if (found && !found.children) {
+				x.children = null;
+			}
+		});
+		//update the graph
+		SharedData.updateHierarchy(newHierarchy);
+	},
+
+	extractOriginalData(root) {
+		let data = [
+			{
+				id: "L-1",
+				source: root.data.source,
+				target: ""
+			}
+		];
+
+		root.links().forEach(entry => data.push(entry.target.data));
+		return data;
+	},
+
+	extractData(root) {
+		let data = [
+			{
+				id: "L-1",
+				source: this.restOfProofNode,
+				target: ""
+			},
+			{
+				id: "rest",
+				source: root.data.source,
+				target: this.restOfProofNode
+			}
+
+		];
+		root.links().forEach(entry => data.push(entry.target.data));
+		return data;
+	},
+
   drawTree: function (source, drawTime) {
     //remove on end functions from previous drawing
     this.removeMouseEvents();
@@ -260,14 +288,14 @@ const SharedData = {
     this.showAll();
 
     // Create a transition for blending in the tree
-    let t = app.svgProof.transition()
+    let t = proof.svgProof.transition()
       .duration(drawTime)
       .on("start", () => {
-        app.isDrawing = true;
+        proof.isDrawing = true;
       })
       .on("end", () => {
         this.addFocusFunctionality();
-        app.isDrawing = false;
+        proof.isDrawing = false;
         document.dispatchEvent(new CustomEvent("drawend", { detail: { main: "proof-view" } }));
       });
 
@@ -291,7 +319,7 @@ const SharedData = {
             })
             .attr("id", d => "N" + d.data.source.id)
             /*TODO change x0 to x of the parent/child magic box, same for y*/
-            .attr("transform", d => `translate(${d.x0}, ${app.proofHeight - parseInt(d.y0)})`)
+            .attr("transform", d => `translate(${d.x0}, ${proof.proofHeight - parseInt(d.y0)})`)
 
             /*.each(function (d) {
               switch (that.currentMagicAction) {
@@ -312,12 +340,12 @@ const SharedData = {
                             return cat(index + 1)
                                 .transition()
                                 .duration(drawTime)
-                                .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${app.proofHeight - parseInt(stops[index].y)})`)
+                                .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${proof.proofHeight - parseInt(stops[index].y)})`)
                           } else {
                             return element
                                 .transition()
                                 .duration(drawTime)
-                                .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${app.proofHeight - parseInt(stops[index].y)})`)
+                                .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${proof.proofHeight - parseInt(stops[index].y)})`)
                           }
                         }
 
@@ -330,12 +358,12 @@ const SharedData = {
               }
             }) */
             .transition(t)
-            .attr("transform", (d, i, n) => `translate(${d.x}, ${app.proofHeight - parseInt(d.y)})`)
+            .attr("transform", (d, i, n) => `translate(${d.x}, ${proof.proofHeight - parseInt(d.y)})`)
         },
         update => {
           update
             .transition(t)
-            .attr("transform", d => `translate(${d.x}, ${app.proofHeight - parseInt(d.y)})`)
+            .attr("transform", d => `translate(${d.x}, ${proof.proofHeight - parseInt(d.y)})`)
         },
         exit => {
           exit
@@ -344,7 +372,7 @@ const SharedData = {
         }
       );
     // Draw links
-    if (!app.isLinear) {
+    if (!proof.isLinear) {
       this.links.selectAll("line")
         .data(this.root.links(), d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
         //.join("line")
@@ -356,19 +384,19 @@ const SharedData = {
               //.attr("marker-mid", "url(#arrowhead)")
               .attr("class", d =>
                 (d.source.data.source.type === "rest" ? "link torest" : "link") +
-                (d.source.data.target.type === "axiom" && !app.isMagic ? " from-axiom " : "")
+                (d.source.data.target.type === "axiom" && !proof.isMagic ? " from-axiom " : "")
               )
               .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
               .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
               .on("click", (_, d) => {
-                if (!app.isMagic && d.source.data.target.type === "axiom") {
-                  SharedData.linkFunctionsHelper.showSubTree(d.target);
+                if (!proof.isMagic && d.source.data.target.type === "axiom") {
+                  this.showSubTree(d.target);
                 }
               })
               .attr("x1", d => d.target.x0)
-              .attr("y1", d => app.proofHeight - d.target.y0 + nodeVisualsDefaults.BOX_HEIGHT + 1)
+              .attr("y1", d => proof.proofHeight - d.target.y0 + nodeVisualsDefaults.BOX_HEIGHT + 1)
               .attr("x2", d => d.source.x0)
-              .attr("y2", d => app.proofHeight - d.source.y0)
+              .attr("y2", d => proof.proofHeight - d.source.y0)
               /*.each(function (d) {
                 switch (that.currentMagicAction) {
                   case "pullUp":
@@ -392,17 +420,17 @@ const SharedData = {
                                   .transition()
                                   .duration(drawTime)
                                   .attr("x1", () => stops[index].x)
-                                  .attr("y1", () => app.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
+                                  .attr("y1", () => proof.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
                                   .attr("x2", d => d.source.x)
-                                  .attr("y2", d => app.proofHeight - d.source.y)
+                                  .attr("y2", d => proof.proofHeight - d.source.y)
                             } else if (stops[index + 1] && !stops[index].data.id.startsWith("MN")) {
                               return cat(index + 1)
                                   .transition()
                                   .duration(drawTime)
                                   .attr("x1", d => stops[index].x)
-                                  .attr("y1", d => app.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
+                                  .attr("y1", d => proof.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
                                   .attr("x2", d => d.source.x)
-                                  .attr("y2", d => app.proofHeight - d.source.y)
+                                  .attr("y2", d => proof.proofHeight - d.source.y)
                             } else {
                               return element
                                   .transition()
@@ -411,9 +439,9 @@ const SharedData = {
                                   .transition()
                                   .duration(drawTime)
                                   .attr("x1", d => d.source.x)
-                                  .attr("y1", d => app.proofHeight - d.source.y)
+                                  .attr("y1", d => proof.proofHeight - d.source.y)
                                   .attr("x2", d => d.source.x)
-                                  .attr("y2", d => app.proofHeight - d.source.y)
+                                  .attr("y2", d => proof.proofHeight - d.source.y)
                             }
                           }
 
@@ -428,9 +456,9 @@ const SharedData = {
               */
               .transition(t)
               .attr("x1", d => d.target.x)
-              .attr("y1", d => app.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+              .attr("y1", d => proof.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
               .attr("x2", d => d.source.x)
-              .attr("y2", d => app.proofHeight - d.source.y);
+              .attr("y2", d => proof.proofHeight - d.source.y);
 
             /*
             container.append("g")
@@ -439,12 +467,12 @@ const SharedData = {
                 .attr("cursor", "pointer")
                 .attr("transform", d => {
                     const { source: s, target: t } = d;
-                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
                 })
                 .transition(t)
                 .attr("transform", d => {
                     const { source: s, target: t } = d;
-                    return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                    return `translate(${t.x + (s.x - t.x) / 2}, ${proof.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
                 })
 
             container
@@ -455,12 +483,12 @@ const SharedData = {
                 .attr("fill", "#ccc")
                 .attr("transform", d => {
                     const { source: s, target: t } = d;
-                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
                 })
                 .transition(t)
                 .attr("transform", d => {
                     const { source: s, target: t } = d;
-                    return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                    return `translate(${t.x + (s.x - t.x) / 2}, ${proof.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
                 })
 
             container
@@ -471,16 +499,16 @@ const SharedData = {
                 .text('\ue14e')
                 .attr("text-anchor", "middle")
                 .on("click", d => {
-                    SharedData.linkFunctionsHelper.showSubTree(d.target);
+                    this.showSubTree(d.target);
                 })
                 .attr("transform", d => {
                     const { source: s, target: t } = d;
-                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${app.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                    return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
                 })
                 .transition(t)
                 .attr("transform", d => {
                     const { source: s, target: t } = d;
-                    return `translate(${t.x + (s.x - t.x) / 2}, ${app.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                    return `translate(${t.x + (s.x - t.x) / 2}, ${proof.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
                 })
             */
           },
@@ -488,9 +516,9 @@ const SharedData = {
             update
               .transition(t)
               .attr("x1", d => d.target.x)
-              .attr("y1", d => app.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+              .attr("y1", d => proof.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
               .attr("x2", d => d.source.x)
-              .attr("y2", d => app.proofHeight - d.source.y)
+              .attr("y2", d => proof.proofHeight - d.source.y)
           },
           exit => {
             exit.remove()
@@ -500,7 +528,7 @@ const SharedData = {
       lP.drawCurvedLinks(t);
     }
 
-    if (!app.isLinear) {
+    if (!proof.isLinear) {
       this.edgeData.forEach(function (link) {
         if (link.source.element === "Asserted Conclusion")
           d3.select("#N" + link.target.id).attr("class", "node axiom asserted");
@@ -509,7 +537,7 @@ const SharedData = {
       });
     }
 
-    this.nodeVisualsHelper.svg = app.svgProof;
+    this.nodeVisualsHelper.svg = proof.svgProof;
     this.nodeVisualsHelper.nodes = this.nodes;
     this.nodeVisualsHelper.renderNodes();
 
@@ -546,9 +574,9 @@ const SharedData = {
       }
     });
 
-    if (app.isMagic && someHierarchy !== this.hierarchy) {
+    if (proof.isMagic && someHierarchy !== this.hierarchy) {
       someHierarchy.descendants().forEach((d, i) => {
-        d.x0 = magic ? parseInt(magic.x) : app.proofWidth / 2;
+        d.x0 = magic ? parseInt(magic.x) : proof.proofWidth / 2;
         d.y0 = magic ? parseInt(magic.y) : 0;
         let originalSource = common.find(x => x.data.target.id === d.data.source.id);
         let originalTarget = common.find(x => x.data.source.id === d.data.source.id);
@@ -568,7 +596,7 @@ const SharedData = {
       });
     } else {
       someHierarchy.descendants().forEach((d, i) => {
-        d.x0 = app.proofWidth / 2;
+        d.x0 = proof.proofWidth / 2;
         d.y0 = 0;
         d.id = i;
         d._children = d.children;
@@ -576,7 +604,7 @@ const SharedData = {
     }
   },
 
-  advancedUpdate: function (drawTime = app.drawTime) {
+  advancedUpdate: function (drawTime = proof.drawTime) {
     this.update(drawTime);
   },
 

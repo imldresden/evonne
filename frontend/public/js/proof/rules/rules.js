@@ -1,4 +1,4 @@
-import { APP_GLOBALS as app } from "../../shared-data.js";
+import { conf as proof } from "../../proof/proof.js";
 import { DLRules } from "./dl-rules.js";
 import { CDRules } from "./cd-rules.js";
 
@@ -7,7 +7,7 @@ let tooltip, div, lastToolTipTriggerID;
 const rule_sets = {
     dl: new DLRules(),
     cd: new CDRules(),
-} 
+}
 
 const utils = {
     addTitle: function(text) {
@@ -104,10 +104,10 @@ class InferenceRulesHelper {
             console.error(`unknown rule type: "${data.source.type}"`);
         }
 
-        if (app.ruleExplanationPosition === "mousePosition") {
+        if (proof.ruleExplanationPosition === "mousePosition") {
             this.setPositionRelativeToMouse(event)
         } else {
-            tooltip.classed(this.getPositionClass(app.ruleExplanationPosition), true);
+            tooltip.classed(this.getPositionClass(proof.ruleExplanationPosition), true);
         }
     }
 
@@ -130,11 +130,11 @@ class InferenceRulesHelper {
             let width = element.offsetWidth;
             let height = element.offsetHeight - 35;
 
-            let x = event.clientX + width > app.proofWidth
-                ? app.proofWidth - width
+            let x = event.clientX + width > proof.proofWidth
+                ? proof.proofWidth - width
                 : event.pageX;
-            let y = event.clientY + height > app.proofHeight
-                ? app.proofHeight - height
+            let y = event.clientY + height > proof.proofHeight
+                ? proof.proofHeight - height
                 : event.pageY;
 
             tooltip.style("left", x + "px").style("top", y + "px");

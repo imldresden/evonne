@@ -1,5 +1,6 @@
-import { APP_GLOBALS as app, SharedData } from "../../shared-data.js";
-import {nodeVisualsDefaults} from "../nodeVisualsHelper.js";
+import { SharedData } from "../../shared-data.js";
+import { conf as proof } from "../proof.js"; 
+import { nodeVisualsDefaults } from "../nodeVisualsHelper.js";
 
 function getDFOrder(hierarchy, orderedElements){
     hierarchy.children?.forEach(d=>{
@@ -30,26 +31,26 @@ function getBFOrder(hierarchy, orderedElements){
 function computeLinearLayout(hierarchy) {
     // Layout and draw the tree
     hierarchy.dx = 50;
-    hierarchy.dy = app.proofWidth / (hierarchy.height + 1);
+    hierarchy.dy = proof.proofWidth / (hierarchy.height + 1);
 
-    let linearLayout = d3.tree().size([app.proofWidth, app.proofHeight])
+    let linearLayout = d3.tree().size([proof.proofWidth, proof.proofHeight])
         .separation((a,b) => (a.width + b.width) / 2)(hierarchy);
 
     let orderedElements = [];
-    if (!app.isDistancePriority)
+    if (!proof.isDistancePriority)
         getDFOrder(linearLayout, orderedElements);
     else {
         getBFOrder([linearLayout],orderedElements);
         orderedElements.push(linearLayout);
     }
 
-    let itemY = app.proofHeight/(orderedElements.length<2?1:orderedElements.length-1);
+    let itemY = proof.proofHeight/(orderedElements.length<2?1:orderedElements.length-1);
     linearLayout.each(d => {
-        d.x = 0.7 * app.proofWidth - d.width/2;
+        d.x = 0.7 * proof.proofWidth - d.width/2;
         if (orderedElements.length<2)
-            d.y = 0.01*app.proofHeight;
+            d.y = 0.01*proof.proofHeight;
         else
-            d.y = 1.01*app.proofHeight - ((orderedElements.indexOf(d))*itemY);
+            d.y = 1.01*proof.proofHeight - ((orderedElements.indexOf(d))*itemY);
     });
 
     return linearLayout;
@@ -89,9 +90,9 @@ function position(d, zero){
         sourceY = d.source.y-0.01;
     }
     x2 = targetX + .5 * d.target.width;
-    y2 = app.proofHeight - targetY + nodeVisualsDefaults.BOX_HEIGHT/2;
+    y2 = proof.proofHeight - targetY + nodeVisualsDefaults.BOX_HEIGHT/2;
     x1 = sourceX+ .5 * d.source.width;
-    y1 = app.proofHeight - sourceY + nodeVisualsDefaults.BOX_HEIGHT/2;
+    y1 = proof.proofHeight - sourceY + nodeVisualsDefaults.BOX_HEIGHT/2;
 
     let offset = Math.abs(y2-y1)/2;
 
@@ -127,7 +128,10 @@ function renderSideConnectorsByType() {
         // let hasChildren;
         // selection.each(d=>hasChildren = !!d.children || !!d._children);
         let inferredUsing;
-        selection.each(d=>inferredUsing = d.data.source.rule.label);
+        selection.each(d=> {
+            console.log(d)
+            inferredUsing = d.data.source.rule.label
+        });
         // if(!hasChildren)
         if (inferredUsing === "Asserted Conclusion")
             selection.attr("class", "node axiom asserted");

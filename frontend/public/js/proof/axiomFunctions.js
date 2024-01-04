@@ -1,7 +1,8 @@
-import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
+import { SharedData } from "../shared-data.js";
 import { nodeVisualsDefaults } from "./nodeVisualsHelper.js";
 import * as lP from "./linearProof/linearProofHelper.js";
 import { InferenceRulesHelper, utils as ruleUtils } from "./rules/rules.js";
+import { conf as proof } from "./proof.js";
 
 export class AxiomFunctionsHelper {
 	constructor(socketIO) {
@@ -50,7 +51,7 @@ export class AxiomFunctionsHelper {
 
 		let group = this._inferredAxiomNodes
 			.filter(d => {
-				if (app.isLinear) 
+				if (proof.isLinear) 
 					return d._children;
 				return d._children[0]._children;
 			}) //remove tautologies
@@ -77,7 +78,7 @@ export class AxiomFunctionsHelper {
 	}
 
 	showPrevious(treeRoot) {
-		if (app.isDrawing) {
+		if (proof.isDrawing) {
 			return;
 		}
 
@@ -85,7 +86,7 @@ export class AxiomFunctionsHelper {
 			treeRoot.children = treeRoot._children;
 		}
 
-		if (!app.isLinear) {
+		if (!proof.isLinear) {
 			if (!treeRoot.children[0].children) {
 				treeRoot.children[0].children = treeRoot.children[0]._children
 			}
@@ -111,7 +112,7 @@ export class AxiomFunctionsHelper {
 
 		let group = this._inferredAxiomNodes
 			.filter(d => {
-				if (app.isLinear)
+				if (proof.isLinear)
 					return d._children;
 				return d._children[0]._children
 			})//remove tautologies
@@ -137,7 +138,7 @@ export class AxiomFunctionsHelper {
 	}
 	
 	hideAllPrevious(treeRoot) {
-		if (app.isDrawing) {
+		if (proof.isDrawing) {
 			return;
 		}
 		if (treeRoot.children) {
@@ -151,7 +152,7 @@ export class AxiomFunctionsHelper {
 
 		let group = this._inferredAxiomNodes
 			.filter(d => {
-				if (app.isLinear)
+				if (proof.isLinear)
 					return d._children;
 				return d._children[0]._children
 			})//remove tautologies
@@ -177,7 +178,7 @@ export class AxiomFunctionsHelper {
 	}
 	
 	showAllPrevious(treeRoot) {
-		if (app.isDrawing) {
+		if (proof.isDrawing) {
 			return;
 		}
 		this.resetAllChildren(treeRoot);
@@ -493,7 +494,7 @@ export class AxiomFunctionsHelper {
 	}
 
 	addHighlightCurrentInference() {
-		if (!app.isLinear)
+		if (!proof.isLinear)
 			return;
 		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
