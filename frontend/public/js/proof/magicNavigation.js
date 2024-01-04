@@ -1,10 +1,9 @@
-import { SharedData } from "../shared-data.js";
 import { nodeVisualsDefaults } from "./nodeVisualsHelper.js";
-import { conf as proof } from "../proof/proof.js";
+import { proof } from "../proof/proof.js";
 
 let edges, allNodes, axiomNodesButConclusion, axiomNodes, inferredAxiomNodes;
 let newMagicBoxCounter = 0, newEdgeIDCounter = 0;
-let c =0;
+
 export class MagicNavigationHelper {
 	constructor() {
 		this._entireProofHierarchy = undefined;
@@ -33,21 +32,21 @@ export class MagicNavigationHelper {
 		//Add a button to push an axiom upwards (hide the premise)
 		this.addPushUp();
 		//Highlight the axiom's justification in the ontology
-		SharedData.axiomFunctionsHelper.addHighlightJustificationInOntology();
+		proof.axiomFunctionsHelper.addHighlightJustificationInOntology();
 		//Create and display repairs for the axiom that corresponds to the selected node
-		SharedData.axiomFunctionsHelper.addShowRepairs();
+		proof.axiomFunctionsHelper.addShowRepairs();
 		//Initializing format buttons
-		SharedData.axiomFunctionsHelper.initializeMaps();
+		proof.axiomFunctionsHelper.initializeMaps();
 		//Set axiom to be displayed in its original format
-		SharedData.axiomFunctionsHelper.addSetAxiomOriginal();
+		proof.axiomFunctionsHelper.addSetAxiomOriginal();
 		//Set axiom to be displayed in its shortened format
-		SharedData.axiomFunctionsHelper.addSetAxiomShortened();
+		proof.axiomFunctionsHelper.addSetAxiomShortened();
 		//Set axiom to be displayed in its textual format
-		SharedData.axiomFunctionsHelper.addSetAxiomTextual();
+		proof.axiomFunctionsHelper.addSetAxiomTextual();
 		//Extend the width of the button to show the full axiom
-		SharedData.axiomFunctionsHelper.addShowFullAxiom();
+		proof.axiomFunctionsHelper.addShowFullAxiom();
 		//Hide all buttons
-		SharedData.nodeVisualsHelper.initHideAllButtons();
+		proof.nodeVisualsHelper.initHideAllButtons();
 	}
 
 	offsets = 0;
@@ -134,13 +133,13 @@ export class MagicNavigationHelper {
 
 	//create the new hierarchy and update
 	updateAll(data, subRoot, action) {
-		let newHierarchy = SharedData.createHierarchy(this.orderStructure(data));
-		SharedData.updateHierarchyVars(newHierarchy, subRoot, action);
-		SharedData.hierarchy = newHierarchy;
+		let newHierarchy = proof.createHierarchy(this.orderStructure(data));
+		proof.updateHierarchyVars(newHierarchy, subRoot, action);
+		proof.hierarchy = newHierarchy;
 
 		d3.select('#proof-view').selectAll(".node #frontRect").each((d, i, nodes) => { d["width"] = nodes[i].getBBox().width; })
-		SharedData.currentMagicAction = action;
-		SharedData.advancedUpdate();
+		proof.currentMagicAction = action;
+		proof.advancedUpdate();
 	}
 
 	//return True if every element of the premise of the current magic rule 

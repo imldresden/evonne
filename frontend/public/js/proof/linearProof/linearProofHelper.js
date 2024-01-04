@@ -1,5 +1,4 @@
-import { SharedData } from "../../shared-data.js";
-import { conf as proof } from "../proof.js"; 
+import { proof } from "../proof.js"; 
 import { nodeVisualsDefaults } from "../nodeVisualsHelper.js";
 
 function getDFOrder(hierarchy, orderedElements){
@@ -57,10 +56,10 @@ function computeLinearLayout(hierarchy) {
 }
 
 function drawCurvedLinks(t){
-    SharedData.links.selectAll("path").remove()
+    proof.links.selectAll("path").remove()
 
-    SharedData.links.selectAll("path")
-        .data(SharedData.root.links(), d=>"L" + d.source.data.source.id + "*" + d.target.data.source.id)
+    proof.links.selectAll("path")
+        .data(proof.root.links(), d=>"L" + d.source.data.source.id + "*" + d.target.data.source.id)
         .join(
             enter=>enter.append("path")
                 .attr("marker-end", "url(#arrowhead)")
@@ -118,7 +117,7 @@ function renderSideConnectorsByType() {
     let connector = undefined;
 
     //get axioms nodes
-    let elements = SharedData.nodes.selectAll(".node");
+    let elements = proof.nodes.selectAll(".node");
     //remove old connectors
     elements.selectAll(".connector").remove();
     //add new connectors
@@ -151,8 +150,8 @@ function renderSideConnectorsByType() {
     });
 
     // Draw the rest-of-proof node
-    SharedData.nodes.select(".rest").append("circle").attr("r", 10)
-        .on("click",()=>{SharedData.resetHierarchy();});
+    proof.nodes.select(".rest").append("circle").attr("r", 10)
+        .on("click",()=>{proof.resetHierarchy();});
 }
 
 function highlightCurrentInference(currentNode){

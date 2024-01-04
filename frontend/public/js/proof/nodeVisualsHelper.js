@@ -1,5 +1,5 @@
-import { SharedData, APP_GLOBALS as app } from "../shared-data.js";
-import { conf as proof } from "../proof/proof.js";
+import { globals } from "../shared-data.js";
+import { proof } from "../proof/proof.js";
 import * as lP from "./linearProof/linearProofHelper.js";
 
 export const nodeVisualsDefaults = {
@@ -125,7 +125,7 @@ export class NodeVisualsHelper {
 
         // Draw the rest-of-proof node
         this.nodes.select(".rest").append("circle").attr("r", 10)
-            .on("click", () => { SharedData.resetHierarchy(); });
+            .on("click", () => { proof.resetHierarchy(); });
     }
 
     renderBoxes() {
@@ -194,11 +194,11 @@ export class NodeVisualsHelper {
                 .attr("y", BOX_HEIGHT - BOX_PADDING_BOTTOM)
                 .text((d, i, nodes) => {
                     d.data.source.element = this.fixTypo(d.data.source.element);
-                    let displayFormat = SharedData.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
+                    let displayFormat = proof.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
                     if (!displayFormat || displayFormat === "original")
                         return d.data.source.element;
                     if (displayFormat === "shortened")
-                        return SharedData.labelsShorteningHelper.shortenLabel(d.data.source.element, proof.isRuleShort, app.shorteningMethod);
+                        return globals.labelsShorteningHelper.shortenLabel(d.data.source.element, proof.isRuleShort, globals.shorteningMethod);
                     else if (displayFormat === "textual")
                         return d.data.source.nLElement;
                 })
@@ -251,12 +251,12 @@ export class NodeVisualsHelper {
     }
 
     initVarsAxiomFunctions() {
-        SharedData.nodeWithVisibleButtons = { id: "nothing" };
+        proof.nodeWithVisibleButtons = { id: "nothing" };
     }
 
     initHideAllButtons() {
         d3.selectAll(".axiom")
-            .filter(() => this.id !== SharedData.nodeWithVisibleButtons.id)
+            .filter(() => this.id !== proof.nodeWithVisibleButtons.id)
             .selectAll(".axiomButton")
             .attr("cursor", "pointer")
             .attr("pointer-events", "all")
@@ -294,8 +294,8 @@ export class NodeVisualsHelper {
                 }
             })
             .on("contextmenu", (e, d) => {
-                const menuItems = SharedData.axiomFunctionsHelper.menuItems;
-                SharedData.contextMenu.create(e, d, menuItems, '#proof-view');
+                const menuItems = proof.axiomFunctionsHelper.menuItems;
+                globals.contextMenu.create(e, d, menuItems, '#proof-view');
             })
     }
 
@@ -355,14 +355,14 @@ export class NodeVisualsHelper {
     }
 
     shiftLabelShowButtons(node) {
-        if (SharedData.nodesDisplayFormat.get(node.id) !== "original") {
+        if (proof.nodesDisplayFormat.get(node.id) !== "original") {
             this.shiftLabel(node, "right");
         }
         this.showButtons(node.id);
     }
 
     shiftLabelHideButtons(node) {
-        if (SharedData.nodesDisplayFormat.get(node.id) !== "original") {
+        if (proof.nodesDisplayFormat.get(node.id) !== "original") {
             this.shiftLabel(node, "left");
         }   
         this.hideButtons(node.id);

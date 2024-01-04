@@ -1,4 +1,4 @@
-import { conf as proof } from "../../proof/proof.js";
+import { proof } from "../../proof/proof.js";
 import { DLRules } from "./dl-rules.js";
 import { CDRules } from "./cd-rules.js";
 

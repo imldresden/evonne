@@ -1,8 +1,7 @@
-import { SharedData } from "../shared-data.js";
 import { nodeVisualsDefaults } from "./nodeVisualsHelper.js";
 import * as lP from "./linearProof/linearProofHelper.js";
 import { InferenceRulesHelper, utils as ruleUtils } from "./rules/rules.js";
-import { conf as proof } from "./proof.js";
+import { proof } from "./proof.js";
 
 export class AxiomFunctionsHelper {
 	constructor(socketIO) {
@@ -38,7 +37,7 @@ export class AxiomFunctionsHelper {
 		//Extend the width of the button to show the full axiom
 		this.addShowFullAxiom();
 		//Hide all buttons
-		SharedData.nodeVisualsHelper.initHideAllButtons();
+		proof.nodeVisualsHelper.initHideAllButtons();
 		//Double-clicking a button should not trigger the expand functionality of the node
 		d3.selectAll(".axiomButton")
 			.on("dblclick", (e) => e.stopPropagation());
@@ -104,7 +103,7 @@ export class AxiomFunctionsHelper {
 			});
 		}
 
-		SharedData.advancedUpdate();
+		proof.advancedUpdate();
 	}
 
 	addHideAllPrevious() {
@@ -143,7 +142,7 @@ export class AxiomFunctionsHelper {
 		}
 		if (treeRoot.children) {
 			treeRoot.children = null;
-			SharedData.advancedUpdate();
+			proof.advancedUpdate();
 		}
 	}
 
@@ -182,7 +181,7 @@ export class AxiomFunctionsHelper {
 			return;
 		}
 		this.resetAllChildren(treeRoot);
-		SharedData.advancedUpdate();
+		proof.advancedUpdate();
 	}
 
 	addHighlightJustificationInOntology() {
@@ -262,9 +261,9 @@ export class AxiomFunctionsHelper {
 
 	setAxiomOriginal (d) {
 		let nodeID = "N"+d.data.source.id;
-		SharedData.nodesCurrentDisplayFormat.set(nodeID,"original");
-		SharedData.nodesDisplayFormat.set(nodeID,"original");
-		SharedData.advancedUpdate();
+		proof.nodesCurrentDisplayFormat.set(nodeID,"original");
+		proof.nodesDisplayFormat.set(nodeID,"original");
+		proof.advancedUpdate();
 		this.switchStateOnClick(nodeID, nodeID);
 	}
 	
@@ -295,9 +294,9 @@ export class AxiomFunctionsHelper {
 
 	setAxiomShortened (d) {
 		let nodeID = "N"+d.data.source.id;
-		SharedData.nodesDisplayFormat.set(nodeID,"shortened");
-		SharedData.nodesCurrentDisplayFormat.set(nodeID,"shortened");
-		SharedData.advancedUpdate();
+		proof.nodesDisplayFormat.set(nodeID,"shortened");
+		proof.nodesCurrentDisplayFormat.set(nodeID,"shortened");
+		proof.advancedUpdate();
 		this.switchStateOnClick(nodeID, nodeID);
 	}
 
@@ -328,9 +327,9 @@ export class AxiomFunctionsHelper {
 	
 	setAxiomTextual (d) {
 		let nodeID = "N"+d.data.source.id;
-		SharedData.nodesCurrentDisplayFormat.set(nodeID,"textual");
-		SharedData.nodesDisplayFormat.set(nodeID,"textual");
-		SharedData.advancedUpdate();
+		proof.nodesCurrentDisplayFormat.set(nodeID,"textual");
+		proof.nodesDisplayFormat.set(nodeID,"textual");
+		proof.advancedUpdate();
 		this.switchStateOnClick(nodeID, nodeID);
 	}
 	
@@ -340,7 +339,7 @@ export class AxiomFunctionsHelper {
 		const group = d3.selectAll(".axiom")
 			.filter((d)=>d)
 			.filter((d)=>{
-				return 	SharedData.nodesDisplayFormat.get("N"+d.data.source.id) !== "original";
+				return 	proof.nodesDisplayFormat.get("N"+d.data.source.id) !== "original";
 			})
 			.append("g").attr("opacity", 0).attr("id", "B03")
 			.attr("class", "axiomButton btn-view")
@@ -352,9 +351,9 @@ export class AxiomFunctionsHelper {
 			})
 			.on("click", (e, d) => {
 				this.showFullAxiom(e.currentTarget.parentNode);
-				SharedData.advancedUpdate();
+				proof.advancedUpdate();
 				this.switchStateOnClick("N"+d.data.source.id,
-					this.getButton(SharedData.nodesDisplayFormat.get("N"+d.data.source.id)));
+					this.getButton(proof.nodesDisplayFormat.get("N"+d.data.source.id)));
 			});
 
 		group.append("text")
@@ -363,10 +362,10 @@ export class AxiomFunctionsHelper {
 			.attr("x", BOX_PADDING)
 			.attr("y", 2)
 			.text((d, i, nodes) =>
-				SharedData.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "\ue8f5" : "\ue8f4");
+				proof.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "\ue8f5" : "\ue8f4");
 
 		group.append("title")
-			.text((d, i, nodes) => SharedData.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "Show formatted axiom" : "Show original axiom")
+			.text((d, i, nodes) => proof.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "Show formatted axiom" : "Show original axiom")
 	}
 
 	repairing = false;
@@ -446,7 +445,7 @@ export class AxiomFunctionsHelper {
 				if (x.children) {
 					x.children = null;
 				}
-				SharedData.update(x);
+				proof.update(x);
 			});
 
 	}
@@ -461,10 +460,10 @@ export class AxiomFunctionsHelper {
 	}
 
 	showFullAxiom(parentNode) {
-		if (SharedData.nodesCurrentDisplayFormat.get(parentNode.id)!=="original") {
-			SharedData.nodesCurrentDisplayFormat.set(parentNode.id,"original");
+		if (proof.nodesCurrentDisplayFormat.get(parentNode.id)!=="original") {
+			proof.nodesCurrentDisplayFormat.set(parentNode.id,"original");
 		} else {
-			SharedData.nodesCurrentDisplayFormat.set(parentNode.id, SharedData.nodesDisplayFormat.get(parentNode.id));
+			proof.nodesCurrentDisplayFormat.set(parentNode.id, proof.nodesDisplayFormat.get(parentNode.id));
 		}
 	}
 
@@ -566,7 +565,7 @@ export class AxiomFunctionsHelper {
 	}
 
 	switchStateOnDraw(node, format){
-		if (SharedData.nodesDisplayFormat.get(node.parentNode.id) === format){
+		if (proof.nodesDisplayFormat.get(node.parentNode.id) === format){
 			node.classList.add("activeFormat");
 			node.classList.remove("inactiveFormat");
 		}
@@ -596,9 +595,9 @@ export class AxiomFunctionsHelper {
 
 	initializeMaps() {
 		d3.selectAll(".axiom,.rule").each(d=>{
-			if (d && !SharedData.nodesDisplayFormat.has("N" + d.data.source.id)){
-				SharedData.nodesDisplayFormat.set("N" + d.data.source.id, "original");
-				SharedData.nodesCurrentDisplayFormat.set("N" + d.data.source.id, "original");
+			if (d && !proof.nodesDisplayFormat.has("N" + d.data.source.id)){
+				proof.nodesDisplayFormat.set("N" + d.data.source.id, "original");
+				proof.nodesCurrentDisplayFormat.set("N" + d.data.source.id, "original");
 			}
 		});
 	}

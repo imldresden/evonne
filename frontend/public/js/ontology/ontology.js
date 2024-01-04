@@ -1,7 +1,7 @@
-import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
+import { globals } from "../shared-data.js";
 import { upload } from '../utils/upload-file.js';
 import { progress } from '../main/main.js';
-import { BasicSophisticatedShorteningFunctions } from "../shortening/sophisticatedBasic.js";
+import { BasicShorteningFunctions } from "../shortening/basic.js";
 import { colors, stylesheet } from "../../style/cy-style.js";
 import { params } from "../layouts/cola.js";
 
@@ -73,7 +73,7 @@ function getNodeTextList(data) {
   if (showOriginal) {
     text = [...tmpText];
   } else {
-    tmpText.forEach(x => text.push(SharedData.labelsShorteningHelper.shortenLabel(x, true, app.shorteningMethod)));
+    tmpText.forEach(x => text.push(globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod)));
   }
 
   return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
@@ -124,7 +124,7 @@ async function initHTML() {
 }
 
 function calcBoxWidth(longestString) {
-  return (longestString * app.fontCharacterWidth + 10) + "px";
+  return (longestString * globals.fontCharacterWidth + 10) + "px";
 }
 
 function calcBoxHeight(stringList) {
@@ -368,10 +368,7 @@ function init_ontology(ad_file_name, ontology_file_param) {
     }
   });
 
-
-
   // CONTROLS ==========================================
-
   btnShowSignature.checked = true;
   btnWrapLines.checked = false;
   lineLengthInput.closest(".modal-option.modal-option-range").style.display = "none";
@@ -429,8 +426,8 @@ function updateShorteningButton() {
 
 function btnShowSignatureFunction() {
   showSignature = this.checked;
-  if (SharedData.labelsShorteningHelper instanceof BasicSophisticatedShorteningFunctions) {
-    SharedData.labelsShorteningHelper.resetAll();
+  if (globals.labelsShorteningHelper instanceof BasicShorteningFunctions) {
+    globals.labelsShorteningHelper.resetAll();
   }
   labelNodes();
 }

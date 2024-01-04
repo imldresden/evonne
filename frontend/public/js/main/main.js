@@ -1,4 +1,4 @@
-import { init_proof, conf as proof } from '../proof/proof.js';
+import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
 
 let status = {};
@@ -19,7 +19,9 @@ window.onload = function () {
 
   // Remove listeners
   thingsWithListeners.forEach(twl => {
-    twl.thing.removeEventListener(twl.type, twl.fn);
+    if (twl && twl.thing)  {
+      twl.thing.removeEventListener(twl.type, twl.fn);
+    }
   });
 
   const projects = document.getElementById("current-projects");

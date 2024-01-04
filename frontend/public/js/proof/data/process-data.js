@@ -1,4 +1,4 @@
-import { conf as proof } from "../proof.js";
+import { proof } from "../proof.js";
 
 function extractConstraints(node) {
     const variables = new Set();
