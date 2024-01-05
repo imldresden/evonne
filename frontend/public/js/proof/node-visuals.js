@@ -47,8 +47,8 @@ export class NodeVisualsHelper {
     nodeWithVisibleButtons = { id: "nothing" }
     nodesCurrentDisplayFormat = new Map()
     nodesDisplayFormat = new Map()
-    maxNodeWidth = 200
-    maxNodeHeight = 45
+    maxNodeWidth = 200;
+    maxNodeHeight = 45;
 
     renderNodes(where, what) {
         proof.nodeVisuals.svg = where;
@@ -307,7 +307,7 @@ export class NodeVisualsHelper {
             })
             .on("contextmenu", (e, d) => {
                 const menuItems = proof.axioms.menuItems;
-                globals.contextMenu.create(e, d, menuItems, proof.div);
+                globals.contextMenu.create(e, d, menuItems, "#proof-view");
             })
     }
 
