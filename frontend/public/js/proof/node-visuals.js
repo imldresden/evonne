@@ -16,8 +16,7 @@ export const nodeVisualsDefaults = {
     BTN_EXTEND_HEIGHT: 20,
     BTN_CIRCLE_SIZE: 15,
     BTN_TRIANGLE_SIZE: 20,
-    BTN_EYE_HORIZONTAL_PADDING: 10,
-    BTN_EYE_VERTICAL_PADDING: 10,
+    BTN_PAD: 10,
     AXIOM_TEXT_BOTTOM_SHIFT: 30,
     EXPANSION_COLLAPSING_DURATION: 200,
 }
@@ -146,6 +145,7 @@ export class NodeVisualsHelper {
     renderBoxes() {
         const { BOX_HEIGHT, BOX_WIDTH, BOTTOM_TRAY_WIDTH, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
         let elements = this._nodes.selectAll(".node:not(.rest)");
+
         //Remove old rectangles
         elements.selectAll(".bg-box").remove();
         //Add a rectangle for the tray of communication buttons
@@ -177,12 +177,12 @@ export class NodeVisualsHelper {
             .attr("class", "bg-box")
             .attr("x", -BOX_WIDTH / 2)
             .attr("y", 0)
-            .attr("width", BOX_WIDTH)
+            .attr("width", d => d.width)
             .attr("height", BOX_HEIGHT);
     }
 
     renderLabels() {
-        const { BOX_HEIGHT, BOX_WIDTH, BOX_PADDING, BOX_PADDING_BOTTOM, BTN_EYE_VERTICAL_PADDING } = nodeVisualsDefaults;
+        const { BOX_HEIGHT, BOX_WIDTH, BOX_PADDING, BOX_PADDING_BOTTOM, BTN_PAD } = nodeVisualsDefaults;
 
         //get all nodes
         let elements = [];
@@ -197,8 +197,7 @@ export class NodeVisualsHelper {
         elementsClass.push("ruleLabel");
         elementsID.push("ruleText");
 
-        let i;
-        for (i = 0; i < elements.length; i++) {
+        for (let i = 0; i < elements.length; i++) {
             //remove labels text
             elements[i].selectAll("text").remove();
             //add new ones
@@ -219,12 +218,10 @@ export class NodeVisualsHelper {
                 })
                 .each((d, i, nodes) => {
                     d3.select(`#${nodes[i].parentNode.id} text`)
-                        .attr("x", () => -(nodes[i].getBBox().width) / 2);
+                        .attr("x", () => -(d.width) / 2);
 
                     d3.select(`#${nodes[i].parentNode.id} #frontRect`)
-                        .attr("width", () => nodes[i].getBBox().width + 2 * BTN_EYE_VERTICAL_PADDING)
-                        .attr("x", () => -(nodes[i].getBBox().width + 2 * BTN_EYE_VERTICAL_PADDING) / 2);
-                    d.width = nodes[i].getBBox().width + 2 * BTN_EYE_VERTICAL_PADDING;
+                        .attr("x", () => -(d.width + 2 * BTN_PAD) / 2);
                 });
         }
     }
@@ -327,7 +324,7 @@ export class NodeVisualsHelper {
     }
 
     expandNode(node) {
-        const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT_Expanded } = nodeVisualsDefaults;
+        const { EXPANSION_COLLAPSING_DURATION } = nodeVisualsDefaults;
         proof.svg.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .on("start", () => { })
@@ -536,9 +533,11 @@ export class NodeVisualsHelper {
                 this.maxNodeWidth = node.width;
             }
 
-            node.children ? node.children.forEach(a => {
-                this.setNodeWidthsAndMax(a);
-            }) : undefined;
+            if (node.children) {
+                node.children.forEach(a => {
+                    this.setNodeWidthsAndMax(a);
+                });   
+            }
         } else {
             console.error('received null node')
         }

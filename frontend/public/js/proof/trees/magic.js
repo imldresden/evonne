@@ -71,18 +71,15 @@ export class MagicNavigation {
 	}
 
 	addPullDown() {
+		const { BTN_PAD } = nodeVisualsDefaults;
+
 		let group = inferredAxiomNodes.filter(d => {
 			return d ? d.children[0].data.source.type === "mrule" : false;
 		})
-			//.filter(function(d){return d.children[0].children;})
 			.append("g")
 			.attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", (d, i, nodes) => {
-				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${-(rect.getAttribute("width") / 2) - this.offsets}, -${this.offsets})`;
-			})
+			.attr("transform", d => `translate(${-(d.width / 2) - BTN_PAD}, -${this.offsets})`)
 			.on("click", (_, d) => this.pullDown(d))
 			.on("hover", (_, d) => this.pullDownHover(d));
 
@@ -90,40 +87,29 @@ export class MagicNavigation {
 	}
 
 	addPushDown() {
-		const { BOX_HEIGHT } = nodeVisualsDefaults;
+		const { BOX_HEIGHT, BTN_PAD } = nodeVisualsDefaults;
 
-		let group = axiomNodesButConclusion.filter(d => {
-			return d ? d.children[0].children : false;
-		})
+		let group = axiomNodesButConclusion
+			.filter(d => d ? d.children[0].children : false)
 			.append("g")
 			.attr("id", "B4")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", (d, i, nodes) => {
-				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${rect.getAttribute("width") / 2 - this.offsets}, ${BOX_HEIGHT - this.offsets * 2})`;
-			})
+			.attr("transform", d => `translate(${d.width / 2 - BTN_PAD}, ${BOX_HEIGHT})`)
 			.on("click", (_, d) => this.pushDown(d))
 			.on("hover", (_, d) => this.pushDownHover(d));
-
 
 		this.appendCircleAndText(group, "exit_to_app", "Push down", "rotated-90"); // file_download, vertical_align_bottom, system_update_alt
 	}
 
 	addPullUp() {
-		const { BOX_HEIGHT } = nodeVisualsDefaults;
+		const { BOX_HEIGHT, BTN_PAD } = nodeVisualsDefaults;
 
-		let group = axiomNodesButConclusion.filter(d => {
-			return d ? d.data.target.type === "mrule" : false;
-		})
+		let group = axiomNodesButConclusion
+			.filter(d =>  d ? d.data.target.type === "mrule" : false)
 			.append("g")
 			.attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", (d, i, nodes) => {
-				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${- (rect.getAttribute("width") / 2) - this.offsets}, ${BOX_HEIGHT + this.offsets})`;
-			})
+			.attr("transform", d =>`translate(${-d.width / 2 - BTN_PAD}, ${BOX_HEIGHT})`)
 			.on("click", (_, d) => this.pullUp(d))
 			.on("hover", (_, d) => this.pullUpHover(d));
 
@@ -131,17 +117,15 @@ export class MagicNavigation {
 	}
 
 	addPushUp() {
+		const { BTN_PAD } = nodeVisualsDefaults;
+
 		let group = axiomNodesButConclusion.filter(d => {
 			return d ? d.children[0].children : false;
 		})
 			.append("g")
 			.attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", (d, i, nodes) => {
-				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${rect.getAttribute("width") / 2 - this.offsets}, ${this.offsets})`;
-			})
+			.attr("transform", d => `translate(${d.width / 2 - BTN_PAD}, 0)`)
 			.on("click", (_, d) => this.pushUp(d))
 			.on("hover", (_, d) => this.pushUpHover(d));
 

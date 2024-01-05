@@ -49,7 +49,7 @@ export class AxiomsHelper {
 	}
 
 	addShowPrevious() {
-		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BOX_HEIGHT, BTN_CIRCLE_SIZE, BTN_PAD } = nodeVisualsDefaults;
 
 		let group = this._inferredAxiomNodes
 			.filter(d => {
@@ -63,7 +63,7 @@ export class AxiomsHelper {
 			.attr("transform", (d, i, nodes) => {
 				const id = nodes[i].parentNode.id;
 				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${rect.getAttribute("width") / 2}, ${BOX_HEIGHT})`;
+				return `translate(${d.width / 2 - BTN_PAD}, ${BOX_HEIGHT})`;
 			})
 			.on("click", (_, d) => this.showPrevious(d))
 		group.append("circle")
@@ -111,7 +111,7 @@ export class AxiomsHelper {
 	}
 
 	addHideAllPrevious() {
-		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BTN_CIRCLE_SIZE, BTN_PAD } = nodeVisualsDefaults;
 
 		let group = this._inferredAxiomNodes
 			.filter(d => {
@@ -125,7 +125,7 @@ export class AxiomsHelper {
 			.attr("transform", (d, i, nodes) => {
 				const id = nodes[i].parentNode.id;
 				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${rect.getAttribute("width") / 2 - BTN_CIRCLE_SIZE - 1}, 0)`;
+				return `translate(${d.width / 2 - BTN_PAD - BTN_CIRCLE_SIZE - 1}, 0)`;
 			})
 			.on("click", (_, d) => this.hideAllPrevious(d))
 		group.append("circle")
@@ -152,7 +152,7 @@ export class AxiomsHelper {
 	}
 
 	addShowAllPrevious() {
-		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BTN_CIRCLE_SIZE, BTN_PAD } = nodeVisualsDefaults;
 
 		let group = this._inferredAxiomNodes
 			.filter(d => {
@@ -167,7 +167,7 @@ export class AxiomsHelper {
 			.attr("transform", (d, i, nodes) => {
 				const id = nodes[i].parentNode.id;
 				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${rect.getAttribute("width") / 2}, 0)`;
+				return `translate(${d.width / 2 - BTN_PAD}, 0)`;
 			})
 			.on("click", (_, d) => this.showAllPrevious(d))
 		group.append("circle")
@@ -350,7 +350,7 @@ export class AxiomsHelper {
 			}
 		}
 
-		const { BOX_HEIGHT, BOX_PADDING_BOTTOM, BOX_PADDING } = nodeVisualsDefaults;
+		const { BOX_HEIGHT, BOX_PADDING_BOTTOM, BOX_PADDING, BTN_PAD } = nodeVisualsDefaults;
 
 		const group = d3.selectAll(".axiom")
 			.filter((d) => d)
@@ -362,7 +362,7 @@ export class AxiomsHelper {
 			.attr("transform", (d, i, nodes) => {
 				const id = nodes[i].parentNode.id;
 				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${-rect.getAttribute("width") / 2 + BOX_PADDING}, 
+				return `translate(${-(d.width / 2 + BTN_PAD) + BOX_PADDING}, 
 					${BOX_HEIGHT - BOX_PADDING_BOTTOM})`;
 			})
 			.on("click", (e, d) => {
@@ -503,7 +503,7 @@ export class AxiomsHelper {
 			return;
 		}
 
-		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BOX_HEIGHT, BTN_CIRCLE_SIZE, BTN_PAD } = nodeVisualsDefaults;
 
 		let group = this._inferredAxiomNodes
 			.filter(d => { return d._children; })//remove tautologies
@@ -511,8 +511,7 @@ export class AxiomsHelper {
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", (d, i, nodes) => {
 				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${rect.getAttribute("width") / 2 - BTN_CIRCLE_SIZE - 1}, ${BOX_HEIGHT})`;
+				return `translate(${-d.width / 2 - BTN_PAD}, ${BOX_HEIGHT})`;
 			})
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")

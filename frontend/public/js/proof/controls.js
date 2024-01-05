@@ -197,10 +197,7 @@ function magicToggleBtnFunction() {
         proof.magic.currentMagicAction = undefined;
     }
 
-    d3.xml("../data/" + getSessionId() + "/" + getFileName()).then((xml) => {
-        proof.svgRootLayer.selectAll("*").remove();
-        createContent(xml);
-    });
+    proof.load();
 }
 
 function layoutToggleBtnFunction() {
