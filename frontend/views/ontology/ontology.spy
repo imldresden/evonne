@@ -17,11 +17,9 @@
   << modals/axiom >>
 
   <main id="ontology-container">
-    <div id="ontology-view"> </div>
-    
     << menus/thumbnail >>
-    << menus/settings >> 
   </main>
+  << menus/settings >> 
 
   << scripts >> 
   

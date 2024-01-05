@@ -54,6 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+
+// Query all resizers
+document.querySelectorAll('.resizer').forEach(function (ele) {
+  resizable(ele);
+});
+
 const sidebarToggles = document.getElementsByClassName("toggles-sidebar");
 const btnToggleSideBar = document.getElementById("btnToggleSideBar");
 
@@ -115,10 +121,12 @@ for (const c of sidebarToggles) {
 const settingsSidebar = document.getElementById("sidebarSettings");
 const settingsButton = document.getElementById("showSettingsMenuButton");
 
-if (settingsSidebar) { 
-  settingsButton.addEventListener("click", showSettingsTab);
-} else {
-  settingsButton.style.display = "none";
+if (settingsButton) {
+  if (settingsSidebar !== null) { 
+    settingsButton.addEventListener("click", showSettingsTab);
+  } else {
+    settingsButton.style.display = "none";
+  }
 }
 
 function startRedrawCSS() {
@@ -225,11 +233,6 @@ function resizable(resizer) {
   resizer.addEventListener('mousedown', mouseDownHandler);
 };
 
-// Query all resizers
-document.querySelectorAll('.resizer').forEach(function (ele) {
-  resizable(ele);
-});
-
 // redirection for demos
 async function loadExample(name, id) {
   document.getElementById("examples").classList.add("hidden");
@@ -244,3 +247,5 @@ async function loadExample(name, id) {
     document.getElementById("generating-example").innerHTML = "Something went wrong. Please reload this page and try again. If the problem persists, feel free to contact the authors";
   }
 }
+
+export { showRepairsTab }

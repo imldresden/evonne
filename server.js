@@ -45,6 +45,13 @@ if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
 }
 
+app.get('/test', (req, res) => {
+  res.render('main/test.spy', { 
+    title: "evonne lib",
+    uuid: uuidv4(),
+  });
+});
+
 // pages
 app.get('/', (req, res) => {
   const id = req.query.id;

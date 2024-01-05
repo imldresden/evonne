@@ -18,11 +18,10 @@
   << modals/axiom >>
   
   <main id="proof-container">
-    <svg id="proof-view"> </svg>
-    
     << menus/thumbnail >>
-    << menus/settings >>
   </main>
+
+  << menus/settings >>
   
   << scripts >>
   <script src="/js/main/main.js" type="module"></script>

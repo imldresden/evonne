@@ -12,7 +12,11 @@ const thumbnailViewer = function (options) {
 
         const minimapSelector = options.containerSelector + " .minimap-view";
         const thumbViewObjectElem = document.querySelector(minimapSelector);
-        thumbViewObjectElem.remove();
+        if (thumbViewObjectElem) {
+            thumbViewObjectElem.remove();
+        } else {
+            return;
+        }
 
         const thumbSVG = document.getElementById(options.mainViewId).cloneNode(true);
         thumbSVG.classList.add("minimap", "minimap-view");

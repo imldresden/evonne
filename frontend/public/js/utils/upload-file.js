@@ -1,6 +1,6 @@
 
 import { loadOntology, loadLayout, loadAtomicDecomposition } from '../ontology/ontology.js';
-import {loadProof, loadSignature} from '../proof/proof.js';
+import { loadProof, loadSignature } from '../proof/proof.js';
 
 const listenerFunctions = [loadProof, loadOntology, loadLayout];
 const fileUploadInput = document.getElementById('browseButton');

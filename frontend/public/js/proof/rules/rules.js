@@ -50,7 +50,7 @@ const utils = {
 class RulesHelper {
 
     addTooltipToNodes() {
-        let proofView = d3.select("#proof-view");
+        let proofView = proof.svg;
         //Reset
         d3.selectAll("body .tooltip-explanation").remove();
 
@@ -130,11 +130,11 @@ class RulesHelper {
             let width = element.offsetWidth;
             let height = element.offsetHeight - 35;
 
-            let x = event.clientX + width > proof.proofWidth
-                ? proof.proofWidth - width
+            let x = event.clientX + width > proof.width
+                ? proof.width - width
                 : event.pageX;
-            let y = event.clientY + height > proof.proofHeight
-                ? proof.proofHeight - height
+            let y = event.clientY + height > proof.height
+                ? proof.height - height
                 : event.pageY;
 
             tooltip.style("left", x + "px").style("top", y + "px");

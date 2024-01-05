@@ -11,9 +11,9 @@ export class LinearNavigation {
     computeLinearLayout(hierarchy) {
         // Layout and draw the tree
         hierarchy.dx = 50;
-        hierarchy.dy = proof.proofWidth / (hierarchy.height + 1);
+        hierarchy.dy = proof.width / (hierarchy.height + 1);
 
-        let linearLayout = d3.tree().size([proof.proofWidth, proof.proofHeight])
+        let linearLayout = d3.tree().size([proof.width, proof.height])
             .separation((a, b) => (a.width + b.width) / 2)(hierarchy);
 
         let orderedElements = [];
@@ -24,13 +24,13 @@ export class LinearNavigation {
             orderedElements.push(linearLayout);
         }
 
-        let itemY = proof.proofHeight / (orderedElements.length < 2 ? 1 : orderedElements.length - 1);
+        let itemY = proof.height / (orderedElements.length < 2 ? 1 : orderedElements.length - 1);
         linearLayout.each(d => {
-            d.x = 0.7 * proof.proofWidth - d.width / 2;
+            d.x = 0.7 * proof.width - d.width / 2;
             if (orderedElements.length < 2) {
-                d.y = 0.01 * proof.proofHeight;
+                d.y = 0.01 * proof.height;
             } else {
-                d.y = 1.01 * proof.proofHeight - ((orderedElements.indexOf(d)) * itemY);
+                d.y = 1.01 * proof.height - ((orderedElements.indexOf(d)) * itemY);
             }
         });
 
@@ -98,9 +98,9 @@ export class LinearNavigation {
             sourceY = d.source.y - 0.01;
         }
         x2 = targetX + .5 * d.target.width;
-        y2 = proof.proofHeight - targetY + nodeVisualsDefaults.BOX_HEIGHT / 2;
+        y2 = proof.height - targetY + nodeVisualsDefaults.BOX_HEIGHT / 2;
         x1 = sourceX + .5 * d.source.width;
-        y1 = proof.proofHeight - sourceY + nodeVisualsDefaults.BOX_HEIGHT / 2;
+        y1 = proof.height - sourceY + nodeVisualsDefaults.BOX_HEIGHT / 2;
 
         let offset = Math.abs(y2 - y1) / 2;
 
@@ -176,7 +176,7 @@ export class LinearNavigation {
         }
         let dataS, dataT;
 
-        d3.select("#proof-view").selectAll("g.node,path.link").style("opacity", (d) => {
+        proof.svg.selectAll("g.node,path.link").style("opacity", (d) => {
             if (d.source) {
                 dataS = d.source.data;
                 dataT = d.target.data;
@@ -192,7 +192,6 @@ export class LinearNavigation {
     }
 
     setFullOpacityToAll() {
-        d3.select("#proof-view").selectAll("g.node,path.link").style("opacity", 1);
+        proof.svg.selectAll("g.node,path.link").style("opacity", 1);
     }
-
 }

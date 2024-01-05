@@ -310,7 +310,7 @@ export class NodeVisualsHelper {
             })
             .on("contextmenu", (e, d) => {
                 const menuItems = proof.axioms.menuItems;
-                globals.contextMenu.create(e, d, menuItems, '#proof-view');
+                globals.contextMenu.create(e, d, menuItems, proof.div);
             })
     }
 
@@ -328,7 +328,7 @@ export class NodeVisualsHelper {
 
     expandNode(node) {
         const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT_Expanded } = nodeVisualsDefaults;
-        proof.svgProof.transition()
+        proof.svg.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .on("start", () => { })
             .on("end", () => {
@@ -341,7 +341,7 @@ export class NodeVisualsHelper {
 
     collapseNode(node) {
         const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT } = nodeVisualsDefaults;
-        let t = proof.svgProof.transition()
+        let t = proof.svg.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .on("start", () => { this.hideCommunicationButtons(node); })
             .on("end", () => { this.addShowHideMouseEvents(); });

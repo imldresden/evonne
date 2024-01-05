@@ -294,13 +294,13 @@ function computeTreeLayout(hierarchy) {
 
     // Layout and draw the tree
     hierarchy.dx = 50;
-    hierarchy.dy = proof.proofWidth / (hierarchy.height + 1);
+    hierarchy.dy = proof.width / (hierarchy.height + 1);
     let tree_layout;
 
     if (proof.allowOverlap) {
         // tries to fit to screen 
         tree_layout = d3.tree()
-            .size([proof.proofWidth, proof.proofHeight])
+            .size([proof.width, proof.height])
             .separation((a, b) => separation(a, b))
             (hierarchy);
     } else {

@@ -41,17 +41,17 @@ export class TreeNavigation {
         // update and draw the tree
         this.updateHierarchyVars(this.hierarchy);
 
-        this.links = proof.svgProofRootLayer
+        this.links = proof.svgRootLayer
             .append("g")
             .attr("id", "links")
             .attr("cursor", "pointer")
             .attr("pointer-events", "all");
 
-        this.nodes = proof.svgProofRootLayer
+        this.nodes = proof.svgRootLayer
             .append("g")
             .attr("id", "nodes");
 
-        this.labels = proof.svgProof.selectAll("#nodes");
+        this.labels = proof.svg.selectAll("#nodes");
         this.update();
     }
 
@@ -89,10 +89,8 @@ export class TreeNavigation {
     }
 
     addFocusFunctionality() {
-        //remove events from previous drawing
-        this.nodes.selectAll("g").on("mouseover", null);
         this.nodes.selectAll("g").on('mouseover', function (d) {
-            const nodes = d3.select("#proof-view").selectAll(".node");
+            const nodes = proof.svg.selectAll(".node");
             nodes.sort((a, b) => (a.id === d.id) ? 1 : (b.id === d.id) ? -1 : 0);
         });
     }
@@ -177,7 +175,7 @@ export class TreeNavigation {
         this.showAll();
 
         // Create a transition for blending in the tree
-        let t = proof.svgProof.transition()
+        let t = proof.svg.transition()
             .duration(drawTime)
             .on("start", () => {
                 proof.isDrawing = true;
@@ -199,7 +197,7 @@ export class TreeNavigation {
                         .attr("class", d => proof.nodeVisuals.getNodeClass(d))
                         .attr("id", d => "N" + d.data.source.id)
                         /*TODO change x0 to x of the parent/child magic box, same for y*/
-                        .attr("transform", d => `translate(${d.x0}, ${proof.proofHeight - parseInt(d.y0)})`)
+                        .attr("transform", d => `translate(${d.x0}, ${proof.height - parseInt(d.y0)})`)
 
                         /*.each(function (d) {
                           switch (that.currentMagicAction) {
@@ -220,12 +218,12 @@ export class TreeNavigation {
                                         return cat(index + 1)
                                             .transition()
                                             .duration(drawTime)
-                                            .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${proof.proofHeight - parseInt(stops[index].y)})`)
+                                            .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${proof.height - parseInt(stops[index].y)})`)
                                       } else {
                                         return element
                                             .transition()
                                             .duration(drawTime)
-                                            .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${proof.proofHeight - parseInt(stops[index].y)})`)
+                                            .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${proof.height - parseInt(stops[index].y)})`)
                                       }
                                     }
             
@@ -238,12 +236,12 @@ export class TreeNavigation {
                           }
                         }) */
                         .transition(t)
-                        .attr("transform", (d, i, n) => `translate(${d.x}, ${proof.proofHeight - parseInt(d.y)})`)
+                        .attr("transform", (d, i, n) => `translate(${d.x}, ${proof.height - parseInt(d.y)})`)
                 },
                 update => {
                     update
                         .transition(t)
-                        .attr("transform", d => `translate(${d.x}, ${proof.proofHeight - parseInt(d.y)})`)
+                        .attr("transform", d => `translate(${d.x}, ${proof.height - parseInt(d.y)})`)
                 },
                 exit => {
                     exit
@@ -273,9 +271,9 @@ export class TreeNavigation {
                                 }
                             })
                             .attr("x1", d => d.target.x0)
-                            .attr("y1", d => proof.proofHeight - d.target.y0 + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                            .attr("y1", d => proof.height - d.target.y0 + nodeVisualsDefaults.BOX_HEIGHT + 1)
                             .attr("x2", d => d.source.x0)
-                            .attr("y2", d => proof.proofHeight - d.source.y0)
+                            .attr("y2", d => proof.height - d.source.y0)
                             /*.each(function (d) {
                               switch (that.currentMagicAction) {
                                 case "pullUp":
@@ -299,17 +297,17 @@ export class TreeNavigation {
                                                 .transition()
                                                 .duration(drawTime)
                                                 .attr("x1", () => stops[index].x)
-                                                .attr("y1", () => proof.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
+                                                .attr("y1", () => proof.height - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
                                                 .attr("x2", d => d.source.x)
-                                                .attr("y2", d => proof.proofHeight - d.source.y)
+                                                .attr("y2", d => proof.height - d.source.y)
                                           } else if (stops[index + 1] && !stops[index].data.id.startsWith("MN")) {
                                             return cat(index + 1)
                                                 .transition()
                                                 .duration(drawTime)
                                                 .attr("x1", d => stops[index].x)
-                                                .attr("y1", d => proof.proofHeight - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
+                                                .attr("y1", d => proof.height - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
                                                 .attr("x2", d => d.source.x)
-                                                .attr("y2", d => proof.proofHeight - d.source.y)
+                                                .attr("y2", d => proof.height - d.source.y)
                                           } else {
                                             return element
                                                 .transition()
@@ -318,9 +316,9 @@ export class TreeNavigation {
                                                 .transition()
                                                 .duration(drawTime)
                                                 .attr("x1", d => d.source.x)
-                                                .attr("y1", d => proof.proofHeight - d.source.y)
+                                                .attr("y1", d => proof.height - d.source.y)
                                                 .attr("x2", d => d.source.x)
-                                                .attr("y2", d => proof.proofHeight - d.source.y)
+                                                .attr("y2", d => proof.height - d.source.y)
                                           }
                                         }
               
@@ -335,9 +333,9 @@ export class TreeNavigation {
                             */
                             .transition(t)
                             .attr("x1", d => d.target.x)
-                            .attr("y1", d => proof.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                            .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
                             .attr("x2", d => d.source.x)
-                            .attr("y2", d => proof.proofHeight - d.source.y);
+                            .attr("y2", d => proof.height - d.source.y);
 
                         /*
                         container.append("g")
@@ -346,12 +344,12 @@ export class TreeNavigation {
                             .attr("cursor", "pointer")
                             .attr("transform", d => {
                                 const { source: s, target: t } = d;
-                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.height - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
                             })
                             .transition(t)
                             .attr("transform", d => {
                                 const { source: s, target: t } = d;
-                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.height - t.y - 1.5 * (s.y - t.y) / 2})`;
                             })
             
                         container
@@ -362,12 +360,12 @@ export class TreeNavigation {
                             .attr("fill", "#ccc")
                             .attr("transform", d => {
                                 const { source: s, target: t } = d;
-                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.height - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
                             })
                             .transition(t)
                             .attr("transform", d => {
                                 const { source: s, target: t } = d;
-                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.height - t.y - 1.5 * (s.y - t.y) / 2})`;
                             })
             
                         container
@@ -382,12 +380,12 @@ export class TreeNavigation {
                             })
                             .attr("transform", d => {
                                 const { source: s, target: t } = d;
-                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.proofHeight - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
+                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.height - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
                             })
                             .transition(t)
                             .attr("transform", d => {
                                 const { source: s, target: t } = d;
-                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.proofHeight - t.y - 1.5 * (s.y - t.y) / 2})`;
+                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.height - t.y - 1.5 * (s.y - t.y) / 2})`;
                             })
                         */
                     },
@@ -395,9 +393,9 @@ export class TreeNavigation {
                         update
                             .transition(t)
                             .attr("x1", d => d.target.x)
-                            .attr("y1", d => proof.proofHeight - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                            .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
                             .attr("x2", d => d.source.x)
-                            .attr("y2", d => proof.proofHeight - d.source.y)
+                            .attr("y2", d => proof.height - d.source.y)
                     },
                     exit => {
                         exit.remove()
@@ -419,7 +417,7 @@ export class TreeNavigation {
             });
         }
 
-        proof.nodeVisuals.renderNodes(proof.svgProof, this.nodes);
+        proof.nodeVisuals.renderNodes(proof.svg, this.nodes);
 
         // Stash the old positions for transition.
         this.hierarchy.eachBefore(d => {
@@ -453,7 +451,7 @@ export class TreeNavigation {
 
         if (proof.isMagic && someHierarchy !== this.hierarchy) {
             someHierarchy.descendants().forEach((d, i) => {
-                d.x0 = magic ? parseInt(magic.x) : proof.proofWidth / 2;
+                d.x0 = magic ? parseInt(magic.x) : proof.width / 2;
                 d.y0 = magic ? parseInt(magic.y) : 0;
                 let originalSource = common.find(x => x.data.target.id === d.data.source.id);
                 let originalTarget = common.find(x => x.data.source.id === d.data.source.id);
@@ -473,7 +471,7 @@ export class TreeNavigation {
             });
         } else {
             someHierarchy.descendants().forEach((d, i) => {
-                d.x0 = proof.proofWidth / 2;
+                d.x0 = proof.width / 2;
                 d.y0 = 0;
                 d.id = i;
                 d._children = d.children;

@@ -4,6 +4,7 @@ import { progress } from '../main/main.js';
 import { BasicShorteningFunctions } from "../shortening/basic.js";
 import { colors, stylesheet } from "../../style/cy-style.js";
 import { params } from "../layouts/cola.js";
+import { showRepairsTab } from "../utils/controls.js";
 
 const socket = io();
 
@@ -14,6 +15,7 @@ let ontologyFile = null;
 let adOntologyFile = null;
 let layoutFile = null;
 let showOriginal = null;
+let div = "ontology-container";
 
 const ontologyNodeId = "oN";
 const flowDirection = document.getElementById("flowDirection");
@@ -47,8 +49,13 @@ const thingsWithListeners = [
 
 // creates the content of the view based on the chosen/read data
 async function createContent(data) {
-  const container = document.getElementById('ontology-view');
+  const svg = document.createElement("svg");
+  svg.id = "ontology-view"
+  document.getElementById(div).append(svg)
+
+  const container = document.getElementById("ontology-view");
   container.innerHTML = "";
+
   const elements = processData(data);
   cy = cytoscape({
     container,
@@ -275,7 +282,7 @@ function loadAtomicDecomposition(e) {
   upload(adOntologyFile, result => {
     console.log('Success:', result);
     d3.xml("../data/" + getSessionId() + "/" + adOntologyFile.name).then((xml) => {
-      createContent(xml);
+      createContent(xml, );
     });
   });
 }
@@ -324,13 +331,19 @@ function loadLayout(e) {
   reader.readAsText(layoutFile);
 }
 
-function init_ontology(ad_file_name, ontology_file_param) {
+function init_ontology({ 
+  ad, 
+  ontology,
+  container = "ontology-container",
+}) {
+  div = container;
+
   adOntologyFile = {
-    name: ontology_file_param ? ad_file_name : 'atomic ontology.xml'
+    name: ontology ? ad : 'atomic ontology.xml'
   };
 
   ontologyFile = {
-    name: ontology_file_param
+    name: ontology
   };
 
   socket.on("highlight axioms", (data) => {
@@ -378,11 +391,11 @@ function init_ontology(ad_file_name, ontology_file_param) {
   flowStrength.value = params.flow.minSeparation;
 
   document.querySelectorAll("input[type=range]").forEach(range => {
-    range.closest(".modal-option-range").querySelector("span.new.badge").innerText = range.value;
-
     function rangeFunction() {
       range.closest(".modal-option-range").querySelector("span.new.badge").innerText = range.value;
     }
+
+    rangeFunction();
     
     range.removeEventListener("input", rangeFunction);
     range.addEventListener("input", rangeFunction);

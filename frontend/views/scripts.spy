@@ -18,6 +18,4 @@
 <script src="/libs/underscore/underscore-min.js"></script>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/utils/controls.js"></script>
 <script src="/js/utils/session-id.js"></script>
-<script src="/js/utils/upload-file.js" type="module"></script>

@@ -19,7 +19,7 @@ window.onload = function () {
 
   // Remove listeners
   thingsWithListeners.forEach(twl => {
-    if (twl && twl.thing)  {
+    if (twl && twl.thing) {
       twl.thing.removeEventListener(twl.type, twl.fn);
     }
   });
@@ -136,11 +136,11 @@ function init_views(loop = false) {
         clearInterval(interval);
         modal.close();
 
-        if (document.getElementById('proof-view')) {
-          init_proof(res.proofs[0]);
+        if (document.getElementById('proof-container')) {
+          init_proof({ file: res.proofs[0] });
         }
-        if (document.getElementById('ontology-view')) {
-          init_ontology(res.ad, res.ontology);
+        if (document.getElementById('ontology-container')) {
+          init_ontology({ ad: res.ad, ontology: res.ontology });
         }
 
         //Hide computing indicator

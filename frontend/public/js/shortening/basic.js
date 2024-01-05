@@ -4,7 +4,7 @@ export class BasicShorteningFunctions {
     _CCToFull;
     _FullToCC;
     _CCToCount;
-    _maxLength;
+    _maxLength = 7;
     _placeHolderToOriginal;
     _placeHolderToShort;
     _placeHolderCounter;
@@ -18,9 +18,14 @@ export class BasicShorteningFunctions {
         this.resetIfNewMax();
     }
 
+    getMaxLengthValue () {
+        return document.getElementById("maximumLength") ? 
+            document.getElementById("maximumLength").value : this_maxLength;
+    }
+
     resetIfNewMax() {
-        const currentMaxLength = document.getElementById("maximumLength").value;
-        if (currentMaxLength !== this._maxLength()) {
+        const currentMaxLength = this.getMaxLengthValue();
+        if (currentMaxLength !== this._maxLength) {
             this.resetAll();
             return true;
         }
@@ -31,11 +36,6 @@ export class BasicShorteningFunctions {
         this._CCToFull = new Map();
         this._FullToCC = new Map();
         this._CCToCount = new Map();
-
-        this._maxLength = function () {
-            return document.getElementById("maximumLength") ? document.getElementById("maximumLength").value : 10;
-        }
-
         this.resetForNewText();
     }
 
@@ -144,7 +144,7 @@ export class BasicShorteningFunctions {
         let current = undefined;
         concepts.forEach(concept => {
             concept = concept.trim();
-            current = concept.length > this._maxLength() ? `${concept.substring(0, this._maxLength())}` : concept;
+            current = concept.length > this.getMaxLengthValue() ? `${concept.substring(0, this.getMaxLengthValue())}` : concept;
             fillMaps(current, concept, this);
             current = this._FullToCC.get(concept) !== concept ? this._FullToCC.get(concept) + "\u2026" :
                 this._FullToCC.get(concept);

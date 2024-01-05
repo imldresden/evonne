@@ -15,7 +15,7 @@ export class AxiomsHelper {
 	addFunctionButtonsToNodes() {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
-		this._inferredAxiomNodes = d3.select("#proof-view").selectAll(".axiom:not(.asserted)")
+		this._inferredAxiomNodes = proof.svg.selectAll(".axiom:not(.asserted)")
 
 		//Show rule name and premise that led to this conclusion
 		this.addShowPrevious();
@@ -475,7 +475,7 @@ export class AxiomsHelper {
 
 	addCollapsedIndicator() {
 		d3.selectAll(".collapse-indicator").remove();
-		d3.select("#proof-view")
+		proof.svg
 			.selectAll(".axiom:not(.asserted) #frontRect")
 			.filter(y => !y.children && y._children)
 			.nodes()

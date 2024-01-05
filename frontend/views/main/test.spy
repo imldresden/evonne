@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<meta charset="utf-8" name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html lang="en">
+
+<head>
+    <title>{{ title }}</title>
+
+    <link rel="shortcut icon" type="image/svg" href="/favicon.svg" />
+    <link rel="stylesheet" href="/libs/materialize-css/dist/css/materialize.css">
+    <link rel="stylesheet" href="/libs/hack-font/build/web/hack.css">
+    <link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">
+    <link rel="stylesheet" href="/style/widgets/general.css">
+    <link rel="stylesheet" href="/style/widgets/parallel-coords.css">
+    <link rel="stylesheet" href="/style/proof.css">
+</head>
+
+<body>
+    <main id="my-reasoning-tree"></main>
+    
+    <script src="/libs/d3/dist/d3.min.js"></script>
+    <script src="/libs/materialize-css/dist/js/materialize.min.js"></script>
+    <script src="/libs/svg-pan-zoom/dist/svg-pan-zoom.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/proof/proof.js" type="module"></script>
+
+    <script type="module">
+        import { init_proof } from "./js/proof/proof.js";
+
+        init_proof({ 
+            external: {
+                div: "my-reasoning-tree",
+                path: "../data/numbers-diff1/testCDProof_graphML0.t.xml",
+                isMagic: true,
+            } 
+        });
+    </script>
+</body>
+
+</html>

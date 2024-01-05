@@ -36,12 +36,13 @@ export class MagicNavigation {
 	}
 
 	addMagicNavButtonsToNodes() {
-		axiomNodes = d3.select('#proof-view').selectAll(".axiom");
-		axiomNodesButConclusion = d3.select('#proof-view').selectAll(".axiom:not(.conclusion)");
-		inferredAxiomNodes = d3.select('#proof-view').selectAll(".axiom:not(.asserted)");
+		const div = proof.svg;
+		axiomNodes = div.selectAll(".axiom");
+		axiomNodesButConclusion = div.selectAll(".axiom:not(.conclusion)");
+		inferredAxiomNodes = div.selectAll(".axiom:not(.asserted)");
 
 		//Remove old buttons
-		d3.select('#proof-view').selectAll(".axiomButton").remove();
+		div.selectAll(".axiomButton").remove();
 
 		//Add a button to pull an axiom downwards (reveal the premise)
 		this.addPullDown();
@@ -153,7 +154,7 @@ export class MagicNavigation {
 		proof.tree.updateHierarchyVars(newHierarchy, subRoot, action);
 		proof.tree.hierarchy = newHierarchy;
 
-		d3.select('#proof-view').selectAll(".node #frontRect").each((d, i, nodes) => { d["width"] = nodes[i].getBBox().width; })
+		proof.svg.selectAll(".node #frontRect").each((d, i, nodes) => { d["width"] = nodes[i].getBBox().width; })
 		this.currentMagicAction = action;
 		proof.tree.update();
 	}
