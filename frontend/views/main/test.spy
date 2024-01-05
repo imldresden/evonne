@@ -7,7 +7,7 @@
     <title>{{ title }}</title>
 
     <link rel="stylesheet" href="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/css/materialize.css">
-    <link rel="stylesheet" href="https://unpkg.com/hack-font@3.3.0/hack-font/build/web/hack.css">
+    <link rel="stylesheet" href="https://unpkg.com/hack-font@3.3.0/build/web/hack.css">
     <link rel="stylesheet" href="https://unpkg.com/material-icons@1.13.9/iconfont/material-icons.css">
 
     <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.2/frontend/public//style/widgets/general.css">
@@ -20,7 +20,7 @@
     
     <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
     <script src="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/js/materialize.min.js"></script>
-    <script src="https://unpkg.com/libs/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+    <script src="https://unpkg.com/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
     
     <script type="module">
