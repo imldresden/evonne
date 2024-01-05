@@ -29,8 +29,8 @@
         init_proof({ 
             external: {
                 div: "my-reasoning-tree",
-                path: "../data/test/example.xml",
-                isMagic: true,
+                path: "../data/test/normal.t.xml",
+                drawTime: 500
             } 
         });
     </script>
