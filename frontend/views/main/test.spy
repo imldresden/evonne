@@ -30,7 +30,7 @@
         init_proof({ 
             external: {
                 div: "my-reasoning-tree",
-                path: "../data/numbers-diff1/testCDProof_graphML0.t.xml",
+                path: "../data/test/example.xml",
                 isMagic: true,
             } 
         });
