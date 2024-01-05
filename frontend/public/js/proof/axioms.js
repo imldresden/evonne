@@ -60,11 +60,7 @@ export class AxiomsHelper {
 			}) //remove tautologies
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", (d, i, nodes) => {
-				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${d.width / 2 - BTN_PAD}, ${BOX_HEIGHT})`;
-			})
+			.attr("transform", d => `translate(${d.width / 2 - BTN_PAD}, ${BOX_HEIGHT})`)
 			.on("click", (_, d) => this.showPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -122,11 +118,7 @@ export class AxiomsHelper {
 			})//remove tautologies
 			.append("g").attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", (d, i, nodes) => {
-				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${d.width / 2 - BTN_PAD - BTN_CIRCLE_SIZE - 1}, 0)`;
-			})
+			.attr("transform", d => `translate(${d.width / 2 - BTN_PAD - BTN_CIRCLE_SIZE - 1}, 0)`)
 			.on("click", (_, d) => this.hideAllPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -164,11 +156,7 @@ export class AxiomsHelper {
 			})//remove tautologies
 			.append("g").attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", (d, i, nodes) => {
-				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${d.width / 2 - BTN_PAD}, 0)`;
-			})
+			.attr("transform", d => `translate(${d.width / 2 - BTN_PAD}, 0)`)
 			.on("click", (_, d) => this.showAllPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -193,8 +181,7 @@ export class AxiomsHelper {
 
 	addHighlightJustificationInOntology() {
 		const { BOTTOM_TRAY_WIDTH, BOX_HEIGHT_Expanded, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
-		const that = this;
-		//let rect = undefined;
+		
 		let group = d3.selectAll(".axiom")
 			.append("g")
 			.style("display", "none")
@@ -220,7 +207,6 @@ export class AxiomsHelper {
 	addShowRepairs() {
 		const { BOTTOM_TRAY_WIDTH, BOX_HEIGHT_Expanded, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
 
-		//let rect = undefined;
 		let group = d3.selectAll(".axiom")
 			.append("g")
 			.style("display", "none")
@@ -359,12 +345,7 @@ export class AxiomsHelper {
 			})
 			.append("g").attr("opacity", 0).attr("id", "B03")
 			.attr("class", "axiomButton btn-view")
-			.attr("transform", (d, i, nodes) => {
-				const id = nodes[i].parentNode.id;
-				const rect = document.querySelector(`#${id} #frontRect`);
-				return `translate(${-(d.width / 2 + BTN_PAD) + BOX_PADDING}, 
-					${BOX_HEIGHT - BOX_PADDING_BOTTOM})`;
-			})
+			.attr("transform", d=> `translate(${-(d.width / 2 + BTN_PAD) + BOX_PADDING}, ${BOX_HEIGHT - BOX_PADDING_BOTTOM})`)
 			.on("click", (e, d) => {
 				showFullAxiom(e.currentTarget.parentNode);
 				proof.update();
