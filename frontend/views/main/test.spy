@@ -6,26 +6,25 @@
 <head>
     <title>{{ title }}</title>
 
-    <link rel="shortcut icon" type="image/svg" href="/favicon.svg" />
-    <link rel="stylesheet" href="/libs/materialize-css/dist/css/materialize.css">
-    <link rel="stylesheet" href="/libs/hack-font/build/web/hack.css">
-    <link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">
-    <link rel="stylesheet" href="/style/widgets/general.css">
-    <link rel="stylesheet" href="/style/widgets/parallel-coords.css">
-    <link rel="stylesheet" href="/style/proof.css">
+    <link rel="stylesheet" href="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/css/materialize.css">
+    <link rel="stylesheet" href="https://unpkg.com/hack-font@3.3.0/hack-font/build/web/hack.css">
+    <link rel="stylesheet" href="https://unpkg.com/material-icons@1.13.9/iconfont/material-icons.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.2/frontend/public//style/widgets/general.css">
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.2/frontend/public//style/widgets/parallel-coords.css">
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.2/frontend/public//style/proof.css">
 </head>
 
 <body>
     <main id="my-reasoning-tree"></main>
     
-    <script src="/libs/d3/dist/d3.min.js"></script>
-    <script src="/libs/materialize-css/dist/js/materialize.min.js"></script>
-    <script src="/libs/svg-pan-zoom/dist/svg-pan-zoom.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/proof/proof.js" type="module"></script>
-
+    <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/js/materialize.min.js"></script>
+    <script src="https://unpkg.com/libs/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
+    
     <script type="module">
-        import { init_proof } from "./js/proof/proof.js";
+        import { init_proof } from "https://unpkg.com/evonne@0.0.2/frontend/public/js/proof/proof.js";
 
         init_proof({ 
             external: {
