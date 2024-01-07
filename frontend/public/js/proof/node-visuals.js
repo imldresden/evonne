@@ -16,7 +16,7 @@ export const nodeVisualsDefaults = {
     BTN_EXTEND_HEIGHT: 20,
     BTN_CIRCLE_SIZE: 15,
     BTN_TRIANGLE_SIZE: 20,
-    BTN_PAD: 10,
+    TEXT_PAD: 10,
     AXIOM_TEXT_BOTTOM_SHIFT: 30,
     EXPANSION_COLLAPSING_DURATION: 200,
 }
@@ -182,7 +182,7 @@ export class NodeVisualsHelper {
     }
 
     renderLabels() {
-        const { BOX_HEIGHT, BOX_WIDTH, BOX_PADDING, BOX_PADDING_BOTTOM, BTN_PAD } = nodeVisualsDefaults;
+        const { BOX_HEIGHT, BOX_PADDING_BOTTOM, TEXT_PAD } = nodeVisualsDefaults;
 
         //get all nodes
         let elements = [];
@@ -204,24 +204,24 @@ export class NodeVisualsHelper {
             elements[i].append("text")
                 .attr("id", elementsID[i])
                 .attr("class", elementsClass[i])
-                .attr("x", -BOX_WIDTH / 2 + BOX_PADDING)
+                .attr("x", d => -(d.width) / 2 + TEXT_PAD)
                 .attr("y", BOX_HEIGHT - BOX_PADDING_BOTTOM)
                 .text((d, i, nodes) => {
                     d.data.source.element = this.fixTypo(d.data.source.element);
                     let displayFormat = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
-                    if (!displayFormat || displayFormat === "original")
+                    if (!displayFormat || displayFormat === "original") {
                         return d.data.source.element;
-                    if (displayFormat === "shortened")
+                    }
+                        
+                    if (displayFormat === "shortened") {
                         return globals.labelsShorteningHelper.shortenLabel(d.data.source.element, proof.isRuleShort, globals.shorteningMethod);
-                    else if (displayFormat === "textual")
+                    } else if (displayFormat === "textual") {
                         return d.data.source.nLElement;
+                    }  
                 })
                 .each((d, i, nodes) => {
-                    d3.select(`#${nodes[i].parentNode.id} text`)
-                        .attr("x", () => -(d.width) / 2);
-
                     d3.select(`#${nodes[i].parentNode.id} #frontRect`)
-                        .attr("x", () => -(d.width + 2 * BTN_PAD) / 2);
+                        .attr("x", () => -(d.width) / 2);
                 });
         }
     }
@@ -314,8 +314,8 @@ export class NodeVisualsHelper {
     //These functions are for expanding and collapsing rectangles of axiom nodes
     expandCollapseNode(nodeID) {
         let node = d3.select("#" + nodeID);
-
         let expanded = node.select(".tray").classed("expanded");
+        
         if (expanded) {
             this.collapseNode(node);
         } else {

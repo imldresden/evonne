@@ -71,15 +71,13 @@ export class MagicNavigation {
 	}
 
 	addPullDown() {
-		const { BTN_PAD } = nodeVisualsDefaults;
-
 		let group = inferredAxiomNodes.filter(d => {
 			return d ? d.children[0].data.source.type === "mrule" : false;
 		})
 			.append("g")
 			.attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${-(d.width / 2) - BTN_PAD}, -${this.offsets})`)
+			.attr("transform", d => `translate(${-(d.width / 2)}, -${this.offsets})`)
 			.on("click", (_, d) => this.pullDown(d))
 			.on("hover", (_, d) => this.pullDownHover(d));
 
@@ -87,14 +85,14 @@ export class MagicNavigation {
 	}
 
 	addPushDown() {
-		const { BOX_HEIGHT, BTN_PAD } = nodeVisualsDefaults;
+		const { BOX_HEIGHT } = nodeVisualsDefaults;
 
 		let group = axiomNodesButConclusion
 			.filter(d => d ? d.children[0].children : false)
 			.append("g")
 			.attr("id", "B4")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2 - BTN_PAD}, ${BOX_HEIGHT})`)
+			.attr("transform", d => `translate(${d.width / 2}, ${BOX_HEIGHT})`)
 			.on("click", (_, d) => this.pushDown(d))
 			.on("hover", (_, d) => this.pushDownHover(d));
 
@@ -102,14 +100,14 @@ export class MagicNavigation {
 	}
 
 	addPullUp() {
-		const { BOX_HEIGHT, BTN_PAD } = nodeVisualsDefaults;
+		const { BOX_HEIGHT } = nodeVisualsDefaults;
 
 		let group = axiomNodesButConclusion
 			.filter(d =>  d ? d.data.target.type === "mrule" : false)
 			.append("g")
 			.attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d =>`translate(${-d.width / 2 - BTN_PAD}, ${BOX_HEIGHT})`)
+			.attr("transform", d =>`translate(${-d.width / 2}, ${BOX_HEIGHT})`)
 			.on("click", (_, d) => this.pullUp(d))
 			.on("hover", (_, d) => this.pullUpHover(d));
 
@@ -117,15 +115,13 @@ export class MagicNavigation {
 	}
 
 	addPushUp() {
-		const { BTN_PAD } = nodeVisualsDefaults;
-
 		let group = axiomNodesButConclusion.filter(d => {
 			return d ? d.children[0].children : false;
 		})
 			.append("g")
 			.attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2 - BTN_PAD}, 0)`)
+			.attr("transform", d => `translate(${d.width / 2}, 0)`)
 			.on("click", (_, d) => this.pushUp(d))
 			.on("hover", (_, d) => this.pushUpHover(d));
 

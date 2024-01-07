@@ -84,7 +84,7 @@ export class LinearNavigation {
     }
 
     position(d, zero) {
-        const { BTN_PAD, BOX_HEIGHT } = nodeVisualsDefaults;
+        const { BOX_HEIGHT } = nodeVisualsDefaults;
         //Note: "-0.01" was added to make the drawing works properly for the arrow of the highest node
         let x2, y2, x1, y1, targetX, targetY, sourceX, sourceY;
         if (zero) {
@@ -98,9 +98,9 @@ export class LinearNavigation {
             sourceX = d.source.x;
             sourceY = d.source.y - 0.01;
         }
-        x2 = targetX + .5 * d.target.width - BTN_PAD;
+        x2 = targetX + .5 * d.target.width;
         y2 = proof.height - targetY + BOX_HEIGHT / 2;
-        x1 = sourceX + .5 * d.source.width - BTN_PAD;
+        x1 = sourceX + .5 * d.source.width;
         y1 = proof.height - sourceY + BOX_HEIGHT / 2;
 
         let offset = Math.abs(y2 - y1) / 2;
@@ -154,7 +154,7 @@ export class LinearNavigation {
             connector = selection.append("circle");
             connector.attr("class", newClasses.join(" "));
             selection.select(".connector")
-                .attr("cx", (d) => d.width / 2 - nodeVisualsDefaults.BTN_PAD)
+                .attr("cx", (d) => d.width / 2)
                 .attr("cy", nodeVisualsDefaults.BOX_HEIGHT / 2)
                 .attr("r", nodeVisualsDefaults.CONNECTOR_SIZE / 2)
         });
