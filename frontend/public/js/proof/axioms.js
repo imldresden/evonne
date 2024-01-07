@@ -80,7 +80,7 @@ export class AxiomsHelper {
 		if (proof.isDrawing) {
 			return;
 		}
-
+		proof.nodeInteracted = treeRoot;
 		if (!treeRoot.children) {
 			treeRoot.children = treeRoot._children;
 		}
@@ -137,6 +137,7 @@ export class AxiomsHelper {
 		if (proof.isDrawing) {
 			return;
 		}
+		proof.nodeInteracted = treeRoot;
 		if (treeRoot.children) {
 			treeRoot.children = null;
 			proof.update();
@@ -175,6 +176,7 @@ export class AxiomsHelper {
 		if (proof.isDrawing) {
 			return;
 		}
+		proof.nodeInteracted = treeRoot;
 		this.resetAllChildren(treeRoot);
 		proof.update();
 	}
@@ -564,18 +566,18 @@ export class AxiomsHelper {
 		if (proof.nodeVisuals.nodesDisplayFormat.get(node.parentNode.id) === format) {
 			node.classList.add("activeFormat");
 			node.classList.remove("inactiveFormat");
-		}
-		else {
+		} else {
 			node.classList.add("inactiveFormat");
 			node.classList.remove("activeFormat");
 		}
 	}
 
 	getButton(format) {
-		if (format === "textual")
+		if (format === "textual") {
 			return "B05";
-		else if (format === "shortened")
+		} else if (format === "shortened") {
 			return "B04";
+		}
 		return "B06";
 	}
 

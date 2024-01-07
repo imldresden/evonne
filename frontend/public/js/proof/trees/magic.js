@@ -133,8 +133,6 @@ export class MagicNavigation {
 		let newHierarchy = proof.tree.createHierarchy(this.orderStructure(data));
 		proof.tree.updateHierarchyVars(newHierarchy, subRoot, action);
 		proof.tree.hierarchy = newHierarchy;
-
-		proof.svg.selectAll(".node #frontRect").each((d, i, nodes) => { d["width"] = nodes[i].getBBox().width; })
 		this.currentMagicAction = action;
 		proof.tree.update();
 	}
@@ -238,9 +236,10 @@ export class MagicNavigation {
 
 	pullUp(treeRoot) {
 		const magicImpossible = treeRoot.parent == null || treeRoot.data.target.type !== "mrule";
-		if (proof.isDrawing || magicImpossible)
+		if (proof.isDrawing || magicImpossible) {
 			return;
-
+		}
+		
 		let newData = [], usedMagicPremises = [], restMagicPremises = [];
 		let currentAtOriginal = this._entireProofHierarchy.descendants().find(x => x.data.source.id === treeRoot.data.source.id);
 
@@ -285,14 +284,14 @@ export class MagicNavigation {
 						found.descendants().filter(z => z !== found).forEach(z => newData.push(z.data));
 					}
 				});
-			}
-			else {
+			} else {
 				//add the rule to conclusion edge
 				newData.push(x.children[0].data);
 
 				//if the rule is a tautology, then stop
-				if (!x.children[0].children)
+				if (!x.children[0].children) {
 					return;
+				}
 
 				//if new magic is not needed because some premise is already there,
 				//then the data that should be added regarding them is from the current structure
@@ -303,8 +302,7 @@ export class MagicNavigation {
 					if (found) {
 						found.descendants().filter(y => y !== found).forEach(y => newData.push(y.data));
 						newData.push(premise.data);
-					}
-					else {
+					} else {
 						premise.descendants().forEach(y => newData.push(y.data));
 					}
 				});
@@ -319,8 +317,9 @@ export class MagicNavigation {
 			newData.push(this.getNewEdge(currentAtOriginal.parent.data.target, treeRoot.data.target));
 
 			treeRoot.parent.children.forEach(x => {
-				if (!usedMagicPremises.includes(x))
+				if (!usedMagicPremises.includes(x)) {
 					x.descendants().forEach(y => newData.push(y.data));
+				}
 			});
 
 			newData.push(treeRoot.parent.data);
@@ -342,8 +341,7 @@ export class MagicNavigation {
 							newData.push(y.data);
 						}
 					})
-				}
-				else {
+				} else {
 					//Add the branches that have some nodes which are not in the magical structures
 					this.incAdd(x, treeRoot.parent, newData);
 				}
@@ -369,14 +367,21 @@ export class MagicNavigation {
 			}
 		});
 
+		if (newMagicBox) {
+			proof.nodeInteracted = { id: newMagicBox.id, search: true }
+		} else {
+			proof.nodeInteracted = { id: treeRoot.data.target.id, search: true }
+		}
+		
 		this.updateAll(newData, treeRoot, "pullUp");
 	}
 
 	pushUp(treeRoot) {
 		//when magic is not possible
 		const magicImpossible = treeRoot.children == null || treeRoot.children[0].children == null || treeRoot.parent == null;
-		if (proof.isDrawing || magicImpossible)
+		if (proof.isDrawing || magicImpossible) {
 			return;
+		}
 
 		let newData = [];
 		let newMagicBox = this.getNewMagicBox();
@@ -406,8 +411,7 @@ export class MagicNavigation {
 						});
 						newData.push(this.getNewEdge(y.data.source, newMagicBox));
 					});
-				}
-				else if (x.children[0].data.source.element === "Asserted Conclusion") {
+				} else if (x.children[0].data.source.element === "Asserted Conclusion") {
 					x.children[0].descendants().forEach(y => newData.push(y.data));
 					newData.push(this.getNewEdge(x.children[0].data.target, newMagicBox));
 
@@ -417,17 +421,20 @@ export class MagicNavigation {
 
 		newData.push(this.getNewEdge(newMagicBox, treeRoot.parent.data.target));
 
-		if (treeRoot.parent.parent != null)
+		if (treeRoot.parent.parent != null) {
 			this.addAllBut(treeRoot.parent.parent, newData);
+		}
 
+		proof.nodeInteracted = { id: newMagicBox.id, search: true };
 		this.updateAll(newData, treeRoot, "pushUp");
 	}
 
 	pullDown(treeRoot) {
 		//when magic is not possible
 		const magicImpossible = treeRoot.children == null || treeRoot.children[0].data.source.type !== "mrule";
-		if (proof.isDrawing || magicImpossible)
+		if (proof.isDrawing || magicImpossible) {
 			return;
+		}
 
 		let newData = [];
 		//add all edges after the selected axiom, until the root is reached
@@ -505,8 +512,7 @@ export class MagicNavigation {
 								console.log("found")
 								console.log(found.data.source.element + " -> " + found.data.target.element);
 								found.children[0].descendants().forEach(z => newData.push(z.data));
-							}
-							else {
+							} else {
 								console.log("not found")
 								y.children[0].descendants().forEach(z => newData.push(z.data));
 							}
@@ -514,7 +520,14 @@ export class MagicNavigation {
 					}
 				}
 			})
-		})
+		});
+
+		if (newMagicBox) {
+			proof.nodeInteracted = { id: newMagicBox.id, search: true };
+		} else {
+			proof.nodeInteracted = { id: treeRoot.children[0].data.source.id, search: true };
+		}
+
 		this.updateAll(newData, treeRoot, "pullDown");
 	}
 
@@ -522,10 +535,12 @@ export class MagicNavigation {
 		//when magic is not possible
 		const magicImpossible = treeRoot.children == null || treeRoot.children[0].children == null || treeRoot.parent == null;
 
-		if (proof.isDrawing || magicImpossible) return;
+		if (proof.isDrawing || magicImpossible) {
+			return;
+		}
 
 		let newData = [], newMagicBox = this.getNewMagicBox();
-
+		
 		//connect the children of the current axiom and all their descendants to the new magic box
 		treeRoot.children[0].children.forEach(x => {
 			//skip tautologies
@@ -572,9 +587,12 @@ export class MagicNavigation {
 
 		newData.push(this.getNewEdge(newMagicBox, treeRoot.parent.data.target));
 
-		if (treeRoot.parent.parent != null)
+		if (treeRoot.parent.parent != null) {
 			this.addAllBut(treeRoot.parent.parent, newData);
-		// this.updateAll(newData);
+		}
+
+		proof.nodeInteracted = { id: newMagicBox.id, search: true };
+		
 		this.updateAll(newData, treeRoot, "pushDown");
 	}
 
@@ -584,10 +602,11 @@ export class MagicNavigation {
 		let ignored = selectedObject.descendants().filter(x => x !== selectedObject);
 
 		root.descendants().forEach(x => {
-			if (ignored.some(y => x === y))
+			if (ignored.some(y => x === y)) {
 				return null;
-			else
+			} else {
 				data.push(x.data);
+			}
 		})
 
 		return data;

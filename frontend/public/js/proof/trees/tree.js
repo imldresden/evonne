@@ -17,6 +17,7 @@ export class TreeNavigation {
     labels = undefined;
     root = undefined;
     edgeData = undefined;
+    restOfProofNode = { id: "r0", element: "", type: "rest" }
 
     init(processedData) {
         let nodeData = processedData.nodes;
@@ -25,7 +26,6 @@ export class TreeNavigation {
         // add a custom link from the root node, needed for the stratify function
         edgeData.push({
           id: "L-1",
-          // source: nodeData[0],
           source: nodeData.filter((x) => x.isRoot)[0],
           target: "",
         });
@@ -95,7 +95,6 @@ export class TreeNavigation {
         });
     }
 
-    //Reset axioms to initial state
     showRest(data) {
         // var others = d3.selectAll(".node").filter(function(d){return d.depth === data.depth && d != data});
         let others = d3.selectAll(".node").filter(d => d === data.closest_right_neighbor);
@@ -113,8 +112,6 @@ export class TreeNavigation {
                 .style("opacity", 1);
         });
     }
-
-    restOfProofNode = { id: "r0", element: "", type: "rest" }
 
     showSubTree(root) {
         //extract the current data
@@ -186,79 +183,65 @@ export class TreeNavigation {
                 document.dispatchEvent(new CustomEvent("drawend", { detail: { main: "proof-view" } }));
             });
 
+        const root = this.root;
+        function getTransformSourceNode() {
+            if (proof.nodeInteracted) {
+                if (proof.nodeInteracted.search) { // magic nodes
+                    const selection = d3.select("#N"+proof.nodeInteracted.id)
+                    selection.raise();
+                    const node = selection.data()[0];
+                    if (!node) { // could not find the node based on id
+                        d3.select("#N"+root.data.source.id).raise();
+                        return root;
+                    }
+                    return node;
+                } 
+                d3.select("#N"+proof.nodeInteracted.data.source.id).raise();
+                return proof.nodeInteracted;                   
+            } 
+            d3.select("#N"+root.data.source.id).raise();
+            return root;
+        }
+
+        function getTransformToSource() {
+            return `translate(${getTransformSourceNode().x}, ${proof.height - parseInt(getTransformSourceNode().y)})`
+        }
         // Add the data
         this.nodes.selectAll("g")
             .data(this.root.descendants(), d => "N" + d.data.source.id)
             .join(
                 enter => {
-                    // const that = this;
-
                     enter.append("g")
                         .attr("class", d => proof.nodeVisuals.getNodeClass(d))
                         .attr("id", d => "N" + d.data.source.id)
-                        /*TODO change x0 to x of the parent/child magic box, same for y*/
-                        .attr("transform", d => `translate(${d.x0}, ${proof.height - parseInt(d.y0)})`)
-
-                        /*.each(function (d) {
-                          switch (that.currentMagicAction) {
-                            case "pullUp":
-                              console.log("pullUp", this);
-                              d3.select(this)
-                                  .call(element => {
-                                    const stops = [d];
-                                    let nextParent = d.parent
-                                    while (nextParent) {
-                                      stops.push(nextParent);
-                                      nextParent = nextParent.parent;
-                                    }
-                                    console.log(stops);
-            
-                                    function cat(index) {
-                                      if (stops[index + 1] && !stops[index].data.id.startsWith("MN")) {
-                                        return cat(index + 1)
-                                            .transition()
-                                            .duration(drawTime)
-                                            .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${proof.height - parseInt(stops[index].y)})`)
-                                      } else {
-                                        return element
-                                            .transition()
-                                            .duration(drawTime)
-                                            .attr("transform", (d, i, n) => `translate(${stops[index].x}, ${proof.height - parseInt(stops[index].y)})`)
-                                      }
-                                    }
-            
-                                    cat(0)
-                                  })
-                              break;
-            
-                            default:
-                              break;
-                          }
-                        }) */
-                        .transition(t)
-                        .attr("transform", (d, i, n) => `translate(${d.x}, ${proof.height - parseInt(d.y)})`)
-                },
-                update => {
-                    update
+                        // init on the source of interaction 
+                        .attr("transform", getTransformToSource)
+                        // move to destination (expand, pull)
                         .transition(t)
                         .attr("transform", d => `translate(${d.x}, ${proof.height - parseInt(d.y)})`)
                 },
+                update => {
+                    update.transition(t)
+                        .attr("transform", d => `translate(${d.x}, ${proof.height - parseInt(d.y)})`)
+                },
                 exit => {
-                    exit
-                        .transition(t).ease(d3.easeLinear).style("opacity", 0)
+                    // move nodes to source of interaction (collapse, push)
+                    exit.transition(t)
+                        .attr("transform", getTransformToSource)
+                        .style("opacity", 0)
                         .remove()
                 }
             );
+
         // Draw links
         if (!proof.isLinear) {
+            const sn = getTransformSourceNode();
             this.links.selectAll("line")
                 .data(this.root.links(), d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
                 .join(
                     enter => {
-                        // const that = this;
-                        const container = enter.append("line")
+                        enter.append("line")
                             .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
-                            //.attr("marker-mid", "url(#arrowhead)")
                             .attr("class", d =>
                                 (d.source.data.source.type === "rest" ? "link torest" : "link") +
                                 (d.source.data.target.type === "axiom" && !proof.isMagic ? " from-axiom " : "")
@@ -270,143 +253,37 @@ export class TreeNavigation {
                                     this.showSubTree(d.target);
                                 }
                             })
-                            .attr("x1", d => d.target.x0)
-                            .attr("y1", d => proof.height - d.target.y0 + nodeVisualsDefaults.BOX_HEIGHT + 1)
-                            .attr("x2", d => d.source.x0)
-                            .attr("y2", d => proof.height - d.source.y0)
-                            /*.each(function (d) {
-                              switch (that.currentMagicAction) {
-                                case "pullUp":
-                                  console.log("pullUp", this, d);
-                                  d3.select(this)
-                                      .call(element => {
-                                        const stops = [d.target];
-                                        let nextParent = d.target.parent
-                                        while (nextParent) {
-                                          stops.push(nextParent);
-                                          nextParent = nextParent.parent;
-                                        }
-                                        console.log(stops);
-              
-                                        function cat(index) {
-                                          if (index === 0 && stops[index + 1]) {
-                                            return cat(index + 1)
-                                                .transition()
-                                                .duration(10)
-                                                .attr("opacity", 1)
-                                                .transition()
-                                                .duration(drawTime)
-                                                .attr("x1", () => stops[index].x)
-                                                .attr("y1", () => proof.height - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
-                                                .attr("x2", d => d.source.x)
-                                                .attr("y2", d => proof.height - d.source.y)
-                                          } else if (stops[index + 1] && !stops[index].data.id.startsWith("MN")) {
-                                            return cat(index + 1)
-                                                .transition()
-                                                .duration(drawTime)
-                                                .attr("x1", d => stops[index].x)
-                                                .attr("y1", d => proof.height - stops[index].y + nodeVisualsDefaults.BOX_HEIGHT)
-                                                .attr("x2", d => d.source.x)
-                                                .attr("y2", d => proof.height - d.source.y)
-                                          } else {
-                                            return element
-                                                .transition()
-                                                .duration(10)
-                                                .attr("opacity", 0)
-                                                .transition()
-                                                .duration(drawTime)
-                                                .attr("x1", d => d.source.x)
-                                                .attr("y1", d => proof.height - d.source.y)
-                                                .attr("x2", d => d.source.x)
-                                                .attr("y2", d => proof.height - d.source.y)
-                                          }
-                                        }
-              
-                                        cat(0)
-                                      })
-                                  break;
-              
-                                default:
-                                  break;
-                              }
-                            })
-                            */
+                            // init on the source node 
+                            .attr("x1", _ => sn.x)
+                            .attr("y1", _ => proof.height - sn.y)
+                            .attr("x2", _ => sn.x)
+                            .attr("y2", _ => proof.height - sn.y)
+                            // move to destinations (expand, pull)
                             .transition(t)
                             .attr("x1", d => d.target.x)
                             .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
                             .attr("x2", d => d.source.x)
                             .attr("y2", d => proof.height - d.source.y);
-
-                        /*
-                        container.append("g")
-                            .attr("class", "edge-button")
-                            .attr('id', d => 'detachButtonN' + d.target.data.source.id)
-                            .attr("cursor", "pointer")
-                            .attr("transform", d => {
-                                const { source: s, target: t } = d;
-                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.height - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
-                            })
-                            .transition(t)
-                            .attr("transform", d => {
-                                const { source: s, target: t } = d;
-                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.height - t.y - 1.5 * (s.y - t.y) / 2})`;
-                            })
-            
-                        container
-                            .append("circle")
-                            .attr("cx", 0)
-                            .attr("cy", -8)
-                            .attr("r", 14)
-                            .attr("fill", "#ccc")
-                            .attr("transform", d => {
-                                const { source: s, target: t } = d;
-                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.height - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
-                            })
-                            .transition(t)
-                            .attr("transform", d => {
-                                const { source: s, target: t } = d;
-                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.height - t.y - 1.5 * (s.y - t.y) / 2})`;
-                            })
-            
-                        container
-                            .append("text")
-                            .attr('class', 'edgelabel material-icons')
-                            .style('font-size', '16px')
-                            .style('fill', 'white')
-                            .text('\ue14e')
-                            .attr("text-anchor", "middle")
-                            .on("click", d => {
-                                this.showSubTree(d.target);
-                            })
-                            .attr("transform", d => {
-                                const { source: s, target: t } = d;
-                                return `translate(${t.x0 + (s.x0 - t.x0) / 2}, ${proof.height - t.y0 - 1.5 * (s.y0 - t.y0) / 2})`;
-                            })
-                            .transition(t)
-                            .attr("transform", d => {
-                                const { source: s, target: t } = d;
-                                return `translate(${t.x + (s.x - t.x) / 2}, ${proof.height - t.y - 1.5 * (s.y - t.y) / 2})`;
-                            })
-                        */
                     },
                     update => {
-                        update
-                            .transition(t)
+                        update.transition(t)
                             .attr("x1", d => d.target.x)
                             .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
                             .attr("x2", d => d.source.x)
                             .attr("y2", d => proof.height - d.source.y)
                     },
                     exit => {
+                        // return nodes to the source of the interaction (collapse, push)
+                        exit.transition(t)
+                            .attr("x1", _ => sn.x)
+                            .attr("y1", _ => proof.height - sn.y)
+                            .attr("x2", _ => sn.x)
+                            .attr("y2", _ => proof.height - sn.y)
+                            .style("opacity", 0)
                         exit.remove()
                     }
                 );
-        } else {
-            proof.linear.drawCurvedLinks(t);
-        }
-
-        if (!proof.isLinear) {
-            this.edgeData.forEach(function (link) {
+            this.edgeData.forEach(link => {
                 if (link.source.element === "Asserted Conclusion") {
                     d3.select("#N" + link.target.id).attr("class", "node axiom asserted");
                 }
@@ -415,6 +292,8 @@ export class TreeNavigation {
                     d3.select("#N" + link.source.id).attr("class", "node rule krule");
                 }
             });
+        } else {
+            proof.linear.drawCurvedLinks(t);
         }
 
         proof.nodeVisuals.renderNodes(proof.svg, this.nodes);
@@ -445,7 +324,7 @@ export class TreeNavigation {
         someHierarchy.descendants().forEach(x => {
             commonElement = this.hierarchy.descendants().find(y => y.data.id === x.data.id);
             if (commonElement) {
-                common.push(commonElement)
+                common.push(commonElement);
             }
         });
 

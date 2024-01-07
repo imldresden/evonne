@@ -115,10 +115,11 @@ export class BasicShorteningFunctions {
     createTextWithPlaceHolders(text) {
         let tmp = text.match(data.regInnerPar);
         if (!tmp) {
-            if (text.split(data.sepReg).length > 2)
+            if (text.split(data.sepReg).length > 2) {
                 tmp = text.split(data.sepReg);
-            else
+            } else {
                 return this.getShort(text);
+            }  
         }
 
         let placeHolder, shortString;

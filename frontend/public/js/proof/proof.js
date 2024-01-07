@@ -39,6 +39,7 @@ const conf = {
   ruleExplanationPosition: "leftBottom",
 
   isDrawing: false,
+  nodeInteracted: undefined,
 
   tree: new TreeNavigation(),
   linear: new LinearNavigation(),

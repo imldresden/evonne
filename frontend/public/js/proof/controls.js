@@ -1,10 +1,6 @@
 import { globals } from "../shared-data.js";
 import { proof } from "./proof.js";
 
-function fixDecimals(num) {
-    return Math.trunc(num);
-}
-
 const openOntology = document.getElementById('openOntologyInNew');
 const proofWidthRange = document.getElementById("proofWidthRange");
 const proofHeightRange = document.getElementById("proofHeightRange");
@@ -168,7 +164,11 @@ const controls = [
         fn: documentFunction,
         type: 'center-root'
     },
-]
+];
+
+function fixDecimals(num) {
+    return Math.trunc(num);
+}
 
 function allowOverlapBtnFunction() {
     proof.allowOverlap = allowOverlapBtn.checked;

@@ -360,8 +360,7 @@ export class NodeVisualsHelper {
         if (direction === "right") {
             //.5em = 8px which is the val in the css class
             element.transition().attr("transform", "translate(8,0)")
-        }
-        else if (direction === "left") {
+        } else if (direction === "left") {
             element.transition().attr("transform", "translate(0,0)")
         }
     }
