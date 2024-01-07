@@ -520,10 +520,7 @@ export class NodeVisualsHelper {
             label = node.data.source.nLElement;
         }
 
-        console.log(label)
-        console.log(label.length)
         node.width = label.length * globals.fontCharacterWidth + nodeVisualsDefaults.TEXT_PAD * 2;
-
         return node.width;
     }
 
