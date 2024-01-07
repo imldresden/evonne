@@ -1,13 +1,11 @@
 export const ShorteningCommonData = {
     subsumes : "⊑",
-    subsumesDisplay : " ⊑ ",
     exists : "∃",
     and : "⊓",
     or : "⊔",
     forall : "∀",
     not:"¬",
     equivalence : "≡",
-    equivalenceDisplay : " ≡ ",
     dot : ".",
     disjoint : "disjoint",
     domain : "domain",
@@ -21,15 +19,15 @@ export const ShorteningCommonData = {
 }
 
 export function fillMaps(ccString, originalString, obj) {
-    if (obj._FullToCC.has(originalString))
+    if (obj._FullToCC.has(originalString)) {
         return;
-
+    }
+    
     if (!obj._CCToFull.has(ccString)) {
         obj._CCToFull.set(ccString, originalString);
         obj._FullToCC.set(originalString, ccString);
         obj._CCToCount.set(ccString, 1);
-    }
-    else if (obj._CCToFull.get(ccString) !== originalString) {
+    } else if (obj._CCToFull.get(ccString) !== originalString) {
         obj._CCToFull.set(ccString + obj._CCToCount.get(ccString), originalString);
         obj._FullToCC.set(originalString, ccString + obj._CCToCount.get(ccString));
         obj._CCToCount.set(ccString, obj._CCToCount.get(ccString) + 1);

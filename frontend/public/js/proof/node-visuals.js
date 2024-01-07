@@ -16,7 +16,7 @@ export const nodeVisualsDefaults = {
     BTN_EXTEND_HEIGHT: 20,
     BTN_CIRCLE_SIZE: 15,
     BTN_TRIANGLE_SIZE: 20,
-    TEXT_PAD: 10,
+    TEXT_PAD: 8,
     AXIOM_TEXT_BOTTOM_SHIFT: 30,
     EXPANSION_COLLAPSING_DURATION: 200,
 }
@@ -315,7 +315,7 @@ export class NodeVisualsHelper {
     expandCollapseNode(nodeID) {
         let node = d3.select("#" + nodeID);
         let expanded = node.select(".tray").classed("expanded");
-        
+
         if (expanded) {
             this.collapseNode(node);
         } else {
@@ -520,7 +520,9 @@ export class NodeVisualsHelper {
             label = node.data.source.nLElement;
         }
 
-        node.width = label.length * globals.fontCharacterWidth + 16;
+        console.log(label)
+        console.log(label.length)
+        node.width = label.length * globals.fontCharacterWidth + nodeVisualsDefaults.TEXT_PAD * 2;
 
         return node.width;
     }

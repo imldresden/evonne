@@ -1,10 +1,11 @@
 import { ShorteningCommonData as data, fillMaps} from "./common.js";
 
 function getQuantifier(text) {
-    if (text.includes(data.exists))
+    if (text.includes(data.exists)) {
         return data.exists;
-    else if (text.includes(data.forall))
+    } else if (text.includes(data.forall)) {
         return data.forall;
+    }
     return undefined;
 }
 
@@ -17,29 +18,27 @@ export class camelCaseShorteningFunctions {
     }
 
     shortenLabel(text, includeRuleNames) {
-        if (!text)
+        if (!text) {
             return;
-        if (text.includes(data.subsumes))
-            return this.cCConcept(text.split(data.subsumes)[0]) + data.subsumesDisplay +
+        }
+            
+        if (text.includes(data.subsumes)) {
+            return this.cCConcept(text.split(data.subsumes)[0]) + data.subsumes +
                 this.cCConcept(text.split(data.subsumes)[1]);
-
-        else if (text.includes(data.equivalence))
-            return this.cCConcept(text.split(data.equivalence)[0]) + data.equivalenceDisplay +
+        } else if (text.includes(data.equivalence)) {
+            return this.cCConcept(text.split(data.equivalence)[0]) + data.equivalence +
                 this.cCConcept(text.split(data.equivalence)[1]);
-
-        else if (text.includes(data.disjoint))
+        } else if (text.includes(data.disjoint)) {
             return text.replace(data.regInnerPar, this.cCConcepts(text.match(data.regInnerPar)))
-
-        else if (text.includes(data.domain))
+        } else if (text.includes(data.domain)) {
             return data.domain + this.cCPair(text.match(data.regEquals));
-
-        else if (text.includes(data.range))
+        } else if (text.includes(data.range)) {
             return data.range + this.cCPair(text.match(data.regEquals));
-
-        else if (includeRuleNames){
+        } else if (includeRuleNames) {
             let res = text.match(data.regCap);
-            if (!res)
-                return text;
+            if (!res) {
+                return text; 
+            }
 
             res = res.join("");
             fillMaps(res, text, this);
@@ -57,10 +56,9 @@ export class camelCaseShorteningFunctions {
         concepts.forEach(concept => {
             current = this.camelCaseChain(concept.trim().replace(data.regPar, ""));
 
-            if (concept.match(data.regOpenParConExp)===null)
+            if (concept.match(data.regOpenParConExp)===null) {
                 current = concept.replace(concept.trim().replace(data.regPar, ""), current);
-
-            else {
+            } else {
                 let tmpConcepts = concept.split(concept.match(data.regOpenParConExp));
                 current = concept;
                 tmpConcepts.forEach(x=>{
@@ -98,22 +96,25 @@ export class camelCaseShorteningFunctions {
 
             let restRoleName = roleName.match(data.regCap);
             ccForm = roleName[0];
-            if (restRoleName)
+            if (restRoleName) {
                 ccForm = ccForm + restRoleName.join("");
-            if (roleName)
+            }   
+            if (roleName) {
                 fillMaps(ccForm, roleName, this);
+            }
             return quantifier + this._FullToCC.get(roleName) + data.dot;
-        }
-        //Camel Case of concept name
-        else {
+        } else {
             conceptName = text
             ccForm = text;
-            if (ccForm.match(data.regCap))
+            if (ccForm.match(data.regCap)) {
                 ccForm = ccForm.match(data.regCap).join("");
-            if (ccForm[0] !== text[0])
+            }
+            if (ccForm[0] !== text[0]) {
                 ccForm = text[0] + ccForm;
-            if (conceptName.includes(data.not))
+            }
+            if (conceptName.includes(data.not)) {
                 ccForm = data.not + ccForm;
+            }
             fillMaps(ccForm, conceptName, this);
             return this._FullToCC.get(conceptName);
         }
