@@ -129,9 +129,9 @@ export class MagicNavigation {
 	}
 
 	//create the new hierarchy and update
-	updateAll(data, subRoot, action) {
+	updateAll(data, action) {
 		let newHierarchy = proof.tree.createHierarchy(this.orderStructure(data));
-		proof.tree.updateHierarchyVars(newHierarchy, subRoot, action);
+		proof.tree.updateHierarchyVars(newHierarchy);
 		proof.tree.hierarchy = newHierarchy;
 		this.currentMagicAction = action;
 		proof.tree.update();
@@ -373,7 +373,7 @@ export class MagicNavigation {
 			proof.nodeInteracted = { id: treeRoot.data.target.id, search: true }
 		}
 		
-		this.updateAll(newData, treeRoot, "pullUp");
+		this.updateAll(newData, "pullUp");
 	}
 
 	pushUp(treeRoot) {
@@ -426,7 +426,7 @@ export class MagicNavigation {
 		}
 
 		proof.nodeInteracted = { id: newMagicBox.id, search: true };
-		this.updateAll(newData, treeRoot, "pushUp");
+		this.updateAll(newData, "pushUp");
 	}
 
 	pullDown(treeRoot) {
@@ -528,7 +528,7 @@ export class MagicNavigation {
 			proof.nodeInteracted = { id: treeRoot.children[0].data.source.id, search: true };
 		}
 
-		this.updateAll(newData, treeRoot, "pullDown");
+		this.updateAll(newData, "pullDown");
 	}
 
 	pushDown(treeRoot) {
@@ -593,7 +593,7 @@ export class MagicNavigation {
 
 		proof.nodeInteracted = { id: newMagicBox.id, search: true };
 		
-		this.updateAll(newData, treeRoot, "pushDown");
+		this.updateAll(newData, "pushDown");
 	}
 
 	//Add the data of all edges that will not be affected by the unraveling / creating of the current magic rule

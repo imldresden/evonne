@@ -293,16 +293,10 @@ export class TreeNavigation {
                 }
             });
         } else {
-            proof.linear.drawCurvedLinks(t);
+            proof.linear.drawCurvedLinks(t, getTransformSourceNode());
         }
 
         proof.nodeVisuals.renderNodes(proof.svg, this.nodes);
-
-        // Stash the old positions for transition.
-        this.hierarchy.eachBefore(d => {
-            d.x0 = d.x;
-            d.y0 = d.y;
-        });
     }
 
     updateHierarchy(newHierarchy) {
@@ -317,10 +311,10 @@ export class TreeNavigation {
         this.updateHierarchy(originalHierarchy);
     }
 
-    updateHierarchyVars(someHierarchy, subRoot, action) {
+    updateHierarchyVars(someHierarchy) {
         let common = [];
         let commonElement;
-        let magic = proof.magic.getMagic(subRoot, action);
+
         someHierarchy.descendants().forEach(x => {
             commonElement = this.hierarchy.descendants().find(y => y.data.id === x.data.id);
             if (commonElement) {
@@ -330,28 +324,17 @@ export class TreeNavigation {
 
         if (proof.isMagic && someHierarchy !== this.hierarchy) {
             someHierarchy.descendants().forEach((d, i) => {
-                d.x0 = magic ? parseInt(magic.x) : proof.width / 2;
-                d.y0 = magic ? parseInt(magic.y) : 0;
                 let originalSource = common.find(x => x.data.target.id === d.data.source.id);
                 let originalTarget = common.find(x => x.data.source.id === d.data.source.id);
                 if (originalSource) {
-                    const { x, y, id } = originalSource.parent;
-                    d.x0 = x;
-                    d.y0 = y;
-                    d.id = id;
+                    d.id = originalSource.parent.id;
                 } else if (originalTarget) {
-                    const { x, y, id } = originalTarget;
-                    d.x0 = x;
-                    d.y0 = y;
-                    d.id = id;
+                    d.id = originalTarget.id;
                 }
-                // d.id = i;
                 d._children = d.children;
             });
         } else {
             someHierarchy.descendants().forEach((d, i) => {
-                d.x0 = proof.width / 2;
-                d.y0 = 0;
                 d.id = i;
                 d._children = d.children;
             });

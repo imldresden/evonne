@@ -64,22 +64,27 @@ export class LinearNavigation {
         });
     }
 
-    drawCurvedLinks(t) {
-        proof.tree.links.selectAll("path").remove()
-
+    drawCurvedLinks(t, sourceNode) {
         proof.tree.links.selectAll("path")
             .data(proof.tree.root.links(), d => "L" + d.source.data.source.id + "*" + d.target.data.source.id)
             .join(
-                enter => enter.append("path")
+                enter => enter
+                    .append("path")
                     .attr("marker-end", "url(#arrowhead)")
                     .attr("class", d => d.source.data.source.type === "rest" ? "link torest" : "link")
                     .attr("id", d => "L" + d.source.data.source.id + "*" + d.target.data.source.id)
-                    .attr('d', d => this.position(d, true))
-                    .call(enter =>
-                        enter.transition(t)
-                            .attr('d', d => this.position(d))
-                    ),
-                exit => exit.remove(),
+                    .attr('d', d => this.position(d, sourceNode))
+                    .transition(t)
+                    .attr('d', d => this.position(d)),
+                update => update
+                    .transition(t)
+                    .attr('d', d => this.position(d)),
+                exit => {
+                    exit.transition(t)
+                        .attr('d', d => this.position(d, sourceNode))
+                        .style("opacity", 0)
+                    exit.remove()
+                },
             );
     }
 
@@ -88,10 +93,10 @@ export class LinearNavigation {
         //Note: "-0.01" was added to make the drawing works properly for the arrow of the highest node
         let x2, y2, x1, y1, targetX, targetY, sourceX, sourceY;
         if (zero) {
-            targetX = d.target.x0;
-            targetY = d.target.y0;
-            sourceX = d.source.x0;
-            sourceY = d.source.y0 - 0.01;
+            targetX = zero.x;
+            targetY = zero.y;
+            sourceX = zero.x;
+            sourceY = zero.y - 0.01;
         } else {
             targetX = d.target.x;
             targetY = d.target.y;
