@@ -29,7 +29,7 @@ export class CDRules {
         //Add a title for the explanation view
         utils.addTitle("Numerical Logic");
 
-        //Add visualization
+        //Add visualization        
         this.tooltip.append("div")
             .style("width", "700px")
             .style("height", "300px")
@@ -77,8 +77,10 @@ export class CDRules {
             pcp_data[i] = [];
 
             const conclusion = getPolyline(data, op.conclusion, colors[1]); 
+            console.log(conclusion)
             op.premises.forEach(premise => {
                 const pr = getPolyline(data, premise.eq, colors[0]);
+                console.log(pr)
                 pcp_data[i].push(pr);
             });
             

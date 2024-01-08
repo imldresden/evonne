@@ -14,7 +14,6 @@ export class MagicNavigation {
 	}
 
 	currentMagicAction = undefined;
-	offsets = 0;
 
 	getInitialMagicalHierarchy(data) {
 		let result = [];
@@ -77,7 +76,7 @@ export class MagicNavigation {
 			.append("g")
 			.attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${-(d.width / 2)}, -${this.offsets})`)
+			.attr("transform", d => `translate(${-(d.width / 2)}, 0)`)
 			.on("click", (_, d) => this.pullDown(d))
 			.on("hover", (_, d) => this.pullDownHover(d));
 
@@ -367,11 +366,8 @@ export class MagicNavigation {
 			}
 		});
 
-		if (newMagicBox) {
-			proof.nodeInteracted = { id: newMagicBox.id, search: true }
-		} else {
-			proof.nodeInteracted = { id: treeRoot.data.target.id, search: true }
-		}
+		// if (newMagicBox) { proof.nodeInteracted = { id: newMagicBox.id, search: true } }
+		proof.nodeInteracted = { id: treeRoot.data.target.id, search: true }
 		
 		this.updateAll(newData, "pullUp");
 	}
@@ -522,12 +518,9 @@ export class MagicNavigation {
 			})
 		});
 
-		if (newMagicBox) {
-			proof.nodeInteracted = { id: newMagicBox.id, search: true };
-		} else {
-			proof.nodeInteracted = { id: treeRoot.children[0].data.source.id, search: true };
-		}
-
+		// if (newMagicBox) { proof.nodeInteracted = { id: newMagicBox.id, search: true }; }
+		proof.nodeInteracted = { id: treeRoot.children[0].data.source.id, search: true };
+		
 		this.updateAll(newData, "pullDown");
 	}
 

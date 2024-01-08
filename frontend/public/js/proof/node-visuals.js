@@ -297,10 +297,12 @@ export class NodeVisualsHelper {
                         this.shiftLabelHideButtons(node);
                         if (!proof.isDrawing) {
                             const tray = d3.select(`#${node.id} .tray`);
-                            if (tray && tray.classed("expanded")) {
-                                this.expandCollapseNode(node.id);
-                                this.updateEdge(d);
-                            }
+                            try { 
+                                if (tray && tray.classed("expanded")) {
+                                    this.expandCollapseNode(node.id);
+                                    this.updateEdge(d);
+                                }
+                            } catch (_) {} // tray becomes undefined despite the check due to timeout
                         }
                     }, 1500);
                 }

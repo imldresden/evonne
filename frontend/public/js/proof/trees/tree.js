@@ -184,28 +184,28 @@ export class TreeNavigation {
             });
 
         const root = this.root;
-        function getTransformSourceNode() {
+        
+        function getInteractionSource() {
+            let returnable = { id: root.data.source.id, x: root.x, y: root.y };
             if (proof.nodeInteracted) {
                 if (proof.nodeInteracted.search) { // magic nodes
                     const selection = d3.select("#N"+proof.nodeInteracted.id)
-                    selection.raise();
                     const node = selection.data()[0];
-                    if (!node) { // could not find the node based on id
-                        d3.select("#N"+root.data.source.id).raise();
-                        return root;
+                    if (node) {
+                        returnable = { id: proof.nodeInteracted.id, x: node.x, y: node.y }
                     }
-                    return node;
-                } 
-                d3.select("#N"+proof.nodeInteracted.data.source.id).raise();
-                return proof.nodeInteracted;                   
+                } else {
+                    returnable = { id: proof.nodeInteracted.data.source.id, x: proof.nodeInteracted.x, y: proof.nodeInteracted.y };
+                }
             } 
-            d3.select("#N"+root.data.source.id).raise();
-            return root;
+            d3.select("#N"+returnable.id).raise();
+            return returnable;
         }
 
-        function getTransformToSource() {
-            return `translate(${getTransformSourceNode().x}, ${proof.height - parseInt(getTransformSourceNode().y)})`
+        function transform(sn) {
+            return `translate(${sn.x}, ${proof.height - parseInt(sn.y)})`;
         }
+
         // Add the data
         this.nodes.selectAll("g")
             .data(this.root.descendants(), d => "N" + d.data.source.id)
@@ -215,27 +215,28 @@ export class TreeNavigation {
                         .attr("class", d => proof.nodeVisuals.getNodeClass(d))
                         .attr("id", d => "N" + d.data.source.id)
                         // init on the source of interaction 
-                        .attr("transform", getTransformToSource)
+                        .attr("transform", transform(getInteractionSource()))
                         // move to destination (expand, pull)
                         .transition(t)
-                        .attr("transform", d => `translate(${d.x}, ${proof.height - parseInt(d.y)})`)
+                        .attr("transform", d => transform(d))
                 },
                 update => {
                     update.transition(t)
-                        .attr("transform", d => `translate(${d.x}, ${proof.height - parseInt(d.y)})`)
+                        .attr("transform", d => transform(d))
                 },
                 exit => {
                     // move nodes to source of interaction (collapse, push)
+                    const transf = transform(getInteractionSource())
                     exit.transition(t)
-                        .attr("transform", getTransformToSource)
+                        .attr("transform", transf)
                         .style("opacity", 0)
                         .remove()
                 }
             );
 
+        const sn = getInteractionSource();
         // Draw links
         if (!proof.isLinear) {
-            const sn = getTransformSourceNode();
             this.links.selectAll("line")
                 .data(this.root.links(), d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
                 .join(
@@ -293,7 +294,7 @@ export class TreeNavigation {
                 }
             });
         } else {
-            proof.linear.drawCurvedLinks(t, getTransformSourceNode());
+            proof.linear.drawCurvedLinks(t, sn);
         }
 
         proof.nodeVisuals.renderNodes(proof.svg, this.nodes);
