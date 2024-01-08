@@ -16,3 +16,7 @@ async function loadExample(name, id) {
     document.getElementById("generating-example").innerHTML = "Something went wrong. Please reload this page and try again. If the problem persists, feel free to contact the authors";
   }
 }
+
+function fixDecimals(num) {
+  return Math.trunc(num);
+}

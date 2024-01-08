@@ -166,10 +166,6 @@ const controls = [
     },
 ];
 
-function fixDecimals(num) {
-    return Math.trunc(num);
-}
-
 function allowOverlapBtnFunction() {
     proof.allowOverlap = allowOverlapBtn.checked;
     overlapAllowingSettings.style.display = proof.allowOverlap ? "block" : "none";
