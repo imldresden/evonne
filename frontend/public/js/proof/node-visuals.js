@@ -207,7 +207,6 @@ export class NodeVisualsHelper {
                 .attr("x", d => -(d.width) / 2 + TEXT_PAD)
                 .attr("y", BOX_HEIGHT - BOX_PADDING_BOTTOM)
                 .text((d, i, nodes) => {
-                    d.data.source.element = this.fixTypo(d.data.source.element);
                     let displayFormat = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
                     if (!displayFormat || displayFormat === "original") {
                         return d.data.source.element;
@@ -499,14 +498,6 @@ export class NodeVisualsHelper {
         line.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .attr("y2", newY);
-    }
-
-    //To get around the typo in the solver
-    fixTypo(element) {
-        if (element === "Property Domain Transaltion") {
-            console.log("still a thing - ")
-        }
-        return element !== "Property Domain Transaltion" ? element : "Property Domain Translation";
     }
 
     getNodeWidth(node) {

@@ -1,14 +1,23 @@
 import { utils } from "./rules.js";
 import { parallelCoords } from "../../parallel-coords/parallel-coords-svg.js";
 
+const operators = {
+    greaterThan: ">",
+    lessThan: "<",
+    equal: "=",
+    plus: "=",
+}
+
 export class CDRules {
 
+    showObvious = false;    
+
     rules = {
-        "[Propagate =]": (data) => { this.diff(data, "propagating..") },
+        "[Propagate =]": (data) => { this.diff(data, "R=") },
         "[Constant too small]": (data) => { this.diff(data, "smalling..") },
-        "[Sum of differences]": (data) => { this.diff(data, "summing..") },
+        "[Sum of differences]": (data) => { this.diff(data, "R+") },
         "[Introduce >]": (data) => { this.diff(data, "introducing..") },
-        "[Constant difference]": (data) => { this.diff(data, "diffing..") },
+        "[Constant difference]": (data) => { this.diff(data, "R-") },
     }
 
     draw({ ruleName, tooltip, data }) {
@@ -156,45 +165,55 @@ export class CDRules {
         let pcp;
         let current = 0;
 
+        const showObvious = this.showObvious;
+
         function displayRowOperation(op) {
             exp.selectAll("*").remove();
 
             let length = 0;
             function printEquation(eq, where) {
                 // use header instead of (Object.keys(eq) to ensure same order)
-                header.forEach((h, i) => {
-                    if (h === "_rhs") {
-                        const term = eq._rhs.replace(/\s+/g, '');
-                        where.append("span").attr("class", "text-black").text(" = " + term)
-                        length += (3 + term.length);
-                    } else if (i === 0) {
-                        const term = eq[h].replace(/\s+/g, '')
-                        where
-                            .insert("span", ":first-child").attr("class", "text-black").text(term)
-                            .append("span").attr("class", "text-green").text(h);
-                        length += (term.length + h.length);
+                let first = true; 
+                header.forEach(variable => {
+                    const number = eq[variable].replace(/\s+/g, '');
+
+                    if (variable === "_rhs") {
+                        where.append("span").attr("class", "text-black").text(" = " + number)
+                        length += (3 + number.length);
                     } else {
-                        const term = eq[h].replace(/\s+/g, '')
-                        where
-                            .append("span").attr("class", "text-black").text(" + " + term)
-                            .append("span").attr("class", "text-green").text(h);
-                        length += (term.length + h.length);
+                        if (!showObvious && eval(number) === 0) {
+                            return; // don't print term and don't set first to false
+                        }
+                        const plus = first ? "" : " + ";
+
+                        if (!showObvious && eval(number) === 1) {
+                            where.append("span").attr("class", "text-black").text(plus);
+                            length += plus.length;
+                        } else {
+                            where.append("span").attr("class", "text-black").text(plus + number);
+                            length += (plus.length + number.length);
+                        }
+                        
+                        where.append("span").attr("class", "text-green").text(variable);
+                        length += (variable.length);
+                        first = false;
                     }
                 });
             }
 
             Object.values(op.premises).forEach((pr, i) => {
+                const coe = pr.coe.replace(/\s+/g, '');
                 if (i !== 0) {
                     exp.append("span").attr("class", "text-red").text(" + ");
                     length += 3
                 }
-                exp.append("span").attr("class", "text-red").text(pr.coe + " * (");
+                exp.append("span").attr("class", "text-red").text(coe+ " * (");
                 printEquation(pr.eq, exp.append("span").attr("id", "eq-" + pr.eq.id))
                 exp.append("span").attr("class", "text-red").text(")");
-                length += (5 + pr.coe.toString().length);
+                length += (5 + coe.length);
             });
 
-            exp.append("hr").attr("class", "mid").attr("width", (length * 13))
+            exp.append("hr").attr("class", "mid").attr("width", (length * 9.6))
             printEquation(op.conclusion.eq, exp.append("span").attr("id", "eq-" + op.conclusion.eq.id))
         }
 
@@ -230,7 +249,7 @@ export class CDRules {
 
     diff(data, name) {
         //Add a title for the explanation view
-        utils.addTitle("Numerical Logic: " + name);
+        utils.addTitle("Difference Logic: " + name);
 
         const exp = this.tooltip
             .append("div").attr("class", "tooltiptext")
@@ -247,39 +266,45 @@ export class CDRules {
         const ops = Object.values(data.ops);
 
         let current = 0;
+        const showObvious = this.showObvious;
 
         function displayRowOperation(op) {
             exp.selectAll("*").remove();
 
             let length = 0;
+            
             function printInequation(ineq, where) {
-                console.log(ineq)
-                Object.keys(ineq.lhs).forEach((h, i) => {
-                    const term = ineq.lhs[h];
-                    if (h === "constant") {
-                        where.append("span").attr("class", "text-black").text((i === 0 ? "" : " + ") + term)
-                        length += (term.length);
-                    } else {
-                        where
-                            .append("span").attr("class", "text-black").text((i === 0 ? "" : " + ") + term)
-                            .append("span").attr("class", "text-green").text(h);
-                        length += (term.length + h.length);
-                    }
-                });
                 
-                where.append("span").attr("class", "text-black").text(" " + ineq.type + " ")
-                Object.keys(ineq.rhs).forEach((h, i) => {
-                    let term = ineq.rhs[h];
-                    if (h === "constant") {
-                        where.append("span").attr("class", "text-black").text((i === 0 ? "" : " + ") + term)
-                        length += (term.length);
-                    } else {
-                        where
-                            .append("span").attr("class", "text-black").text((i === 0 ? "" : " + ") + term)
-                            .append("span").attr("class", "text-green").text(h);
-                        length += (term.length + h.length);
-                    }
-                });
+                function printTerms(terms) {
+                    let first = true;
+                    Object.keys(terms).forEach(variable => {
+                        const number = terms[variable];
+                        if (!showObvious && eval(number) === 0) {
+                            return; // don't print term and don't set first to false
+                        }
+
+                        const plus = first ? "" : " + ";
+                        if (variable === "constant") {
+                            where.append("span").attr("class", "text-black").text(plus + number)
+                            length += (plus.length + number.length);
+                        } else {
+                            if (!showObvious && eval(number) === 1) {
+                                where.append("span").attr("class", "text-black").text(plus)
+                                length += plus.length;
+                            } else {
+                                where.append("span").attr("class", "text-black").text(plus + number)
+                                length += (plus.length + number.length);
+                            }
+                            where.append("span").attr("class", "text-green").text(variable);
+                            length += variable.length;
+                        }
+                        first = false;
+                    })
+                }
+
+                printTerms(ineq.lhs);
+                where.append("span").attr("class", "text-black").text(" " + operators[ineq.type] + " ")
+                printTerms(ineq.rhs);
             }
 
             Object.values(op.premises).forEach((pr, i) => {
@@ -289,7 +314,7 @@ export class CDRules {
                 }
                 exp.append("span").attr("class", "text-red").text("[" + pr.coe + "] ");
                 printInequation(pr.eq, exp.append("span").attr("id", "eq-" + pr.eq.id))
-                length += (5 + pr.coe.toString().length);
+                length += (3 + pr.coe.length);
             });
 
             exp.append("hr").attr("class", "mid").attr("width", (length * 13))
