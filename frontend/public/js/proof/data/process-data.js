@@ -1,11 +1,6 @@
 import { proof } from "../proof.js";
 
 function getConstraint(id, data) {
-    // TODO: handle bottom differently
-    if (id === "-1") {
-        return { id, "bottom" : "bottom" }
-    }
-
     const node = data.getElementById(id);
     const q = node.querySelectorAll("equation, inequation"); 
 
@@ -14,6 +9,14 @@ function getConstraint(id, data) {
     }
 
     const c = node.querySelectorAll("equation, inequation")[0]
+    if (!c) {
+        if (node.querySelector("key").innerHTML === "⊥") {
+            return { id, "bottom" : "⊥" }
+        } else {
+            console.error("faulty constraintID")
+            return;
+        }
+    }
 
     function extractTerm(term) {
         const coe = term.getAttribute("coe");
