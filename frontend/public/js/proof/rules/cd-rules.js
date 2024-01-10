@@ -4,12 +4,28 @@ import { parallelCoords } from "../../parallel-coords/parallel-coords-svg.js";
 export class CDRules {
 
     rules = {
-        "[Propagate =]": (data) => { this.diff(data, "propagating..") },
-        "[Constant too small]": (data) => { this.diff(data, "smalling..") },
-        "[Sum of differences]": (data) => { this.diff(data, "summing..") },
-        "[Introduce >]": (data) => { this.diff(data, "introducing..") },
-        "[Constant difference]": (data) => { this.diff(data, "diffing..") },
+        "[Different constants]": (data) => { this.diff(data, "R/=") },
+        "[Different differences]": (data) => { this.diff(data, "R /= +") },
+        "[Constant too small]": (data) => { this.diff(data, "R<") },
+        "[Sum of differences]": (data) => { this.diff(data, "R+") },
+        "[Constant difference]": (data) => { this.diff(data, "R-") },
+        "[Propagate =]": (data) => { this.diff(data, "R=") },
+        "[Tautology]": (data) => { this.diff(data, "R0") },
+        "[Invert]": (data) => { this.diff(data, "R<->") },
+        "[Propagate >]": (data) => { this.diff(data, "R>") },
+        "[Introduce >]": (data) => { this.diff(data, "Introduce >") },
+        "[Weaken >]": (data) => { this.diff(data, "Introduce >") },
+        "[From ⊥]": (data) => { this.diff(data, "From ⊥") },
     }
+
+    types = {
+        "plus": "=",
+        "equal": "=",
+        "greaterThan": ">",
+        "lessThan": "<"
+    }
+
+    showObvious = false; 
 
     draw({ ruleName, tooltip, data }) {
         this.tooltip = tooltip;
@@ -26,23 +42,11 @@ export class CDRules {
     }
 
     text(data, type) {
-        const ops = Object.values(data.ops);
+        const ops = data.map(d => d.op);
         const text_data = {};
 
         ops.forEach((op, i) => {
-            text_data[i] = {
-                premises: {},
-                conclusion: {}
-            };
-
-            op.premises.forEach(premise => {
-                text_data[i].premises[premise.eq] = {
-                    coe: premise.coe,
-                    eq: data.constraints[premise.eq]
-                };
-            });
-
-            text_data[i].conclusion = { eq: data.constraints[op.conclusion] };
+            text_data[i] = op;
         });
 
         return text_data;
@@ -89,27 +93,37 @@ export class CDRules {
             .attr("class", "pcp-container")
             .attr("id", "pcp-container")
 
-        const header = [...data.variables, "_rhs"];
+        function getVariables(data) {
+            const set = new Set(data.map(d => [
+                ...(d.op.premises.map(p => Object.keys(p.constraint))).flat(1), 
+                ...Object.keys(d.op.conclusion.constraint)
+            ]).flat(1));
+
+            set.delete("_rhs");
+            return Array.from(set);
+        }
+
+        const variables = getVariables(data);
+        const header = [...variables, "_rhs"]; // ensures _rhs is at the end
+
         const pcp_data = {};
 
-        function getPolyline(data, id, color) {
-            const augmentedEq = data.constraints[id];
-            [...data.variables].forEach(v => {
-                if (!augmentedEq[v]) {
-                    augmentedEq[v] = "0";
+        function getPolyline(eq, id, color) {
+            variables.forEach(v => {
+                if (!eq[v]) {
+                    eq[v] = "0";
                 }
             });
 
             const polyline = { id, color, nuid: "" };
-            Object.keys(augmentedEq)
+            Object.keys(eq)
                 .sort((a, b) => a.localeCompare(b))
                 .forEach(k => {
                     polyline[k] = {
-                        value: eval(augmentedEq[k]),
+                        value: eval(eq[k]),
                         type: 'numbers'
                     }
-                    polyline.nuid +=
-                        augmentedEq[k]
+                    polyline.nuid += eq[k]
                             .replaceAll(" ", "")
                             .replaceAll("-", "min")
                             .replaceAll("/", "div") + k;
@@ -125,18 +139,22 @@ export class CDRules {
             style.getPropertyValue('--color-purple-dark'),
         ];
 
-        const ops = Object.values(data.ops);
-        const finalC = getPolyline(data, ops[ops.length - 1].conclusion, colors[2]);
+        const finalC = getPolyline(
+            data[data.length - 1].op.conclusion.constraint,
+            data[data.length - 1].op.conclusion.id, 
+            colors[2]
+        );
 
-        ops.forEach((op, i) => {
+        data.forEach((d, i) => {
+            const op = d.op;
             pcp_data[i] = [];
 
             op.premises.forEach(premise => {
-                const pr = getPolyline(data, premise.eq, colors[0]);
+                const pr = getPolyline(premise.constraint, premise.id, colors[0]);
                 pcp_data[i].push(pr);
             });
 
-            const conclusion = getPolyline(data, op.conclusion, colors[1]);
+            const conclusion = getPolyline(op.conclusion.constraint, op.conclusion.id, colors[1]);
 
             if (conclusion.nuid !== finalC.nuid) {
                 pcp_data[i].push(conclusion);
@@ -156,30 +174,39 @@ export class CDRules {
         let pcp;
         let current = 0;
 
+        const showObvious = this.showObvious;
         function displayRowOperation(op) {
             exp.selectAll("*").remove();
 
             let length = 0;
             function printEquation(eq, where) {
+                let first = true;
                 // use header instead of (Object.keys(eq) to ensure same order)
-                header.forEach((h, i) => {
-                    if (h === "_rhs") {
-                        const term = eq._rhs.replace(/\s+/g, '');
+                header.forEach(variable => {
+                    const term = eq[variable].replace(/\s+/g, '');
+
+                    if (variable === "_rhs") {
                         where.append("span").attr("class", "text-black").text(" = " + term)
                         length += (3 + term.length);
-                    } else if (i === 0) {
-                        const term = eq[h].replace(/\s+/g, '')
-                        where
-                            .insert("span", ":first-child").attr("class", "text-black").text(term)
-                            .append("span").attr("class", "text-green").text(h);
-                        length += (term.length + h.length);
-                    } else {
-                        const term = eq[h].replace(/\s+/g, '')
-                        where
-                            .append("span").attr("class", "text-black").text(" + " + term)
-                            .append("span").attr("class", "text-green").text(h);
-                        length += (term.length + h.length);
+                        return;
+                    }                    
+                    
+                    if (!showObvious && eval(term) === 0 ) {
+                        return; // don't print, don't set first to false
+                    } 
+                    
+                    const plus = first ? "" : " + ";
+                    where.append("span").attr("class", "text-black").text(plus)
+                    
+                    if (!showObvious && eval(term) !== 1) {
+                        where.append("span").attr("class", "text-black").text(term);
+                        length += term.length; 
                     }
+
+                    where.append("span").attr("class", "text-green").text(variable);
+                    length += (plus.length + variable.length);
+            
+                    first = false;
                 });
             }
 
@@ -188,14 +215,15 @@ export class CDRules {
                     exp.append("span").attr("class", "text-red").text(" + ");
                     length += 3
                 }
-                exp.append("span").attr("class", "text-red").text(pr.coe + " * (");
-                printEquation(pr.eq, exp.append("span").attr("id", "eq-" + pr.eq.id))
+                const oper = pr.coe.replace(/\s+/g, '');
+                exp.append("span").attr("class", "text-red").text(oper + " * (");
+                printEquation(pr.constraint, exp.append("span").attr("id", "eq-" + pr.id))
                 exp.append("span").attr("class", "text-red").text(")");
-                length += (5 + pr.coe.toString().length);
+                length += (5 + oper.length);
             });
 
             exp.append("hr").attr("class", "mid").attr("width", (length * 13))
-            printEquation(op.conclusion.eq, exp.append("span").attr("id", "eq-" + op.conclusion.eq.id))
+            printEquation(op.conclusion.constraint, exp.append("span").attr("id", "eq-" + op.conclusion.id))
         }
 
         const text_data = this.text(data);
@@ -244,60 +272,72 @@ export class CDRules {
             .attr("class", "pcp-container")
             .attr("id", "pcp-container")
 
-        const ops = Object.values(data.ops);
-
         let current = 0;
 
-        function displayRowOperation(op) {
+        const showObvious = this.showObvious;
+        const types = this.types;
+        function displayRule(op) {
             exp.selectAll("*").remove();
 
             let length = 0;
-            function printInequation(ineq, where) {
-                console.log(ineq)
-                Object.keys(ineq.lhs).forEach((h, i) => {
-                    const term = ineq.lhs[h];
-                    if (h === "constant") {
-                        where.append("span").attr("class", "text-black").text((i === 0 ? "" : " + ") + term)
-                        length += (term.length);
-                    } else {
-                        where
-                            .append("span").attr("class", "text-black").text((i === 0 ? "" : " + ") + term)
-                            .append("span").attr("class", "text-green").text(h);
-                        length += (term.length + h.length);
+            function printTerms(terms, where) {
+                let first = true;
+                Object.keys(terms).forEach(variable => {
+                    const term = terms[variable];
+                    if (!showObvious && eval(term) === 0 ) {
+                        return; // don't print, don't set first to false
+                    } 
+                    
+                    const plus = first ? "" : " + ";
+                    where.append("span").attr("class", "text-black").text(plus)
+                    length += plus.length
+                    
+                    if (!showObvious && eval(term) !== 1) {
+                        where.append("span").attr("class", "text-black").text(term);
+                        length += term.length; 
                     }
-                });
-                
-                where.append("span").attr("class", "text-black").text(" " + ineq.type + " ")
-                Object.keys(ineq.rhs).forEach((h, i) => {
-                    let term = ineq.rhs[h];
-                    if (h === "constant") {
-                        where.append("span").attr("class", "text-black").text((i === 0 ? "" : " + ") + term)
-                        length += (term.length);
-                    } else {
-                        where
-                            .append("span").attr("class", "text-black").text((i === 0 ? "" : " + ") + term)
-                            .append("span").attr("class", "text-green").text(h);
-                        length += (term.length + h.length);
+
+                    if (variable !== "constant") {
+                        where.append("span").attr("class", "text-green").text(variable);
                     }
+
+                    length += variable.length;
+                    first = false;
                 });
             }
 
-            Object.values(op.premises).forEach((pr, i) => {
+            exp.append("span").attr("class", "text-red").text("[" + name + "] ");
+
+            op.premises.forEach((pr, i) => {
                 if (i !== 0) {
-                    exp.append("span").attr("class", "text-red").text(" + ");
-                    length += 3
+                    exp.append("span").attr("class", "tab");
                 }
-                exp.append("span").attr("class", "text-red").text("[" + pr.coe + "] ");
-                printInequation(pr.eq, exp.append("span").attr("id", "eq-" + pr.eq.id))
-                length += (5 + pr.coe.toString().length);
+
+                if (pr.constraint.bottom) {
+                    exp.append("span").attr("id", "eq-" + pr.bottom.id)
+                    .attr("class", "text-red").text("⊥")
+                } else {
+                    const constraint = exp.append("span").attr("id", "eq-" + pr.id);
+                    printTerms(pr.constraint.lhs, constraint);
+                    constraint.append("span").attr("class", "text-black").text(" " + types[pr.constraint.type] + " ");
+                    printTerms(pr.constraint.rhs, constraint);
+                }                
             });
 
             exp.append("hr").attr("class", "mid").attr("width", (length * 13))
-            printInequation(op.conclusion.eq, exp.append("span").attr("id", "eq-" + op.conclusion.eq.id))
+            if (op.conclusion.constraint.bottom) {
+                exp.append("span").attr("id", "eq-" + op.conclusion.id)
+                .attr("class", "text-red").text("⊥")
+            } else {
+                const constraint = exp.append("span").attr("id", "eq-" + op.conclusion.id)
+                printTerms(op.conclusion.constraint.lhs, constraint)
+                constraint.append("span").attr("class", "text-black").text(" " + types[op.conclusion.constraint.type] + " ")
+                printTerms(op.conclusion.constraint.rhs, constraint)
+            }
         }
 
         const text_data = this.text(data);
         this.controls({})
-        displayRowOperation(text_data[current]);
+        displayRule(text_data[current]);
     }
 }
