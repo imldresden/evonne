@@ -292,7 +292,7 @@ export class CDRules {
                     where.append("span").attr("class", "text-black").text(plus)
                     length += plus.length
                     
-                    if (!showObvious && eval(term) !== 1) {
+                    if (!showObvious && (eval(term) !== 1 || variable === "constant")) {
                         where.append("span").attr("class", "text-black").text(term);
                         length += term.length; 
                     }
