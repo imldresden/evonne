@@ -14,7 +14,7 @@ export class CDRules {
         "[Invert]": (data) => { this.diff(data, "R<->") },
         "[Propagate >]": (data) => { this.diff(data, "R>") },
         "[Introduce >]": (data) => { this.diff(data, "Introduce >") },
-        "[Weaken >]": (data) => { this.diff(data, "Introduce >") },
+        "[Weaken >]": (data) => { this.diff(data, "Weaken >") },
         "[From ⊥]": (data) => { this.diff(data, "From ⊥") },
     }
 
@@ -222,7 +222,7 @@ export class CDRules {
                 length += (5 + oper.length);
             });
 
-            exp.append("hr").attr("class", "mid").attr("width", (length * 13))
+            exp.append("hr").attr("class", "mid").attr("width", (length * 10))
             printEquation(op.conclusion.constraint, exp.append("span").attr("id", "eq-" + op.conclusion.id))
         }
 
@@ -258,7 +258,7 @@ export class CDRules {
 
     diff(data, name) {
         //Add a title for the explanation view
-        utils.addTitle("Numerical Logic: " + name);
+        utils.addTitle("Difference Logic: " + name);
 
         const exp = this.tooltip
             .append("div").attr("class", "tooltiptext")
@@ -284,13 +284,13 @@ export class CDRules {
                 let first = true;
                 Object.keys(terms).forEach(variable => {
                     const term = terms[variable];
-                    if (!showObvious && eval(term) === 0 ) {
+                    if (!showObvious && eval(term) === 0 && variable !== "constant") {
                         return; // don't print, don't set first to false
                     } 
                     
                     const plus = first ? "" : " + ";
                     where.append("span").attr("class", "text-black").text(plus)
-                    length += plus.length
+                    length += plus.length;
                     
                     if (!showObvious && (eval(term) !== 1 || variable === "constant")) {
                         where.append("span").attr("class", "text-black").text(term);
@@ -324,7 +324,7 @@ export class CDRules {
                 }                
             });
 
-            exp.append("hr").attr("class", "mid").attr("width", (length * 13))
+            exp.append("hr").attr("class", "mid").attr("width", (length * 10))
             if (op.conclusion.constraint.bottom) {
                 exp.append("span").attr("id", "eq-" + op.conclusion.id)
                 .attr("class", "text-red").text("⊥")

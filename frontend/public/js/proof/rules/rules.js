@@ -72,7 +72,7 @@ class RulesHelper {
     showExplanation(event, { premises, conclusion, data }) {
 
         if (tooltip) {
-            tooltip.selectAll("*").remove();
+            tooltip.remove();
         }
 
         if (data.source.id !== lastToolTipTriggerID) {
