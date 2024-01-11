@@ -10,8 +10,6 @@ const operators = {
 
 export class CDRules {
 
-    showObvious = false;    
-
     rules = {
         "[Different constants]": (data) => { this.diff(data, "R/=") },
         "[Different differences]": (data) => { this.diff(data, "R /= +") },
@@ -62,27 +60,29 @@ export class CDRules {
     }
 
     controls({ prevFn, currentFn, nextFn }) {
-        const prev = this.tooltip
-            .append("button")
-            .attr("class", "btn btn-primary");
+        const buttons = this.tooltip
+            .append("div")
+            .attr("class", "controls-bar");
 
-        prev.on("click", prevFn);
-
+        const prev = buttons.append("a").attr("class", "bar-button");
         prev.append("i")
             .attr("class", "material-icons")
-            .text("keyboard_arrow_left");
+            .text("skip_previous");
 
-        const next = this.tooltip
-            .append("button")
-            .attr("class", "btn btn-primary");
+        const play = buttons.append("a").attr("class", "bar-button");
+        play.append("i")
+            .attr("class", "material-icons")
+            .text("play_arrow");
 
-        next.on("click", nextFn);
-
+        const next = buttons.append("a").attr("class", "bar-button");
         next.append("i")
             .attr("class", "material-icons")
-            .text("keyboard_arrow_right");
+            .text("skip_next");
 
-        this.tooltip.append("br");
+        prev.on("click", prevFn);
+        play.on("click", currentFn);
+        next.on("click", nextFn);
+
         this.tooltip.append("br");
     }
 
@@ -199,7 +199,7 @@ export class CDRules {
                         where.append("span").attr("class", "text-black").text(" = " + term)
                         length += (3 + term.length);
                         return;
-                    }                    
+                    }
                     
                     if (!showObvious && eval(term) === 0 ) {
                         return; // don't print, don't set first to false
@@ -283,10 +283,10 @@ export class CDRules {
             .attr("id", "pcp-container")
 
         let current = 0;
-        const showObvious = this.showObvious;
 
         const showObvious = this.showObvious;
         const types = this.types;
+
         function displayRule(op) {
             exp.selectAll("*").remove();
 
@@ -325,8 +325,9 @@ export class CDRules {
                 }
 
                 if (pr.constraint.bottom) {
-                    exp.append("span").attr("id", "eq-" + pr.bottom.id)
-                    .attr("class", "text-red").text("⊥")
+                    exp.append("span")
+                        .attr("id", "eq-" + pr.bottom.id)
+                        .attr("class", "text-red").text("⊥")
                 } else {
                     const constraint = exp.append("span").attr("id", "eq-" + pr.id);
                     printTerms(pr.constraint.lhs, constraint);
@@ -337,8 +338,7 @@ export class CDRules {
 
             exp.append("hr").attr("class", "mid").attr("width", (length * 10))
             if (op.conclusion.constraint.bottom) {
-                exp.append("span").attr("id", "eq-" + op.conclusion.id)
-                .attr("class", "text-red").text("⊥")
+                exp.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-red").text("⊥")
             } else {
                 const constraint = exp.append("span").attr("id", "eq-" + op.conclusion.id)
                 printTerms(op.conclusion.constraint.lhs, constraint)

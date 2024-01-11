@@ -1,4 +1,6 @@
 /* Tooltip style */
+@import "../colors.css";
+
 .tooltip-explanation {
     position: absolute;
     display: inline-block;
@@ -48,4 +50,19 @@
 
 .tooltip-explanation .modal-close {
     margin-right: 15px;
+}
+
+.controls-bar {
+    text-align: center;
+}
+
+.bar-button > i {
+    font-size: 30px;
+    cursor:pointer;
+    color: var(--color-primary)
+}
+
+.bar-button > i:hover {
+    font-size: 30px;
+    color: var(--color-primary-light)
 }
