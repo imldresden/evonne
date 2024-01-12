@@ -54,15 +54,29 @@
 
 .controls-bar {
     text-align: center;
+    padding-left: 50px;
 }
 
 .bar-button > i {
     font-size: 30px;
     cursor:pointer;
+    
     color: var(--color-primary)
 }
 
 .bar-button > i:hover {
-    font-size: 30px;
     color: var(--color-primary-light)
+}
+
+.hl-text {
+    text-decoration: underline;
+
+}
+
+.hl-text.premise {
+    text-decoration-color: var(--color-blue);
+}
+
+.hl-text.conclusion {
+    text-decoration-color: var(--color-purple-dark);
 }

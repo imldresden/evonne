@@ -77,19 +77,17 @@ const parallelCoords = function (pane, data, metadata) {
             .data(data, k=> k.nuid)
             .join(
                 enter => {
-                    // new data spawns in path0 positions
                     enter = enter
                         .append("path")
-                        .attr("d", path0)
-                    enter = transition(enter, updateMS)
                         .attr("d", path)
+                    enter = transition(enter, updateMS)
+                        .attr("d", pathD) // asks for the destination of the lines
                         .attr("stroke", d => d.color);
                     
                     return enter
                 },
                 update => {
                     return update
-                        
                         .attr("d", path)
                         .attr("stroke", d => d.color);
                 },
@@ -116,7 +114,6 @@ const parallelCoords = function (pane, data, metadata) {
             return line(
                 dimensions.map(p => [position(p), resp.axes[p](d[p].value)])
             );
-
         } else {
             return line(
                 dimensions.map(p => [resp.axes[p](d[p].value), position(p)])
@@ -124,15 +121,15 @@ const parallelCoords = function (pane, data, metadata) {
         }
     }
 
-    function path0(d) {
+    function pathD(d) {
         if (orient) {
             return line(
-                dimensions.map(p => [position(p), 0])
+                dimensions.map(p => [position(p), resp.axes[p](d[p].dest)])
             );
 
         } else {
             return line(
-                dimensions.map(p => [0, position(p)])
+                dimensions.map(p => [resp.axes[p](d[p].dest), position(p)])
             );
         }
     }
@@ -352,6 +349,9 @@ const parallelCoords = function (pane, data, metadata) {
             tooltip.text(text)
         }, 50);
 
+        const dispatchHighlightCustomEvent = _.throttle((ids) => {
+            document.dispatchEvent(new CustomEvent("pcp-hl", { detail: { ids }, }))
+        }, 50);
 
         // cursor logic
         svg.on("mousemove", function (e) {
@@ -407,6 +407,7 @@ const parallelCoords = function (pane, data, metadata) {
             });
 
             countTooltipUpdate(count_tooltip, mouse, highlighted.size);
+            dispatchHighlightCustomEvent(highlighted);
         });
 
         // axes and title.

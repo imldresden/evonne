@@ -1,13 +1,6 @@
 import { utils } from "./rules.js";
 import { parallelCoords } from "../../parallel-coords/parallel-coords-svg.js";
 
-const operators = {
-    greaterThan: ">",
-    lessThan: "<",
-    equal: "=",
-    plus: "=",
-}
-
 export class CDRules {
 
     rules = {
@@ -59,7 +52,7 @@ export class CDRules {
         return text_data;
     }
 
-    controls({ prevFn, currentFn, nextFn }) {
+    controls({ prevFn, currentFn, nextFn, replayFn }) {
         const buttons = this.tooltip
             .append("div")
             .attr("class", "controls-bar");
@@ -79,9 +72,19 @@ export class CDRules {
             .attr("class", "material-icons")
             .text("skip_next");
 
+        const replay = buttons.append("a").attr("class", "bar-button");
+        replay.append("i")
+            .attr("class", "material-icons")
+            .text("replay")
+            .style("float", "right")
+            .style("padding-right", "50px")
+            .style("font-size", "20px");
+        
+    
         prev.on("click", prevFn);
         play.on("click", currentFn);
         next.on("click", nextFn);
+        replay.on("click", replayFn);
 
         this.tooltip.append("br");
     }
@@ -128,8 +131,10 @@ export class CDRules {
             Object.keys(eq)
                 .sort((a, b) => a.localeCompare(b))
                 .forEach(k => {
+                    const value = eval(eq[k])
                     polyline[k] = {
-                        value: eval(eq[k]),
+                        value: value,
+                        dest: value,
                         type: 'numbers'
                     }
                     polyline.nuid += eq[k]
@@ -170,8 +175,20 @@ export class CDRules {
             }
 
             pcp_data[i].push(finalC);
+
+            if (pcp_data[i.length !== 3] || pcp_data[i.length !== 4]) {
+                console.error("linear inferences should only have 2 premises leading to 1 conclusion + optional final conclusion");
+            }
         });
 
+        Object.keys(pcp_data).forEach(i => {
+            Object.keys(pcp_data[i][0]).forEach(k => {
+                if (pcp_data[i][0][k].hasOwnProperty("value")) {
+                    pcp_data[i][0][k].dest = pcp_data[i][2][k].value; // 1st premise will become conclusion
+                }
+            })
+        })
+        
         const domains = {};
 
         header.forEach(v => {
@@ -227,13 +244,13 @@ export class CDRules {
                 }
                 const oper = pr.coe.replace(/\s+/g, '');
                 exp.append("span").attr("class", "text-red").text(oper + " * (");
-                printEquation(pr.constraint, exp.append("span").attr("id", "eq-" + pr.id))
+                printEquation(pr.constraint, exp.append("span").attr("id", "eq-" + pr.id).attr("class", "text-eq premise"))
                 exp.append("span").attr("class", "text-red").text(")");
                 length += (5 + oper.length);
             });
 
             exp.append("hr").attr("class", "mid").attr("width", (length * 10))
-            printEquation(op.conclusion.constraint, exp.append("span").attr("id", "eq-" + op.conclusion.id))
+            printEquation(op.conclusion.constraint, exp.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-eq conclusion"))
         }
 
         const text_data = this.text(data);
@@ -248,22 +265,46 @@ export class CDRules {
                 current = Math.min(current + 1, Object.keys(pcp_data).length - 1);
                 pcp.update(pcp_data[current]);
                 displayRowOperation(text_data[current]);
-            }
+            },
+            replayFn: (e, d) => {
+                current = Math.min(current + 1, Object.keys(pcp_data).length - 1);
+                pcp.destroy();
+                makePCP(pcp_data[current]);
+                displayRowOperation(text_data[current]);
+            },
         });
 
         displayRowOperation(text_data[current]);
-        pcp = parallelCoords(
-            { id: "pcp", details: "pcp-container", width: 700, height: 300 },
-            pcp_data[current],
-            {
-                data_id: 'id',
-                nominals: [],
-                booleans: [],
-                numbers: header,
-                cols: header,
-                domains: domains,
-            }
-        );
+        makePCP(pcp_data[current]);
+
+        function highlightText(d) {
+            const allEqs = d3.selectAll(".text-eq")
+            allEqs.classed("hl-text", false)
+            
+            Array.from(d.detail.ids).forEach(id => {
+                d3.select(`#eq-${id}`).classed("hl-text", true)
+            })
+        }
+        
+        document.removeEventListener('pcp-hl', highlightText)
+        document.addEventListener('pcp-hl', highlightText)
+
+        function makePCP(data) {
+            d3.select("#pcp").selectAll("*").remove();
+            pcp = parallelCoords(
+                { id: "pcp", details: "pcp-container", width: 700, height: 300 },
+                data,
+                {
+                    data_id: 'id',
+                    nominals: [],
+                    booleans: [],
+                    numbers: header,
+                    cols: header,
+                    domains: domains,
+                }
+            );
+        }
+        
     }
 
     diff(data, name) {
