@@ -48,22 +48,23 @@ const parallelCoords = function (pane, data, metadata) {
     };
 
     function update(data) {
+        const updateMS = 1000;
         // background lines for context.
         //d3.selectAll(".background path").remove()
         pcpHtml.bg = background
             .selectAll("path")
             .data(data)
             .join(
-                function(enter) {
+                enter => {
                     return enter
                         .append("path")
                         .attr("d", path);
                 },
-                function(update) {
+                update => {
                     return update
                         .attr("d", path);
                 },
-                function(exit) {
+                exit => {
                     return exit.remove();
                 }
             )
@@ -75,19 +76,24 @@ const parallelCoords = function (pane, data, metadata) {
             .selectAll("path")
             .data(data, k=> k.nuid)
             .join(
-                function(enter) {
-                    return enter
+                enter => {
+                    // new data spawns in path0 positions
+                    enter = enter
                         .append("path")
+                        .attr("d", path0)
+                    enter = transition(enter, updateMS)
                         .attr("d", path)
                         .attr("stroke", d => d.color);
+                    
+                    return enter
                 },
-                function(update) {
+                update => {
                     return update
-                        .transition()
+                        
                         .attr("d", path)
                         .attr("stroke", d => d.color);
                 },
-                function(exit) {
+                exit => {
                     return exit.transition().attr("opacity", 0).remove();
                 }
             )
@@ -114,6 +120,19 @@ const parallelCoords = function (pane, data, metadata) {
         } else {
             return line(
                 dimensions.map(p => [resp.axes[p](d[p].value), position(p)])
+            );
+        }
+    }
+
+    function path0(d) {
+        if (orient) {
+            return line(
+                dimensions.map(p => [position(p), 0])
+            );
+
+        } else {
+            return line(
+                dimensions.map(p => [0, position(p)])
             );
         }
     }
