@@ -1,5 +1,6 @@
 import { utils } from "./rules.js";
 import { parallelCoords } from "../../parallel-coords/parallel-coords-svg.js";
+import { proof } from "../proof.js";
 
 export class CDRules {
 
@@ -27,7 +28,7 @@ export class CDRules {
 
     showObvious = false; 
 
-    draw({ ruleName, tooltip, data }) {
+    draw({ ruleName, tooltip, data, node }) {
         this.tooltip = tooltip;
 
         console.log(data)
@@ -38,7 +39,7 @@ export class CDRules {
             this.linear(data);
         } else {
             console.error("unknown cd rule")
-        }
+        }       
     }
 
     text(data, type) {
@@ -318,7 +319,7 @@ export class CDRules {
         //Add visualization
         this.tooltip.append("div")
             .style("width", "700px")
-            .style("height", "300px")
+            .style("height", "10px")
             .append("div")
             .attr("class", "pcp-container")
             .attr("id", "pcp-container")
@@ -389,7 +390,7 @@ export class CDRules {
         }
 
         const text_data = this.text(data);
-        this.controls({})
+        //this.controls({})
         displayRule(text_data[current]);
     }
 }

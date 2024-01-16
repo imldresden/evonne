@@ -70,7 +70,7 @@
 
 .hl-text {
     text-decoration: underline;
-
+    text-decoration-thickness: 3px;
 }
 
 .hl-text.premise {

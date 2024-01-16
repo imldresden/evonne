@@ -19,6 +19,7 @@ const utils = {
             .on("click", () => {
                 tooltip.selectAll("*").remove();
                 lastToolTipTriggerID = null;
+                proof.svg.selectAll("g.node, line.link").style("opacity", 1);
             })
     
         title.append("h2").attr("align", "center").text(text);
@@ -64,15 +65,16 @@ class RulesHelper {
             }
 
             proofView.select("#N" + x.data.source.id).on("click", (event, node) => {
-                this.showExplanation(event, { premises, conclusion, data: node.data });
+                this.showExplanation(event, { premises, conclusion, data: node.data, node });
             });
         });
     }
 
-    showExplanation(event, { premises, conclusion, data }) {
+    showExplanation(event, { premises, conclusion, data, node }) {
 
         if (tooltip) {
             tooltip.remove();
+            proof.svg.selectAll("g.node, line.link").style("opacity", 1);
         }
 
         if (data.source.id !== lastToolTipTriggerID) {
@@ -99,10 +101,22 @@ class RulesHelper {
         if (data.source.type === "rule" || data.source.type === "DLRule") {
             rule_sets.dl.draw({ ruleName, div, premises, conclusion });
         } else if (data.source.type === "CDRule") {
-            rule_sets.cd.draw({ ruleName, tooltip, data: data.source.data });
+            rule_sets.cd.draw({ ruleName, tooltip, data: data.source.data, node });
         } else {
             console.error(`unknown rule type: "${data.source.type}"`);
         }
+
+        const ids = [node.data.source.id, node.data.target.id];
+        if (node.children) {
+            node.children.forEach(x => {
+                ids.push(x.data.source.id);
+            });
+        }
+
+        proof.svg.selectAll("g.node")
+            .style("opacity", d => ids.includes(d.data.source.id) ? 1:.2);
+        proof.svg.selectAll("line.link")
+            .style("opacity", d => (ids.includes(d.source.data.source.id) || ids.includes(d.target.data.target.id) ? 1:.2)); 
 
         if (proof.ruleExplanationPosition === "mousePosition") {
             this.setPositionRelativeToMouse(event)
