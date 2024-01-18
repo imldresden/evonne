@@ -11,7 +11,7 @@ const rule_sets = {
 
 const utils = {
     addTitle: function(text) {
-        let title = div.append("header")
+        let title = div.append("header").attr("id", "tooltip-handle-bar")
         
         title.append("i")
             .attr("class", "material-icons right modal-close")
@@ -85,7 +85,6 @@ class RulesHelper {
                 .attr("id", "toolTipID");
             
             lastToolTipTriggerID = data.source.id;
-            this.makeDraggable(document.getElementById("toolTipID"));
 
         } else {
             lastToolTipTriggerID = null;
@@ -123,6 +122,8 @@ class RulesHelper {
         } else {
             tooltip.classed(this.getPositionClass(proof.ruleExplanationPosition), true);
         }
+
+        this.makeDraggable(document.getElementById("toolTipID"), document.getElementById("tooltip-handle-bar"));
     }
 
     getPositionClass(ruleExplanationPosition) {
@@ -156,9 +157,9 @@ class RulesHelper {
     }
 
     // https://www.w3schools.com/howto/howto_js_draggable.asp
-    makeDraggable(elmnt) {
+    makeDraggable(elmnt, handle) {
         let x = 0, y = 0, clientX = 0, clientY = 0;
-        elmnt.onmousedown = dragMouseDown;
+        handle.onmousedown = dragMouseDown;
         
         function dragMouseDown(e) {
             e.preventDefault();

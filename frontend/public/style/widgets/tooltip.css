@@ -80,3 +80,7 @@
 .hl-text.conclusion {
     text-decoration-color: var(--color-purple-dark);
 }
+
+#tooltip-handle-bar {
+    cursor:pointer;
+}
