@@ -283,19 +283,20 @@ export class TreeNavigation {
                             .style("opacity", 0)
                         exit.remove()
                     }
-                );
-            this.edgeData.forEach(link => {
-                if (link.source.element === "Asserted Conclusion") {
-                    d3.select("#N" + link.target.id).attr("class", "node axiom asserted");
-                }
-                
-                if (link.source.element === "Known") {
-                    d3.select("#N" + link.source.id).attr("class", "node rule krule");
-                }
-            });
+                );    
         } else {
-            proof.linear.drawCurvedLinks(t, sn);
+            proof.linear.drawLinks(t, sn);
         }
+
+        this.edgeData.forEach(link => {
+            if (link.source.element === "Asserted Conclusion") {
+                d3.select("#N" + link.target.id).attr("class", "node axiom asserted");
+            }
+            
+            if (link.source.element === "Known") {
+                d3.select("#N" + link.source.id).attr("class", "node rule krule");
+            }
+        });
 
         proof.nodeVisuals.renderNodes(proof.svg, this.nodes);
     }

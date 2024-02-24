@@ -509,7 +509,6 @@ export class AxiomsHelper {
 		if (state === "\ue1b7") {
 			d3.selectAll("#H1 text").text("\ue1b7");
 			proof.linear.highlightCurrentInference(nodeData);
-			console.log("here")
 			btn.text("\ue1b6");
 		} else {
 			proof.linear.setFullOpacityToAll();

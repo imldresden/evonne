@@ -18,6 +18,7 @@ const conf = {
   div: "proof-container",
   shortenAll: false,
   allowOverlap: false,
+  showRules: false,
   isMagic: false,
   isRuleShort: false,
   isLinear: false,
@@ -165,7 +166,7 @@ function getFileName() {
     fileName.substring(0, fileName.indexOf(".t.xml")) : fileName;
   
   fileName += ".t.xml";
-  
+
   return fileName;
 }
 

@@ -19,7 +19,7 @@ const utils = {
             .on("click", () => {
                 tooltip.selectAll("*").remove();
                 lastToolTipTriggerID = null;
-                proof.svg.selectAll("g.node, line.link").style("opacity", 1);
+                proof.svg.selectAll("g.node, line.link, path.link").style("opacity", 1);
             })
     
         title.append("h2").attr("align", "center").text(text);
@@ -74,7 +74,7 @@ class RulesHelper {
 
         if (tooltip) {
             tooltip.remove();
-            proof.svg.selectAll("g.node, line.link").style("opacity", 1);
+            proof.svg.selectAll("g.node, line.link, path.link").style("opacity", 1);
         }
 
         if (data.source.id !== lastToolTipTriggerID) {
@@ -105,17 +105,18 @@ class RulesHelper {
             console.error(`unknown rule type: "${data.source.type}"`);
         }
 
-        const ids = [node.data.source.id, node.data.target.id];
+        const ids = {}; 
+        ids[node.data.source.id] = 1;
+        ids[node.data.target.id] = 2;
+
         if (node.children) {
-            node.children.forEach(x => {
-                ids.push(x.data.source.id);
-            });
+            node.children.forEach(x => { ids[x.data.source.id] = 3; });
         }
 
         proof.svg.selectAll("g.node")
-            .style("opacity", d => ids.includes(d.data.source.id) ? 1:.2);
-        proof.svg.selectAll("line.link")
-            .style("opacity", d => (ids.includes(d.source.data.source.id) || ids.includes(d.target.data.target.id) ? 1:.2)); 
+            .style("opacity", d => ids[d.data.source.id] ? 1:.2);
+        proof.svg.selectAll("line.link, path.link")
+            .style("opacity", d => (ids[d.source.data.source.id] === 2 || ids[d.target.data.target.id] === 1 ? 1:.2)); 
 
         if (proof.ruleExplanationPosition === "mousePosition") {
             this.setPositionRelativeToMouse(event)

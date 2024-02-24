@@ -97,8 +97,6 @@
       </select>
     </div>
 
-    
-
     <div class="modal-option">
       <label class="label-toggle">Linear Mode</label>
       <div class="switch">
@@ -109,18 +107,16 @@
       </div>
     </div>
 
-    <div class = "planar-div-wrapper">
-        <div class="modal-option">
-            <label class="label-toggle">Optimize premise distance</label>
-            <div class="switch">
-              <label>
-                <input id="togglePlanar" type="checkbox">
-                <span class="lever"></span>
-              </label>
-            </div>
-        </div>
+    <div class="modal-option" id="planar-div-wrapper">
+      <label class="label-toggle">Optimize premise distance</label>
+      <div class="switch">
+        <label>
+          <input id="togglePlanar" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
     </div>
-
+    
     <!-- Magic option -->
     <div class="modal-option">
       <label class="label-toggle">Magic Mode</label>
@@ -131,5 +127,16 @@
         </label>
       </div>
     </div>
+
+    <div class="modal-option">
+      <label class="label-toggle">Show Rules</label>
+      <div class="switch">
+        <label>
+          <input id="toggleRulesDisplay" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+    
   </fieldset>
 </div>

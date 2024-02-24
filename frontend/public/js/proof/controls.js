@@ -19,6 +19,7 @@ const tooltipPositionSelection = document.getElementById("toolTipPosition");
 
 //Toggle buttons
 const allowOverlapBtn = document.getElementById("toggleAllowOverlap");
+const showRulesBtn = document.getElementById("toggleRulesDisplay");
 const magicToggleBtn = document.getElementById("toggleMagicMode");
 const layoutToggleBtn = document.getElementById("toggleLayoutMode");
 const shortenRules = document.getElementById("toggleRuleNamesShortening");
@@ -36,6 +37,12 @@ const controls = [
         name: "allowOverlapBtn",
         el: allowOverlapBtn,
         fn: allowOverlapBtnFunction,
+        type: 'click'
+    },
+    {
+        name: "showRulesBtn",
+        el: showRulesBtn,
+        fn: showRulesBtnFunction,
         type: 'click'
     },
     {
@@ -172,6 +179,11 @@ function allowOverlapBtnFunction() {
     proof.update();
 }
 
+function showRulesBtnFunction() {
+    proof.showRules = showRulesBtn.checked;
+    proof.update();
+}
+
 function collapseAllBtnFunction() {
     // disable magic mode
     magicToggleBtn.checked = false;
@@ -186,7 +198,7 @@ function magicToggleBtnFunction() {
     proof.svgRootLayer.selectAll("*").remove();
     if (magicToggleBtn.checked) {
         layoutToggleBtn.checked = false;
-        proof.isLinear = false;
+        layoutToggleBtnFunction();
     }
     proof.isMagic = magicToggleBtn.checked;
     if (!proof.isMagic) {
@@ -196,18 +208,18 @@ function magicToggleBtnFunction() {
     proof.load();
 }
 
+function getPlanarWrapper() {
+    return planarToggleBtn && document.getElementById("planar-div-wrapper");
+}
+
 function layoutToggleBtnFunction() {
     // Clear the SVG content
     proof.svgRootLayer.selectAll("*").remove();
 
-    function getPlanarWrapper() {
-        return planarToggleBtn && planarToggleBtn.closest(".planar-div-wrapper");
-    }
-
     if (layoutToggleBtn.checked) {
         magicToggleBtn.checked = false;
         proof.isMagic = false;
-        getPlanarWrapper().style.display = "block";
+        getPlanarWrapper().style.display = "flex";
     } else {
         getPlanarWrapper().style.display = "none";
     }
@@ -300,7 +312,7 @@ function maxLengthInputResetFunction() {
     if (badge) {
         badge.innerHTML = maxLengthInput.value
     }
-    //maxLengthInput.closest("span.badge").innerHTML = maxLengthInput.value;
+    
     proof.update();
 }
 
@@ -399,15 +411,20 @@ function documentFunction() {
 function init() {
     // set listeners
     let isHTMLValid = true;
+    const missing = [];
     controls.forEach(control => {
         if (!control.el) {
-            console.error(`control: ${control.name} invalid`)
+            missing.push(control.name)
             isHTMLValid = false;
         } else {
             control.el.removeEventListener(control.type, control.fn);
             control.el.addEventListener(control.type, control.fn);
         }
     });
+
+    if (missing.length !== 0) {
+        console.error(`controls: [${missing.join(', ')}] invalid`)
+    }
 
     if (!isHTMLValid) {
         return;
@@ -421,7 +438,7 @@ function init() {
     magicToggleBtn.checked = false;
     layoutToggleBtn.checked = false;
     planarToggleBtn.checked = true;
-    planarToggleBtn.closest(".planar-div-wrapper").style.display = "none";
+    getPlanarWrapper() ? getPlanarWrapper().style.display = "none" : "";
 
     shorteningMethodSelection.value = globals.shorteningMethod;
     maxLengthInput.closest(".input-range-wrapper").style.display = "none";

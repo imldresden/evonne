@@ -55,7 +55,7 @@ export class NodeVisualsHelper {
         proof.nodeVisuals.nodes = what;
 
         if (proof.isLinear) {
-            this.renderConnectorsByType("Right");
+            this.renderConnectorsByType("Right", "Left");
         } else {
             this.renderConnectorsByType("Up");
             this.renderConnectorsByType("Down");
@@ -67,7 +67,7 @@ export class NodeVisualsHelper {
         this.addShowHideMouseEvents();
     }
 
-    renderConnectorsByType(direction) {
+    renderConnectorsByType(direction, alternate) {
         const { BOX_HEIGHT, CONNECTOR_SIZE } = nodeVisualsDefaults;
         const directions = {
             "Up": {
@@ -90,6 +90,13 @@ export class NodeVisualsHelper {
                 x: (d) => d.width / 2 - CONNECTOR_SIZE / 2,
                 y: BOX_HEIGHT / 2 - CONNECTOR_SIZE / 2
             },
+
+            "Left": {
+                cx: (d) => - d.width / 2,
+                cy: BOX_HEIGHT / 2,
+                x: (d) => - d.width / 2 - CONNECTOR_SIZE / 2,
+                y: BOX_HEIGHT / 2 - CONNECTOR_SIZE / 2
+            },
         };
 
         const circleAttributes = {
@@ -98,8 +105,8 @@ export class NodeVisualsHelper {
             r: CONNECTOR_SIZE / 2,
         };
         const rectangleAttributes = {
-            x: directions[direction].x,
-            y: directions[direction].y,
+            x: alternate ? directions[alternate].x : directions[direction].x,
+            y: alternate ? directions[alternate].y : directions[direction].y,
             height: CONNECTOR_SIZE,
             width: CONNECTOR_SIZE,
         };
@@ -114,8 +121,6 @@ export class NodeVisualsHelper {
         
         //get axioms nodes
         let elements = this.nodes.selectAll(".node");
-        //remove old connectors
-        elements.selectAll("." + directionClass).remove();
         //add new connectors
         elements.each(function () {
             selection = d3.select(this);
