@@ -215,3 +215,9 @@ input:checked + .slider:before {
 #repairsDiv {
 	margin-bottom: 5%;
 }
+
+.prevent-select {
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}

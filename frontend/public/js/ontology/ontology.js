@@ -117,7 +117,7 @@ async function initHTML() {
         }
 
         const template = `
-          <div class="cy-html node ontNode bg-box" id="${ontologyNodeId + data.id}"> 
+          <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
             <div id="frontRect" style="padding: 5px; white-space:nowrap;">
               ${html}
             </div>

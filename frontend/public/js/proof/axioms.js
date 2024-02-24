@@ -5,7 +5,7 @@ import { proof } from "./proof.js";
 export class AxiomsHelper {
 	constructor() {
 		this._socket = undefined;
-		this._inferredAxiomNodes = undefined;
+		this.axioms = undefined;
 	}
 
 	set socket(socketIO) {
@@ -15,7 +15,7 @@ export class AxiomsHelper {
 	addFunctionButtonsToNodes() {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
-		this._inferredAxiomNodes = proof.svg.selectAll(".axiom:not(.asserted)")
+		this.axioms = proof.svg.selectAll(".axiom")
 
 		//Show rule name and premise that led to this conclusion
 		this.addShowPrevious();
@@ -50,14 +50,8 @@ export class AxiomsHelper {
 
 	addShowPrevious() {
 		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
-
-		let group = this._inferredAxiomNodes
-			.filter(d => {
-				if (proof.isLinear) {
-					return d._children;
-				}
-				return d._children[0]._children;
-			}) //remove tautologies
+		let group = this.axioms
+			.filter(d => d._children[0]._children) //remove tautologies
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2}, ${BOX_HEIGHT})`)
@@ -109,13 +103,8 @@ export class AxiomsHelper {
 	addHideAllPrevious() {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
-		let group = this._inferredAxiomNodes
-			.filter(d => {
-				if (proof.isLinear) {
-					return d._children;
-				}
-				return d._children[0]._children
-			})//remove tautologies
+		let group = this.axioms
+			.filter(d => d._children[0]._children) //remove tautologies
 			.append("g").attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2 - BTN_CIRCLE_SIZE - 1}, 0)`)
@@ -147,14 +136,8 @@ export class AxiomsHelper {
 	addShowAllPrevious() {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
-		let group = this._inferredAxiomNodes
-			.filter(d => {
-				if (proof.isLinear) {
-					return d._children;
-				}
-
-				return d._children[0]._children
-			})//remove tautologies
+		let group = this.axioms
+			.filter(d => d._children[0]._children ) //remove tautologies
 			.append("g").attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2}, 0)`)
@@ -475,21 +458,13 @@ export class AxiomsHelper {
 						.style("fill", `hsla(207, 89%, ${70 + i * 8}%, 1)`)
 						.lower()
 				}
-				d3.select(node.parentElement)
-					.select(".connectorUp")
-					.style("opacity", 0)
 			})
 	}
 
 	addHighlightCurrentInference() {
-		if (!proof.isLinear) {
-			return;
-		}
-
 		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
-		let group = this._inferredAxiomNodes
-			.filter(d => d._children)
+		let group = this.axioms
 			.append("g").attr("id", "H1")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${-d.width / 2}, ${BOX_HEIGHT})`)
@@ -534,6 +509,7 @@ export class AxiomsHelper {
 		if (state === "\ue1b7") {
 			d3.selectAll("#H1 text").text("\ue1b7");
 			proof.linear.highlightCurrentInference(nodeData);
+			console.log("here")
 			btn.text("\ue1b6");
 		} else {
 			proof.linear.setFullOpacityToAll();

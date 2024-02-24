@@ -125,23 +125,12 @@ function getNodes(data, edgeData) {
         const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
         node.isRoot = outGoingEdges.length === 0;
 
-        let rule = edgeData.filter((edge) => edge.target === d.id)[0];
-        rule = rule ? rule.rule : rule;
-
-        if (proof.isLinear) {
-            node.data = { rule };
-        }
-    
         return node;
     });
 }
 
 function processData(data) {
-    if (proof.isLinear) {
-        return processDataLinear(data);
-    } 
-    
-    // Compute edges
+    // read edges 
     let edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
         let edgeId = d.getAttribute("id");
         let edgeSource = d.getAttribute("source");
@@ -150,9 +139,10 @@ function processData(data) {
         return { id: edgeId, source: edgeSource, target: edgeTarget };
     });
 
+    // read nodes
     let nodeData = getNodes(data, edgeData);
 
-    // Add the nodeData to the edgeData
+    // add the nodeData to the edgeData
     edgeData.forEach((d) => {
         d.source = nodeData.find((b) => b.id === d.source);
         d.target = nodeData.find((b) => b.id === d.target);
@@ -164,63 +154,7 @@ function processData(data) {
     };
 }
 
-function processDataLinear(data) {
-    // Compute edges
-    let edgeData = [];
-    [].map.call(data.querySelectorAll("hyperedge"), d => {
-        let edgeIDSuffix = 97;
-        let edgeTarget;
-        let rule = {};
-        d.querySelectorAll("data").forEach(k => {
-            rule[k.getAttribute("key")] = k.textContent;
-        });
-        d.querySelectorAll("endpoint").forEach(e => {
-            if (e.getAttribute("type") === "in") {
-                edgeTarget = e.getAttribute("node");
-            }
-        });
-        let endPoints = d.querySelectorAll("endpoint");
-        if (endPoints.length === 1) {
-            endPoints.forEach(e => {
-                let edgeId = d.getAttribute("id");
-                let edgeSource = null;
-                edgeIDSuffix++;
-                edgeData.push({ id: edgeId, source: edgeSource, target: edgeTarget, rule });
-            });
-        } else {
-            endPoints.forEach(e => {
-                if (e.getAttribute("type") === "out") {
-                    let edgeId = d.getAttribute("id") + String.fromCharCode(edgeIDSuffix);
-                    let edgeSource = e.getAttribute("node");
-                    edgeIDSuffix++;
-                    edgeData.push({ id: edgeId, source: edgeSource, target: edgeTarget, rule });
-                }
-            });
-        }
-    });
-
-    let nodeData = getNodes(data, edgeData);
-
-    //remove edges with a null source
-    edgeData = edgeData.filter(d => !!d.source)
-
-    // Add the nodeData to the edgeData
-    edgeData.forEach(d => {
-        d.source = nodeData.find(b => b.id === d.source);
-        d.target = nodeData.find(b => b.id === d.target);
-    });
-
-    return {
-        nodes: nodeData,
-        edges: edgeData
-    };
-}
-
 function computeTreeLayout(hierarchy) {
-
-    if (proof.isLinear) {
-        return proof.linear.computeLinearLayout(hierarchy);
-    }
 
     function separation(a, b) {
         return ((a.width + b.width) / 2) / proof.nodeVisuals.maxNodeWidth + 0.03;
@@ -238,13 +172,20 @@ function computeTreeLayout(hierarchy) {
             .separation((a, b) => separation(a, b))
             (hierarchy);
     } else {
-
         tree_layout = d3.tree()
             .nodeSize([proof.nodeVisuals.maxNodeWidth, proof.nodeVisuals.maxNodeHeight * 1.2])
             .separation((a, b) => separation(a, b))
             (hierarchy);
+        
+        tree_layout.each(d => {
+            d.x += proof.width / 2; // center proof in view
+        });
     }
-
+    
+    if (proof.isLinear) {
+        return proof.linear.computeLinearLayout(tree_layout, proof.allowOverlap);
+    }
+    
     return tree_layout;
 }
 

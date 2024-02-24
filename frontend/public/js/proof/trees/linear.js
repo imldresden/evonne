@@ -8,14 +8,7 @@ export class LinearNavigation {
 
     isDistancePriority = true;
 
-    computeLinearLayout(hierarchy) {
-        // Layout and draw the tree
-        hierarchy.dx = 50;
-        hierarchy.dy = proof.width / (hierarchy.height + 1);
-
-        let linearLayout = d3.tree().size([proof.width, proof.height])
-            .separation((a, b) => (a.width + b.width) / 2)(hierarchy);
-
+    computeLinearLayout(linearLayout, overlapAllowed) {
         let orderedElements = [];
         if (!this.isDistancePriority) {
             this.getDFOrder(linearLayout, orderedElements);
@@ -24,21 +17,31 @@ export class LinearNavigation {
             orderedElements.push(linearLayout);
         }
 
-        let itemY = proof.height / (orderedElements.length < 2 ? 1 : orderedElements.length - 1);
-        linearLayout.each(d => {
-            d.x = 0.7 * proof.width - d.width / 2;
-            if (orderedElements.length < 2) {
-                d.y = 0.01 * proof.height;
-            } else {
-                d.y = 1.01 * proof.height - ((orderedElements.indexOf(d)) * itemY);
-            }
-        });
-
+        if (overlapAllowed) {
+            const itemY = proof.height / (orderedElements.length < 2 ? 1 : orderedElements.length - 1);
+            linearLayout.each(d => {
+                d.x = 0.7 * proof.width - d.width / 2;
+                if (orderedElements.length < 2) {
+                    d.y = 0.01 * proof.height;
+                } else {
+                    d.y = 1.01 * proof.height - ((orderedElements.indexOf(d)) * itemY);
+                }
+            });    
+        } else {
+            const itemY = proof.nodeVisuals.maxNodeHeight * 1.2;
+            const maxHeight = itemY * orderedElements.length;
+            linearLayout.each(d => {
+                d.x = 0.7 * proof.width - d.width / 2;
+                d.y = maxHeight - ((orderedElements.indexOf(d)) * itemY);
+            });
+        }
+        
         return linearLayout;
     }
 
     getDFOrder(hierarchy, orderedElements) {
         hierarchy.children?.forEach(d => {
+            console.log(d)
             this.getDFOrder(d, orderedElements);
         });
         orderedElements.push(hierarchy);
@@ -124,52 +127,6 @@ export class LinearNavigation {
         return "M" + x2 + "," + y2 +
             "S" + offSetX + "," + offSetY +
             " " + x1 + "," + y1;
-    }
-
-    renderSideConnectorsByType() {
-        let newClasses = undefined;
-        let selection = undefined;
-        let connector = undefined;
-
-        //get axioms nodes
-        let elements = proof.tree.nodes.selectAll(".node");
-        //remove old connectors
-        elements.selectAll(".connector").remove();
-        //add new connectors
-        elements.each(function (e) {
-            selection = d3.select(this);
-            let inferredUsing;
-            selection.each(d => {
-                inferredUsing = d.data.source.data.rule.label
-            });
-
-            if (inferredUsing === "Asserted Conclusion") {
-                selection.attr("class", "node axiom asserted");
-            }
-            
-            newClasses = ["connector"];
-            if (selection.classed("conclusion")) {
-                newClasses.push("conclusionConnector");
-            } else if (selection.classed("asserted")) {
-                newClasses.push("assertedAxiomConnector");
-            } else {
-                newClasses.push("inferredAxiomConnector");
-            }
-
-            connector = selection.append("circle");
-            connector.attr("class", newClasses.join(" "));
-            selection.select(".connector")
-                .attr("cx", (d) => d.width / 2)
-                .attr("cy", nodeVisualsDefaults.BOX_HEIGHT / 2)
-                .attr("r", nodeVisualsDefaults.CONNECTOR_SIZE / 2)
-        });
-
-        // Draw the rest-of-proof node
-        proof.tree.nodes
-            .select(".rest")
-            .append("circle")
-            .attr("r", 10)
-            .on("click", () => proof.tree.resetHierarchy());
     }
 
     highlightCurrentInference(currentNode) {

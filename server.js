@@ -137,7 +137,7 @@ app.get('/project', (req, res) => {
 
   const status = {
     status: undefined,
-    ontology: '',
+    ontology: [],
     names: {},
     proofs: [],
     reasoner:'',
@@ -153,17 +153,20 @@ app.get('/project', (req, res) => {
   }
 
   files.forEach(function (file) {
-    if (file.endsWith('.ht.xml')) {
+    if (file.endsWith('.t.xml')) {
       status.proofs.push(file.split('.')[0]);
       flags.proofs = true;
     }
-    if ((file.endsWith('.xml') || file.endsWith('.owl')) && !file.startsWith('atomic ') && !file.startsWith('proof_')) {
-      status.ontology = file;
-      flags.ontology = true;
-    }
+    
     if (file.endsWith('.xml') && file.startsWith('atomic ')) {
       status.ad = file;
       flags.ad = true;
+    }
+
+    if ((file.endsWith('.xml') || file.endsWith('.owl')) 
+    && !file.startsWith('atomic ') && !file.startsWith('proof_') && !file.endsWith('t.xml')) {
+      status.ontology.push(file);
+      flags.ontology = true;
     }
   });
 

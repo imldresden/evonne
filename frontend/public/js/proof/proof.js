@@ -51,7 +51,7 @@ const conf = {
 
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
-    d3.xml(file).then((xml) => {
+    d3.xml(file).then(xml => {
       proof.svgRootLayer.selectAll("*").remove();
       createContent(xml);
     });
@@ -161,16 +161,11 @@ function getFileName() {
     };
   }
 
-  fileName = fileName.indexOf(".ht.xml") !== -1 ?
-    fileName.substring(0, fileName.indexOf(".ht.xml")) :
-    fileName.indexOf(".t.xml") !== -1 ?
-      fileName.substring(0, fileName.indexOf(".t.xml")) : fileName;
-
-  if (proof.isLinear) {
-    fileName += ".ht.xml";
-  } else {
-    fileName += ".t.xml";
-  }
+  fileName.indexOf(".t.xml") !== -1 ?
+    fileName.substring(0, fileName.indexOf(".t.xml")) : fileName;
+  
+  fileName += ".t.xml";
+  
   return fileName;
 }
 

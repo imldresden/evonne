@@ -55,7 +55,7 @@ export class NodeVisualsHelper {
         proof.nodeVisuals.nodes = what;
 
         if (proof.isLinear) {
-            proof.linear.renderSideConnectorsByType();
+            this.renderConnectorsByType("Right");
         } else {
             this.renderConnectorsByType("Up");
             this.renderConnectorsByType("Down");
@@ -69,6 +69,41 @@ export class NodeVisualsHelper {
 
     renderConnectorsByType(direction) {
         const { BOX_HEIGHT, CONNECTOR_SIZE } = nodeVisualsDefaults;
+        const directions = {
+            "Up": {
+                cx: 0,
+                cy: 0,
+                x: - CONNECTOR_SIZE / 2,
+                y: - CONNECTOR_SIZE / 2,
+            },
+
+            "Down": {
+                cx: 0,
+                cy: BOX_HEIGHT,
+                x: - CONNECTOR_SIZE / 2,
+                y: BOX_HEIGHT - CONNECTOR_SIZE / 2
+            },
+
+            "Right": {
+                cx: (d) => d.width / 2,
+                cy: BOX_HEIGHT / 2,
+                x: (d) => d.width / 2 - CONNECTOR_SIZE / 2,
+                y: BOX_HEIGHT / 2 - CONNECTOR_SIZE / 2
+            },
+        };
+
+        const circleAttributes = {
+            cx: directions[direction].cx,
+            cy: directions[direction].cy,
+            r: CONNECTOR_SIZE / 2,
+        };
+        const rectangleAttributes = {
+            x: directions[direction].x,
+            y: directions[direction].y,
+            height: CONNECTOR_SIZE,
+            width: CONNECTOR_SIZE,
+        };
+
         let newClasses = undefined;
         let directionClass = "connector" + direction;
         let commonClasses = ["connector", directionClass];
@@ -76,18 +111,7 @@ export class NodeVisualsHelper {
         let connector = undefined;
         let connectorType = undefined;
         let attributes = undefined;
-        let circleAttributes = {
-            cx: ["cx", 0],
-            cy: ["cy", direction === "Up" ? 0 : BOX_HEIGHT],
-            r: ["r", CONNECTOR_SIZE / 2]
-        };
-        let rectangleAttributes = {
-            x: ["x", - CONNECTOR_SIZE / 2],
-            y: ["y", direction === "Up" ? - CONNECTOR_SIZE / 2 : BOX_HEIGHT - CONNECTOR_SIZE / 2],
-            height: ["height", CONNECTOR_SIZE],
-            width: ["width", CONNECTOR_SIZE]
-        };
-
+        
         //get axioms nodes
         let elements = this.nodes.selectAll(".node");
         //remove old connectors
@@ -132,8 +156,8 @@ export class NodeVisualsHelper {
             }
             connector = selection.append(connectorType);
             connector.attr("class", newClasses.join(" "));
-            Object.values(attributes).forEach(value => {
-                selection.select("." + directionClass).attr(value[0], value[1]);
+            Object.keys(attributes).forEach(k => {
+                selection.select("." + directionClass).attr(k, attributes[k]);
             });
         });
 
@@ -211,12 +235,12 @@ export class NodeVisualsHelper {
                     if (!displayFormat || displayFormat === "original") {
                         return d.data.source.element;
                     }
-                        
+
                     if (displayFormat === "shortened") {
                         return globals.labelsShorteningHelper.shortenLabel(d.data.source.element, proof.isRuleShort, globals.shorteningMethod);
                     } else if (displayFormat === "textual") {
                         return d.data.source.nLElement;
-                    }  
+                    }
                 })
                 .each((d, i, nodes) => {
                     d3.select(`#${nodes[i].parentNode.id} #frontRect`)
@@ -296,12 +320,12 @@ export class NodeVisualsHelper {
                         this.shiftLabelHideButtons(node);
                         if (!proof.isDrawing) {
                             const tray = d3.select(`#${node.id} .tray`);
-                            try { 
+                            try {
                                 if (tray && tray.classed("expanded")) {
                                     this.expandCollapseNode(node.id);
                                     this.updateEdge(d);
                                 }
-                            } catch (_) {} // tray becomes undefined despite the check due to timeout
+                            } catch (_) { } // tray becomes undefined despite the check due to timeout
                         }
                     }, 1500);
                 }
@@ -527,7 +551,7 @@ export class NodeVisualsHelper {
             if (node.children) {
                 node.children.forEach(a => {
                     this.setNodeWidthsAndMax(a);
-                });   
+                });
             }
         } else {
             console.error('received null node')
