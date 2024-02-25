@@ -157,14 +157,14 @@ function getTreeFromXML(data) {
     return addNodesToEdges(nodeData, edgeData);
 }
 
-function getTreeFromJSON(data) {
+function getTreeFromJSON(data) { // { edges, nodes }
     let edgeData = data.edges; // { id, source, target }
     let nodeData = data.nodes.map(d => {
         const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
         node.isRoot = outGoingEdges.length === 0;
         return node;
-    }); // { id, type, element, mSElement, nLElement, data } // data is used for numbers
-
+    }); // { id, type, element, mSElement, nLElement, data (eg numerical)} 
+    
     return addNodesToEdges(nodeData, edgeData);
 }
 

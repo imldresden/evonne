@@ -53,13 +53,13 @@ const conf = {
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
 
-    if (file.indexOf(".t.xml") !== -1) {
+    if (file.endsWith(".t.xml")) {
       d3.xml(file).then(xml => {
         proof.tree.init(getTreeFromXML(xml));
       });
     }
 
-    if (file.indexOf(".json") !== -1) {
+    if (file.endsWith(".json")) {
       d3.json(file).then(json => {
         proof.tree.init(getTreeFromJSON(json));
       });

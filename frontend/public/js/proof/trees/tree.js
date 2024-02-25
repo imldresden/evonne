@@ -1,6 +1,7 @@
 import { proof } from "../proof.js";
 import { nodeVisualsDefaults } from "../node-visuals.js";
 import { computeTreeLayout } from "../data/process-data.js";
+import { utils as ruleUtils } from "../rules/rules.js";
 
 export class TreeNavigation {
 
@@ -39,24 +40,19 @@ export class TreeNavigation {
 
     restart() { // this.edgeData must have been set 
         proof.svgRootLayer.selectAll("*").remove();
+        this.hierarchy = this.createHierarchy(this.edgeData); 
 
-        let data; 
-        // initialize hierarchy depending on options
-        
         if (proof.isMagic) {
-            data = proof.magic.getInitialMagicalHierarchy(this.edgeData);
-        } else {
-            data = this.edgeData;
+            this.hierarchy = this.createHierarchy(
+                proof.magic.getInitialMagicalHierarchy(this.edgeData)
+            );
+        } else { // rules always shown in magic
+            if (!proof.showRules) {
+                this.hierarchy = this.createHierarchy(
+                    this.flattenRules(this.edgeData)
+                );
+            } 
         }
-
-        if (!proof.showRules) {
-
-        }
-
-        this.hierarchy = this.createHierarchy(data);
-
-        // update and draw the tree
-        this.updateHierarchyVars(this.hierarchy);
 
         this.links = proof.svgRootLayer
             .append("g")
@@ -69,6 +65,28 @@ export class TreeNavigation {
             .attr("id", "nodes");
 
         this.labels = proof.svg.selectAll("#nodes");
+    }
+
+    flattenRules() {
+        const data = structuredClone(this.edgeData);
+        const rules = {}, rts = {}, targets = []; 
+        data.forEach(e => {
+            if (ruleUtils.isRule(e.source.type)) {
+                rules[e.source.id] = e;
+                rts[e.target.id] = e;
+            } else {
+                targets.push(e)
+            }
+        })
+        targets.forEach(t => {
+            t.source.rule = rts[t.source.id].source;
+            
+            if (t.target !== "" && rules[t.target.id]) {
+                t.target = rules[t.target.id].target; // replaces rule with rule target
+            }
+        })
+        
+        return targets;
     }
 
     update(reset = false) {
@@ -84,7 +102,6 @@ export class TreeNavigation {
         // add axiom buttons depending on the navigation mode (Normal vs Magic)
         if (proof.isMagic) {
             let originalHierarchy = this.createHierarchy(this.edgeData);
-            this.updateHierarchyVars(originalHierarchy);
             proof.magic.entireProofHierarchy = originalHierarchy;
             proof.magic.addMagicNavButtonsToNodes();
         } else {
@@ -96,13 +113,44 @@ export class TreeNavigation {
     }
 
     createHierarchy(data) {
-        // Create the stratify function for our data
-        let stratify = d3.stratify()
-            .id(d => d.source.id)
-            .parentId(d => d.target.id);
+        function updateHierarchyVars(someHierarchy, currentHierarchy) {
+            if (!currentHierarchy) {
+                currentHierarchy = someHierarchy; 
+            }
+            
+            let common = [];
+            let commonElement;
+            
+            someHierarchy.descendants().forEach(x => {
+                commonElement = currentHierarchy.descendants().find(y => y.data.id === x.data.id);
+                if (commonElement) {
+                    common.push(commonElement);
+                }
+            });
+    
+            if (proof.isMagic && someHierarchy !== currentHierarchy) {
+                someHierarchy.descendants().forEach((d, i) => {
+                    let originalSource = common.find(x => x.data.target.id === d.data.source.id);
+                    let originalTarget = common.find(x => x.data.source.id === d.data.source.id);
+                    if (originalSource) {
+                        d.id = originalSource.parent.id;
+                    } else if (originalTarget) {
+                        d.id = originalTarget.id;
+                    }
+                    d._children = d.children;
+                });
+            } else {
+                someHierarchy.descendants().forEach((d, i) => {
+                    d.id = i;
+                    d._children = d.children;
+                });
+            }
+        }
 
-        // conclusion is the root node, asserted axioms are the leaf nodes
-        return stratify(data);
+        const stratify = d3.stratify().id(d => d.source.id).parentId(d => d.target.id);
+        const hierarchy = stratify(data); // conclusion is the root node, asserted axioms are the leaf nodes
+        updateHierarchyVars(hierarchy, this.hierarchy);
+        return hierarchy;
     }
 
     showAll() {
@@ -143,10 +191,8 @@ export class TreeNavigation {
         let newEdgesData = this.extractData(root);
         //create a new hierarchy
         let newHierarchy = this.createHierarchy(newEdgesData);
-        this.updateHierarchyVars(newHierarchy);
         //preserve previous sub-structure
         let previousHierarchy = this.createHierarchy(originalEdgeData);
-        this.updateHierarchyVars(previousHierarchy);
         let found;
         newHierarchy.children[0].descendants().forEach(x => {
             found = previousHierarchy.descendants().find(y => y.data.source.id === x.data.source.id);
@@ -154,8 +200,11 @@ export class TreeNavigation {
                 x.children = null;
             }
         });
+        
         //update the graph
-        this.updateHierarchy(newHierarchy);
+        this.hierarchy = newHierarchy;
+        proof.nodeVisuals.initVarsAxiomFunctions();
+        this.update();
     }
 
     extractOriginalData(root) {
@@ -320,47 +369,5 @@ export class TreeNavigation {
         });
 
         proof.nodeVisuals.renderNodes(proof.svg, this.nodes);
-    }
-
-    updateHierarchy(newHierarchy) {
-        this.hierarchy = newHierarchy;
-        proof.nodeVisuals.initVarsAxiomFunctions();
-        this.update();
-    }
-
-    resetHierarchy() {
-        let originalHierarchy = this.createHierarchy(this.edgeData);
-        this.updateHierarchyVars(originalHierarchy)
-        this.updateHierarchy(originalHierarchy);
-    }
-
-    updateHierarchyVars(someHierarchy) {
-        let common = [];
-        let commonElement;
-
-        someHierarchy.descendants().forEach(x => {
-            commonElement = this.hierarchy.descendants().find(y => y.data.id === x.data.id);
-            if (commonElement) {
-                common.push(commonElement);
-            }
-        });
-
-        if (proof.isMagic && someHierarchy !== this.hierarchy) {
-            someHierarchy.descendants().forEach((d, i) => {
-                let originalSource = common.find(x => x.data.target.id === d.data.source.id);
-                let originalTarget = common.find(x => x.data.source.id === d.data.source.id);
-                if (originalSource) {
-                    d.id = originalSource.parent.id;
-                } else if (originalTarget) {
-                    d.id = originalTarget.id;
-                }
-                d._children = d.children;
-            });
-        } else {
-            someHierarchy.descendants().forEach((d, i) => {
-                d.id = i;
-                d._children = d.children;
-            });
-        }
     }
 }

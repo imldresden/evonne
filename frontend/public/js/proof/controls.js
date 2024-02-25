@@ -181,7 +181,7 @@ function allowOverlapBtnFunction() {
 
 function showRulesBtnFunction() {
     proof.showRules = showRulesBtn.checked;
-    proof.update();
+    proof.update(true);
 }
 
 function collapseAllBtnFunction() {
@@ -189,7 +189,6 @@ function collapseAllBtnFunction() {
     magicToggleBtn.checked = false;
     proof.isMagic = false;
     proof.magic.currentMagicAction = "";
-    proof.tree.resetHierarchy();
     proof.axioms.showConclusionOnly();
 }
 
@@ -200,15 +199,15 @@ function getShowRulesWrapper() {
 function magicToggleBtnFunction() {
     // Clear the SVG content
     proof.svgRootLayer.selectAll("*").remove();
+    proof.isMagic = magicToggleBtn.checked;
+    
     if (magicToggleBtn.checked) {
-        layoutToggleBtn.checked = false;
-        layoutToggleBtnFunction();
+        showRulesBtn.checked = true;
+        proof.showRules = true;
         getShowRulesWrapper().style.display = "none";
+   
     } else {
         getShowRulesWrapper().style.display = "flex";
-    }
-    proof.isMagic = magicToggleBtn.checked;
-    if (!proof.isMagic) {
         proof.magic.currentMagicAction = undefined;
     }
 
@@ -223,14 +222,14 @@ function layoutToggleBtnFunction() {
     // Clear the SVG content
     proof.svgRootLayer.selectAll("*").remove();
 
+    proof.isLinear = layoutToggleBtn.checked;
+
     if (layoutToggleBtn.checked) {
-        magicToggleBtn.checked = false;
-        magicToggleBtnFunction();
         getPlanarWrapper().style.display = "flex";
     } else {
         getPlanarWrapper().style.display = "none";
     }
-    proof.isLinear = layoutToggleBtn.checked;
+    
     proof.update(true);
 }
 

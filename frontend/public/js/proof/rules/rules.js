@@ -12,15 +12,10 @@ const rule_sets = {
 const utils = {
     addTitle: function(text) {
         let title = div.append("header").attr("id", "tooltip-handle-bar")
-        
         title.append("i")
             .attr("class", "material-icons right modal-close")
             .html("close")
-            .on("click", () => {
-                tooltip.selectAll("*").remove();
-                lastToolTipTriggerID = null;
-                proof.svg.selectAll("g.node, line.link, path.link").style("opacity", 1);
-            })
+            .on("click", () => proof.rules.destroyExplanation())
     
         title.append("h2").attr("align", "center").text(text);
     }, 
@@ -56,41 +51,40 @@ class RulesHelper {
         d3.selectAll("body .tooltip-explanation").remove();
 
         proofView.selectAll(".rule").each(x => {
-
-            let conclusion = x.parent.data.source.element;
-            let premises = [];
-    
-            if (x.children) {
-                x.children.forEach(child => premises.push(child.data.source.element));
-            }
-
             proofView.select("#N" + x.data.source.id).on("click", (event, node) => {
-                this.showExplanation(event, { premises, conclusion, data: node.data, node });
+                if (node.data.source.id !== lastToolTipTriggerID) {
+                    this.destroyExplanation();
+
+                    let conclusion = x.parent.data.source.element;
+                    let premises = [];
+                    let iDsToHighlight = [x.parent.data.source.id];
+            
+                    if (x.children) {
+                        x.children.forEach(child => { 
+                            premises.push(child.data.source.element);
+                            iDsToHighlight.push(child.data.source.id);
+                        });
+                    }
+
+                    iDsToHighlight.push(node.data.source.id);
+                    lastToolTipTriggerID = node.data.source.id;
+                    proof.nodeVisuals.changeOpacities(iDsToHighlight);
+                    this.showExplanation(event, { premises, conclusion, data: node.data });
+                } else {
+                    this.destroyExplanation();
+                }
             });
         });
     }
 
-    showExplanation(event, { premises, conclusion, data, node }) {
+    showExplanation(event, { premises, conclusion, data }) {
 
-        if (tooltip) {
-            tooltip.remove();
-            proof.svg.selectAll("g.node, line.link, path.link").style("opacity", 1);
-        }
-
-        if (data.source.id !== lastToolTipTriggerID) {
-            //create the tooltip
-            tooltip = d3.select("body")
-                .append("div")
-                .attr("class", "tooltip-explanation")
-                .attr("id", "toolTipID");
-            
-            lastToolTipTriggerID = data.source.id;
-
-        } else {
-            lastToolTipTriggerID = null;
-            return;
-        }
-
+        //create the tooltip
+        tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip-explanation")
+            .attr("id", "toolTipID");
+        
         div = tooltip
             .append("div").attr("class", "tooltiptext")
             .attr("id", "explanationTextSpan");
@@ -100,23 +94,10 @@ class RulesHelper {
         if (data.source.type === "rule" || data.source.type === "DLRule") {
             rule_sets.dl.draw({ ruleName, div, premises, conclusion });
         } else if (data.source.type === "CDRule") {
-            rule_sets.cd.draw({ ruleName, tooltip, data: data.source.data, node });
+            rule_sets.cd.draw({ ruleName, tooltip, data: data.source.data });
         } else {
             console.error(`unknown rule type: "${data.source.type}"`);
         }
-
-        const ids = {}; 
-        ids[node.data.source.id] = 1;
-        ids[node.data.target.id] = 2;
-
-        if (node.children) {
-            node.children.forEach(x => { ids[x.data.source.id] = 3; });
-        }
-
-        proof.svg.selectAll("g.node")
-            .style("opacity", d => ids[d.data.source.id] ? 1:.2);
-        proof.svg.selectAll("line.link, path.link")
-            .style("opacity", d => (ids[d.source.data.source.id] === 2 || ids[d.target.data.target.id] === 1 ? 1:.2)); 
 
         if (proof.ruleExplanationPosition === "mousePosition") {
             this.setPositionRelativeToMouse(event)
@@ -125,6 +106,16 @@ class RulesHelper {
         }
 
         this.makeDraggable(document.getElementById("toolTipID"), document.getElementById("tooltip-handle-bar"));
+    }
+
+    destroyExplanation() {
+        if (tooltip) {
+            tooltip.remove();    
+        }
+
+        lastToolTipTriggerID = null;
+        proof.nodeVisuals.setFullOpacityToAll();
+        d3.selectAll("#H1 text").text("\ue1b7");
     }
 
     getPositionClass(ruleExplanationPosition) {

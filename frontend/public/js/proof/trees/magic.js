@@ -19,7 +19,7 @@ export class MagicNavigation {
 		let result = [];
 		let magicBox = this.getNewMagicBox();
 		let fake = data.find((x) => x.id === "L-1");
-		data
+		structuredClone(data)
 			.filter((x) => x.source.element === "Asserted Conclusion")
 			.forEach((x) => {
 				result.push(x);
@@ -129,9 +129,7 @@ export class MagicNavigation {
 
 	//create the new hierarchy and update
 	updateAll(data, action) {
-		let newHierarchy = proof.tree.createHierarchy(this.orderStructure(data));
-		proof.tree.updateHierarchyVars(newHierarchy);
-		proof.tree.hierarchy = newHierarchy;
+		proof.tree.hierarchy = proof.tree.createHierarchy(this.orderStructure(data));
 		this.currentMagicAction = action;
 		proof.update();
 	}

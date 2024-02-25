@@ -168,7 +168,7 @@ export class NodeVisualsHelper {
 
         // Draw the rest-of-proof node
         this.nodes.select(".rest").append("circle").attr("r", 10)
-            .on("click", () => { proof.tree.resetHierarchy(); });
+            .on("click", () => { proof.tree.update(true); });
     }
 
     renderBoxes() {
@@ -570,5 +570,28 @@ export class NodeVisualsHelper {
         }
         classStr = !d.parent && d.data.source.type !== "rest" ? classStr + " conclusion" : classStr;
         return classStr;
+    }
+
+     
+    changeOpacities(iDsToHighlight) {
+        let dataS, dataT;
+
+        proof.svg.selectAll("g.node,line.link,path.link").style("opacity", (d) => {
+            if (d.source) {
+                dataS = d.source.data;
+                dataT = d.target.data;
+            } else {
+                dataS = dataT = d.data;
+            }
+
+            if (iDsToHighlight.includes(dataS.source.id) && iDsToHighlight.includes(dataT.source.id)) {
+                return 1;
+            }
+            return .2;
+        });
+    }
+
+    setFullOpacityToAll() {
+        proof.svg.selectAll("g.node,line.link,path.link").style("opacity", 1);
     }
 }

@@ -28,7 +28,7 @@ export class CDRules {
 
     showObvious = false; 
 
-    draw({ ruleName, tooltip, data, node }) {
+    draw({ ruleName, tooltip, data }) {
         this.tooltip = tooltip;
 
         console.log(data)

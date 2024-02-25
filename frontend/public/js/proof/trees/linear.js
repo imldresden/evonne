@@ -143,40 +143,14 @@ export class LinearNavigation {
             let dy = (y1 - y2);
     
             let normalise = Math.sqrt((dx * dx) + (dy * dy));
+            if (normalise === 0) {
+                normalise = 1; // avoid division by zero
+            }
     
             let offSetX = midpoint_x + offset * (dy / normalise);
             let offSetY = midpoint_y - offset * (dx / normalise);
     
             return "M" + x2 + "," + y2 + "S" + offSetX + "," + offSetY + " " + x1 + "," + y1; // bezier curves
         }
-    }
-
-    highlightCurrentInference(currentNode) {
-
-        let iDsToHighlight = [currentNode.data.source.id];
-        if (currentNode.children) {
-            currentNode.children.forEach(x => {
-                iDsToHighlight.push(x.data.source.id);
-            });
-        }
-        let dataS, dataT;
-
-        proof.svg.selectAll("g.node,path.link").style("opacity", (d) => {
-            if (d.source) {
-                dataS = d.source.data;
-                dataT = d.target.data;
-            } else {
-                dataS = dataT = d.data;
-            }
-
-            if (iDsToHighlight.includes(dataS.source.id) && iDsToHighlight.includes(dataT.source.id)) {
-                return 1;
-            }
-            return .2;
-        });
-    }
-
-    setFullOpacityToAll() {
-        proof.svg.selectAll("g.node,path.link").style("opacity", 1);
     }
 }
