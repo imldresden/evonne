@@ -444,7 +444,7 @@ function init() {
     magicToggleBtn.checked = false;
     layoutToggleBtn.checked = false;
     planarToggleBtn.checked = true;
-    showRulesBtn.checked = false;
+    showRulesBtn.checked = true;
     getPlanarWrapper() ? getPlanarWrapper().style.display = "none" : "";
 
     shorteningMethodSelection.value = globals.shorteningMethod;

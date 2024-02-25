@@ -18,9 +18,15 @@ export class LinearNavigation {
             orderedElements.push(linearLayout);
         }
 
-        const rules = orderedElements.filter(d => ruleUtils.isRule(d.data.source.type))
-        const axioms = orderedElements.filter(d => !ruleUtils.isRule(d.data.source.type))
-        
+        const al = {};
+        let c = 0;
+        orderedElements.forEach(d => {
+            if (!ruleUtils.isRule(d.data.source.type)) {
+                al[d.data.source.id] = { axiom: d, pos: c };
+                c += 1;
+            }
+        });
+
         if (overlapAllowed) {
             const itemY = proof.height / (orderedElements.length < 2 ? 1 : orderedElements.length - 1);
             linearLayout.each(d => {
@@ -33,14 +39,14 @@ export class LinearNavigation {
             });    
         } else {
             const itemY = proof.nodeVisuals.maxNodeHeight * 1.1;
-            const maxHeight = itemY * axioms.length;
+            const maxHeight = itemY * c;
             linearLayout.each(d => {
                 if (ruleUtils.isRule(d.data.source.type)) {
                     d.x = 0.7 * proof.width - d.width / 2 + d.width + 50;
-                    d.y = maxHeight - ((rules.indexOf(d)) * itemY) + 15;    
+                    d.y = maxHeight - (al[d.data.target.id].pos * itemY) + 15;    
                 } else {
                     d.x = 0.7 * proof.width - d.width / 2 - 15;
-                    d.y = maxHeight - ((axioms.indexOf(d)) * itemY);
+                    d.y = maxHeight - (al[d.data.source.id].pos  * itemY);
                 }
             });
         }

@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="https://unpkg.com/hack-font@3.3.0/build/web/hack.css">
     <link rel="stylesheet" href="https://unpkg.com/material-icons@1.13.9/iconfont/material-icons.css">
 
-    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.3/frontend/public//style/widgets/general.css">
-    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.3/frontend/public//style/widgets/parallel-coords.css">
-    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.3/frontend/public//style/proof.css">
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.4/frontend/public//style/widgets/general.css">
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.4/frontend/public//style/widgets/parallel-coords.css">
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.4/frontend/public//style/proof.css">
 </head>
 
 <body>
@@ -25,13 +25,14 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
     
     <script type="module">
-        import { init_proof } from "https://unpkg.com/evonne@0.0.3/frontend/public/js/proof/proof.js";
+        import { init_proof } from "https://unpkg.com/evonne@0.0.4/frontend/public/js/proof/proof.js";
 
         init_proof({ 
             external: {
                 div: "my-reasoning-tree",
                 path: "../data/test/normal.t.xml",
-                drawTime: 500
+                drawTime: 500,
+                isLinear: true,
             } 
         });
     </script>

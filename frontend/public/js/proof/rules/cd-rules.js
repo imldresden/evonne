@@ -1,6 +1,5 @@
 import { utils } from "./rules.js";
 import { parallelCoords } from "../../parallel-coords/parallel-coords-svg.js";
-import { proof } from "../proof.js";
 
 export class CDRules {
 

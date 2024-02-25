@@ -79,7 +79,7 @@ export class AxiomsHelper {
 			treeRoot.children = treeRoot._children;
 		}
 
-		if (!proof.isLinear) {
+		if (proof.showRules) {
 			if (!treeRoot.children[0].children) {
 				treeRoot.children[0].children = treeRoot.children[0]._children
 			}
