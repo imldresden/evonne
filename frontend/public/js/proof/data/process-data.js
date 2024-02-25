@@ -103,7 +103,6 @@ function buildCDRule({ d, data }) {
 }
 
 function getNodes(data, edgeData) {
-
     // Compute nodes
     return [].map.call(data.querySelectorAll("node"), (d) => {
 
@@ -129,7 +128,20 @@ function getNodes(data, edgeData) {
     });
 }
 
-function processData(data) {
+function addNodesToEdges(nodeData, edgeData) {
+    // add the nodeData to the edgeData
+    edgeData.forEach((d) => {
+        d.source = nodeData.find((b) => b.id === d.source);
+        d.target = nodeData.find((b) => b.id === d.target);
+    });
+
+    return {
+        nodes: nodeData,
+        edges: edgeData,
+    };
+}
+
+function getTreeFromXML(data) {
     // read edges 
     let edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
         let edgeId = d.getAttribute("id");
@@ -142,16 +154,18 @@ function processData(data) {
     // read nodes
     let nodeData = getNodes(data, edgeData);
 
-    // add the nodeData to the edgeData
-    edgeData.forEach((d) => {
-        d.source = nodeData.find((b) => b.id === d.source);
-        d.target = nodeData.find((b) => b.id === d.target);
-    });
+    return addNodesToEdges(nodeData, edgeData);
+}
 
-    return {
-        nodes: nodeData,
-        edges: edgeData,
-    };
+function getTreeFromJSON(data) {
+    let edgeData = data.edges; // { id, source, target }
+    let nodeData = data.nodes.map(d => {
+        const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
+        node.isRoot = outGoingEdges.length === 0;
+        return node;
+    }); // { id, type, element, mSElement, nLElement, data } // data is used for numbers
+
+    return addNodesToEdges(nodeData, edgeData);
 }
 
 function computeTreeLayout(hierarchy) {
@@ -189,4 +203,4 @@ function computeTreeLayout(hierarchy) {
     return tree_layout;
 }
 
-export { processData, computeTreeLayout }
+export { getTreeFromXML, getTreeFromJSON, computeTreeLayout }

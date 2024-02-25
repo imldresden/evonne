@@ -193,19 +193,26 @@ function collapseAllBtnFunction() {
     proof.axioms.showConclusionOnly();
 }
 
+function getShowRulesWrapper() {
+    return showRulesBtn && document.getElementById("show-rules-div-wrapper");
+}
+
 function magicToggleBtnFunction() {
     // Clear the SVG content
     proof.svgRootLayer.selectAll("*").remove();
     if (magicToggleBtn.checked) {
         layoutToggleBtn.checked = false;
         layoutToggleBtnFunction();
+        getShowRulesWrapper().style.display = "none";
+    } else {
+        getShowRulesWrapper().style.display = "flex";
     }
     proof.isMagic = magicToggleBtn.checked;
     if (!proof.isMagic) {
         proof.magic.currentMagicAction = undefined;
     }
 
-    proof.load();
+    proof.update(true);
 }
 
 function getPlanarWrapper() {
@@ -218,13 +225,13 @@ function layoutToggleBtnFunction() {
 
     if (layoutToggleBtn.checked) {
         magicToggleBtn.checked = false;
-        proof.isMagic = false;
+        magicToggleBtnFunction();
         getPlanarWrapper().style.display = "flex";
     } else {
         getPlanarWrapper().style.display = "none";
     }
     proof.isLinear = layoutToggleBtn.checked;
-    proof.load();
+    proof.update(true);
 }
 
 function planarToggleBtnFunction() {
@@ -438,6 +445,7 @@ function init() {
     magicToggleBtn.checked = false;
     layoutToggleBtn.checked = false;
     planarToggleBtn.checked = true;
+    showRulesBtn.checked = false;
     getPlanarWrapper() ? getPlanarWrapper().style.display = "none" : "";
 
     shorteningMethodSelection.value = globals.shorteningMethod;

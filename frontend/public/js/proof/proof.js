@@ -1,5 +1,5 @@
 import thumbnailViewer from "../utils/pan-zoom.js";
-import { processData } from "./data/process-data.js";
+import { getTreeFromXML, getTreeFromJSON } from "./data/process-data.js";
 import { upload } from '../utils/upload-file.js';
 
 import { AxiomsHelper } from "./axioms.js";
@@ -52,14 +52,22 @@ const conf = {
 
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
-    d3.xml(file).then(xml => {
-      proof.svgRootLayer.selectAll("*").remove();
-      createContent(xml);
-    });
+
+    if (file.indexOf(".t.xml") !== -1) {
+      d3.xml(file).then(xml => {
+        proof.tree.init(getTreeFromXML(xml));
+      });
+    }
+
+    if (file.indexOf(".json") !== -1) {
+      d3.json(file).then(json => {
+        proof.tree.init(getTreeFromJSON(json));
+      });
+    }
   },
 
-  update: function (drawTime) {
-    proof.tree.update(drawTime);
+  update: function (reset) {
+    proof.tree.update(reset);
   }
 }
 
@@ -146,12 +154,6 @@ function init_proof({
   proof.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: `#${proof.div}` });
 }
 
-function createContent(data) {
-  // Generate nodes and edges from the raw data
-  let processedData = processData(data);
-  proof.tree.init(processedData);
-}
-
 function getFileName() {
   let fileName = "proof";
   if (proof.proofFile) {
@@ -162,11 +164,7 @@ function getFileName() {
     };
   }
 
-  fileName.indexOf(".t.xml") !== -1 ?
-    fileName.substring(0, fileName.indexOf(".t.xml")) : fileName;
-  
   fileName += ".t.xml";
-
   return fileName;
 }
 

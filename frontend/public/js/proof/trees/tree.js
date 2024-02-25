@@ -33,10 +33,27 @@ export class TreeNavigation {
         //Store original data
         this.edgeData = edgeData;
       
-        // initialize hierarchy depending on the navigation mode
-        this.hierarchy = proof.isMagic
-            ? this.createHierarchy(proof.magic.getInitialMagicalHierarchy(edgeData))
-            : this.createHierarchy(edgeData);
+        this.restart();
+        this.update();
+    }
+
+    restart() { // this.edgeData must have been set 
+        proof.svgRootLayer.selectAll("*").remove();
+
+        let data; 
+        // initialize hierarchy depending on options
+        
+        if (proof.isMagic) {
+            data = proof.magic.getInitialMagicalHierarchy(this.edgeData);
+        } else {
+            data = this.edgeData;
+        }
+
+        if (!proof.showRules) {
+
+        }
+
+        this.hierarchy = this.createHierarchy(data);
 
         // update and draw the tree
         this.updateHierarchyVars(this.hierarchy);
@@ -52,15 +69,19 @@ export class TreeNavigation {
             .attr("id", "nodes");
 
         this.labels = proof.svg.selectAll("#nodes");
-        this.update();
     }
 
-    update(drawTime = proof.drawTime) {
+    update(reset = false) {
+        if (reset) {
+            this.restart();
+        }
+
+        const drawTime = proof.drawTime;
         proof.nodeVisuals.setNodeWidthsAndMax(this.hierarchy);
         this.root = computeTreeLayout(this.hierarchy);
         this.drawTree(drawTime);
 
-        // Add axiom buttons depending on the navigation mode (Normal vs Magic)
+        // add axiom buttons depending on the navigation mode (Normal vs Magic)
         if (proof.isMagic) {
             let originalHierarchy = this.createHierarchy(this.edgeData);
             this.updateHierarchyVars(originalHierarchy);

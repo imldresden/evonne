@@ -133,7 +133,7 @@ export class MagicNavigation {
 		proof.tree.updateHierarchyVars(newHierarchy);
 		proof.tree.hierarchy = newHierarchy;
 		this.currentMagicAction = action;
-		proof.tree.update();
+		proof.update();
 	}
 
 	//return True if every element of the premise of the current magic rule 

@@ -128,7 +128,7 @@
       </div>
     </div>
 
-    <div class="modal-option">
+    <div class="modal-option" id="show-rules-div-wrapper">
       <label class="label-toggle">Show Rules</label>
       <div class="switch">
         <label>

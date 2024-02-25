@@ -426,7 +426,7 @@ export class AxiomsHelper {
 				if (x.children) {
 					x.children = null;
 				}
-				proof.update(x);
+				proof.update();
 			});
 	}
 
