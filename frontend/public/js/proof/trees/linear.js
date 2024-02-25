@@ -79,12 +79,8 @@ export class LinearNavigation {
         proof.tree.links.selectAll("path")
             .data(proof.tree.root.links(), d => "L" + d.source.data.source.id + "*" + d.target.data.source.id)
             .join(
-                enter => enter
-                    .append("path")
-                    .attr("marker-end", "url(#arrowhead)")
-                    .attr("class", d => d.source.data.source.type === "rest" ? "link torest" : "link")
-                    .attr("id", d => "L" + d.source.data.source.id + "*" + d.target.data.source.id)
-                    .attr('d', d => this.position(d, sourceNode))
+                enter => proof.tree.lineAttributes(enter.append("path"))
+                    .attr('d', d => this.position(d, sourceNode))    
                     .transition(t)
                     .attr('d', d => this.position(d)),
                 update => update

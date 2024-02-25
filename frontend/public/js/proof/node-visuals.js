@@ -167,8 +167,10 @@ export class NodeVisualsHelper {
         });
 
         // Draw the rest-of-proof node
-        this.nodes.select(".rest").append("circle").attr("r", 10)
-            .on("click", () => { proof.tree.update(true); });
+        this.nodes.select(".rest")
+            .append("circle")
+            .attr("r", 10).attr("cy", 15)
+            .on("click", () => proof.tree.update(true));
     }
 
     renderBoxes() {

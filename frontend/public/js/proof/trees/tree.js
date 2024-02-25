@@ -164,24 +164,6 @@ export class TreeNavigation {
         });
     }
 
-    showRest(data) {
-        // var others = d3.selectAll(".node").filter(function(d){return d.depth === data.depth && d != data});
-        let others = d3.selectAll(".node").filter(d => d === data.closest_right_neighbor);
-
-        others.transition()
-            .duration(100)
-            .ease(d3.easeLinear)
-            .style("opacity", 1);
-        //Show the corresponding delink button, This requires a link button of id = detachButton + nodeID(N+num)
-        others.each(x => {
-            d3.select("#detachButtonN" + x.data.source.id)
-                .transition()
-                .duration(100)
-                .ease(d3.easeLinear)
-                .style("opacity", 1);
-        });
-    }
-
     showSubTree(root) {
         //extract the current data
         let originalEdgeData = this.extractOriginalData(root);
@@ -235,6 +217,22 @@ export class TreeNavigation {
         ];
         root.links().forEach(entry => data.push(entry.target.data));
         return data;
+    }
+
+    lineAttributes(input) {
+        return input
+            .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
+            .attr("class", d =>
+                (d.source.data.source.type === "rest" ? "link torest" : "link") +
+                (d.source.data.target.type === "axiom" && !proof.isMagic ? " from-axiom " : "")
+            )
+            .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
+            .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
+            .on("click", (_, d) => {
+                if (!proof.isMagic && d.source.data.target.type === "axiom") {
+                    proof.tree.showSubTree(d.target);
+                }
+            })
     }
 
     drawTree(drawTime) {
@@ -310,20 +308,7 @@ export class TreeNavigation {
             this.links.selectAll("line")
                 .data(this.root.links(), d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
                 .join(
-                    enter => {
-                        enter.append("line")
-                            .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
-                            .attr("class", d =>
-                                (d.source.data.source.type === "rest" ? "link torest" : "link") +
-                                (d.source.data.target.type === "axiom" && !proof.isMagic ? " from-axiom " : "")
-                            )
-                            .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
-                            .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
-                            .on("click", (_, d) => {
-                                if (!proof.isMagic && d.source.data.target.type === "axiom") {
-                                    this.showSubTree(d.target);
-                                }
-                            })
+                    enter => this.lineAttributes(enter.append("line"))
                             // init on the source node 
                             .attr("x1", _ => sn.x)
                             .attr("y1", _ => proof.height - sn.y)
@@ -334,15 +319,12 @@ export class TreeNavigation {
                             .attr("x1", d => d.target.x)
                             .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
                             .attr("x2", d => d.source.x)
-                            .attr("y2", d => proof.height - d.source.y);
-                    },
-                    update => {
-                        update.transition(t)
+                            .attr("y2", d => proof.height - d.source.y),
+                    update => update.transition(t)
                             .attr("x1", d => d.target.x)
                             .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
                             .attr("x2", d => d.source.x)
-                            .attr("y2", d => proof.height - d.source.y)
-                    },
+                            .attr("y2", d => proof.height - d.source.y),
                     exit => {
                         // return nodes to the source of the interaction (collapse, push)
                         exit.transition(t)
