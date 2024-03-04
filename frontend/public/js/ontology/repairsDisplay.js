@@ -34,10 +34,10 @@ function readRepairs({ axiom, file, cy } = {}) {
   const repairs = [];
 
   d3.dsv(";", file).then((txt) => {
-    d3.keys(txt).forEach((key) => {
+    Object.keys(txt).forEach((key) => {
       if (key !== "columns") {
         repair = [];
-        d3.keys(txt[key]).forEach((column) => {
+        Object.keys(txt[key]).forEach((column) => {
           let repairPart = txt[key][column].trim();
           if (repairPart !== "") {
             if (txt["columns"].indexOf(column) !== 0) {
@@ -79,6 +79,8 @@ function computingRepairsFailed(msg) {
 //Notify the user that the repairs are being computed
 function computingRepairs() {
   notify(getComputingNotification());
+  document.getElementById("diagnoses-axiom").innerHTML = "";
+  document.getElementById("diagnoses-title").innerHTML = "Diagnoses";
   computingInterval = setInterval(function () {
     notificationDiv.text(getComputingNotification());
   }, 350);
@@ -266,8 +268,7 @@ function highlightNodesOf(data, cy) {
   cy.justification = new Set();
 
   data.forEach((axiom) => {
-    const trimmedAxiom = axiom.trim()
-    console.log(cy.nodes())
+    const trimmedAxiom = axiom.trim();
     
     cy.nodes().forEach((n) => {
       const node = n.data();

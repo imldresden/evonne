@@ -1,5 +1,6 @@
-import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
-import * as lP from "./linearProof/linearProofHelper.js";
+import { globals } from "../shared-data.js";
+import { proof } from "./proof.js";
+import { utils as ruleUtils } from "./rules/rules.js"
 
 export const nodeVisualsDefaults = {
     BOX_WIDTH: 170,
@@ -15,10 +16,9 @@ export const nodeVisualsDefaults = {
     BTN_EXTEND_HEIGHT: 20,
     BTN_CIRCLE_SIZE: 15,
     BTN_TRIANGLE_SIZE: 20,
-    BTN_EYE_HORIZONTAL_PADDING: 10,
-    BTN_EYE_VERTICAL_PADDING: 10,
+    TEXT_PAD: 8,
     AXIOM_TEXT_BOTTOM_SHIFT: 30,
-    EXPANSION_COLLAPSING_DURATION: 70,
+    EXPANSION_COLLAPSING_DURATION: 200,
 }
 
 export class NodeVisualsHelper {
@@ -44,21 +44,73 @@ export class NodeVisualsHelper {
         return this._svg;
     }
 
-    renderNodes() {
-        if (app.isLinear) {
-            lP.renderSideConnectorsByType();
+    nodeWithVisibleButtons = { id: "nothing" }
+    nodesCurrentDisplayFormat = new Map()
+    nodesDisplayFormat = new Map()
+    maxNodeWidth = 200;
+    maxNodeHeight = 45;
+
+    renderNodes(where, what) {
+        proof.nodeVisuals.svg = where;
+        proof.nodeVisuals.nodes = what;
+
+        if (proof.isLinear) {
+            this.renderConnectorsByType("Right", "Left");
         } else {
             this.renderConnectorsByType("Up");
             this.renderConnectorsByType("Down");
         }
+
         this.renderBoxes();
         this.renderLabels();
         //handle hover effect on axiom nodes
         this.addShowHideMouseEvents();
     }
 
-    renderConnectorsByType(direction) {
+    renderConnectorsByType(direction, alternate) {
         const { BOX_HEIGHT, CONNECTOR_SIZE } = nodeVisualsDefaults;
+        const directions = {
+            "Up": {
+                cx: 0,
+                cy: 0,
+                x: - CONNECTOR_SIZE / 2,
+                y: - CONNECTOR_SIZE / 2,
+            },
+
+            "Down": {
+                cx: 0,
+                cy: BOX_HEIGHT,
+                x: - CONNECTOR_SIZE / 2,
+                y: BOX_HEIGHT - CONNECTOR_SIZE / 2
+            },
+
+            "Right": {
+                cx: (d) => d.width / 2,
+                cy: BOX_HEIGHT / 2,
+                x: (d) => d.width / 2 - CONNECTOR_SIZE / 2,
+                y: BOX_HEIGHT / 2 - CONNECTOR_SIZE / 2
+            },
+
+            "Left": {
+                cx: (d) => - d.width / 2,
+                cy: BOX_HEIGHT / 2,
+                x: (d) => - d.width / 2 - CONNECTOR_SIZE / 2,
+                y: BOX_HEIGHT / 2 - CONNECTOR_SIZE / 2
+            },
+        };
+
+        const circleAttributes = {
+            cx: directions[direction].cx,
+            cy: directions[direction].cy,
+            r: CONNECTOR_SIZE / 2,
+        };
+        const rectangleAttributes = {
+            x: alternate ? directions[alternate].x : directions[direction].x,
+            y: alternate ? directions[alternate].y : directions[direction].y,
+            height: CONNECTOR_SIZE,
+            width: CONNECTOR_SIZE,
+        };
+
         let newClasses = undefined;
         let directionClass = "connector" + direction;
         let commonClasses = ["connector", directionClass];
@@ -66,69 +118,65 @@ export class NodeVisualsHelper {
         let connector = undefined;
         let connectorType = undefined;
         let attributes = undefined;
-        let circleAttributes = {
-            cx: ["cx", 0],
-            cy: ["cy", direction === "Up" ? 0 : BOX_HEIGHT],
-            r: ["r", CONNECTOR_SIZE / 2]
-        };
-        let rectangleAttributes = {
-            x: ["x", - CONNECTOR_SIZE / 2],
-            y: ["y", direction === "Up" ? - CONNECTOR_SIZE / 2 : BOX_HEIGHT - CONNECTOR_SIZE / 2],
-            height: ["height", CONNECTOR_SIZE],
-            width: ["width", CONNECTOR_SIZE]
-        };
-
+        
         //get axioms nodes
         let elements = this.nodes.selectAll(".node");
-        //remove old connectors
-        elements.selectAll("." + directionClass).remove();
         //add new connectors
         elements.each(function () {
             selection = d3.select(this);
             //Skip conclusion for bottom connectors
-            if (selection.classed("conclusion") && direction === "Down")
+            if (selection.classed("conclusion") && direction === "Down") {
                 return;
+            }
+
             //Skip first rules for top connectors
             let hasChildren;
             selection.each(d => hasChildren = !!d.children || !!d._children);
-            if (!hasChildren && direction === "Up")
+            if (!hasChildren && direction === "Up") {
                 return;
+            }
+
             //Continue with adding the connectors
             newClasses = [...commonClasses];
             if (selection.classed("axiom")) {
                 connectorType = "circle";
                 attributes = circleAttributes;
-                if (selection.classed("conclusion"))
+                if (selection.classed("conclusion")) {
                     newClasses.push("conclusionConnector");
-                else if (selection.classed("asserted"))
+                } else if (selection.classed("asserted")) {
                     newClasses.push("assertedAxiomConnector");
-                else
+                } else {
                     newClasses.push("inferredAxiomConnector");
+                }
             } else {
                 connectorType = "rect";
                 attributes = rectangleAttributes;
-                if (selection.classed("rule"))
+                if (selection.classed("rule")) {
                     newClasses.push("ruleConnector");
-                else if (selection.classed("krule"))
+                } else if (selection.classed("krule")) {
                     newClasses.push("kRuleConnector");
-                else
+                } else {
                     newClasses.push("mRuleConnector");
+                }
             }
             connector = selection.append(connectorType);
             connector.attr("class", newClasses.join(" "));
-            Object.values(attributes).forEach(value => {
-                selection.select("." + directionClass).attr(value[0], value[1]);
+            Object.keys(attributes).forEach(k => {
+                selection.select("." + directionClass).attr(k, attributes[k]);
             });
         });
 
         // Draw the rest-of-proof node
-        this.nodes.select(".rest").append("circle").attr("r", 10)
-            .on("click", () => { SharedData.resetHierarchy(); });
+        this.nodes.select(".rest")
+            .append("circle")
+            .attr("r", 10).attr("cy", 15)
+            .on("click", () => proof.tree.update(true));
     }
 
     renderBoxes() {
         const { BOX_HEIGHT, BOX_WIDTH, BOTTOM_TRAY_WIDTH, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
         let elements = this._nodes.selectAll(".node:not(.rest)");
+
         //Remove old rectangles
         elements.selectAll(".bg-box").remove();
         //Add a rectangle for the tray of communication buttons
@@ -160,12 +208,12 @@ export class NodeVisualsHelper {
             .attr("class", "bg-box")
             .attr("x", -BOX_WIDTH / 2)
             .attr("y", 0)
-            .attr("width", BOX_WIDTH)
+            .attr("width", d => d.width)
             .attr("height", BOX_HEIGHT);
     }
 
     renderLabels() {
-        const { BOX_HEIGHT, BOX_WIDTH, BOX_PADDING, BOX_PADDING_BOTTOM, BTN_EYE_VERTICAL_PADDING } = nodeVisualsDefaults;
+        const { BOX_HEIGHT, BOX_PADDING_BOTTOM, TEXT_PAD } = nodeVisualsDefaults;
 
         //get all nodes
         let elements = [];
@@ -180,34 +228,30 @@ export class NodeVisualsHelper {
         elementsClass.push("ruleLabel");
         elementsID.push("ruleText");
 
-        let i;
-        for (i = 0; i < elements.length; i++) {
+        for (let i = 0; i < elements.length; i++) {
             //remove labels text
             elements[i].selectAll("text").remove();
             //add new ones
             elements[i].append("text")
                 .attr("id", elementsID[i])
                 .attr("class", elementsClass[i])
-                .attr("x", -BOX_WIDTH / 2 + BOX_PADDING)
+                .attr("x", d => -(d.width) / 2 + TEXT_PAD)
                 .attr("y", BOX_HEIGHT - BOX_PADDING_BOTTOM)
                 .text((d, i, nodes) => {
-                    d.data.source.element = this.fixTypo(d.data.source.element);
-                    let displayFormat = SharedData.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
-                    if (!displayFormat || displayFormat === "original")
+                    let displayFormat = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
+                    if (!displayFormat || displayFormat === "original") {
                         return d.data.source.element;
-                    if (displayFormat === "shortened")
-                        return SharedData.labelsShorteningHelper.shortenLabel(d.data.source.element, app.isRuleShort, app.shorteningMethod);
-                    else if (displayFormat === "textual")
-                        return d.data.source.nlelement;
+                    }
+
+                    if (displayFormat === "shortened") {
+                        return globals.labelsShorteningHelper.shortenLabel(d.data.source.element, proof.isRuleShort, globals.shorteningMethod);
+                    } else if (displayFormat === "textual") {
+                        return d.data.source.nLElement;
+                    }
                 })
                 .each((d, i, nodes) => {
-                    d3.select(`#${nodes[i].parentNode.id} text`)
-                        .attr("x", () => -(nodes[i].getBBox().width) / 2);
-                        
                     d3.select(`#${nodes[i].parentNode.id} #frontRect`)
-                        .attr("width", () => nodes[i].getBBox().width + 2 * BTN_EYE_VERTICAL_PADDING)
-                        .attr("x", () => -(nodes[i].getBBox().width + 2 * BTN_EYE_VERTICAL_PADDING) / 2);
-                    d.width = nodes[i].getBBox().width + 2 * BTN_EYE_VERTICAL_PADDING;
+                        .attr("x", () => -(d.width) / 2);
                 });
         }
     }
@@ -249,12 +293,12 @@ export class NodeVisualsHelper {
     }
 
     initVarsAxiomFunctions() {
-        SharedData.nodeWithVisibleButtons = { id: "nothing" };
+        this.nodeWithVisibleButtons = { id: "nothing" };
     }
 
     initHideAllButtons() {
         d3.selectAll(".axiom")
-            .filter(() => this.id !== SharedData.nodeWithVisibleButtons.id)
+            .filter(() => this.id !== this.nodeWithVisibleButtons.id)
             .selectAll(".axiomButton")
             .attr("cursor", "pointer")
             .attr("pointer-events", "all")
@@ -265,70 +309,71 @@ export class NodeVisualsHelper {
     activeNodes = {};
     addShowHideMouseEvents() {
         d3.selectAll(".axiom")
-            .on("dblclick", (d, i, nodes) => {
-                if (!app.isDrawing) {
-                    this.expandCollapseNode(nodes[i].id);
+            .on("dblclick", (e, d) => {
+                if (!proof.isDrawing) {
+                    this.expandCollapseNode(e.currentTarget.id);
                     this.updateEdge(d);
                 }
             })
-            .on("mouseenter", (d, i, nodes) => {
+            .on("mouseenter", (e, d) => {
                 this.activeNodes[d.id] && clearTimeout(this.activeNodes[d.id]);
-                this.shiftLabelShowButtons(nodes[i]);
+                this.shiftLabelShowButtons(e.currentTarget);
             })
-            .on("mouseleave", (d, i, nodes) => {
-                const { id } = nodes[i];
-                const inactive = d3.selectAll(`#${id} .axiomButton.active`).empty();
+            .on("mouseleave", (e, d) => {
+                const node = e.currentTarget;
+                const inactive = d3.selectAll(`#${node.id} .axiomButton.active`).empty();
                 if (inactive) {
                     this.activeNodes[d.id] = setTimeout(() => {
-                        this.shiftLabelHideButtons(nodes[i]);
-                        if (!app.isDrawing) {
-                            if (d3.select(`#${id} .tray`).classed("expanded")) {
-                                this.expandCollapseNode(id);
-                                this.updateEdge(d);
-                            }
+                        this.shiftLabelHideButtons(node);
+                        if (!proof.isDrawing) {
+                            const tray = d3.select(`#${node.id} .tray`);
+                            try {
+                                if (tray && tray.classed("expanded")) {
+                                    this.expandCollapseNode(node.id);
+                                    this.updateEdge(d);
+                                }
+                            } catch (_) { } // tray becomes undefined despite the check due to timeout
                         }
                     }, 1500);
                 }
             })
-            .on("contextmenu", (d, i, n) => {
-                const menuItems = SharedData.axiomFunctionsHelper.menuItems;
-                SharedData.contextMenu.create({ d, i, n }, menuItems, '#proof-view');
+            .on("contextmenu", (e, d) => {
+                const menuItems = proof.axioms.menuItems;
+                globals.contextMenu.create(e, d, menuItems, "#proof-view");
             })
     }
 
     //These functions are for expanding and collapsing rectangles of axiom nodes
     expandCollapseNode(nodeID) {
         let node = d3.select("#" + nodeID);
-
         let expanded = node.select(".tray").classed("expanded");
+
         if (expanded) {
             this.collapseNode(node);
-            this.hideCommunicationButtons(node);
         } else {
             this.expandNode(node);
-            this.showCommunicationButtons(node);
         }
     }
 
     expandNode(node) {
-        const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT_Expanded } = nodeVisualsDefaults;
-        let t = app.svgProof.transition()
+        const { EXPANSION_COLLAPSING_DURATION } = nodeVisualsDefaults;
+        proof.svg.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
-            .on("start", () => console.log("start"))
+            .on("start", () => { })
             .on("end", () => {
-                console.log("end");
                 this.addShowHideMouseEvents();
+                this.showCommunicationButtons(node);
             });
-        
+
         this.moveButtons(node, "expand");
     }
 
     collapseNode(node) {
         const { EXPANSION_COLLAPSING_DURATION, BOX_HEIGHT } = nodeVisualsDefaults;
-        let t = app.svgProof.transition()
+        let t = proof.svg.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
-            .on("start", () => { console.log("start"); })
-            .on("end", () => { console.log("end"); this.addShowHideMouseEvents(); });
+            .on("start", () => { this.hideCommunicationButtons(node); })
+            .on("end", () => { this.addShowHideMouseEvents(); });
 
         //Collapse the trays
         node.selectAll(".tray")
@@ -337,7 +382,7 @@ export class NodeVisualsHelper {
             .attr("y", 0)
             .attr("height", BOX_HEIGHT)
             .style("opacity", 0);
-        
+
         //Move right bottom buttons to new position
         this.moveButtons(node, "collapse", t);
     }
@@ -347,23 +392,22 @@ export class NodeVisualsHelper {
         if (direction === "right") {
             //.5em = 8px which is the val in the css class
             element.transition().attr("transform", "translate(8,0)")
-        }
-        else if (direction === "left") {
+        } else if (direction === "left") {
             element.transition().attr("transform", "translate(0,0)")
         }
     }
 
     shiftLabelShowButtons(node) {
-        if (SharedData.nodesDisplayFormat.get(node.id) !== "original") {
+        if (proof.nodeVisuals.nodesDisplayFormat.get(node.id) !== "original") {
             this.shiftLabel(node, "right");
         }
         this.showButtons(node.id);
     }
 
     shiftLabelHideButtons(node) {
-        if (SharedData.nodesDisplayFormat.get(node.id) !== "original") {
+        if (proof.nodeVisuals.nodesDisplayFormat.get(node.id) !== "original") {
             this.shiftLabel(node, "left");
-        }   
+        }
         this.hideButtons(node.id);
     }
 
@@ -396,15 +440,15 @@ export class NodeVisualsHelper {
         let bottomNodeConnector = node.select(".connectorDown");
         let bottomConnectorTranslate = "translate(0, 0)"; // collapse
 
-        if (action === "expand") { 
+        if (action === "expand") {
             //Expand the back rectangle
             node.selectAll("#backRect")
-            .classed("expanded", true)
-            .style("opacity", 1)
-            .transition(t)
-            .attr("y", BOX_HEIGHT_Expanded)
+                .classed("expanded", true)
+                .style("opacity", 1)
+                .transition(t)
+                .attr("y", BOX_HEIGHT_Expanded)
             bottomConnectorTranslate = `translate(0, ${BOX_HEIGHT_Expanded})`;
-        } 
+        }
 
         //move the down connector to the new position
         bottomNodeConnector.transition()
@@ -420,7 +464,7 @@ export class NodeVisualsHelper {
         let topNodeConnector = node.select(".connectorUp");
         let topConnectorTranslate = "translate(0, 0)"; // collapse
 
-        if (action === "expand") { 
+        if (action === "expand") {
             //Expand the top tray
             node.selectAll("#topRect")
                 .classed("expanded", true)
@@ -443,12 +487,12 @@ export class NodeVisualsHelper {
             this.moveUpperConnector(d);
         }
     }
-    
+
     moveLowerConnector(d) {
         const { BOX_HEIGHT_Expanded, EXPANSION_COLLAPSING_DURATION } = nodeVisualsDefaults;
-        const  id = `L${d.data.target.id}*${d.data.source.id}`;
+        const id = `L${d.data.target.id}*${d.data.source.id}`;
         const line = d3.select(`[id="${id}"]`);
-        
+
         //For the final conclusion, no edge update is needed
         if (line.empty()) {
             return;
@@ -467,7 +511,7 @@ export class NodeVisualsHelper {
 
     moveUpperConnector(d) {
         const { BOX_HEIGHT_Expanded, EXPANSION_COLLAPSING_DURATION } = nodeVisualsDefaults;
-       
+
         if (!d.children) {
             return;
         }
@@ -487,8 +531,69 @@ export class NodeVisualsHelper {
             .attr("y2", newY);
     }
 
-    //To get around the typo in the solver
-    fixTypo(element) {
-        return element !== "Property Domain Transaltion" ? element : "Property Domain Translation";
+    getNodeWidth(node) {
+        // estimation of the size of each character
+        const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.data.source.id}`)
+        let label = "";
+        if (!display || display === "original") {
+            label = node.data.source.element;
+        } else if (display === "shortened") {
+            label = globals.labelsShorteningHelper.shortenLabel(node.data.source.element, proof.isRuleShort, globals.shorteningMethod);
+        } else if (display === "textual") {
+            label = node.data.source.nLElement;
+        }
+
+        node.width = label.length * globals.fontCharacterWidth + nodeVisualsDefaults.TEXT_PAD * 2;
+        return node.width;
+    }
+
+    setNodeWidthsAndMax(node) {
+        // computes all widths, saves them per node and sets max
+        if (node !== null) {
+            this.getNodeWidth(node);
+            if (node.width > this.maxNodeWidth) {
+                this.maxNodeWidth = node.width;
+            }
+
+            if (node.children) {
+                node.children.forEach(a => {
+                    this.setNodeWidthsAndMax(a);
+                });
+            }
+        } else {
+            console.error('received null node')
+        }
+    }
+
+    getNodeClass(d) {
+        let classStr = "node " + d.data.source.type;
+        if (ruleUtils.isRule(d.data.source.type)) {
+            classStr += " rule";
+        }
+        classStr = !d.parent && d.data.source.type !== "rest" ? classStr + " conclusion" : classStr;
+        return classStr;
+    }
+
+     
+    changeOpacities(iDsToHighlight) {
+        let dataS, dataT;
+
+        proof.svg.selectAll("g.node,line.link,path.link").style("opacity", (d) => {
+            if (d.source) {
+                dataS = d.source.data;
+                dataT = d.target.data;
+            } else {
+                dataS = dataT = d.data;
+            }
+
+            if (iDsToHighlight.includes(dataS.source.id) && iDsToHighlight.includes(dataT.source.id)) {
+                return 1;
+            }
+            return .2;
+        });
+    }
+
+    setFullOpacityToAll() {
+        proof.svg.selectAll("g.node,line.link,path.link").style("opacity", 1);
     }
 }

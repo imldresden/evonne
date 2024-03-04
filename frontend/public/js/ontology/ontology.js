@@ -1,9 +1,10 @@
-import { APP_GLOBALS as app, SharedData, removeListeners } from "../shared-data.js";
+import { globals } from "../shared-data.js";
 import { upload } from '../utils/upload-file.js';
 import { progress } from '../main/main.js';
-import { BasicSophisticatedShorteningFunctions } from "../shortening/sophisticatedBasic.js";
+import { BasicShorteningFunctions } from "../shortening/basic.js";
 import { colors, stylesheet } from "../../style/cy-style.js";
 import { params } from "../layouts/cola.js";
+import { showRepairsTab } from "../utils/controls.js";
 
 const socket = io();
 
@@ -14,6 +15,7 @@ let ontologyFile = null;
 let adOntologyFile = null;
 let layoutFile = null;
 let showOriginal = null;
+let div = "ontology-container";
 
 const ontologyNodeId = "oN";
 const flowDirection = document.getElementById("flowDirection");
@@ -29,32 +31,34 @@ const showRepairsMenuButton = document.getElementById("showRepairsMenuButton");
 const shortenAllInOntologyBtn = document.getElementById("shortenAllInOntologyBtn");
 const openProof = document.getElementById('openProofInNew');
 
-// Mapping elements with click event to their function
-const thingsWithClickListeners = new Map();
-thingsWithClickListeners.set(btnShowSignature, btnShowSignatureFunction);
-thingsWithClickListeners.set(btnWrapLines, btnWrapLinesFunction);
-thingsWithClickListeners.set(resetLayoutButton, resetLayout);
-thingsWithClickListeners.set(saveLayoutButton, saveLayout);
-thingsWithClickListeners.set(showRepairsMenuButton, showRepairsTab);
-thingsWithClickListeners.set(flowStrengthReset, flowStrengthResetFunction);
-thingsWithClickListeners.set(openProof, openProofFunction);
-thingsWithClickListeners.set(shortenAllInOntologyBtn, shortenAllInOntology);
-
-// Mapping elements with input event to their function
-const thingsWithInputListeners = new Map();
-thingsWithInputListeners.set(lineLengthInput, labelNodes);
-thingsWithInputListeners.set(maxLengthInput, maxLengthInputFunction);
-thingsWithInputListeners.set(flowStrength, rerunLayout);
-
-// Mapping elements with change event to their function
-const thingsWithChangeListeners = new Map();
-thingsWithChangeListeners.set(flowDirection, rerunLayout);
+const thingsWithListeners = [
+  { type: 'click', thing: btnShowSignature, fn: btnShowSignatureFunction },
+  { type: 'click', thing: btnWrapLines, fn: btnWrapLinesFunction },
+  { type: 'click', thing: resetLayoutButton, fn: resetLayout },
+  { type: 'click', thing: saveLayoutButton, fn: saveLayout },
+  { type: 'click', thing: showRepairsMenuButton, fn: showRepairsTab },
+  { type: 'click', thing: flowStrengthReset, fn: flowStrengthResetFunction },
+  { type: 'click', thing: openProof, fn: openProofFunction },
+  { type: 'click', thing: shortenAllInOntologyBtn, fn: shortenAllInOntology },
+  { type: 'input', thing: lineLengthInput, fn: labelNodes },
+  { type: 'input', thing: maxLengthInput, fn: maxLengthInputFunction },
+  { type: 'input', thing: flowStrength, fn: rerunLayout }, 
+  { type: 'change', thing: flowDirection, fn: rerunLayout }, 
+  { type: 'view_resize', thing: window, fn: () => cy.resize() }, 
+];
 
 // creates the content of the view based on the chosen/read data
 async function createContent(data) {
+  const svg = document.createElement("svg");
+  svg.id = "ontology-view"
+  document.getElementById(div).append(svg)
+
+  const container = document.getElementById("ontology-view");
+  container.innerHTML = "";
+
   const elements = processData(data);
   cy = cytoscape({
-    container: document.getElementById('ontology-view'),
+    container,
     style: stylesheet,
     layout: params,
     wheelSensitivity: 0.3
@@ -76,7 +80,7 @@ function getNodeTextList(data) {
   if (showOriginal) {
     text = [...tmpText];
   } else {
-    tmpText.forEach(x => text.push(SharedData.labelsShorteningHelper.shortenLabel(x, true, app.shorteningMethod)));
+    tmpText.forEach(x => text.push(globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod)));
   }
 
   return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
@@ -113,7 +117,7 @@ async function initHTML() {
         }
 
         const template = `
-          <div class="cy-html node ontNode bg-box" id="${ontologyNodeId + data.id}"> 
+          <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
             <div id="frontRect" style="padding: 5px; white-space:nowrap;">
               ${html}
             </div>
@@ -127,7 +131,7 @@ async function initHTML() {
 }
 
 function calcBoxWidth(longestString) {
-  return (longestString * 8.1 + 10) + "px";
+  return (longestString * globals.fontCharacterWidth + 10) + "px";
 }
 
 function calcBoxHeight(stringList) {
@@ -278,8 +282,7 @@ function loadAtomicDecomposition(e) {
   upload(adOntologyFile, result => {
     console.log('Success:', result);
     d3.xml("../data/" + getSessionId() + "/" + adOntologyFile.name).then((xml) => {
-      app.svgOntology.innerHTML = "";
-      createContent(xml);
+      createContent(xml, );
     });
   });
 }
@@ -328,18 +331,19 @@ function loadLayout(e) {
   reader.readAsText(layoutFile);
 }
 
-function init_ontology(ad_file_name, ontology_file_param) {
-  //Remove listeners of types
-  removeListeners("click", thingsWithClickListeners);
-  removeListeners("input", thingsWithInputListeners);
-  removeListeners("change", thingsWithChangeListeners);
+function init_ontology({ 
+  ad, 
+  ontology,
+  container = "ontology-container",
+}) {
+  div = container;
 
   adOntologyFile = {
-    name: ontology_file_param ? ad_file_name : 'atomic ontology.xml'
+    name: ontology ? ad : 'atomic ontology.xml'
   };
 
   ontologyFile = {
-    name: ontology_file_param
+    name: ontology
   };
 
   socket.on("highlight axioms", (data) => {
@@ -377,46 +381,25 @@ function init_ontology(ad_file_name, ontology_file_param) {
     }
   });
 
-  if (!app.svgOntology) {
-    app.svgOntology = document.getElementById("ontology-view");
-  }
-
   // CONTROLS ==========================================
-
   btnShowSignature.checked = true;
-  btnShowSignature.addEventListener("click", btnShowSignatureFunction);
-
   btnWrapLines.checked = false;
-  btnWrapLines.addEventListener("click", btnWrapLinesFunction);
-
   lineLengthInput.closest(".modal-option.modal-option-range").style.display = "none";
-  lineLengthInput.addEventListener("input", labelNodes);
-
-  resetLayoutButton.addEventListener("click", resetLayout);
-  saveLayoutButton.addEventListener("click", saveLayout);
-  showRepairsMenuButton.addEventListener("click", showRepairsTab);
-
-  maxLengthInput.addEventListener("input", maxLengthInputFunction);
   maxLengthInput.closest(".input-range-wrapper").style.display = "none";
-
-  flowDirection.addEventListener("change", rerunLayout);
   flowStrength.max = 500;
   flowStrength.min = 10;
   flowStrength.value = params.flow.minSeparation;
-  flowStrength.addEventListener("input", rerunLayout);
-  flowStrengthReset.addEventListener("click", flowStrengthResetFunction);
 
   document.querySelectorAll("input[type=range]").forEach(range => {
-    range.closest(".modal-option-range").querySelector("span.new.badge").innerText = range.value;
-
     function rangeFunction() {
       range.closest(".modal-option-range").querySelector("span.new.badge").innerText = range.value;
     }
+
+    rangeFunction();
+    
     range.removeEventListener("input", rangeFunction);
     range.addEventListener("input", rangeFunction);
   });
-
-  openProof.addEventListener('click', openProofFunction);
 
   d3.xml("../data/" + getSessionId() + "/" + adOntologyFile.name).then((xml) => {
     createContent(xml);
@@ -424,7 +407,12 @@ function init_ontology(ad_file_name, ontology_file_param) {
 
   showOriginal = true;
   updateShorteningButton();
-  shortenAllInOntologyBtn.addEventListener("click", shortenAllInOntology);
+
+  // set listeners
+  thingsWithListeners.forEach(twl => {
+    twl.thing.removeEventListener(twl.type, twl.fn);
+    twl.thing.addEventListener(twl.type, twl.fn);
+  });
 }
 
 function shortenAllInOntology() {
@@ -451,8 +439,8 @@ function updateShorteningButton() {
 
 function btnShowSignatureFunction() {
   showSignature = this.checked;
-  if (SharedData.labelsShorteningHelper instanceof BasicSophisticatedShorteningFunctions) {
-    SharedData.labelsShorteningHelper.resetAll();
+  if (globals.labelsShorteningHelper instanceof BasicShorteningFunctions) {
+    globals.labelsShorteningHelper.resetAll();
   }
   labelNodes();
 }

@@ -1,0 +1,77 @@
+@import '../colors.css';
+
+.pcp-container {
+  display: block;
+  background-color: var(--pcp-bg);
+}
+
+.pcp-container text {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 12px;
+}
+
+.background,
+.background path {
+  fill: none;
+  stroke: var(--pcp-bg-stroke);
+  opacity: 0.5;
+  shape-rendering: optimizeQuality;
+}
+
+.foreground path, 
+.background path {
+  stroke-width: 3px;
+}
+
+.foreground path {
+  fill: none;
+  opacity: 0.5;
+}
+
+.cursor-area {
+  opacity: 0.5;
+  fill: var(--pcp-bubble-cursor-color); /*transparent*/
+}
+
+.selection-count-tooltip {
+  fill: black 
+}
+
+path.highlighted-path {
+  stroke-width: 7px;
+}
+
+.brush .extent {
+  fill-opacity: .3;
+  stroke: var(--pcp-bubble-cursor-color);
+  shape-rendering: optimizeQuality;
+}
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: var(--pcp-axes-lines);
+  shape-rendering: optimizeQuality;
+}
+
+.axis text {
+  fill: var(--pcp-text-fill);
+  /*text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;*/
+  cursor: move;
+}
+
+.pcp-container canvas,
+.pcp-container svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.pcp-container {
+  position: absolute;
+  display: inline-block;
+}
+
+line {
+  transition: 0.5s;
+}

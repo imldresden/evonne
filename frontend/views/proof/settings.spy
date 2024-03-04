@@ -1,3 +1,5 @@
+<div style="background-color:#a9a9a9; height:0.5px;"></div>
+<br>
 <header class="modal-section-header toggles-content"  target="proof-settings">
   <h3 class="modal-section-heading">Proof Settings</h3> <i class="material-icons">arrow_drop_up</i>
 </header>
@@ -67,16 +69,21 @@
           </form>
         </div>
       </div>
-
-      
-      <a class="modal-trigger advanced-settings-link" data-target="settingsModal" type="button">
-        More settings...
-      </a>
     </div>
+    <a class="modal-trigger advanced-settings-link" data-target="settingsModal" type="button">
+      More settings...
+    </a>
   </fieldset>
 
   <fieldset>
-    <h4>Behavior</h4>
+    <h4>Behavior
+
+      <div class="modal-option">
+        <button class="btn-small btn-primary" id="collapseAll" title="Collapse all nodes to show only proof root">
+          Collapse All
+        </button>
+      </div>
+    </h4>
 
     <!-- Form for selecting the position of the rule explanation tooltip -->
     <label>Tooltip Position</label>
@@ -91,7 +98,7 @@
     </div>
 
     <div class="modal-option">
-      <label class="label-toggle">Linear Proof</label>
+      <label class="label-toggle">Linear Mode</label>
       <div class="switch">
         <label>
           <input id="toggleLayoutMode" type="checkbox">
@@ -100,28 +107,16 @@
       </div>
     </div>
 
-    <div class = "planar-div-wrapper">
-        <div class="modal-option">
-            <label class="label-toggle">Optimize premise distance</label>
-            <div class="switch">
-              <label>
-                <input id="togglePlanar" type="checkbox">
-                <span class="lever"></span>
-              </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-option">
-      <label class="label-toggle">Stepwise Mode</label>
+    <div class="modal-option" id="planar-div-wrapper">
+      <label class="label-toggle">Optimize premise distance</label>
       <div class="switch">
         <label>
-          <input id="toggleNavMode" type="checkbox">
+          <input id="togglePlanar" type="checkbox">
           <span class="lever"></span>
         </label>
       </div>
     </div>
-
+    
     <!-- Magic option -->
     <div class="modal-option">
       <label class="label-toggle">Magic Mode</label>
@@ -132,5 +127,16 @@
         </label>
       </div>
     </div>
+
+    <div class="modal-option" id="show-rules-div-wrapper">
+      <label class="label-toggle">Show Rules</label>
+      <div class="switch">
+        <label>
+          <input id="toggleRulesDisplay" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+    
   </fieldset>
 </div>

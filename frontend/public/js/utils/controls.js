@@ -54,6 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+
+// Query all resizers
+document.querySelectorAll('.resizer').forEach(function (ele) {
+  resizable(ele);
+});
+
 const sidebarToggles = document.getElementsByClassName("toggles-sidebar");
 const btnToggleSideBar = document.getElementById("btnToggleSideBar");
 
@@ -115,10 +121,12 @@ for (const c of sidebarToggles) {
 const settingsSidebar = document.getElementById("sidebarSettings");
 const settingsButton = document.getElementById("showSettingsMenuButton");
 
-if (settingsSidebar) { 
-  settingsButton.addEventListener("click", showSettingsTab);
-} else {
-  settingsButton.style.display = "none";
+if (settingsButton) {
+  if (settingsSidebar !== null) { 
+    settingsButton.addEventListener("click", showSettingsTab);
+  } else {
+    settingsButton.style.display = "none";
+  }
 }
 
 function startRedrawCSS() {
@@ -128,6 +136,7 @@ function startRedrawCSS() {
 function finishRedrawCSS() {
   document.querySelectorAll('.svg-pan-zoom-control').forEach(e => e.classList.remove("redraw"));
   document.dispatchEvent(new CustomEvent("reinit-minimap"));
+  dispatchEvent(new CustomEvent("view_resize", {}));
 }
 
 function resizable(resizer) {
@@ -224,22 +233,4 @@ function resizable(resizer) {
   resizer.addEventListener('mousedown', mouseDownHandler);
 };
 
-// Query all resizers
-document.querySelectorAll('.resizer').forEach(function (ele) {
-  resizable(ele);
-});
-
-// redirection for demos
-async function loadExample(name, id) {
-  document.getElementById("examples").classList.add("hidden");
-  document.getElementById("generating-example").classList.remove("hidden");
-  
-  const response = await fetch("/create?example=" + name + "&id=" + id);
-  console.log(response)
-  console.log(response.ok)
-  if (response.ok) {
-    window.location.href = "/?id=" + id;
-  } else {
-    document.getElementById("generating-example").innerHTML = "Something went wrong. Please reload this page and try again. If the problem persists, feel free to contact the authors";
-  }
-}
+export { showRepairsTab }

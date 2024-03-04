@@ -1,7 +1,12 @@
 /* Tooltip style */
+@import "../colors.css";
+
 .tooltip-explanation {
     position: absolute;
     display: inline-block;
+    height: fit-content;
+    background-color: #fafafa;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 }
 
 .positionLT {
@@ -41,4 +46,41 @@
 .tooltip-light {
     background: transparent;
     color: var(--color-gray);
+}
+
+.tooltip-explanation .modal-close {
+    margin-right: 15px;
+}
+
+.controls-bar {
+    text-align: center;
+    padding-left: 50px;
+}
+
+.bar-button > i {
+    font-size: 30px;
+    cursor:pointer;
+    
+    color: var(--color-primary)
+}
+
+.bar-button > i:hover {
+    color: var(--color-primary-light)
+}
+
+.hl-text {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+}
+
+.hl-text.premise {
+    text-decoration-color: var(--color-blue);
+}
+
+.hl-text.conclusion {
+    text-decoration-color: var(--color-purple-dark);
+}
+
+#tooltip-handle-bar {
+    cursor:pointer;
 }

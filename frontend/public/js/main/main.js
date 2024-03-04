@@ -1,6 +1,5 @@
-import { init_proof } from '../proof/proof.js';
+import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
-import { APP_GLOBALS as app, removeListeners } from "../shared-data.js";
 
 let status = {};
 let interval = undefined;
@@ -12,13 +11,18 @@ const clearSigFilePath = document.getElementById("clearSignatureFile");
 const computeAxiomsBtn = document.getElementById('computeAxiomPairBtn');
 
 window.onload = function () {
-  //Mapping elements with click event to their functions
-  let thingsWithClickListeners = new Map();
-  thingsWithClickListeners.set(clearSigFilePath, clearSigFilePathFunction);
-  thingsWithClickListeners.set(computeAxiomsBtn, computeAxiomsBtnFunction);
+  //Mapping elements with events to their functions
+  const thingsWithListeners = [
+    { type: 'click', thing: clearSigFilePath, fn: clearSigFilePathFunction },
+    { type: 'click', thing: computeAxiomsBtn, fn: computeAxiomsBtnFunction },
+  ];
 
-  //Remove listeners of types
-  removeListeners("click", thingsWithClickListeners);
+  // Remove listeners
+  thingsWithListeners.forEach(twl => {
+    if (twl && twl.thing) {
+      twl.thing.removeEventListener(twl.type, twl.fn);
+    }
+  });
 
   const projects = document.getElementById("current-projects");
   projects && fetch('/projects')
@@ -47,11 +51,11 @@ window.onload = function () {
     signaturePathText.value = "";
     signaturePathFile.value = "";
     signaturePathText.classList.remove("valid");
-    app.signatureFile = undefined;
+    proof.signatureFile = undefined;
 
     browseFilePathText.value = "";
     browseFilePathText.classList.remove("valid");
-    app.proofFile = undefined;
+    proof.proofFile = undefined;
   }
 
   init_views();
@@ -132,17 +136,11 @@ function init_views(loop = false) {
         clearInterval(interval);
         modal.close();
 
-        if (document.getElementById('proof-view')) {
-          if (app.svgProofRootLayer) {
-            app.svgProofRootLayer.selectAll("*").remove();
-          }
-          init_proof(res.proofs[0]);
+        if (document.getElementById('proof-container')) {
+          init_proof({ file: res.proofs[0] });
         }
-        if (document.getElementById('ontology-view')) {
-          if (app.svgOntology) {
-            app.svgOntology.innerHTML = "";
-          }
-          init_ontology(res.ad, res.ontology);
+        if (document.getElementById('ontology-container')) {
+          init_ontology({ ad: res.ad, ontology: res.ontology });
         }
 
         //Hide computing indicator
@@ -177,12 +175,11 @@ function sortNames(c1, c2) {
   return 0;
 }
 
-
 function clearSigFilePathFunction() {
   signaturePathText.value = "";
   signaturePathFile.value = "";
   signaturePathText.classList.remove("valid");
-  app.signatureFile = undefined;
+  proof.signatureFile = undefined;
 }
 
 function computeAxiomsBtnFunction() {
@@ -195,8 +192,8 @@ function computeAxiomsBtnFunction() {
   body.append('lhs', document.getElementById('lhsConcepts').value);
   body.append('rhs', document.getElementById('rhsConcepts').value);
   body.append('method', document.getElementById('methodsList').value);
-  body.append('signaturePath', app.signatureFile
-    ? "frontend/public/data/" + getSessionId() + "/" + app.signatureFile.name
+  body.append('signaturePath', proof.signatureFile
+    ? "frontend/public/data/" + getSessionId() + "/" + proof.signatureFile.name
     : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 

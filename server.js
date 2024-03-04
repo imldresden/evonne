@@ -1,7 +1,7 @@
 import express, {response} from 'express';
 import sprightly from 'sprightly';
 import http from 'http';
-import io from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { spawn } from 'child_process';
 import {
   unlink,
@@ -34,7 +34,7 @@ app.use('/libs', express.static('./node_modules'));
 app.use(upload());
 
 const http_ = http.createServer(app);
-const io_ = io(http_);
+const io_ = new Server(http_);
 const title = "evonne";
 const sessions = {};
 const dataDir = './frontend/public/data/';
@@ -44,6 +44,13 @@ const fs = require('fs');
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
 }
+
+app.get('/test', (req, res) => {
+  res.render('main/test.spy', { 
+    title: "evonne lib",
+    uuid: uuidv4(),
+  });
+});
 
 // pages
 app.get('/', (req, res) => {
@@ -130,7 +137,7 @@ app.get('/project', (req, res) => {
 
   const status = {
     status: undefined,
-    ontology: '',
+    ontology: [],
     names: {},
     proofs: [],
     reasoner:'',
@@ -146,17 +153,20 @@ app.get('/project', (req, res) => {
   }
 
   files.forEach(function (file) {
-    if (file.endsWith('.ht.xml')) {
+    if (file.endsWith('.t.xml')) {
       status.proofs.push(file.split('.')[0]);
       flags.proofs = true;
     }
-    if ((file.endsWith('.xml') || file.endsWith('.owl')) && !file.startsWith('atomic ') && !file.startsWith('proof_')) {
-      status.ontology = file;
-      flags.ontology = true;
-    }
+    
     if (file.endsWith('.xml') && file.startsWith('atomic ')) {
       status.ad = file;
       flags.ad = true;
+    }
+
+    if ((file.endsWith('.xml') || file.endsWith('.owl')) 
+    && !file.startsWith('atomic ') && !file.startsWith('proof_') && !file.endsWith('t.xml')) {
+      status.ontology.push(file);
+      flags.ontology = true;
     }
   });
 

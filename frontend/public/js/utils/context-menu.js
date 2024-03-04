@@ -20,7 +20,7 @@ export class ContextMenu {
             const c = a.title ? a.title.length : a;
             const d = b.title ? b.title.length : b;
             return (c > d ? c : d)
-        }) * 6.5;
+        }) * 9;
         
         if (x + maxWidth + 30 > svgBBox.width) {
             orient[0] = false;
@@ -49,7 +49,7 @@ export class ContextMenu {
             .attr('y', yF)
             .attr('width', maxWidth)
             .attr('height', heightF)
-            .on('click', (d) => { d.action(data.d, data.i, data.n) });
+            .on('click', (_, d) => { d.action(_, data) });
 
         d3.selectAll(`.menuEntry`)
             .append('text')
@@ -58,7 +58,7 @@ export class ContextMenu {
             .attr('y', yF)
             .attr('dy', 15)
             .attr('dx', 15)
-            .on('click', (d) => { d.action(data.d, data.i, data.n) });
+            .on('click', (_, d) => { d.action(_, data) });
 
         if (!this.once) {
             d3.select('body').on('click', () => {
@@ -68,8 +68,8 @@ export class ContextMenu {
         }
     }
 
-    create(data, menuItems, svgId) {
-        this.menuFactory(d3.event.pageX, d3.event.pageY - 40, menuItems, data, svgId);
-        d3.event.preventDefault();
+    create(event, data, menuItems, svgId) {
+        this.menuFactory(event.pageX, event.pageY - 40, menuItems, data, svgId);
+        event.preventDefault();
     }
 }

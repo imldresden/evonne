@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<meta charset="utf-8" name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html lang="en">
+
+<head>
+    <title>{{ title }}</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/css/materialize.css">
+    <link rel="stylesheet" href="https://unpkg.com/hack-font@3.3.0/build/web/hack.css">
+    <link rel="stylesheet" href="https://unpkg.com/material-icons@1.13.9/iconfont/material-icons.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.3/frontend/public//style/widgets/general.css">
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.3/frontend/public//style/widgets/parallel-coords.css">
+    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.3/frontend/public//style/proof.css">
+</head>
+
+<body>
+    <main id="my-reasoning-tree"></main>
+    
+    <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/js/materialize.min.js"></script>
+    <script src="https://unpkg.com/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+    <script src="https://unpkg.com/underscore@1.13.6/underscore-min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
+    
+    <script type="module">
+        import { init_proof } from "https://unpkg.com/evonne@0.0.3/frontend/public/js/proof/proof.js";
+
+        init_proof({ 
+            external: {
+                div: "my-reasoning-tree",
+                path: "../data/test/normal.t.xml",
+                drawTime: 500
+            } 
+        });
+    </script>
+</body>
+
+</html>
