@@ -18,7 +18,7 @@ const conf = {
   div: "proof-container",
   shortenAll: false,
   allowOverlap: false,
-  showRules: false,
+  showRules: true,
   isMagic: false,
   isRuleShort: false,
   isLinear: false,
@@ -74,7 +74,7 @@ const conf = {
 function init_proof({
   file,
   external,
-}) {
+} = {}) {
   if (external) {
     proof.div = external.div || proof.div,
     proof.isMagic = external.isMagic || proof.isMagic; 
@@ -164,7 +164,6 @@ function getFileName() {
     };
   }
 
-  fileName += ".t.xml";
   return fileName;
 }
 
@@ -173,7 +172,7 @@ function loadProof(event) {
   proof.nodeVisuals.initVarsAxiomFunctions();
 
   upload(proof.proofFile, _ => {
-    proof.load();
+    init_proof();//proof.load();
   });
 }
 

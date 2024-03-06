@@ -105,10 +105,11 @@ function init_views(loop = false) {
     .then(res => res.json())
     .then(res => {
       status = res;
-      console.log(res)
-      if (res.status === 'corrupt') {
+      console.log(res);
+      
+      if (res.status === 'custom' || res.reasoner === 'n/a') { // blank project
         clearInterval(interval);
-        throw Error('This project is beyond salvation');
+        return;
       }
 
       blockProofMethods(res.reasoner);

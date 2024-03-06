@@ -346,21 +346,21 @@ function init_ontology({
     name: ontology
   };
 
-  socket.on("highlight axioms", (data) => {
+  socket.on('highlight axioms', (data) => {
     restoreColor(true, cy);
     if (data && data.id === getSessionId()) {
       highlightNodesOf(data.pre, cy);
     }
   });
 
-  socket.on("set ontology", (data) => {
+  socket.on('set ontology', (data) => {
     if (data && data.id === getSessionId()) {
       if (!adOntologyFile) {
         computingRepairsFailed("Please select an ontology file");
       } else {
         showRepairsTab(false); // from controls.js
         computingRepairs();
-        socket.emit("get repairs", {
+        socket.emit('get repairs', {
           id: data.id,
           axiom: data.axiom,
           readableAxiom: data.readableAxiom,
@@ -371,7 +371,7 @@ function init_ontology({
     }
   });
 
-  socket.on("read repairs", (data) => {
+  socket.on('read repairs', (data) => {
     if (data && data.id === getSessionId()) {
       if (data.msg === "mDs.txt is now available!") {
         readRepairs({ axiom: data.axiom, file: "../data/" + data.id + "/mDs_" + data.id + ".txt", cy });
