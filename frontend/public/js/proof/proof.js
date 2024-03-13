@@ -74,7 +74,7 @@ const conf = {
 function init_proof({
   file,
   external,
-}) {
+} = {}) {
   if (external) {
     proof.div = external.div || proof.div,
     proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
@@ -165,7 +165,6 @@ function getFileName() {
     };
   }
 
-  fileName += ".t.xml";
   return fileName;
 }
 
@@ -174,7 +173,7 @@ function loadProof(event) {
   proof.nodeVisuals.initVarsAxiomFunctions();
 
   upload(proof.proofFile, _ => {
-    proof.load();
+    init_proof();//proof.load();
   });
 }
 

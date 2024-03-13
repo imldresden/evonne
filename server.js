@@ -52,6 +52,11 @@ app.get('/test', (req, res) => {
   });
 });
 
+// TODO: this is a workaround to avoid injecting the node_module into the browser 
+app.get('/uuid', (req, res) => { 
+  res.status(200).send(uuidv4());
+});
+
 // pages
 app.get('/', (req, res) => {
   const id = req.query.id;
@@ -65,7 +70,7 @@ app.get('/', (req, res) => {
       settings_specific: '<< proof/settings >> << ontology/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
-      menu_specific: `${MODE === 'demo' ? '' : '<< menus/compute >>'} << proof/menu >> << ontology/menu >>`,
+      menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << proof/menu >> << ontology/menu >>`,
       general_settings: '<< menus/shortening >>'
     });
   }
@@ -82,7 +87,7 @@ app.get('/ontology', (req, res) => {
       uuid: id,
       settings_specific: '<< ontology/settings >>',
       sidebars_specific: '<< ontology/repairs >>',
-      menu_specific: `${MODE === 'demo' ? '' : '<< menus/compute >>'}  << ontology/menu >>`,
+      menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << ontology/menu >>`,
       general_settings: '<< menus/shortening >>'
     });
   }
@@ -99,7 +104,7 @@ app.get('/proof', (req, res) => {
       uuid: id,
       settings_specific: '<< proof/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
-      menu_specific: `${MODE === 'demo' ? '' : '<< menus/compute >>'}  << proof/menu >>`,
+      menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'}  << proof/menu >>`,
       general_settings: '<< menus/shortening >>'
     });
   }
@@ -154,7 +159,7 @@ app.get('/project', (req, res) => {
 
   files.forEach(function (file) {
     if (file.endsWith('.t.xml')) {
-      status.proofs.push(file.split('.')[0]);
+      status.proofs.push(file);
       flags.proofs = true;
     }
     
@@ -165,7 +170,7 @@ app.get('/project', (req, res) => {
 
     if ((file.endsWith('.xml') || file.endsWith('.owl')) 
     && !file.startsWith('atomic ') && !file.startsWith('proof_') && !file.endsWith('t.xml')) {
-      status.ontology.push(file);
+      status.ontology = file; // there is more than one
       flags.ontology = true;
     }
   });
@@ -193,15 +198,16 @@ app.get('/project', (req, res) => {
     status.status = 'pending';
   }
 
-  if (!flags.ontology || (pending && !flags.names)) {
-    status.status = 'corrupt'; // shouldn't ever happen
-  }
-
   if (sessions[id]) {
     status.status = 'busy';
   }
 
-  status.reasoner = readFileSync(path.join(target, 'reasoner.txt')).toString();
+  if (!status.status) { // e.g. !flags.ontology || (pending && !flags.names) 
+    status.status = 'custom'; 
+  }
+
+  const reasonerPath = path.join(target, 'reasoner.txt');
+  status.reasoner = existsSync(reasonerPath) ? readFileSync(path.join(target, 'reasoner.txt')).toString() : "n/a";
 
   // delete sessions[id]
   res.status(200).send(status);
