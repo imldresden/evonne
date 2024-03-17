@@ -160,6 +160,17 @@ export class AxiomsHelper {
 			return;
 		}
 		proof.nodeInteracted = treeRoot;
+		let axioms = [];
+		this.getAllPreviousAxioms(treeRoot, axioms, 'id');
+		axioms.forEach(nodeID => {
+		  nodeID = "N" + nodeID;
+		  const displayFormat = proof.nodeVisuals.nodesDisplayFormat.get(nodeID);
+		  if (displayFormat !== "textual") {
+			const newFormat = proof.shortenAll ? "shortened" : "original";
+			proof.nodeVisuals.nodesDisplayFormat.set(nodeID, newFormat);
+			proof.nodeVisuals.nodesCurrentDisplayFormat.set(nodeID, newFormat);
+		  }
+		});
 		this.resetAllChildren(treeRoot);
 		proof.update();
 	}
@@ -386,7 +397,7 @@ export class AxiomsHelper {
 
 	highlightJustificationInOntology(treeRoot) {
 		let pre = [treeRoot.data.source.element];
-		this.getAllPreviousAxioms(treeRoot, pre);
+		this.getAllPreviousAxioms(treeRoot, pre, 'element');
 		this._socket.emit("highlight in ontology", { id: getSessionId(), pre });
 	}
 
@@ -404,16 +415,16 @@ export class AxiomsHelper {
 		}
 	}
 
-	getAllPreviousAxioms(treeRoot, axioms) {
+	getAllPreviousAxioms(treeRoot, axioms, propertyName) {
 		if (!treeRoot._children) {
 			return;
 		}
 
 		treeRoot._children.forEach(child => {
 			if (!ruleUtils.isRule(child.data.source.type)) {
-				axioms.push(child.data.source.element);
+				axioms.push(child.data.source[propertyName]);
 			}
-			this.getAllPreviousAxioms(child, axioms);
+			this.getAllPreviousAxioms(child, axioms, propertyName);
 		});
 	}
 
