@@ -63,7 +63,14 @@ async function createContent(data) {
     layout: params,
     wheelSensitivity: 0.3
   });
-
+  cy.on('tap', 'node', function(event) {
+    const clickedElement = event.originalEvent.target;
+    const node = event.target.isNode() ? event.target : event.target.isEdge() ? event.target.source() : null; 
+    if (clickedElement && (clickedElement.classList.contains('node-eye')) && node) {
+        const data = node.data();
+        enable_eye(data, node);
+    }
+  });
   cy.params = structuredClone(params);
   cy.stylesheet = stylesheet;
   cy.add(elements);
@@ -71,6 +78,78 @@ async function createContent(data) {
   bindListeners();
   cy.layout(cy.params).run();
   return cy;
+}
+
+function enable_eye(data,node) {
+  if(!showOriginal){
+    const nodeHtmlElement = document.getElementById(ontologyNodeId + data.id);
+    if (nodeHtmlElement && nodeHtmlElement.parentNode) {
+    nodeHtmlElement.parentNode.remove();
+  }
+  if (data.revealed === undefined || data.revealed === false) {
+    data.revealed = true;
+  } else {
+    data.revealed = false;
+  }
+  const eyeIconClass = data.revealed ? 'eye-crossed' : 'eye-on';
+  const eyeIconSrc = data.revealed ? '../icons/eye-crossed.svg' : '../icons/eye.svg';
+
+  let html = `<div class='${eyeIconClass}'><img src='${eyeIconSrc}' class='node-eye' width='14' height='14'></div><div class='node-title'>`;
+  const text = getNodeText(data);
+
+  for (let i = 0; i < text.length; i++) {
+    let color = 'black'; 
+    if (cy.justification && cy.justification.has(text[i])) {
+      color = colors.justNodeStroke;
+    } 
+    if (cy.diagnoses && cy.diagnoses.has(text[i])) {
+      color = colors.diagNodeStroke;
+    } 
+    html += `
+      <p style="color:${color};margin:0;padding:0">
+          ${text[i]}
+      </p>`;
+  }
+  html += `</div>`;
+  let longestn = 1;
+  text.forEach(l => {
+        if (l.length > longestn) {
+          longestn = l.length;
+        }
+      });
+  data.boxH = calcBoxHeight(text);
+  data.boxW = calcBoxWidth(longestn);
+
+  node.style({
+    'width': data.boxW + 'px',
+    'height': data.boxH + 'px'
+  });
+  const template = `
+    <div class="cy-html node ontNode bg-box" id="${ontologyNodeId + data.id}"> 
+      <div id="frontRect" style="padding: 5px; white-space:nowrap;">
+        ${html}
+      </div>
+    </div>
+  `;
+  // Replace the node's label with the new HTML template using cy.nodeHtmlLabel()
+  cy.nodeHtmlLabel([
+    {
+      query: '#' + node.id(),
+      valign: "center",
+      halign: "center",
+      tpl: function(data) {
+        return template;
+      }
+    }
+  ]);
+  cy.layout(cy.params).run();
+}
+}
+
+function getNodeText(data) {
+  const tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
+  const text = data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
+  return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
 }
 
 function getNodeTextList(data) {
@@ -99,7 +178,7 @@ async function initHTML() {
       query: 'node',
       tpl: function (data) {
         const text = getNodeTextList(data);
-        let html = "";
+        let html = !showOriginal && text.filter(element => element.trim() !== '').length > 0 ? "<div class='eye-on'><img src='../icons/eye.svg' class='node-eye' width='14' height='14'></div><div class='node-title'>" : '';
 
         for (let i = 0; i < text.length; i++) {
           let color = 'black'; 
@@ -115,7 +194,7 @@ async function initHTML() {
                 ${text[i]}
             </p>`;
         }
-
+        html += `</div>`;
         const template = `
           <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
             <div id="frontRect" style="padding: 5px; white-space:nowrap;">
@@ -130,12 +209,44 @@ async function initHTML() {
   ]);
 }
 
+setInterval(function(){
+  document.addEventListener('mouseover', function(event) {
+    var node = event.target.closest('.cy-html');
+    if (node) {
+      var domElem = node;
+      if (!showOriginal) {
+        var container = findContainerWithClass(domElem, 'node');
+        if (container && container.contains(domElem)) {
+          var imageElement = container.querySelector('img');
+          var nodeText = container.querySelector('.node-title');
+          if (imageElement) {
+            imageElement.style.transition = 'opacity 200ms ease-in-out, transform 50ms ease-in-out';
+            imageElement.style.opacity = 1; 
+            nodeText.style.transform = 'translate(1px, 0)';          
+          }
+        }
+      }
+    }
+  });
+  
+  function findContainerWithClass(element, className) {
+    while (element && element !== document) {
+      if (element.classList && element.classList.contains(className)) {
+        return element;
+      }
+      element = element.parentNode;
+    }
+    return null;
+  }
+  
+ },500);
+
 function calcBoxWidth(longestString) {
-  return (longestString * globals.fontCharacterWidth + 10) + "px";
+  return (longestString * globals.fontCharacterWidth + 25) + "px";
 }
 
 function calcBoxHeight(stringList) {
-  return (stringList.length * 20 + 10) + "px";
+  return (stringList.length * 20 + 15) + "px";
 }
 
 function processData(data) {
@@ -231,6 +342,7 @@ function bindListeners() {
 function labelNodes(layout = true) {
   cy.startBatch();
   cy.nodes().forEach(function (node) {
+    node.removeStyle();
     const d = node.data();
     const text = getNodeTextList(d);
     let longest = 1;
@@ -241,8 +353,10 @@ function labelNodes(layout = true) {
     });
     d.boxH = calcBoxHeight(text);
     d.boxW = calcBoxWidth(longest);
+    // Resetting data nodes to false for eye functionality removes all previous saved values and starts fresh.
+    d.revealed = false;
   });
-
+  initHTML();
   cy.style().update();
   cy.endBatch();
   if (layout) {
@@ -416,8 +530,16 @@ function init_ontology({
 }
 
 function shortenAllInOntology() {
+  // Removing all the nodes which will be reseted by LabelNodes
+  const nodesHTML = [...document.getElementsByClassName(`cy-html`)];
+  nodesHTML.forEach(node => {
+      if (node.parentNode && node.parentNode.parentNode) {
+          node.parentNode.parentNode.remove();
+      }
+  });
   //Update shortening button
   showOriginal = !showOriginal
+  !showOriginal ? document.getElementById('ontology-view').classList.remove("complete-ontology") : document.getElementById('ontology-view').classList.add("complete-ontology");
   updateShorteningButton(this);
   labelNodes();
 }
