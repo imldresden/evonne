@@ -48,9 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   for (const toggle of document.getElementsByClassName('toggle-map')) {
     toggle.addEventListener("click", () => {
-      if (toggle.getAttribute("target") === "ontology")
-        window.toggleOntologyMinimap();
-      else
+      // if (toggle.getAttribute("target") === "ontology")
+      //   window.toggleOntologyMinimap();
+      // else
         document.querySelector("#" + toggle.getAttribute("target") + "-container .minimap-view-container").classList.toggle("scale-out");
     });
   }

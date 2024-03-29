@@ -597,48 +597,35 @@ function rerunLayout(e) {
   cy.layout(cy.params).run();
 }
 
-function toggleOntologyMinimap() {
-  const minimapContainerId = "ontology-minimap-container";
-  let minimapContainer = document.getElementById(minimapContainerId);
 
-  if (!minimapContainer) {
-    console.error(`Container with ID '${minimapContainerId}' not found.`);
-    return;
-  }
+function setupOntologyMinimap(params) {
+  try {
+    let defaults = {
+      container: "#ontology-minimap-container",
+      viewLiveFramerate: 0,
+      thumbnailEventFramerate: 60,
+      thumbnailLiveFramerate: true,
+      dblClickDelay: 200,
+      removeCustomContainer: false,
+      rerenderDelay: 100
+    };
 
-  if (window.ontologyMinimap) {
-    minimapContainer.classList.add("scale-out");
-    setTimeout(() => {
-      window.ontologyMinimap.destroy();
-      window.ontologyMinimap = undefined;
-      minimapContainer.innerHTML = "";
-    }, 150); // Adjust to match CSS animation duration
-  } else {
-    try {
-      let defaults = {
-        container: "#" + minimapContainerId,
-        viewLiveFramerate: 0,
-        thumbnailEventFramerate: 60,
-        thumbnailLiveFramerate: true,
-        dblClickDelay: 200,
-        removeCustomContainer: false,
-        rerenderDelay: 100
-      };
-
-      if (typeof cy === "undefined" || !cy.navigator) {
-        console.error("Cytoscape or navigator plugin is not defined.");
-        return;
-      }
-
-      window.ontologyMinimap = cy.navigator(defaults);
-
-      minimapContainer.classList.remove("scale-out");
-    } catch (error) {
-      console.error("Failed to create the ontology minimap:", error);
+    if (typeof cy === "undefined" || !cy.navigator) {
+      console.error("Cytoscape or navigator plugin is not defined.");
     }
+
+    let ontologyMinimap = cy.navigator(defaults);
+
+    // minimapContainer.classList.remove("scale-out");
+  } catch (error) {
+    console.error("Failed to create the ontology minimap:", error);
   }
 }
 
-window.toggleOntologyMinimap = toggleOntologyMinimap;
+setTimeout(() => {
+  setupOntologyMinimap();
+}, 1000);
+
+// window.toggleOntologyMinimap = toggleOntologyMinimap;
 
 export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology }
