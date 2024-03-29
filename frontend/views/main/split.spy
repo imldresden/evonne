@@ -27,7 +27,7 @@
       <div class="resizer" data-direction="horizontal"></div>
       
       <div class="container-right" id="ontology-container">
-        << menus/thumbnail >>
+        << menus/minimap >>
       </div>
     </div>
     

@@ -1,5 +1,6 @@
 <!-- cytoscape and layouts -->
 <script src="/libs/cytoscape/dist/cytoscape.min.js"></script>
+<script src="/libs/cytoscape-navigator/cytoscape-navigator.js"></script>
 <script src="/libs/layout-base/layout-base.js"></script>
 <script src="/libs/cytoscape-layout-utilities/cytoscape-layout-utilities.js"></script>
 

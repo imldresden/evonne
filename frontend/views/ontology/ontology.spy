@@ -17,7 +17,7 @@
   << modals/axiom >>
 
   <main id="ontology-container">
-    << menus/thumbnail >>
+    << menus/minimap >>
   </main>
   << menus/settings >> 
 
