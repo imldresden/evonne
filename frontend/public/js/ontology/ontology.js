@@ -614,9 +614,7 @@ function setupOntologyMinimap(params) {
       console.error("Cytoscape or navigator plugin is not defined.");
     }
 
-    let ontologyMinimap = cy.navigator(defaults);
-
-    // minimapContainer.classList.remove("scale-out");
+    cy.navigator(defaults);
   } catch (error) {
     console.error("Failed to create the ontology minimap:", error);
   }

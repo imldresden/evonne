@@ -29,7 +29,8 @@
 	width: var(--minimap-width);
 	height: var(--minimap-height);
 	margin-bottom: 16px;
-	/* width: calc(100% - var(--sidebar-toggle-width)); */
+	opacity: 1;
+	transition: opacity 0.2s;
 }
 
 .minimap-view {
@@ -42,7 +43,13 @@
 }
 
 /* Cytoscape minimap styles */
+.opacity-0 {
+	opacity: 0;
+	pointer-events: none;
+}
+
 #ontology-minimap-container{
+	/* transition: opacity 0.2s; */
 	overflow: hidden;
 	z-index: 1;
 	position: absolute;
