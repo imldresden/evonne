@@ -9,6 +9,7 @@ import { showRepairsTab } from "../utils/controls.js";
 const socket = io();
 
 let cy;
+const lastDraggedPositions = {};
 let showSignature = true;
 let wrapLines = false;
 let ontologyFile = null;
@@ -24,6 +25,7 @@ const flowStrengthReset = document.getElementById("flowStrengthReset");
 const maxLengthInput = document.getElementById("maximumLength");
 const btnShowSignature = document.querySelector("#btnShowSignature");
 const btnWrapLines = document.querySelector("#btnWrapLines");
+const btnAnimation = document.querySelector("#btnAnimation");
 const lineLengthInput = document.getElementById("lineLength");
 const resetLayoutButton = document.getElementById("resetLayoutButton");
 const saveLayoutButton = document.getElementById("saveLayoutButton");
@@ -63,6 +65,27 @@ async function createContent(data) {
     layout: params,
     wheelSensitivity: 0.3
   });
+
+  const handleLayoutEvent = function(enabled) {
+    return function() {
+      cy.userZoomingEnabled(enabled);
+      cy.userPanningEnabled(enabled);
+      cy.autoungrabify(!enabled);
+    };
+  };
+  cy.on('layoutstart', handleLayoutEvent(false));
+  setTimeout(function() {
+    cy.on('layoutstop', handleLayoutEvent(true) );
+  }, 100);
+
+  cy.on('dragfree', 'node', function(event) {
+    const nodeId = event.target.id();
+    const newPosition = event.target.position();
+    // Store the last dragged position of the node
+    lastDraggedPositions[nodeId] = newPosition;
+    // console.log(lastDraggedPositions);
+  });
+
   cy.on('tap', 'node', function(event) {
     const clickedElement = event.originalEvent.target;
     const node = event.target.isNode() ? event.target : event.target.isEdge() ? event.target.source() : null; 
@@ -125,7 +148,7 @@ function enable_eye(data,node) {
     'height': data.boxH + 'px'
   });
   const template = `
-    <div class="cy-html node ontNode bg-box" id="${ontologyNodeId + data.id}"> 
+    <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
       <div id="frontRect" style="padding: 5px; white-space:nowrap;">
         ${html}
       </div>
@@ -142,7 +165,7 @@ function enable_eye(data,node) {
       }
     }
   ]);
-  cy.layout(cy.params).run();
+  // cy.layout(cy.params).run();
 }
 }
 
@@ -341,6 +364,12 @@ function bindListeners() {
 
 function labelNodes(layout = true) {
   cy.startBatch();
+  const nodesHTML = [...document.getElementsByClassName(`cy-html`)];
+  nodesHTML.forEach(node => {
+      if (node.parentNode && node.parentNode.parentNode) {
+          node.parentNode.parentNode.remove();
+      }
+  });
   cy.nodes().forEach(function (node) {
     node.removeStyle();
     const d = node.data();
@@ -360,7 +389,7 @@ function labelNodes(layout = true) {
   cy.style().update();
   cy.endBatch();
   if (layout) {
-    cy.layout(cy.params).run();
+    keepNodes();
   }
 }
 
@@ -498,6 +527,7 @@ function init_ontology({
   // CONTROLS ==========================================
   btnShowSignature.checked = true;
   btnWrapLines.checked = false;
+  btnAnimation.checked = true;
   lineLengthInput.closest(".modal-option.modal-option-range").style.display = "none";
   maxLengthInput.closest(".input-range-wrapper").style.display = "none";
   flowStrength.max = 500;
@@ -588,13 +618,64 @@ function openProofFunction() {
   window.open('/proof?id=' + getSessionId())
 }
 
+function keepNodes() {
+  if (btnAnimation.checked === false) {
+    cy.params.maxSimulationTime = 1;
+    cy.params.animate = true,
+      cy.params.animationDuration = undefined,
+      cy.params.animationThreshold = 1,
+      cy.params.fit = false;
+    cy.params.centerGrsaph = false;
+  }
+  else {
+    cy.params.animate = true,
+      cy.params.animationDuration = 500,
+      cy.params.maxSimulationTime = 2000;
+    cy.params.fit = false;
+    cy.params.centerGraph = true;
+  }
+  Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+    const node = cy.$id(nodeId);
+    const lastPosition = lastDraggedPositions[nodeId];
+    // Set the position of the node to its last dragged position
+    node.position(lastPosition);
+    // Lock the position to maintain it even after layout
+    node.lock();
+  });
+  cy.layout(cy.params).run();
+  let layoutStopTimer;
+
+  cy.on('layoutstart', function (event) {
+    clearTimeout(layoutStopTimer); // Clear any existing timer
+    handleLayoutEvent(false);
+  });
+
+  cy.on('layoutstop', function (event) {
+    clearTimeout(layoutStopTimer); // Clear any existing timer
+    layoutStopTimer = setTimeout(function () {
+      handleLayoutEvent(true);
+    }, 500);
+  });
+
+  const handleLayoutEvent = function (enabled) {
+    cy.userZoomingEnabled(enabled);
+    cy.userPanningEnabled(enabled);
+    cy.autoungrabify(!enabled);
+    if (enabled === true) {
+      Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+        const node = cy.$id(nodeId);
+        node.unlock();
+      });
+    };
+  };
+}
+
 function rerunLayout(e) {
   cy.params.flow = {
     axis: flowDirection.value,
     minSeparation: +flowStrength.value,
   }
-
-  cy.layout(cy.params).run();
+  keepNodes();
 }
 
 export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology }
