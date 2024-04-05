@@ -624,6 +624,4 @@ setTimeout(() => {
   setupOntologyMinimap();
 }, 1000);
 
-// window.toggleOntologyMinimap = toggleOntologyMinimap;
-
 export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology }
