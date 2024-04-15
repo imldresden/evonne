@@ -1,4 +1,4 @@
-<div class="minimap-view-container scale-transition scale-out">
+<div class="minimap-view-container opacity-0">
   <svg class="minimap scope-container">
     <g>
       <rect class="scope" x="199.99999857761642" y="157.9999943659637" width="41.10526272763356" height="37.59999960472709"></rect>

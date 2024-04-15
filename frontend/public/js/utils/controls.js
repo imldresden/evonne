@@ -47,8 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   for (const toggle of document.getElementsByClassName('toggle-map')) {
-    toggle.addEventListener('click', () => {
-      document.querySelector('#' + toggle.getAttribute('target') + '-container .minimap-view-container').classList.toggle('scale-out');
+    toggle.addEventListener("click", () => {
+        document.querySelector("#" + toggle.getAttribute("target") + "-container .minimap-view-container").classList.toggle("opacity-0");
     });
   }
 

@@ -678,4 +678,31 @@ function rerunLayout(e) {
   keepNodes();
 }
 
+
+function setupOntologyMinimap(params) {
+  try {
+    let defaults = {
+      container: "#ontology-minimap-container",
+      viewLiveFramerate: 0,
+      thumbnailEventFramerate: 60,
+      thumbnailLiveFramerate: true,
+      dblClickDelay: 200,
+      removeCustomContainer: false,
+      rerenderDelay: 100
+    };
+
+    if (typeof cy === "undefined" || !cy.navigator) {
+      console.error("Cytoscape or navigator plugin is not defined.");
+    }
+
+    cy.navigator(defaults);
+  } catch (error) {
+    console.error("Failed to create the ontology minimap:", error);
+  }
+}
+
+setTimeout(() => {
+  setupOntologyMinimap();
+}, 1000);
+
 export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology }
