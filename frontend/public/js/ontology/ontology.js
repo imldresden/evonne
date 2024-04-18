@@ -9,6 +9,7 @@ import { showRepairsTab } from "../utils/controls.js";
 const socket = io();
 
 let cy;
+const lastDraggedPositions = {};
 let showSignature = true;
 let wrapLines = false;
 let ontologyFile = null;
@@ -24,6 +25,7 @@ const flowStrengthReset = document.getElementById("flowStrengthReset");
 const maxLengthInput = document.getElementById("maximumLength");
 const btnShowSignature = document.querySelector("#btnShowSignature");
 const btnWrapLines = document.querySelector("#btnWrapLines");
+const btnAnimation = document.querySelector("#btnAnimation");
 const lineLengthInput = document.getElementById("lineLength");
 const resetLayoutButton = document.getElementById("resetLayoutButton");
 const saveLayoutButton = document.getElementById("saveLayoutButton");
@@ -64,6 +66,34 @@ async function createContent(data) {
     wheelSensitivity: 0.3
   });
 
+  const handleLayoutEvent = function(enabled) {
+    return function() {
+      cy.userZoomingEnabled(enabled);
+      cy.userPanningEnabled(enabled);
+      cy.autoungrabify(!enabled);
+    };
+  };
+  cy.on('layoutstart', handleLayoutEvent(false));
+  setTimeout(function() {
+    cy.on('layoutstop', handleLayoutEvent(true) );
+  }, 100);
+
+  cy.on('dragfree', 'node', function(event) {
+    const nodeId = event.target.id();
+    const newPosition = event.target.position();
+    // Store the last dragged position of the node
+    lastDraggedPositions[nodeId] = newPosition;
+    // console.log(lastDraggedPositions);
+  });
+
+  cy.on('tap', 'node', function(event) {
+    const clickedElement = event.originalEvent.target;
+    const node = event.target.isNode() ? event.target : event.target.isEdge() ? event.target.source() : null; 
+    if (clickedElement && (clickedElement.classList.contains('node-eye')) && node) {
+        const data = node.data();
+        enable_eye(data, node);
+    }
+  });
   cy.params = structuredClone(params);
   cy.stylesheet = stylesheet;
   cy.add(elements);
@@ -71,6 +101,78 @@ async function createContent(data) {
   bindListeners();
   cy.layout(cy.params).run();
   return cy;
+}
+
+function enable_eye(data,node) {
+  if(!showOriginal){
+    const nodeHtmlElement = document.getElementById(ontologyNodeId + data.id);
+    if (nodeHtmlElement && nodeHtmlElement.parentNode) {
+    nodeHtmlElement.parentNode.remove();
+  }
+  if (data.revealed === undefined || data.revealed === false) {
+    data.revealed = true;
+  } else {
+    data.revealed = false;
+  }
+  const eyeIconClass = data.revealed ? 'eye-crossed' : 'eye-on';
+  const eyeIconSrc = data.revealed ? '../icons/eye-crossed.svg' : '../icons/eye.svg';
+
+  let html = `<div class='${eyeIconClass}'><img src='${eyeIconSrc}' class='node-eye' width='14' height='14'></div><div class='node-title'>`;
+  const text = getNodeText(data);
+
+  for (let i = 0; i < text.length; i++) {
+    let color = 'black'; 
+    if (cy.justification && cy.justification.has(text[i])) {
+      color = colors.justNodeStroke;
+    } 
+    if (cy.diagnoses && cy.diagnoses.has(text[i])) {
+      color = colors.diagNodeStroke;
+    } 
+    html += `
+      <p style="color:${color};margin:0;padding:0">
+          ${text[i]}
+      </p>`;
+  }
+  html += `</div>`;
+  let longestn = 1;
+  text.forEach(l => {
+        if (l.length > longestn) {
+          longestn = l.length;
+        }
+      });
+  data.boxH = calcBoxHeight(text);
+  data.boxW = calcBoxWidth(longestn);
+
+  node.style({
+    'width': data.boxW + 'px',
+    'height': data.boxH + 'px'
+  });
+  const template = `
+    <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
+      <div id="frontRect" style="padding: 5px; white-space:nowrap;">
+        ${html}
+      </div>
+    </div>
+  `;
+  // Replace the node's label with the new HTML template using cy.nodeHtmlLabel()
+  cy.nodeHtmlLabel([
+    {
+      query: '#' + node.id(),
+      valign: "center",
+      halign: "center",
+      tpl: function(data) {
+        return template;
+      }
+    }
+  ]);
+  // cy.layout(cy.params).run();
+}
+}
+
+function getNodeText(data) {
+  const tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
+  const text = data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
+  return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
 }
 
 function getNodeTextList(data) {
@@ -99,7 +201,7 @@ async function initHTML() {
       query: 'node',
       tpl: function (data) {
         const text = getNodeTextList(data);
-        let html = "";
+        let html = !showOriginal && text.filter(element => element.trim() !== '').length > 0 ? "<div class='eye-on'><img src='../icons/eye.svg' class='node-eye' width='14' height='14'></div><div class='node-title'>" : '';
 
         for (let i = 0; i < text.length; i++) {
           let color = 'black'; 
@@ -115,7 +217,7 @@ async function initHTML() {
                 ${text[i]}
             </p>`;
         }
-
+        html += `</div>`;
         const template = `
           <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
             <div id="frontRect" style="padding: 5px; white-space:nowrap;">
@@ -130,12 +232,44 @@ async function initHTML() {
   ]);
 }
 
+setInterval(function(){
+  document.addEventListener('mouseover', function(event) {
+    var node = event.target.closest('.cy-html');
+    if (node) {
+      var domElem = node;
+      if (!showOriginal) {
+        var container = findContainerWithClass(domElem, 'node');
+        if (container && container.contains(domElem)) {
+          var imageElement = container.querySelector('img');
+          var nodeText = container.querySelector('.node-title');
+          if (imageElement) {
+            imageElement.style.transition = 'opacity 200ms ease-in-out, transform 50ms ease-in-out';
+            imageElement.style.opacity = 1; 
+            nodeText.style.transform = 'translate(1px, 0)';          
+          }
+        }
+      }
+    }
+  });
+  
+  function findContainerWithClass(element, className) {
+    while (element && element !== document) {
+      if (element.classList && element.classList.contains(className)) {
+        return element;
+      }
+      element = element.parentNode;
+    }
+    return null;
+  }
+  
+ },500);
+
 function calcBoxWidth(longestString) {
-  return (longestString * globals.fontCharacterWidth + 10) + "px";
+  return (longestString * globals.fontCharacterWidth + 25) + "px";
 }
 
 function calcBoxHeight(stringList) {
-  return (stringList.length * 20 + 10) + "px";
+  return (stringList.length * 20 + 15) + "px";
 }
 
 function processData(data) {
@@ -230,7 +364,14 @@ function bindListeners() {
 
 function labelNodes(layout = true) {
   cy.startBatch();
+  const nodesHTML = [...document.getElementsByClassName(`cy-html`)];
+  nodesHTML.forEach(node => {
+      if (node.parentNode && node.parentNode.parentNode) {
+          node.parentNode.parentNode.remove();
+      }
+  });
   cy.nodes().forEach(function (node) {
+    node.removeStyle();
     const d = node.data();
     const text = getNodeTextList(d);
     let longest = 1;
@@ -241,12 +382,14 @@ function labelNodes(layout = true) {
     });
     d.boxH = calcBoxHeight(text);
     d.boxW = calcBoxWidth(longest);
+    // Resetting data nodes to false for eye functionality removes all previous saved values and starts fresh.
+    d.revealed = false;
   });
-
+  initHTML();
   cy.style().update();
   cy.endBatch();
   if (layout) {
-    cy.layout(cy.params).run();
+    keepNodes();
   }
 }
 
@@ -346,21 +489,21 @@ function init_ontology({
     name: ontology
   };
 
-  socket.on("highlight axioms", (data) => {
+  socket.on('highlight axioms', (data) => {
     restoreColor(true, cy);
     if (data && data.id === getSessionId()) {
       highlightNodesOf(data.pre, cy);
     }
   });
 
-  socket.on("set ontology", (data) => {
+  socket.on('set ontology', (data) => {
     if (data && data.id === getSessionId()) {
       if (!adOntologyFile) {
         computingRepairsFailed("Please select an ontology file");
       } else {
         showRepairsTab(false); // from controls.js
         computingRepairs();
-        socket.emit("get repairs", {
+        socket.emit('get repairs', {
           id: data.id,
           axiom: data.axiom,
           readableAxiom: data.readableAxiom,
@@ -371,7 +514,7 @@ function init_ontology({
     }
   });
 
-  socket.on("read repairs", (data) => {
+  socket.on('read repairs', (data) => {
     if (data && data.id === getSessionId()) {
       if (data.msg === "mDs.txt is now available!") {
         readRepairs({ axiom: data.axiom, file: "../data/" + data.id + "/mDs_" + data.id + ".txt", cy });
@@ -384,6 +527,7 @@ function init_ontology({
   // CONTROLS ==========================================
   btnShowSignature.checked = true;
   btnWrapLines.checked = false;
+  btnAnimation.checked = true;
   lineLengthInput.closest(".modal-option.modal-option-range").style.display = "none";
   maxLengthInput.closest(".input-range-wrapper").style.display = "none";
   flowStrength.max = 500;
@@ -416,8 +560,16 @@ function init_ontology({
 }
 
 function shortenAllInOntology() {
+  // Removing all the nodes which will be reseted by LabelNodes
+  const nodesHTML = [...document.getElementsByClassName(`cy-html`)];
+  nodesHTML.forEach(node => {
+      if (node.parentNode && node.parentNode.parentNode) {
+          node.parentNode.parentNode.remove();
+      }
+  });
   //Update shortening button
   showOriginal = !showOriginal
+  !showOriginal ? document.getElementById('ontology-view').classList.remove("complete-ontology") : document.getElementById('ontology-view').classList.add("complete-ontology");
   updateShorteningButton(this);
   labelNodes();
 }
@@ -466,13 +618,91 @@ function openProofFunction() {
   window.open('/proof?id=' + getSessionId())
 }
 
+function keepNodes() {
+  if (btnAnimation.checked === false) {
+    cy.params.maxSimulationTime = 1;
+    cy.params.animate = true,
+      cy.params.animationDuration = undefined,
+      cy.params.animationThreshold = 1,
+      cy.params.fit = false;
+    cy.params.centerGrsaph = false;
+  }
+  else {
+    cy.params.animate = true,
+      cy.params.animationDuration = 500,
+      cy.params.maxSimulationTime = 2000;
+    cy.params.fit = false;
+    cy.params.centerGraph = true;
+  }
+  Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+    const node = cy.$id(nodeId);
+    const lastPosition = lastDraggedPositions[nodeId];
+    // Set the position of the node to its last dragged position
+    node.position(lastPosition);
+    // Lock the position to maintain it even after layout
+    node.lock();
+  });
+  cy.layout(cy.params).run();
+  let layoutStopTimer;
+
+  cy.on('layoutstart', function (event) {
+    clearTimeout(layoutStopTimer); // Clear any existing timer
+    handleLayoutEvent(false);
+  });
+
+  cy.on('layoutstop', function (event) {
+    clearTimeout(layoutStopTimer); // Clear any existing timer
+    layoutStopTimer = setTimeout(function () {
+      handleLayoutEvent(true);
+    }, 500);
+  });
+
+  const handleLayoutEvent = function (enabled) {
+    cy.userZoomingEnabled(enabled);
+    cy.userPanningEnabled(enabled);
+    cy.autoungrabify(!enabled);
+    if (enabled === true) {
+      Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+        const node = cy.$id(nodeId);
+        node.unlock();
+      });
+    };
+  };
+}
+
 function rerunLayout(e) {
   cy.params.flow = {
     axis: flowDirection.value,
     minSeparation: +flowStrength.value,
   }
-
-  cy.layout(cy.params).run();
+  keepNodes();
 }
+
+
+function setupOntologyMinimap(params) {
+  try {
+    let defaults = {
+      container: "#ontology-minimap-container",
+      viewLiveFramerate: 0,
+      thumbnailEventFramerate: 60,
+      thumbnailLiveFramerate: true,
+      dblClickDelay: 200,
+      removeCustomContainer: false,
+      rerenderDelay: 100
+    };
+
+    if (typeof cy === "undefined" || !cy.navigator) {
+      console.error("Cytoscape or navigator plugin is not defined.");
+    }
+
+    cy.navigator(defaults);
+  } catch (error) {
+    console.error("Failed to create the ontology minimap:", error);
+  }
+}
+
+setTimeout(() => {
+  setupOntologyMinimap();
+}, 1000);
 
 export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology }

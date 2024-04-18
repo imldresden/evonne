@@ -60,6 +60,15 @@
 
   <fieldset>
     <h4>Layout Simulation Settings</h4>
+    <div class="modal-option">
+      <label>Animation</label>
+      <div class="switch">
+        <label>
+          <input id="btnAnimation" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
     <label>Flow Direction</label>
     <div class="input-wrapper modal-option">
       <select id="flowDirection" class="browser-default">

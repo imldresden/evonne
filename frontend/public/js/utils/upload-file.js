@@ -1,4 +1,3 @@
-
 import { loadOntology, loadLayout, loadAtomicDecomposition } from '../ontology/ontology.js';
 import { loadProof, loadSignature } from '../proof/proof.js';
 
@@ -16,6 +15,20 @@ function adaptUploadFileModal(whatToUpload) {
   }
   M.Modal.getInstance(document.getElementById('uploadFileModal')).open();
 }
+
+// blank project 
+const createBlankProject = document.getElementById("createBlank");
+createBlankProject && createBlankProject.addEventListener("click", async () => {
+  const id = await (await fetch("/uuid")).text();
+  const response = await fetch("/create?id=" + id);
+  
+  if (response.ok) {
+    window.location.href = "/?id=" + id;
+  } else {
+    console.error("Something went wrong. Please reload this page and try again. If the problem persists, feel free to contact the authors");
+  }
+});
+
 
 // for uploading the actual ontology, project menu 
 const uploadOntologyTriggers = Array.from(document.getElementsByClassName("uploadOntologyTrigger"));

@@ -437,14 +437,14 @@ function init() {
     }
 
     // configure the html 
-    allowOverlapBtn.checked = false;
+    allowOverlapBtn.checked = proof.allowOverlap || false;
     overlapAllowingSettings.style.display = proof.allowOverlap ? "block" : "none";
-    shortenRules.checked = false;
+    shortenRules.checked = proof.shortenRules || false;
 
-    magicToggleBtn.checked = false;
-    layoutToggleBtn.checked = false;
-    planarToggleBtn.checked = true;
-    showRulesBtn.checked = false;
+    magicToggleBtn.checked = proof.isMagic || false;
+    layoutToggleBtn.checked = proof.isLinear || false;
+    planarToggleBtn.checked = proof.linear.isDistancePriority || false;
+    showRulesBtn.checked = proof.showRules || false;
     getPlanarWrapper() ? getPlanarWrapper().style.display = "none" : "";
 
     shorteningMethodSelection.value = globals.shorteningMethod;

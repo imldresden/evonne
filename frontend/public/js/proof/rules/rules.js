@@ -95,8 +95,11 @@ class RulesHelper {
             rule_sets.dl.draw({ ruleName, div, premises, conclusion });
         } else if (data.source.type === "CDRule") {
             rule_sets.cd.draw({ ruleName, tooltip, data: data.source.data });
+        } else if (data.source.type === "mrule" || data.source.type === "krule") {
+            return;
         } else {
             console.error(`unknown rule type: "${data.source.type}"`);
+            return;
         }
 
         if (proof.ruleExplanationPosition === "mousePosition") {
@@ -150,6 +153,10 @@ class RulesHelper {
 
     // https://www.w3schools.com/howto/howto_js_draggable.asp
     makeDraggable(elmnt, handle) {
+        if (!handle) {
+            return; 
+        }
+        
         let x = 0, y = 0, clientX = 0, clientY = 0;
         handle.onmousedown = dragMouseDown;
         

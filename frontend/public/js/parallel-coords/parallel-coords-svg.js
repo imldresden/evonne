@@ -1,6 +1,8 @@
 // Adapted from: https://gist.github.com/mbostock/1341021
 // d3v7 brushing example https://observablehq.com/@d3/brushable-parallel-coordinates
 
+// import throttle from "/libs/underscore/modules/throttle.js";
+
 const parallelCoords = function (pane, data, metadata) {
     const selections = new Map(); // stores dimension -> brush selection
     const highlighted = new Set(); // stores hover highlighting, always a subset of selections

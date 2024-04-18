@@ -18,7 +18,7 @@ const conf = {
   div: "proof-container",
   shortenAll: false,
   allowOverlap: false,
-  showRules: false,
+  showRules: true,
   isMagic: false,
   isRuleShort: false,
   isLinear: false,
@@ -53,16 +53,18 @@ const conf = {
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
 
-    if (file.endsWith(".t.xml")) {
-      d3.xml(file).then(xml => {
-        proof.tree.init(getTreeFromXML(xml));
-      });
-    }
-
     if (file.endsWith(".json")) {
       d3.json(file).then(json => {
         proof.tree.init(getTreeFromJSON(json));
       });
+    } else {
+      try { // file.endsWith(".t.xml"), or blob
+        d3.xml(file).then(xml => {
+          proof.tree.init(getTreeFromXML(xml));
+        });
+      } catch (e) {
+        console.error(e)
+      }
     }
   },
 
@@ -74,17 +76,18 @@ const conf = {
 function init_proof({
   file,
   external,
-}) {
+} = {}) {
   if (external) {
     proof.div = external.div || proof.div,
-    proof.isMagic = external.isMagic || proof.isMagic; 
-    proof.isLinear = external.isLinear || proof.isLinear; 
+    proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
+    proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
+    proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
 
     globals.shorteningMethod = external.shorteningMethod || globals.shorteningMethod;
-    proof.shortenAll = external.shortenAll || proof.shortenAll; 
-    proof.isRuleShort = external.isRuleShort || proof.isRuleShort;
-
-    proof.allowOverlap = external.allowOverlap || proof.allowOverlap; 
+    proof.shortenAll = external.shortenAll === undefined ? proof.shortenAll : external.shortenAll; 
+    proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
+    proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
+    
     proof.drawTime = external.drawTime || proof.drawTime; 
   }
 
@@ -164,7 +167,6 @@ function getFileName() {
     };
   }
 
-  fileName += ".t.xml";
   return fileName;
 }
 
@@ -173,7 +175,7 @@ function loadProof(event) {
   proof.nodeVisuals.initVarsAxiomFunctions();
 
   upload(proof.proofFile, _ => {
-    proof.load();
+    init_proof();//proof.load();
   });
 }
 
