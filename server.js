@@ -438,7 +438,7 @@ io_.on('connection', function (socket) {
       ]);
       printOutput(repairs);
       repairs.on("exit", ()=> {
-        io_.sockets.emit('read repairs', { id, axiom: data.readableAxiom, msg: "mDs.txt is now available!" });
+        io_.sockets.emit('read repairs', { id, axiom: data.axiom, msg: "mDs.txt is now available!" });
         //removeFile(path.join(projectPath, "pi.txt"));
         delete sessions[id];
       });

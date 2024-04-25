@@ -2,7 +2,7 @@
 <div id="uploadFileModal" class="modal upload-file-modal">
 
   <div class="modal-content">
-    <i class="material-icons right modal-close">close</i>
+    <i class="material-icons right modal-button">close</i>
     <header>
       <h4>File Upload</h4>
       <p>Select a file containing a<span id="what-is-uploaded"> </span> </p>

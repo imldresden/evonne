@@ -107,17 +107,29 @@ function getNodes(data, edgeData) {
     return [].map.call(data.querySelectorAll("node"), (d) => {
 
         const node = { id: d.id };
-        const dataNodes = d.querySelectorAll("data");
+        const dataNodes = d.childNodes;//querySelectorAll("data");
 
+        
         dataNodes.forEach((item) => {
-            const key = item.getAttribute("key");
+            const key = item.getAttribute("key");            
+            const children = item.childNodes;
 
             if (key) {
-                node[key] = item.textContent;
+                if (children.length === 1) {
+                    node[key] = item.textContent;
+                } else {
+                    node[key] = {};
+                    children.forEach(c => {
+                        const ckey = c.getAttribute("key");
+                        if (ckey) {
+                            node[key][ckey] = c.textContent;
+                        }
+                    });
+                }
             }
         });
 
-        if (node["type"] === "CDRule") {
+        if (node.type === "CDRule") {
             node.data = [buildCDRule({ d, data })];
         }
 
@@ -163,7 +175,7 @@ function getTreeFromJSON(data) { // { edges, nodes }
         const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
         node.isRoot = outGoingEdges.length === 0;
         return node;
-    }); // { id, type, element, mSElement, nLElement, data (eg numerical)} 
+    }); // { id, type, element, labels:{}, data (eg numerical)} 
     
     return addNodesToEdges(nodeData, edgeData);
 }

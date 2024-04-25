@@ -202,7 +202,6 @@ export class DLRules {
         lHS = conclusion.substring(1, conclusion.indexOf(")")).split(subsumes)[0].trim();
         rHS = conclusion.split(subsumes)[1].trim();
         lHSConjuncts = lHS.split(and);
-        console.log(lHSConjuncts)
         lHSConjuncts = lHSConjuncts.map(x => x.trim());
         indexOfMatch = lHSConjuncts.findIndex(x => x === rHS);
 

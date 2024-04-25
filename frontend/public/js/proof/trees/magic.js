@@ -436,14 +436,12 @@ export class MagicNavigation {
 		this.addAllBut(treeRoot, newData);
 
 		let childrenOfMagic = treeRoot.children[0].children;
-
 		let currentAtOriginal = this._entireProofHierarchy.descendants().find(x => x.data.source.id === treeRoot.data.source.id);
-
 		let newMagicBox, relevantPremise, relevantPremiseCount, found;
+
 		currentAtOriginal.children.forEach(child => {
 			newData.push(child.data);//add the rule to axiom edge data
 			child.children.forEach(grandChild => {
-				console.log("**Processing** " + grandChild.data.source.element)
 				newData.push(grandChild.data);//add the axiom to rule edge data
 
 				//get the premise of the magic rule that corresponds to the current conclusion
@@ -621,7 +619,7 @@ export class MagicNavigation {
 			source: sourceObject,
 			target: TargetObject,
 			childrenIDs: [],
-			mSElement: ""
+			element: ""
 		};
 	}
 

@@ -124,7 +124,7 @@ function init_proof({
   // Configure Socket IO
   let socket = io();
   socket.on("highlight axioms", (data) => {
-    console.log("proof received the following ");
+    console.log("highlighting the following:");
     console.log(data);
   });
 
