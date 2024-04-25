@@ -494,7 +494,7 @@ function init_ontology({
   };
 
   socket.on('highlight axioms', (data) => {
-    restoreColor(true, cy);
+    restoreColor(false, cy);
     if (data && data.id === getSessionId()) {
       highlightNodesOf(data.pre, cy);
     }

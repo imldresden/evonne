@@ -406,12 +406,8 @@ export class AxiomsHelper {
 			b.classList.remove("active");
 			b.parentElement.dispatchEvent(new MouseEvent("mouseleave"));
 		});
-		const active = button.classList.toggle("active");
-		if (active) {
-			this.highlightJustificationInOntology(d);
-		} else {
-			restoreColor();
-		}
+		button.classList.add("active");
+		this.highlightJustificationInOntology(d);
 	}
 
 	getAllPreviousAxioms(treeRoot, axioms, fn) {
