@@ -65,13 +65,13 @@ class RulesHelper {
                 if (node.data.source.id !== lastToolTipTriggerID) {
                     this.destroyExplanation();
 
-                    let conclusion = x.parent.data.source.element;
+                    let conclusion = proof.nodeVisuals.getLabel(x.parent.data.source);
                     let premises = [];
                     let iDsToHighlight = [x.parent.data.source.id];
             
                     if (x.children) {
                         x.children.forEach(child => { 
-                            premises.push(child.data.source.element);
+                            premises.push(proof.nodeVisuals.getLabel(child.data.source));
                             iDsToHighlight.push(child.data.source.id);
                         });
                     }
@@ -109,7 +109,7 @@ class RulesHelper {
             .append("div").attr("class", "tooltiptext")
             .attr("id", "explanationTextSpan");
 
-        const ruleName = data.source.element;
+        const ruleName = proof.nodeVisuals.getLabel(data.source);
 
         if (data.source.type === "rule" || data.source.type === "DLRule") {
             rule_sets.dl.draw({ ruleName, div, premises, conclusion });
