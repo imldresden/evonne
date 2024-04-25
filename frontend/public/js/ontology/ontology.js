@@ -557,6 +557,8 @@ function init_ontology({
     twl.thing.removeEventListener(twl.type, twl.fn);
     twl.thing.addEventListener(twl.type, twl.fn);
   });
+
+  setupOntologyMinimap();
 }
 
 function shortenAllInOntology() {
@@ -679,7 +681,7 @@ function rerunLayout(e) {
 }
 
 
-function setupOntologyMinimap(params) {
+function setupOntologyMinimap() {
   try {
     let defaults = {
       container: "#ontology-minimap-container",
@@ -700,9 +702,5 @@ function setupOntologyMinimap(params) {
     console.error("Failed to create the ontology minimap:", error);
   }
 }
-
-setTimeout(() => {
-  setupOntologyMinimap();
-}, 1000);
 
 export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology }
