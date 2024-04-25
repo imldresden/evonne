@@ -161,7 +161,7 @@ export class AxiomsHelper {
 		}
 		proof.nodeInteracted = treeRoot;
 		let axioms = [];
-		this.getAllPreviousAxioms(treeRoot, axioms, 'id');
+		this.getAllPreviousAxioms(treeRoot, axioms, (node) => node.id);
 		axioms.forEach(nodeID => {
 		  nodeID = "N" + nodeID;
 		  const displayFormat = proof.nodeVisuals.nodesDisplayFormat.get(nodeID);
@@ -389,15 +389,14 @@ export class AxiomsHelper {
 
 	showRepairs(axiom) {
 		this._socket.emit("get ontology", {
-			axiom: axiom.mSElement,
-			readableAxiom: axiom.element,
+			axiom: axiom.element,
 			id: getSessionId()
 		});
 	}
 
 	highlightJustificationInOntology(treeRoot) {
-		let pre = [treeRoot.data.source.element];
-		this.getAllPreviousAxioms(treeRoot, pre, 'element');
+		let pre = [proof.nodeVisuals.getLabel(treeRoot.data.source)];
+		this.getAllPreviousAxioms(treeRoot, pre, (node) => proof.nodeVisuals.getLabel(node));
 		this._socket.emit("highlight in ontology", { id: getSessionId(), pre });
 	}
 
@@ -415,16 +414,16 @@ export class AxiomsHelper {
 		}
 	}
 
-	getAllPreviousAxioms(treeRoot, axioms, propertyName) {
+	getAllPreviousAxioms(treeRoot, axioms, fn) {
 		if (!treeRoot._children) {
 			return;
 		}
 
 		treeRoot._children.forEach(child => {
 			if (!ruleUtils.isRule(child.data.source.type)) {
-				axioms.push(child.data.source[propertyName]);
+				axioms.push(fn(child.data.source));
 			}
-			this.getAllPreviousAxioms(child, axioms, propertyName);
+			this.getAllPreviousAxioms(child, axioms, fn);
 		});
 	}
 

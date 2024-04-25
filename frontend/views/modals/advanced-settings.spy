@@ -9,7 +9,7 @@
     {{ advanced_settings_specific }}
 
     <footer class="modal-footer modal-section">
-      <button class="modal-close waves-effect waves-purple btn-flat">close</button>
+      <button class="modal-button waves-effect waves-purple btn-flat">close</button>
     </footer>
   </div>
 </div>

@@ -325,12 +325,12 @@ fieldset {
 	margin-bottom: 0;
 }
 
-.modal-close {
+.modal-button {
 	margin: 0;
 	color: var(--color-gray-darker);
 }
 
-.modal-close:hover {
+.modal-button:hover {
 	color: var(--color-gray-dark);
 	cursor: pointer;
 	background-color: transparent;

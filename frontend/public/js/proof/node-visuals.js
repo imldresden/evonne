@@ -238,20 +238,17 @@ export class NodeVisualsHelper {
                 .attr("x", d => -(d.width) / 2 + TEXT_PAD)
                 .attr("y", BOX_HEIGHT - BOX_PADDING_BOTTOM)
                 .text((d, i, nodes) => {
-                    let displayFormat = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
-                    if (!displayFormat || displayFormat === "original") {
-                        return d.data.source.element;
+                    const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
+
+                    let label = this.getLabel(d.data.source, display)
+                    if (display && display === "shortened") {
+                        label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
                     }
 
-                    if (displayFormat === "shortened") {
-                        return globals.labelsShorteningHelper.shortenLabel(d.data.source.element, proof.isRuleShort, globals.shorteningMethod);
-                    } else if (displayFormat === "textual") {
-                        return d.data.source.nLElement;
-                    }
+                    return label;
                 })
                 .each((d, i, nodes) => {
-                    d3.select(`#${nodes[i].parentNode.id} #frontRect`)
-                        .attr("x", () => -(d.width) / 2);
+                    d3.select(`#${nodes[i].parentNode.id} #frontRect`).attr("x", () => -(d.width) / 2);
                 });
         }
     }
@@ -534,13 +531,11 @@ export class NodeVisualsHelper {
     getNodeWidth(node) {
         // estimation of the size of each character
         const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.data.source.id}`)
-        let label = "";
-        if (!display || display === "original") {
-            label = node.data.source.element;
-        } else if (display === "shortened") {
-            label = globals.labelsShorteningHelper.shortenLabel(node.data.source.element, proof.isRuleShort, globals.shorteningMethod);
-        } else if (display === "textual") {
-            label = node.data.source.nLElement;
+        
+        let label = this.getLabel(node.data.source);
+        
+        if (display && display === "shortened") {
+            label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
         }
 
         node.width = label.length * globals.fontCharacterWidth + nodeVisualsDefaults.TEXT_PAD * 2;
@@ -595,5 +590,15 @@ export class NodeVisualsHelper {
 
     setFullOpacityToAll() {
         proof.svg.selectAll("g.node,line.link,path.link").style("opacity", 1);
+    }
+
+    getLabel(node, display = "original") {   
+        if (node.labels) {
+            if (display === "textual") {
+                return node.labels.naturalLanguage;
+            }
+            return node.labels.default;
+        }
+        return node.element;
     }
 }

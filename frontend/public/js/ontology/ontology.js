@@ -174,6 +174,7 @@ function enable_eye(data, node) {
 
 function getNodeText(data) {
   const tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
+  console.log(tmpText)
   const text = data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
   return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
 }
@@ -509,7 +510,6 @@ function init_ontology({
         socket.emit('get repairs', {
           id: data.id,
           axiom: data.axiom,
-          readableAxiom: data.readableAxiom,
           ontologyFile: ontologyFile.name,
           reasoner: document.getElementById('diagnosesReasoner').value
         });

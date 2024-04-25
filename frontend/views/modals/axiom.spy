@@ -1,6 +1,6 @@
 <div id="selectAxiomModal" class="modal settings-modal">
   <div class="modal-content">
-    <i class="material-icons right modal-close">close</i>
+    <i class="material-icons right modal-button">close</i>
     <header>
       <h2>Specify Input</h2>
       <p>Please indicate the following options to generate a proof and an atomic decomposition.</p>

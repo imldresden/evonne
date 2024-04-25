@@ -27,8 +27,8 @@ export class CDRules {
 
     showObvious = false; 
 
-    draw({ ruleName, tooltip, data }) {
-        this.tooltip = tooltip;
+    draw({ ruleName, div, data }) {
+        this.tooltip = div;
 
         console.log(data)
 
@@ -249,7 +249,7 @@ export class CDRules {
                 length += (5 + oper.length);
             });
 
-            exp.append("hr").attr("class", "mid").attr("width", (length * 10))
+            utils.addMidRule([length], exp)
             printEquation(op.conclusion.constraint, exp.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-eq conclusion"))
         }
 
@@ -377,7 +377,7 @@ export class CDRules {
                 }                
             });
 
-            exp.append("hr").attr("class", "mid").attr("width", (length * 10))
+            utils.addMidRule([length], exp);
             if (op.conclusion.constraint.bottom) {
                 exp.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-red").text("⊥")
             } else {
