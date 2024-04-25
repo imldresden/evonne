@@ -411,6 +411,7 @@ io_.on('connection', function (socket) {
 
     const id = data.id;
     const axiom = data.axiom;
+    console.log(axiom)
     const ontologyFile = data.ontologyFile;
     const projectPath = path.join(dataDir, id);
     const ontologyPath = path.join(projectPath, ontologyFile);
@@ -424,6 +425,9 @@ io_.on('connection', function (socket) {
 
     console.log("Received the following, generating repairs...");
     console.log(data);
+
+    console.log("java -jar externalTools/explain.jar -a "+ axiom + " -o "+ ontologyPath+
+        " -mds "  + id, reasoner +  " -od " + projectPath);
 
     if (axiom !== "") {
       //Added this to make sure that previous result does not interfere with current computation
