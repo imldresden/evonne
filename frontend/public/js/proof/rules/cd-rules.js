@@ -27,7 +27,7 @@ export class CDRules {
 
     showObvious = false; 
 
-    draw({ ruleName, div, data }) {
+    draw({ ruleName, div, data, params }) {
         this.tooltip = div;
 
         console.log(data)
@@ -35,7 +35,7 @@ export class CDRules {
         if (this.rules[ruleName]) {
             this.rules[ruleName](data);
         } else if (data) {
-            this.linear(data);
+            this.linear(data, params);
         } else {
             console.error("unknown cd rule")
         }       
@@ -57,39 +57,36 @@ export class CDRules {
             .append("div")
             .attr("class", "controls-bar");
 
-        const prev = buttons.append("a").attr("class", "bar-button");
+        const centered = buttons.append("a").attr("class", "bar-center");
+        const prev = centered.append("a").attr("class", "bar-button");
         prev.append("i")
             .attr("class", "material-icons")
             .text("skip_previous");
 
-        const play = buttons.append("a").attr("class", "bar-button");
+        const play = centered.append("a").attr("class", "bar-button");
         play.append("i")
             .attr("class", "material-icons")
             .text("play_arrow");
 
-        const next = buttons.append("a").attr("class", "bar-button");
+        const next = centered.append("a").attr("class", "bar-button");
         next.append("i")
             .attr("class", "material-icons")
             .text("skip_next");
 
-        const replay = buttons.append("a").attr("class", "bar-button");
+        const righted = buttons.append("a").attr("class", "bar-right");
+        const replay = righted.append("a").attr("class", "bar-button");
         replay.append("i")
             .attr("class", "material-icons")
             .text("replay")
-            .style("float", "right")
-            .style("padding-right", "50px")
-            .style("font-size", "20px");
-        
+            .style("font-size", "23px");
     
         prev.on("click", prevFn);
         play.on("click", currentFn);
         next.on("click", nextFn);
         replay.on("click", replayFn);
-
-        this.tooltip.append("br");
     }
 
-    linear(data) {
+    linear(data, params) {
         //Add a title for the explanation view
         utils.addTitle("Numerical Logic: Gaussian Elimination");
 
@@ -99,11 +96,10 @@ export class CDRules {
 
         //Add visualization
         this.tooltip.append("div")
-            .style("width", "700px")
-            .style("height", "300px")
-            .append("div")
             .attr("class", "pcp-container")
             .attr("id", "pcp-container")
+            .style("height", params.large ? `${params.p.height - 150}px` : "200px")
+            .style("width", "100%")
 
         function getVariables(data) {
             const set = new Set(data.map(d => [
@@ -289,10 +285,13 @@ export class CDRules {
         document.removeEventListener('pcp-hl', highlightText)
         document.addEventListener('pcp-hl', highlightText)
 
+        
         function makePCP(data) {
             d3.select("#pcp").selectAll("*").remove();
+            const dim = d3.select("#pcp-container").node().getBoundingClientRect()
+            
             pcp = parallelCoords(
-                { id: "pcp", details: "pcp-container", width: 700, height: 300 },
+                { id: "pcp", details: "pcp-container", width: dim.width, height: dim.height },
                 data,
                 {
                     data_id: 'id',
@@ -317,11 +316,9 @@ export class CDRules {
 
         //Add visualization
         this.tooltip.append("div")
-            .style("width", "700px")
-            .style("height", "10px")
-            .append("div")
             .attr("class", "pcp-container")
             .attr("id", "pcp-container")
+            .style("min-width", "700px")
 
         let current = 0;
 

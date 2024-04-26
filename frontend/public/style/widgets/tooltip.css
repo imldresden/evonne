@@ -49,14 +49,28 @@
 }
 
 .controls-bar {
+    height: 30px;
+}
+
+.bar-right {
+    position: absolute;
+    margin-left: auto;
+    right: 15px;
     text-align: center;
-    padding-left: 50px;
+}
+
+.bar-center {
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
 }
 
 .bar-button > i {
     font-size: 30px;
     cursor:pointer;
-    
     color: var(--color-primary)
 }
 

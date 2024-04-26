@@ -2,12 +2,14 @@ import { proof } from "../../proof/proof.js";
 import { DLRules } from "./dl-rules.js";
 import { CDRules } from "./cd-rules.js";
 
-let tooltip, div, lastToolTipTriggerID, params, large;
+let tooltip, div, lastToolTipTriggerID, params;
 
 const rule_sets = {
     dl: new DLRules(),
     cd: new CDRules(),
 }
+
+document.addEventListener("destroy_explanation", () => proof.rules.destroyExplanation())
 
 const utils = {
     addTitle: function(text) {
@@ -18,7 +20,8 @@ const utils = {
             .style("margin-right", "15px")
             .html("close")
             .on("click", () => proof.rules.destroyExplanation())
-
+        
+            
         title.append("i")
             .attr("class", "material-icons left modal-button")
             .attr("id", "enlarge-tooltip")
@@ -88,7 +91,7 @@ class RulesHelper {
     }
 
     showExplanation(event, { premises, conclusion, data }) {
-        params = { event, premises, conclusion, data };
+        params = { event, premises, conclusion, data, large: false };
         this.renderExplanation();
     }
 
@@ -109,12 +112,27 @@ class RulesHelper {
             .append("div").attr("class", "tooltiptext")
             .attr("id", "explanationTextSpan");
 
+        if (params.large) {    
+            const p = d3.select("#proof-view").node().getBoundingClientRect();
+            params.p = p;
+            
+            d3.select("#toolTipID")
+                .style("width", `${p.width}px`)
+                .style("height", `${p.height}px`)
+                .style("left", 0)
+                .style("bottom", 0)
+                .style("top", 0)
+                .style("right", 0);
+
+            d3.select("#enlarge-tooltip").html("photo_size_select_small");
+        } 
+
         const ruleName = proof.nodeVisuals.getLabel(data.source);
 
         if (data.source.type === "rule" || data.source.type === "DLRule") {
             rule_sets.dl.draw({ ruleName, div, premises, conclusion });
         } else if (data.source.type === "CDRule") {
-            rule_sets.cd.draw({ ruleName, div, data: data.source.data });
+            rule_sets.cd.draw({ ruleName, div, data: data.source.data, params });
         } else if (data.source.type === "mrule" || data.source.type === "krule") {
             return;
         } else {
@@ -130,19 +148,7 @@ class RulesHelper {
 
         this.makeDraggable(document.getElementById("toolTipID"), document.getElementById("tooltip-handle-bar"));
         
-        if (large) {    
-            const p = d3.select("#proof-view").node().getBoundingClientRect();
-            
-            d3.select("#toolTipID")
-                .style("width", `${p.width}px`)
-                .style("height", `${p.height}px`)
-                .style("left", 0)
-                .style("bottom", 0)
-                .style("top", 0)
-                .style("right", 0);
-
-            d3.select("#enlarge-tooltip").html("photo_size_select_small");
-        } 
+        
     }
 
     destroyExplanation() {
@@ -156,11 +162,11 @@ class RulesHelper {
     }
 
     enlargeExplanation() {
-        if (large) {
-            large = false;
+        if (params.large) {
+            params.large = false;
             this.renderExplanation();
         } else {
-            large = true;
+            params.large = true;
             this.renderExplanation();
         }
     }

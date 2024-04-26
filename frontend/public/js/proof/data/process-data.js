@@ -107,11 +107,10 @@ function getNodes(data, edgeData) {
     return [].map.call(data.querySelectorAll("node"), (d) => {
 
         const node = { id: d.id };
-        const dataNodes = d.childNodes;//querySelectorAll("data");
+        const dataNodes = d.childNodes; // querySelectorAll(`[*|id='${d.id}']>data`);
 
-        
         dataNodes.forEach((item) => {
-            const key = item.getAttribute("key");            
+            const key = item.getAttribute && item.getAttribute("key");
             const children = item.childNodes;
 
             if (key) {
@@ -120,7 +119,7 @@ function getNodes(data, edgeData) {
                 } else {
                     node[key] = {};
                     children.forEach(c => {
-                        const ckey = c.getAttribute("key");
+                        const ckey = c.getAttribute && c.getAttribute("key");
                         if (ckey) {
                             node[key][ckey] = c.textContent;
                         }

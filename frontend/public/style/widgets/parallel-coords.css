@@ -60,15 +60,9 @@ path.highlighted-path {
   cursor: move;
 }
 
-.pcp-container canvas,
-.pcp-container svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
 .pcp-container {
-  position: absolute;
+  display:block;
+  width: 100%;
 }
 
 line {
