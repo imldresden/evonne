@@ -372,13 +372,16 @@ export class CDRules {
             // expects x = c, x > c, x + c = y
             const edges = []
             const nodes = {};
+            const constraints = [...op.premises.map(p => p.constraint), op.conclusion.nConstraint].filter(p => !p.bottom)
+            const x0 = "x0";
 
-            let i = 0;
-            op.premises.map(p => p.constraint).forEach(p => {
+            let i = 1;
+
+            constraints.forEach(p => {
                 const lhs = structuredClone(p.lhs);
                 const rhs = structuredClone(p.rhs);
-                if (p.type === "plus") {
-                    // x+c=y is the same as y-x=c
+
+                if (p.type === "plus") { // x+c=y is the same as y-x=c
                     const c = +lhs.constant;
                     delete lhs.constant;
                     const x = Object.keys(lhs)[0];
@@ -390,21 +393,42 @@ export class CDRules {
                     nodes[y] = nodes[y] || i++;
                     edges.push({ data: { id: i++, 
                         source: nodes[x], target: nodes[y], weight: c } // x-y<=c : (y,x),c 
-                    }) 
+                    });
                     edges.push({ data: { id: i++, 
                         source: nodes[y], target: nodes[x], weight: -c } // y-x<=-c : (x,y),-c 
-                    }) 
-                }
+                    });
+                } else if (p.type === "equal" || p.type === "lessThan") { // x = c || x < c
+                    // x < c can be rewritten as x−x0 < c
+                    const x = Object.keys(lhs)[0];
+                    const c = +rhs.constant;
 
-                //TODO: other types
+                    nodes[x] = nodes[x] || i++;
+                    nodes[x0] = nodes[x0] || i++;
 
-                // "equal": "=",
-                // "greaterThan": ">",
-                // "lessThan": "<"
+                    edges.push({ data: { id: i++, 
+                        source: nodes[x0], target: nodes[x], weight: c } // x-y<=c : (y,x),c 
+                    });
 
-                // x − y ≥ c is the same as y − x ≤ −c.
-                // x − y > c is the same as y − x < −c.
-                // x < c can be rewritten as x−x0 < c,
+                    if (p.type === "equal") {
+                        edges.push({ data: { id: i++, 
+                            source: nodes[x], target: nodes[x0], weight: -c } // y-x<=-c : (x,y),-c
+                        });
+                    }
+                } else if (p.type === "greaterThan") { // x > c
+                    // x > c can be rewritten as x−x0 > c
+                    // x−y > c is the same as y−x < −c
+                    const x = Object.keys(lhs)[0];
+                    const c = +rhs.constant;
+
+                    nodes[x] = nodes[x] || i++;
+                    nodes[x0] = nodes[x0] || i++;
+
+                    edges.push({ data: { id: i++, 
+                        source: nodes[x], target: nodes[x0], weight: -c } // y−x < −c.
+                    });
+                } 
+
+                // x − y >= c is the same as y − x <= −c. This is not considered and should not happen!
             });
 
             const cynodes = Object.keys(nodes).map(n => {
@@ -412,8 +436,6 @@ export class CDRules {
                     data: {
                         id: nodes[n],
                         v: n,
-                        boxW: 25,
-                        boxH: 25
                     }
                 }
             });
@@ -449,56 +471,8 @@ export class CDRules {
         })
         displayRule(text_data[current]);
         const graph = getDiffGrammarEqs(text_data[current], types);
-
-        console.log(graph)
-        //explanation-container
         const container = document.getElementById("explanation-container");
         container.innerHTML = "";
-        container.style.textAlign = "unset !important"
-
-        async function initHTML() {
-            const nodesHTML = container.getElementsByClassName(`cy-html`);
-
-            // the html layer lives here, remove it before creating a new one
-            if (nodesHTML[0] && nodesHTML[0].parentNode && nodesHTML[0].parentNode.parentNode) {
-                nodesHTML[0].parentNode.parentNode.remove();
-            }
-
-            await cy.nodeHtmlLabel([
-                {
-                    query: 'node',
-                    tpl: function (data) {
-                        const text = getNodeTextList(data);
-                        let html = !showOriginal && text.filter(element => element.trim() !== '').length > 0 ? "<div class='eye-on'><img src='../icons/eye.svg' class='node-eye' width='14' height='14'></div><div class='node-title'>" : '';
-
-                        for (let i = 0; i < text.length; i++) {
-                            let color = 'black';
-                            if (cy.justification && cy.justification.has(text[i])) {
-                                color = colors.justNodeStroke;
-                            }
-                            if (cy.diagnoses && cy.diagnoses.has(text[i])) {
-                                color = colors.diagNodeStroke;
-                            }
-
-                            html += `
-                      <p style="color:${color};margin:0;padding:0">
-                          ${text[i]}
-                      </p>`;
-                        }
-                        html += `</div>`;
-                        const template = `
-                    <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
-                      <div id="frontRect" style="padding: 5px; white-space:nowrap;">
-                        ${html}
-                      </div>
-                    </div>
-                  `;
-
-                        return template;
-                    }
-                },
-            ]);
-        }
 
         const cy = cytoscape({
             container,

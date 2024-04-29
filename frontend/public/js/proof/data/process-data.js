@@ -89,7 +89,8 @@ function buildCDRule({ d, data }) {
             id, 
             t: m.getAttribute("type"),
             coe: m.getAttribute("coe"),
-            constraint: getConstraint(id, data)
+            constraint: getConstraint(id, data),
+            nConstraint: getConstraint(`~${id}`, data)
         }
     });
 
