@@ -2,7 +2,7 @@ import { globals } from "../shared-data.js";
 import { upload } from '../utils/upload-file.js';
 import { progress } from '../main/main.js';
 import { BasicShorteningFunctions } from "../shortening/basic.js";
-import { colors, stylesheet } from "../../style/cy-style.js";
+import { colors, stylesheet } from "../../style/cy-ontology-style.js";
 import { params } from "../layouts/cola.js";
 import { showRepairsTab } from "../utils/controls.js";
 
@@ -59,6 +59,7 @@ async function createContent(data) {
   container.innerHTML = "";
 
   const elements = processData(data);
+  console.log(elements)
   cy = cytoscape({
     container,
     style: stylesheet,
