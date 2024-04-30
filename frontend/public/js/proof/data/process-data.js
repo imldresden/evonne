@@ -8,13 +8,12 @@ function getNegs(id, data) {
         const n2id = nid+"-2";
 
         if (data.getElementById(n1id) && data.getElementById(n2id)) {
-            return [n1id, n2id]
+            return [n1id, n2id];
         } else {
             return [];
         }
     }
-    return [nid]
-
+    return [nid];
 }
 
 function getConstraint(id, data) {

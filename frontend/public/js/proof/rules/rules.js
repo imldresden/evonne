@@ -26,7 +26,7 @@ const utils = {
             .attr("class", "material-icons left modal-button")
             .attr("id", "enlarge-tooltip")
             .style("margin-left", "15px")
-            .html("zoom_out_map")
+            .html(params.large? "fullscreen_exit":"fullscreen")
             .on("click", () => proof.rules.enlargeExplanation())
 
         title.append("h2").attr("align", "center").text(text);
@@ -123,8 +123,6 @@ class RulesHelper {
                 .style("bottom", 0)
                 .style("top", 0)
                 .style("right", 0);
-
-            d3.select("#enlarge-tooltip").html("photo_size_select_small");
         } 
 
         const ruleName = proof.nodeVisuals.getLabel(data.source);

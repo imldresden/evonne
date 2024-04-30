@@ -3,14 +3,37 @@ const colors = {
   SELECTED_NODE_COLOR: "#4887b9",
 
   // taken from style/widgets/general
-  compNodeFill: 'hsl(205, 87%, 94%)',
-	compNodeStroke: 'hsl(207, 89%, 68%)',
-  justNodeFill: '#e0f2f1',
-	justNodeStroke: '#80cbc4',
-  diagNodeFill: '#fdefe3', 
-  diagNodeStroke: '#bb6b20',
-  fixedNodeFill: '#eceff1',
-  fixedNodeStroke: '#b0bec5',
+  nodeText: '#000',
+
+  edgeWeightTextColor: '#b34343',
+  edgeColor: '#db9e9e',
+
+}
+const edge = {
+  "text-background-opacity": 1,
+  "text-background-color": "#fafafa",
+  'font-family': 'Hack, monospace',
+  'label': 'data(weight)',
+  'font-size': 7,
+  'curve-style': 'bezier', //taxi
+  'width': .5,
+  'line-color': '#ccc',
+  'target-arrow-color': '#ccc',
+  'target-arrow-shape': 'triangle',
+  'arrow-scale': .5,
+}
+
+const node = {
+  'font-family': 'Hack, monospace',
+  'font-size': 7,
+  "text-valign": "center",
+  "text-halign": "center",
+  "color": colors.nodeText,
+  'content': 'data(v)',
+  'shape': 'round-rectangle',
+  'background-color': '#fafafa',
+  'height': 10,
+  'width': 'data(w)',
 }
 
 const stylesheet = [
@@ -18,61 +41,28 @@ const stylesheet = [
     "selector": "core",
     "style": {
       "selection-box-color": colors.SELECTED_NODE_COLOR,
-      "selection-box-border-color": "#8BB0D0",
-      "selection-box-opacity": "0.5"
+      "selection-box-border-color": "#fafafa",
+      "selection-box-opacity": "0",
     }
   }, {
     "selector": "node",
-    "style": {
-      'shape':'round-rectangle',
-      'background-color': colors.compNodeFill,
-      'border-style': 'solid',
-      'border-width': '1px',
-      'border-color': colors.compNodeStroke,
-      'label': 'data(v)',
-      'height': '15px',
-      'width': '15px',
-    }
-  }, {
-    "selector": "node.justification",
-    "style": {
-      'background-color': colors.justNodeFill,
-      'border-color': colors.justNodeStroke,
-    }
-  }, {
-    "selector": "node.diagnoses",
-    "style": {
-      'background-color': colors.diagNodeFill,
-      'border-color': colors.diagNodeStroke,
-    }
-  }, {
-    "selector": "node.fixed-diagnosis",
-    "style": {
-      'background-color': colors.fixedNodeFill,
-      'border-color': colors.fixedNodeStroke,
-      'border-width': '3px',
-      'background-image': '../icons/mui-lock.svg',
-      'background-image-containment': 'over',
-      'bounds-expansion': '20px',
-      'background-clip': 'none',
-      'background-height': '15px',
-      'background-width': '15px',
-      'background-position-x': '50%',
-      'background-position-y': '-18px',
-    }
+    "style": node,
   }, {
     "selector": "node:selected",
-    "style": {
-      'border-width': '3px',
-    }
+    "style": node,
   }, {
     "selector": "edge",
+    "style": edge,
+  }, {
+    "selector": "edge:selected",
+    "style": edge,
+  }, {
+    "selector": "edge.highlighted",
     "style": {
-      'label': 'data(weight)',
-      'font-size': 8,
-      'curve-style': 'bezier', //taxi
-      'width': 1.5,
-      'target-arrow-shape': 'triangle',
+      'color': colors.edgeWeightTextColor,
+      'line-color': colors.edgeColor,
+      'target-arrow-color': colors.edgeColor,
+      'width': .5,
     }
   }
 ];

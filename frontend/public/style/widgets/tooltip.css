@@ -66,6 +66,13 @@
     height: 30px;
 }
 
+.bar-left {
+    position: absolute;
+    margin-right: auto;
+    left: 15px;
+    text-align: center;
+}
+
 .bar-right {
     position: absolute;
     margin-left: auto;

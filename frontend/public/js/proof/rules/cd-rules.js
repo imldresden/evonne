@@ -61,31 +61,34 @@ export class CDRules {
             .append("div")
             .attr("class", "controls-bar");
 
+        const lefted = buttons.append("a").attr("class", "bar-left");
         const centered = buttons.append("a").attr("class", "bar-center");
-        const prev = centered.append("a").attr("class", "bar-button");
-        prev.append("i")
-            .attr("class", "material-icons")
-            .text("skip_previous");
-
-        const play = centered.append("a").attr("class", "bar-button");
-        play.append("i")
-            .attr("class", "material-icons")
-            .text("play_arrow");
-
-        const next = centered.append("a").attr("class", "bar-button");
-        next.append("i")
-            .attr("class", "material-icons")
-            .text("skip_next");
-
         const righted = buttons.append("a").attr("class", "bar-right");
+
+        /*const complete = lefted.append("a").attr("class", "bar-button");
+        complete.append("i")
+            .attr("class", "material-icons")
+            .text("settings_overscan")
+            .style("font-size", "23px");*/
+
         const replay = righted.append("a").attr("class", "bar-button");
         replay.append("i")
             .attr("class", "material-icons")
             .text("replay")
             .style("font-size", "23px");
+        //const centered = buttons.append("a").attr("class", "bar-center");
+
+        const prev = lefted.append("a").attr("class", "bar-button");
+        prev.append("i")
+            .attr("class", "material-icons")
+            .text("skip_previous");
+
+        const next = lefted.append("a").attr("class", "bar-button");
+        next.append("i")
+            .attr("class", "material-icons")
+            .text("skip_next");
 
         prev.on("click", prevFn);
-        play.on("click", currentFn);
         next.on("click", nextFn);
         replay.on("click", replayFn);
     }
@@ -377,7 +380,7 @@ export class CDRules {
                 ...op.premises.map(p => p.constraint),
                 ...op.conclusion.negs.map(p => p.constraint)
             ].filter(p => !p.bottom)
-            
+
             let i = 1;
 
             constraints.forEach(p => {
@@ -394,11 +397,17 @@ export class CDRules {
                     // for x-y <= c, edge is (y,x) with weight c 
                     nodes[x] = nodes[x] || i++;
                     nodes[y] = nodes[y] || i++;
-                    edges.push({ data: { id: i++, 
-                        source: nodes[x], target: nodes[y], weight: c } // x-y<=c : (y,x),c 
+                    edges.push({
+                        data: {
+                            id: i++,
+                            source: nodes[x], target: nodes[y], weight: c
+                        } // x-y<=c : (y,x),c 
                     });
-                    edges.push({ data: { id: i++, 
-                        source: nodes[y], target: nodes[x], weight: -c } // y-x<=-c : (x,y),-c 
+                    edges.push({
+                        data: {
+                            id: i++,
+                            source: nodes[y], target: nodes[x], weight: -c
+                        } // y-x<=-c : (x,y),-c 
                     });
                 } else if (p.type === "equal" || p.type === "lessThan") { // x = c || x < c
                     // x < c can be rewritten as x−x0 < c
@@ -408,13 +417,19 @@ export class CDRules {
                     nodes[x] = nodes[x] || i++;
                     nodes[x0] = nodes[x0] || i++;
 
-                    edges.push({ data: { id: i++, 
-                        source: nodes[x0], target: nodes[x], weight: c } // x-y<=c : (y,x),c 
+                    edges.push({
+                        data: {
+                            id: i++,
+                            source: nodes[x0], target: nodes[x], weight: c
+                        } // x-y<=c : (y,x),c 
                     });
 
                     if (p.type === "equal") {
-                        edges.push({ data: { id: i++, 
-                            source: nodes[x], target: nodes[x0], weight: -c } // y-x<=-c : (x,y),-c
+                        edges.push({
+                            data: {
+                                id: i++,
+                                source: nodes[x], target: nodes[x0], weight: -c
+                            } // y-x<=-c : (x,y),-c
                         });
                     }
                 } else if (p.type === "greaterThan") { // x > c
@@ -426,10 +441,13 @@ export class CDRules {
                     nodes[x] = nodes[x] || i++;
                     nodes[x0] = nodes[x0] || i++;
 
-                    edges.push({ data: { id: i++, 
-                        source: nodes[x], target: nodes[x0], weight: -c } // y−x < −c.
+                    edges.push({
+                        data: {
+                            id: i++,
+                            source: nodes[x], target: nodes[x0], weight: -c
+                        } // y−x < −c.
                     });
-                } 
+                }
 
                 // x − y >= c is the same as y − x <= −c. This is not considered and should not happen!
             });
@@ -439,10 +457,42 @@ export class CDRules {
                     data: {
                         id: nodes[n],
                         v: n,
+                        w: n.length * 4.5
                     }
                 }
             });
             return { nodes: cynodes, edges };
+        }
+
+        let timeout;
+        function animateNegativeCycle(cy) {
+            clearTimeout(timeout);
+            cy.elements().removeClass("highlighted");
+            if (cy.elements().length > 0) {
+                const start = cy.elements()[0];
+                const sEdges = start.outgoers("edge").sort((a, b) => a.data().weight - b.data().weight);
+
+                if (sEdges.length > 0) {
+                    let current = sEdges[0];
+
+                    const highlightNextEle = function () {
+                        current.addClass("highlighted");
+                        const cData = current.data();
+                        const next = cy.elements(`#${cData.target}`);
+
+                        if (next.data().id !== start.data().id) {
+                            const nEdges = next.outgoers("edge").sort((a, b) => a.data().weight - b.data().weight);
+
+                            if (nEdges.length > 0) {
+                                current = nEdges[0];
+
+                                timeout = setTimeout(highlightNextEle, 1000);
+                            }
+                        }
+                    };
+                    timeout = setTimeout(highlightNextEle, 1000);
+                }
+            }
         }
 
         utils.addTitle("Difference Logic: " + name);
@@ -453,25 +503,7 @@ export class CDRules {
         const types = this.types;
         const text_data = this.text(data);
 
-        this.controls({
-            prevFn: (e, d) => {
-                current = Math.max(0, current - 1);
-                pcp.update(pcp_data[current]);
-                displayRowOperation(text_data[current]);
-            },
-            currentFn: () => { },
-            nextFn: (e, d) => {
-                current = Math.min(current + 1, Object.keys(pcp_data).length - 1);
-                pcp.update(pcp_data[current]);
-                displayRowOperation(text_data[current]);
-            },
-            replayFn: (e, d) => {
-                current = Math.min(current + 1, Object.keys(pcp_data).length - 1);
-                pcp.destroy();
-                makePCP(pcp_data[current]);
-                displayRowOperation(text_data[current]);
-            },
-        })
+
         displayRule(text_data[current]);
         const graph = getDiffGrammarEqs(text_data[current], types);
         const container = document.getElementById("explanation-container");
@@ -484,13 +516,24 @@ export class CDRules {
             wheelSensitivity: 0.3,
             elements: graph,
         });
-
-        // await initHTML();
-        // bindListeners();
-        // cy.layout(cy.params).run();
-        // setupOntologyMinimap(cy);
-        // return cy;
+        animateNegativeCycle(cy);
+        this.controls({
+            prevFn: (e, d) => {
+                current = Math.max(0, current - 1);
+                pcp.update(pcp_data[current]);
+                displayRowOperation(text_data[current]);
+            },
+            currentFn: () => {
+                animateNegativeCycle(cy);
+            },
+            nextFn: (e, d) => {
+                current = Math.min(current + 1, Object.keys(pcp_data).length - 1);
+                pcp.update(pcp_data[current]);
+                displayRowOperation(text_data[current]);
+            },
+            replayFn: (e, d) => {
+                animateNegativeCycle(cy);
+            },
+        })
     }
-
-
 }
