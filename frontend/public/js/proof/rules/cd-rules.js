@@ -372,9 +372,12 @@ export class CDRules {
             // expects x = c, x > c, x + c = y
             const edges = []
             const nodes = {};
-            const constraints = [...op.premises.map(p => p.constraint), op.conclusion.nConstraint].filter(p => !p.bottom)
             const x0 = "x0";
-
+            const constraints = [
+                ...op.premises.map(p => p.constraint),
+                ...op.conclusion.negs.map(p => p.constraint)
+            ].filter(p => !p.bottom)
+            
             let i = 1;
 
             constraints.forEach(p => {

@@ -1,5 +1,22 @@
 import { proof } from "../proof.js";
 
+
+function getNegs(id, data) {
+    const nid = `~${id}`;
+    if (!data.getElementById(nid)) {
+        const n1id = nid+"-1";
+        const n2id = nid+"-2";
+
+        if (data.getElementById(n1id) && data.getElementById(n2id)) {
+            return [n1id, n2id]
+        } else {
+            return [];
+        }
+    }
+    return [nid]
+
+}
+
 function getConstraint(id, data) {
     const node = data.getElementById(id);
     const q = node.querySelectorAll("equation, inequation"); 
@@ -7,8 +24,8 @@ function getConstraint(id, data) {
     if (q.length > 1) {
         console.error("multiple constraints in a single entry")
     }
-
-    const c = node.querySelectorAll("equation, inequation")[0]
+    
+    const c = q[0]
     if (!c) {
         if (node.querySelector("key").innerHTML === "⊥") {
             return { id, "bottom" : "⊥" }
@@ -90,7 +107,7 @@ function buildCDRule({ d, data }) {
             t: m.getAttribute("type"),
             coe: m.getAttribute("coe"),
             constraint: getConstraint(id, data),
-            nConstraint: getConstraint(`~${id}`, data)
+            negs: getNegs(id, data).map(n => getConstraint(n, data))
         }
     });
 
