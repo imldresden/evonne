@@ -44,7 +44,7 @@ export class DifferenceCD {
             exp.selectAll("*").remove();
 
             let length = 0;
-            function printTerms(terms, where) {
+            function printTerms(terms, where, negated = false) {
                 let first = true;
                 Object.keys(terms).forEach(variable => {
                     const term = terms[variable];
@@ -59,13 +59,13 @@ export class DifferenceCD {
                         return; // don't print, don't set first to false
                     }
 
-                    const plus = first ? "" : " + ";
+                    const plus = first ? "" : (negated? " ": " + ");
                     where.append("span").attr("class", "text-black").text(plus);
                     length += plus.length;
 
                     if (!showObvious && (eval(term) !== 1 || variable === "constant")) {
                         if (eval(term) === -1 && variable !== "constant") {
-                            where.append("span").attr("class", "text-black").text("-");
+                            where.append("span").attr("class", "text-black").text("- ");
                             length += 1;
                         } else {
                             where.append("span").attr("class", "text-black").text(term);
@@ -124,7 +124,7 @@ export class DifferenceCD {
                         cons.append("br");
                         cons.append("span").attr("class", "tab");
                         cons.append("span").attr("class", "tab");
-                        printTerms(c.lhs, cons);
+                        printTerms(c.lhs, cons, true);
                         cons.append("span").attr("class", "text-black").text(" " + types[c.type] + " ")
                         printTerms(c.rhs, cons);
                     })
@@ -154,14 +154,13 @@ export class DifferenceCD {
             constraints.forEach(p => {
                 const lhs = structuredClone(p.lhs);
                 const rhs = structuredClone(p.rhs);
-
+                let _epsilon = "";
                 if (rhs.constant) {
                     const minusEp = rhs.constant.includes(EPSILON);
     
-                    rhs.epsilon = "";
                     if (minusEp) {
-                        rhs.epsilon = EPSILON;
-                        rhs.constant = rhs.constant.split(rhs.epsilon)[0];
+                        _epsilon = EPSILON;
+                        rhs.constant = rhs.constant.split(_epsilon)[0];
                     }
                 }
                 
@@ -170,6 +169,9 @@ export class DifferenceCD {
                     delete lhs.constant;
                     const x = Object.keys(lhs)[0];
                     const y = Object.keys(rhs)[0];
+                    if (Object.keys(lhs).length > 1 || Object.keys(rhs).length > 1) {
+                        console.error("wrong format!")
+                    }
 
                     // x−y=c is the same as x-y<=c ; y-x<=-c
                     // for x-y <= c, edge is (y,x) with weight c 
@@ -187,41 +189,38 @@ export class DifferenceCD {
                             source: nodes[y], target: nodes[x], label: -c, weight: -c
                         } // y-x<=-c : (x,y),-c 
                     });
-                } else if (p.type === "equal" || p.type === "lessThan" || p.type === "lessOrEqualThan") { // x = c || x < c
+                } else if (p.type === "equal" || p.type === "lessThan") { // x = c || x < c
                     // x < c can be rewritten as x−x0 < c
                     const x = Object.keys(lhs)[0];
                     const c = +rhs.constant;
 
+                    if (Object.keys(lhs).length > 1 || Object.keys(rhs).length > 1) {
+                        console.error("wrong format!");
+                        console.log(Object.keys(lhs))
+                        console.log(Object.keys(rhs))
+                    }
+
                     nodes[x] = nodes[x] || i++;
                     nodes[x0] = nodes[x0] || i++;
 
-                    if (lhs[x] < 0) {
-                        edges.push({
-                            data: {
-                                id: i++,
-                                source: nodes[x], 
-                                target: nodes[x0], 
-                                weight: c - (rhs.epsilon !== "" ? 0.0001 : 0), 
-                                label: `${c}${rhs.epsilon}`
-                            } // y-x<=-c : (x,y),c 
-                        });    
-                    } else {
-                        edges.push({
-                            data: {
-                                id: i++,
-                                source: nodes[x0], 
-                                target: nodes[x], 
-                                weight: c - (rhs.epsilon !== "" ? 0.0001 : 0), 
-                                label: `${c}${rhs.epsilon}`
-                            } // x-y<=c : (y,x),c 
-                        });
-                    }
+                    edges.push({
+                        data: {
+                            id: i++,
+                            source: nodes[x0], 
+                            target: nodes[x], 
+                            weight: c, 
+                            label: c
+                        } // x-y<=c : (y,x),c 
+                    });
                     
                     if (p.type === "equal") {
                         edges.push({
                             data: {
                                 id: i++,
-                                source: nodes[x], target: nodes[x0], weight: -c - (rhs.epsilon !== "" ? 0.0001 : 0), label: `${-c}${rhs.epsilon}`
+                                source: nodes[x], 
+                                target: nodes[x0], 
+                                weight: -c, 
+                                label: -c
                             } // include opposite edge
                         });
                     }
@@ -240,6 +239,56 @@ export class DifferenceCD {
                             source: nodes[x], target: nodes[x0], label: -c, weight: -c
                         } // y−x < −c.
                     });
+                } else if (p.type === "lessOrEqualThan") { // (-) x <= c (-e) OR x - y <= c (-e)
+                    if (Object.keys(lhs).length === 1) {
+                        const x = Object.keys(lhs)[0];
+                        const c = +rhs.constant;
+    
+                        nodes[x] = nodes[x] || i++;
+                        nodes[x0] = nodes[x0] || i++;
+    
+                        if (lhs[x] < 0) {
+                            edges.push({
+                                data: {
+                                    id: i++,
+                                    source: nodes[x], 
+                                    target: nodes[x0], 
+                                    label: `${-c}${_epsilon}`, 
+                                    weight: -c - (_epsilon !== "" ? 0.0001 : 0) 
+                                } // x−x0 <= −c
+                            });    
+                        } else {
+                            edges.push({
+                                data: {
+                                    id: i++,
+                                    source: nodes[x], 
+                                    target: nodes[x0], 
+                                    label: `${-c}${_epsilon}`,
+                                    weight: -c - (_epsilon !== "" ? 0.0001 : 0) 
+                                } // x0−x <= −c
+                            });    
+                        }
+                    } else if (Object.keys(lhs).length === 2) {
+                        const x = Object.keys(lhs)[0];
+                        const y = Object.keys(lhs)[1];
+                        const c = +rhs.constant;
+    
+                        nodes[x] = nodes[x] || i++;
+                        nodes[y] = nodes[y] || i++;
+    
+                        edges.push({
+                            data: {
+                                id: i++,
+                                source: nodes[y], 
+                                target: nodes[x], 
+                                label: `${-c}${_epsilon}`, 
+                                weight: -c - (_epsilon !== "" ? 0.0001 : 0)
+                            } // x−y <= −c.
+                        });
+                    } else {
+                        console.error("wrong format!");
+                    }
+                    
                 } else { 
                     console.error(`inequation ${p.type} not supported!`);
                 }
@@ -270,6 +319,17 @@ export class DifferenceCD {
 
             const l = cy.elements("node").length;
             
+            function sortCycleEdges(edges) {
+                let s = edges[0];
+                const r = [s];
+                while (edges.length !== r.length) {
+                    const next = edges.filter(e => e.data().source === s.data().target)[0];
+                    r.push(next);
+                    s = next;
+                }
+                return r;
+            }
+
             if (l > 0) {
                 const start = cy.elements("node")[Math.floor(Math.random() * (l))] // starts at random node 
                 const bf = cy.elements().bellmanFord({ 
@@ -280,7 +340,11 @@ export class DifferenceCD {
                 });
 
                 if (bf.hasNegativeWeightCycle) {
-                    const ncycle = bf.negativeWeightCycles[0].filter(el => el.group() === "edges");
+                    const ncycle = sortCycleEdges(
+                        bf.negativeWeightCycles[0]
+                        .filter(el => el.group() === "edges")
+                    );
+
                     let i = 0, ep = 0, cycleValue = 0, current;
                     const highlightNextEle = function () {
                         current = ncycle[i];
