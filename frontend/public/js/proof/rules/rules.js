@@ -1,6 +1,6 @@
 import { proof } from "../../proof/proof.js";
 import { DLRules } from "./dl-rules.js";
-import { CDRules } from "./cd-rules.js";
+import { CDRules } from "./cd/cd-rules.js";
 
 let tooltip, div, lastToolTipTriggerID, params;
 

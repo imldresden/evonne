@@ -13,7 +13,7 @@ const edge = {
   "text-background-opacity": 1,
   "text-background-color": "#fafafa",
   'font-family': 'Hack, monospace',
-  'label': 'data(weight)',
+  'label': 'data(label)',
   'font-size': 7,
   'curve-style': 'bezier', //taxi
   'width': .5,

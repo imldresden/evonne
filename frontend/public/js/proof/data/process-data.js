@@ -17,16 +17,12 @@ function getNegs(id, data) {
 }
 
 function getConstraint(id, data) {
-    const node = data.getElementById(id);
-    const q = node.querySelectorAll("equation, inequation"); 
 
-    if (q.length > 1) {
-        console.error("multiple constraints in a single entry")
-    }
-    
-    const c = q[0]
-    if (!c) {
-        if (node.querySelector("key").innerHTML === "⊥") {
+    const q = data.getElementById(id); 
+    const type = q.nodeName; // equation, inequation or bottom
+
+    if (type === "bottom") {
+        if (q.querySelector("key").innerHTML === "⊥") {
             return { id, "bottom" : "⊥" }
         } else {
             console.error("faulty constraintID")
@@ -38,7 +34,7 @@ function getConstraint(id, data) {
         const coe = term.getAttribute("coe");
 
         if (coe === null) { // constant
-            const con = term.getAttribute("con");
+            let con = term.getAttribute("con");
             if (con === null) {
                 console.error("malformed term");
             }
@@ -54,7 +50,6 @@ function getConstraint(id, data) {
         }
     }
 
-    const type = c.nodeName; // equation or inequation
     const constraint = {};
 
     if (type === "inequation") {
@@ -62,30 +57,29 @@ function getConstraint(id, data) {
         constraint.rhs = {};
 
         let constants = 0;
-        const terms = c.querySelectorAll("lhs > term, rhs > term");
+        const terms = q.querySelectorAll("lhs > term, rhs > term");
         terms.forEach((t) => {
             const term = extractTerm(t);
-
             if (term.type === "constant") {
                 constraint[t.parentNode.nodeName].constant = term.value;
                 constants++;
             } else {
                 constraint[t.parentNode.nodeName][term.name] = term.coe;
             }
-            constraint.type = c.getAttribute("type");
+            constraint.type = q.getAttribute("type");
         });
         if (constants > 1) {
             console.error("more than 1 constant")
         }
 
     } else { // equations only have variables on lhs and a constant on rhs
-        const lhs = c.querySelectorAll("lhs > term");
+        const lhs = q.querySelectorAll("lhs > term");
         lhs.forEach((t) => {
             const term = extractTerm(t);
             constraint[term.name] = term.coe;
         });
 
-        const rhs = c.querySelector("rhs > term").getAttribute("con");
+        const rhs = q.querySelector("rhs > term").getAttribute("con");
         constraint._rhs = rhs;
     }
 

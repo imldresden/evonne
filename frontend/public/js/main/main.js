@@ -118,7 +118,7 @@ function init_views(loop = false) {
         if (res.names && Object.keys(res.names).length > 0) {
           createConceptDropdowns(res.names);
         } else {
-          console.log('concept names not available! extract them first')
+          console.error('concept names not available! extract them first')
         }
       }
 
@@ -127,9 +127,9 @@ function init_views(loop = false) {
         return;
       } else if (res.status === 'pending') {
         if (res.axioms && res.axioms.length === 1) {
-          console.log('atomic decomposition missing');
+          console.error('atomic decomposition missing');
         } else {
-          console.log('proofs + ad missing');
+          console.error('proofs + ad missing');
         }
 
         modal.open();
