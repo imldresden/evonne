@@ -189,28 +189,43 @@ export class DifferenceCD {
                     });
                 } else if (p.type === "equal" || p.type === "lessThan" || p.type === "lessOrEqualThan") { // x = c || x < c
                     // x < c can be rewritten as x−x0 < c
-                    const x = Object.keys(lhs)[0];                    
+                    const x = Object.keys(lhs)[0];
                     const c = +rhs.constant;
 
                     nodes[x] = nodes[x] || i++;
                     nodes[x0] = nodes[x0] || i++;
 
-                    edges.push({
-                        data: {
-                            id: i++,
-                            source: nodes[x0], target: nodes[x], weight: c, label: c
-                        } // x-y<=c : (y,x),c 
-                    });
-
-                    if (p.type.toLowerCase().includes("equal")) {
+                    if (lhs[x] < 0) {
                         edges.push({
                             data: {
                                 id: i++,
-                                source: nodes[x], target: nodes[x0], weight: -c - 0.0001, label: `${-c}${rhs.epsilon}`
+                                source: nodes[x], 
+                                target: nodes[x0], 
+                                weight: c - (rhs.epsilon !== "" ? 0.0001 : 0), 
+                                label: `${c}${rhs.epsilon}`
+                            } // y-x<=-c : (x,y),c 
+                        });    
+                    } else {
+                        edges.push({
+                            data: {
+                                id: i++,
+                                source: nodes[x0], 
+                                target: nodes[x], 
+                                weight: c - (rhs.epsilon !== "" ? 0.0001 : 0), 
+                                label: `${c}${rhs.epsilon}`
+                            } // x-y<=c : (y,x),c 
+                        });
+                    }
+                    
+                    if (p.type === "equal") {
+                        edges.push({
+                            data: {
+                                id: i++,
+                                source: nodes[x], target: nodes[x0], weight: -c - (rhs.epsilon !== "" ? 0.0001 : 0), label: `${-c}${rhs.epsilon}`
                             } // include opposite edge
                         });
                     }
-                } else if (p.type === "greaterThan" || p.type === "greaterOrEqualThan") { // x > c
+                } else if (p.type === "greaterThan") { // x > c
                     // x > c can be rewritten as x−x0 > c
                     // x−y > c is the same as y−x < −c
                     const x = Object.keys(lhs)[0];
@@ -225,16 +240,9 @@ export class DifferenceCD {
                             source: nodes[x], target: nodes[x0], label: -c, weight: -c
                         } // y−x < −c.
                     });
-
-                    if (p.type.toLowerCase().includes("equal")) {
-                        edges.push({
-                            data: {
-                                id: i++,
-                                source: nodes[x0], target: nodes[x], label: c, weight: c
-                            } // include opposite edge
-                        });
-                    }
-                } 
+                } else { 
+                    console.error(`inequation ${p.type} not supported!`);
+                }
 
                 // x − y >= c is the same as y − x <= −c. This is not considered and should not happen!
             });
@@ -264,18 +272,19 @@ export class DifferenceCD {
             
             if (l > 0) {
                 const start = cy.elements("node")[Math.floor(Math.random() * (l))] // starts at random node 
-                // const start = cy.elements("node")[0]; // to always start in the same place
-                const sEdges = start.outgoers("edge").sort((a, b) => a.data().weight - b.data().weight);
+                const bf = cy.elements().bellmanFord({ 
+                    root: `#${start.data().id}`, 
+                    directed: true,
+                    findNegativeWeightCycles: true, 
+                    weight: (edge) => edge.data().weight
+                });
 
-                if (sEdges.length > 0) {
-                    let current = sEdges[0];
-                    let cycleValue = 0;
-                    let ep = 0;
-
+                if (bf.hasNegativeWeightCycle) {
+                    const ncycle = bf.negativeWeightCycles[0].filter(el => el.group() === "edges");
+                    let i = 0, ep = 0, cycleValue = 0, current;
                     const highlightNextEle = function () {
-                        edges.add(current.data().id);
+                        current = ncycle[i];
                         current.addClass("highlighted");
-                        nodes.add(current.target().data().v);
                         const label = `${current.data().label}`;
 
                         if (label.includes(EPSILON)) {
@@ -286,32 +295,14 @@ export class DifferenceCD {
                         }
                         
                         d3.select("#cycle-val").text(`${cycleValue}${EPSILONS(ep)}`);
-
-                        const cData = current.data();
-                        const next = cy.elements(`#${cData.target}`);
-
-                        if (next.data().id !== start.data().id) {
-                            const nEdges = next.outgoers("edge").sort((a, b) => a.data().weight - b.data().weight);
-
-                            if (nEdges.length > 0) {
-                                let i = 0;
-                                current = nEdges[i];
-                                //while (edges.has(current.data().id)) { // unused edges
-                                while (nodes.has(current.target().data().v)) { // unvisited nodes
-                                    current = nEdges[i];
-                                    i += 1;
-
-                                    if (i > nEdges.length) {
-                                        console.error("could not detect negative cycle");
-                                        return;
-                                    }
-                                }
-
-                                timeout = setTimeout(highlightNextEle, 1000);            
-                            }
+                        i+=1;
+                        if (i < ncycle.length) {
+                            timeout = setTimeout(highlightNextEle, 1000);
                         }
                     };
                     timeout = setTimeout(highlightNextEle, 1000);
+                } else {
+                    console.error("negative weight cycle could not be detected");
                 }
             }
         }
