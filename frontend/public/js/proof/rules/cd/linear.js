@@ -205,7 +205,7 @@ export class LinearCD {
                 makePCP(pcp_data[current]);
                 displayRowOperation(text_data[current]);
             },
-        }, where);
+        }, where, params);
         displayRowOperation(text_data[current]);
         makePCP(pcp_data[current]);
         document.removeEventListener('pcp-hl', highlightText)

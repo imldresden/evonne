@@ -59,15 +59,13 @@ async function createContent(data) {
   container.innerHTML = "";
 
   const elements = processData(data);
-  console.log(elements)
+
   cy = cytoscape({
     container,
     style: stylesheet,
     layout: params,
     wheelSensitivity: 0.3
   });
-
-
 
   const handleLayoutEvent = function (enabled) {
     return function () {
@@ -76,6 +74,7 @@ async function createContent(data) {
       cy.autoungrabify(!enabled);
     };
   };
+
   cy.on('layoutstart', handleLayoutEvent(false));
   setTimeout(function () {
     cy.on('layoutstop', handleLayoutEvent(true));
@@ -86,7 +85,6 @@ async function createContent(data) {
     const newPosition = event.target.position();
     // Store the last dragged position of the node
     lastDraggedPositions[nodeId] = newPosition;
-    // console.log(lastDraggedPositions);
   });
 
   cy.on('tap', 'node', function (event) {
@@ -97,6 +95,7 @@ async function createContent(data) {
       enable_eye(data, node);
     }
   });
+  
   cy.params = structuredClone(params);
   cy.stylesheet = stylesheet;
   cy.add(elements);

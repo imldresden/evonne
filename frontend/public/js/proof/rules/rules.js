@@ -17,6 +17,7 @@ const utils = {
         
         title.append("i")
             .attr("class", "material-icons right modal-button")
+            .attr("title", "Close")
             .style("margin-right", "15px")
             .html("close")
             .on("click", () => proof.rules.destroyExplanation())
@@ -24,6 +25,7 @@ const utils = {
             
         title.append("i")
             .attr("class", "material-icons left modal-button")
+            .attr("title", params.large? "Minimize":"Maximize")
             .attr("id", "enlarge-tooltip")
             .style("margin-left", "15px")
             .html(params.large? "fullscreen_exit":"fullscreen")

@@ -355,6 +355,6 @@ export class DifferenceCD {
             replayFn: (e, d) => {
                 animateNegativeCycle(cy);
             },
-        }, where)
+        }, where, params)
     }
 }

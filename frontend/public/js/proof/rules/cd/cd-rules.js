@@ -12,7 +12,7 @@ function text(data, type) {
     return text_data;
 }
 
-function controls({ prevFn, currentFn, nextFn, replayFn }, where) {
+function controls({ prevFn, currentFn, nextFn, replayFn }, where, params) {
     const buttons = where
         .append("div")
         .attr("class", "controls-bar");
@@ -21,25 +21,34 @@ function controls({ prevFn, currentFn, nextFn, replayFn }, where) {
     const centered = buttons.append("a").attr("class", "bar-center");
     const righted = buttons.append("a").attr("class", "bar-right");
 
-    /*const complete = lefted.append("a").attr("class", "bar-button");
+    const complete = righted.append("a")
+        .attr("class", "bar-button tooltipped")
+        .attr("id", "entire-subproof")
+        .attr("title", params.isSubProof?"Show Single Inference":"Show Entire Numerical Subproof");
     complete.append("i")
         .attr("class", "material-icons")
-        .text("settings_overscan")
-        .style("font-size", "23px");*/
+        .text(params.isSubProof?"unfold_less":"unfold_more")
+        .style("font-size", "23px");
 
-    const replay = righted.append("a").attr("class", "bar-button");
+    const replay = righted.append("a")
+        .attr("class", "bar-button")
+        .attr("title", "Replay animation");
     replay.append("i")
         .attr("class", "material-icons")
         .text("replay")
         .style("font-size", "23px");
     //const centered = buttons.append("a").attr("class", "bar-center");
 
-    const prev = lefted.append("a").attr("class", "bar-button");
+    const prev = lefted.append("a")
+        .attr("class", "bar-button")
+        .attr("title", "Previous Inference");
     prev.append("i")
         .attr("class", "material-icons")
         .text("skip_previous");
 
-    const next = lefted.append("a").attr("class", "bar-button");
+    const next = lefted.append("a")
+        .attr("class", "bar-button")
+        .attr("title", "Next Inference");
     next.append("i")
         .attr("class", "material-icons")
         .text("skip_next");
