@@ -57,6 +57,11 @@ const stylesheet = [
     "selector": "edge:selected",
     "style": edge,
   }, {
+    "selector": "edge.negated",
+    "style": {
+      'line-style': 'dashed',
+    },
+  }, {
     "selector": "edge.highlighted",
     "style": {
       'color': colors.edgeWeightTextColor,

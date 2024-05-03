@@ -6,6 +6,7 @@ import { bellmanFord } from "./bellman-ford.js";
 
 const EPSILON = " - Є";
 const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? EPSILON : ` - ${n}Є`);
+const epsilon_value = 0.000000000000001;
 
 export class DifferenceCD {
 
@@ -151,11 +152,11 @@ export class DifferenceCD {
             // expects x = c, x > c, x + c = y
             const edges = [];
             const nodes = {};
-            const x0 = "x0";
+            const x0 = "(0)";
 
             const constraints = [
                 ...op.premises.map(p => p.constraint),
-                ...op.conclusion.negs
+                ...op.conclusion.negs.map(n => { n.negated = true; return n; })
             ].filter(p => !p.bottom);
             let i = 1;
 
@@ -171,6 +172,8 @@ export class DifferenceCD {
                         rhs.constant = rhs.constant.split(_epsilon)[0];
                     }
                 }
+
+                const negated = p.negated; 
 
                 if (p.type === "plus") { // x+c=y is the same as y-x=c
                     const c = +lhs.constant;
@@ -188,13 +191,15 @@ export class DifferenceCD {
                     edges.push({
                         data: {
                             id: `e-${i++}`,
-                            source: nodes[x], target: nodes[y], label: c, weight: c
+                            source: nodes[x], target: nodes[y], 
+                            label: c, weight: c, negated
                         } // x-y<=c : (y,x),c 
                     });
                     edges.push({
                         data: {
                             id: `e-${i++}`,
-                            source: nodes[y], target: nodes[x], label: -c, weight: -c
+                            source: nodes[y], target: nodes[x], 
+                            label: -c, weight: -c, negated
                         } // y-x<=-c : (x,y),-c 
                     });
                 } else if (p.type === "equal" || p.type === "lessThan") { // x = c || x < c
@@ -204,8 +209,6 @@ export class DifferenceCD {
 
                     if (Object.keys(lhs).length > 1 || Object.keys(rhs).length > 1) {
                         console.error("wrong format!");
-                        console.log(Object.keys(lhs))
-                        console.log(Object.keys(rhs))
                     }
 
                     nodes[x] = nodes[x] || `n-${i++}`;
@@ -214,27 +217,23 @@ export class DifferenceCD {
                     edges.push({
                         data: {
                             id: `e-${i++}`,
-                            source: nodes[x0],
-                            target: nodes[x],
-                            weight: c,
-                            label: c
-                        } // x-y<=c : (y,x),c 
+                            source: nodes[x0], target: nodes[x],
+                            label: c, weight: c, negated
+                        } // x-y<=c : (y,x) c 
                     });
 
                     if (p.type === "equal") {
                         edges.push({
                             data: {
                                 id: `e-${i++}`,
-                                source: nodes[x],
-                                target: nodes[x0],
-                                weight: -c,
-                                label: -c
-                            } // include opposite edge
+                                source: nodes[x], target: nodes[x0],
+                                label: -c, weight: -c, negated
+                            } // include opposite edge: (x,y)-c
                         });
                     }
                 } else if (p.type === "greaterThan") { // x > c
-                    // x > c can be rewritten as x−x0 > c
-                    // x−y > c is the same as y−x < −c
+                    // x > c can be rewritten as x−x0 > c 
+                    // x−y > c is the same as y−x <= −c
                     const x = Object.keys(lhs)[0];
                     const c = +rhs.constant;
 
@@ -244,66 +243,62 @@ export class DifferenceCD {
                     edges.push({
                         data: {
                             id: `e-${i++}`,
-                            source: nodes[x], target: nodes[x0], label: -c, weight: -c
-                        } // y−x < −c.
+                            source: nodes[x], target: nodes[x0], 
+                            label: -c, weight: -c, negated
+                        } // y−x < −c  ... (x, y) -c 
                     });
                 } else if (p.type === "lessOrEqualThan") { // (-) x <= c (-e) OR x - y <= c (-e)
-                    if (Object.keys(lhs).length === 1) {
-                        const x = Object.keys(lhs)[0];
+                    const klhs = Object.keys(lhs);
+                    if (klhs.length === 1) {
+                        const x = klhs[0];
                         const c = +rhs.constant;
 
                         nodes[x] = nodes[x] || `n-${i++}`;
                         nodes[x0] = nodes[x0] || `n-${i++}`;
 
-                        if (lhs[x] < 0) {
-                            edges.push({
-                                data: {
-                                    id: `e-${i++}`,
-                                    source: nodes[x],
-                                    target: nodes[x0],
-                                    label: `${c}${_epsilon}`,
-                                    weight: c - (_epsilon !== "" ? 0.0001 : 0)
-                                } // x0−x <= c
-                            });
-                        } else {
-                            edges.push({
-                                data: {
-                                    id: `e-${i++}`,
-                                    source: nodes[x0],
-                                    target: nodes[x],
-                                    label: `${c}${_epsilon}`,
-                                    weight: c - (_epsilon !== "" ? 0.0001 : 0)
-                                } // x−x0 <= c
-                            });
+                        const edge = {
+                            id: `e-${i++}`,
+                            label: `${c}${_epsilon}`, 
+                            weight: c - (_epsilon !== "" ? epsilon_value : 0), 
+                            negated
                         }
-                    } else if (Object.keys(lhs).length === 2) {
-                        const x = Object.keys(lhs)[0];
-                        const y = Object.keys(lhs)[1];
-                        const c = +rhs.constant;
 
+                        if (lhs[x] < 0) {
+                            edge.source = nodes[x];
+                            edge.target = nodes[x0];
+                            // x0−x <= c ... (x, x0) c
+                        } else {
+                            edge.source = nodes[x0];
+                            edge.target = nodes[x];
+                            // x-x0 <= c ... (x0, x) c
+                        }
+                        edges.push({ data: edge }); 
+                    } else if (klhs.length === 2) {
+                        const x = klhs[0];
+                        const y = klhs[1];
+                        const c = +rhs.constant;
+                        
                         nodes[x] = nodes[x] || `n-${i++}`;
                         nodes[y] = nodes[y] || `n-${i++}`;
 
                         edges.push({
                             data: {
-                                id: `e-${i++}`,
-                                source: nodes[y],
-                                target: nodes[x],
-                                label: `${-c}${_epsilon}`,
-                                weight: -c - (_epsilon !== "" ? 0.0001 : 0)
-                            } // x−y <= −c.
+                                id: `e-${i++}`, negated,
+                                source: nodes[y], target: nodes[x],
+                                label: `${c}${_epsilon}`,
+                                weight: c - (_epsilon !== "" ? epsilon_value : 0),
+                            } // x−y <= c  ... (y, x) c
                         });
                     } else {
                         console.error("wrong format!");
                     }
-
                 } else {
                     console.error(`inequation ${p.type} not supported!`);
                 }
 
-                // x − y >= c is the same as y − x <= −c. This is not considered and should not happen!
+                // x − y >= c is the same as y − x < −c. This is not considered and should not happen!
             });
-
+            
             const cynodes = Object.keys(nodes).map(n => {
                 return {
                     data: {
@@ -341,14 +336,22 @@ export class DifferenceCD {
             if (l > 0) {
                 const start = cy.elements("node")[Math.floor(Math.random() * (l))] // starts at random node 
 
+                let negs = 0;
+                const elementsWithJustOneNegated = cy.elements().filter(e => {
+                    if (e.data().negated) {
+                        negs++;
+                    } 
+                    return negs < 2; 
+                });
+                
                 const bf = bellmanFord({
                     root: `#${start.data().id}`,
                     directed: true,
                     findNegativeWeightCycles: true,
                     weight: (edge) => edge.data().weight
-                }, cy.elements()); /**/
+                }, elementsWithJustOneNegated); /**/
 
-                /* const bf = cy.elements().bellmanFord({ 
+                /* const bf = elementsWithJustOneNegated.bellmanFord({ 
                     root: `#${start.data().id}`, 
                     directed: true,
                     findNegativeWeightCycles: true, 
@@ -392,7 +395,7 @@ export class DifferenceCD {
         let current = 0;
 
         const text_data = text(data);
-        const exp = createVisContainer(params, where, 100 + 25 * text_data[current].conclusion.negs.length);
+        const exp = createVisContainer(params, where, 50 + 45 * text_data[current].conclusion.negs.length);
         const showObvious = this.showObvious;
         const types = this.types;
 
@@ -403,6 +406,7 @@ export class DifferenceCD {
 
         const cyp = structuredClone(cola);
         cyp.animate = false;
+
         const cy = cytoscape({
             container,
             style: stylesheet,
@@ -410,6 +414,7 @@ export class DifferenceCD {
             wheelSensitivity: 0.3,
             elements: graph,
         });
+        cy.elements().filter(e => e.data().negated).addClass("negated");
         cy.fit();
 
         animateNegativeCycle(cy);
