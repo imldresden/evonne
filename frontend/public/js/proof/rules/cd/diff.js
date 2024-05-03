@@ -258,19 +258,19 @@ export class DifferenceCD {
                                     id: `e-${i++}`,
                                     source: nodes[x],
                                     target: nodes[x0],
-                                    label: `${-c}${_epsilon}`,
-                                    weight: -c - (_epsilon !== "" ? 0.0001 : 0)
-                                } // x−x0 <= −c
+                                    label: `${c}${_epsilon}`,
+                                    weight: c - (_epsilon !== "" ? 0.0001 : 0)
+                                } // x0−x <= c
                             });
                         } else {
                             edges.push({
                                 data: {
                                     id: `e-${i++}`,
-                                    source: nodes[x],
-                                    target: nodes[x0],
-                                    label: `${-c}${_epsilon}`,
-                                    weight: -c - (_epsilon !== "" ? 0.0001 : 0)
-                                } // x0−x <= −c
+                                    source: nodes[x0],
+                                    target: nodes[x],
+                                    label: `${c}${_epsilon}`,
+                                    weight: c - (_epsilon !== "" ? 0.0001 : 0)
+                                } // x−x0 <= c
                             });
                         }
                     } else if (Object.keys(lhs).length === 2) {
@@ -336,7 +336,7 @@ export class DifferenceCD {
             }
 
             if (l > 0) {
-                const start = cy.elements("node")[0]//[Math.floor(Math.random() * (l))] // starts at random node 
+                const start = cy.elements("node")[Math.floor(Math.random() * (l))] // starts at random node 
                 
                 const bf = bellmanFord({
                     root: `#${start.data().id}`,

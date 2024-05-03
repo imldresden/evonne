@@ -190,6 +190,6 @@ function bellmanFord(options, _eles) {
         negativeWeightCycles
     };
 
-} // bellmanFord
+}
 
 export { bellmanFord };
