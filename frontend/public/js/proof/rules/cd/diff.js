@@ -132,16 +132,19 @@ export class DifferenceCD {
                         printTerms(c.lhs, cons);
                         cons.append("span").attr("class", "text-black").text(" " + types[c.type] + " ")
                         printTerms(c.rhs, cons);
-                    })
-
-                    neg.append("br");
-                    neg.append("span").attr("class", "tab");
-                    neg.append("span").attr("class", "text-black").text("Negative Cycle Value: ");
-                    neg.append("span").attr("class", "text-red").attr("id", "cycle-val").text("0");
-                    neg.append("br");
-                    neg.append("span").attr("class", "tab");
+                    });
                 }
             }
+
+            const negCValue = exp.append("span")
+                .attr("class", "text-black")
+                .style("display", "block")
+                .style("text-align", "left")
+            negCValue.append("span").attr("class", "tab");
+            negCValue.append("span").attr("class", "text-black").text("Negative Cycle Value: ");
+            negCValue.append("span").attr("class", "text-red").attr("id", "cycle-val").text("0");
+            negCValue.append("br");
+            negCValue.append("span").attr("class", "tab");
         }
 
         function getDiffGrammarEqs(op) {
@@ -337,7 +340,7 @@ export class DifferenceCD {
 
             if (l > 0) {
                 const start = cy.elements("node")[Math.floor(Math.random() * (l))] // starts at random node 
-                
+
                 const bf = bellmanFord({
                     root: `#${start.data().id}`,
                     directed: true,

@@ -21,7 +21,7 @@ function getConstraint(id, data) {
     const q = data.getElementById(id); 
     const type = q.nodeName; // equation, inequation or bottom
 
-    if (type === "bottom") {
+    if (type === "entry") {
         if (q.querySelector("key").innerHTML === "⊥") {
             return { id, "bottom" : "⊥" }
         } else {
