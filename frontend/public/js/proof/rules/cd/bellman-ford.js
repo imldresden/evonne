@@ -127,8 +127,7 @@ function bellmanFord(options, _eles) {
 
             if (srcDist + weight < tgtDist || (!directed && tgtDist + weight < srcDist)) {
                 if (!hasNegativeWeightCycle) {
-                    console.warn('Graph contains a negative weight cycle for Bellman-Ford');
-
+                    //console.warn('Graph contains a negative weight cycle for Bellman-Ford');
                     hasNegativeWeightCycle = true;
                 }
 

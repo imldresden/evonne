@@ -1,4 +1,4 @@
-import { text, controls, createVisContainer } from "./cd-rules.js";
+import { getIndexedData, controls, createVisContainer } from "./cd-rules.js";
 import { utils } from "../rules.js";
 import { parallelCoords } from "../../../parallel-coords/parallel-coords-svg.js";
 
@@ -8,9 +8,9 @@ export class LinearCD {
 
     draw(data, name, params, where) {
         function getVariables(data) {
-            const set = new Set(data.map(d => [
-                ...(d.op.premises.map(p => Object.keys(p.constraint))).flat(1),
-                ...Object.keys(d.op.conclusion.constraint)
+            const set = new Set(data.ops.map(d => [
+                ...(d.premises.map(p => Object.keys(p.constraint))).flat(1),
+                ...Object.keys(d.conclusion.constraint)
             ]).flat(1));
 
             set.delete("_rhs");
@@ -139,13 +139,12 @@ export class LinearCD {
             style.getPropertyValue('--color-purple-dark'),
         ];
         const finalC = getPolyline(
-            data[data.length - 1].op.conclusion.constraint,
-            data[data.length - 1].op.conclusion.id,
+            data.ops[data.ops.length - 1].conclusion.constraint,
+            data.ops[data.ops.length - 1].conclusion.id,
             colors[2]
         );
 
-        data.forEach((d, i) => {
-            const op = d.op;
+        data.ops.forEach((op, i) => {
             pcp_data[i] = [];
 
             op.premises.forEach(premise => {
@@ -183,30 +182,35 @@ export class LinearCD {
         });
 
         let pcp;
-        let current = 0;
 
         const showObvious = this.showObvious;
-        const text_data = text(data);
+        
+        let { indexed_data, current } = getIndexedData(data);
         controls({
             prevFn: (e, d) => {
                 current = Math.max(0, current - 1);
                 pcp.update(pcp_data[current]);
-                displayRowOperation(text_data[current]);
+                pcp.destroy();
+                makePCP(pcp_data[current]);/**/
+                
+                displayRowOperation(indexed_data[current]);
             },
             currentFn: () => { },
             nextFn: (e, d) => {
                 current = Math.min(current + 1, Object.keys(pcp_data).length - 1);
                 pcp.update(pcp_data[current]);
-                displayRowOperation(text_data[current]);
+                pcp.destroy();
+                makePCP(pcp_data[current]);/**/
+
+                displayRowOperation(indexed_data[current]);
             },
             replayFn: (e, d) => {
-                current = Math.min(current + 1, Object.keys(pcp_data).length - 1);
                 pcp.destroy();
                 makePCP(pcp_data[current]);
-                displayRowOperation(text_data[current]);
+                displayRowOperation(indexed_data[current]);
             },
         }, where, params);
-        displayRowOperation(text_data[current]);
+        displayRowOperation(indexed_data[current]);
         makePCP(pcp_data[current]);
         document.removeEventListener('pcp-hl', highlightText)
         document.addEventListener('pcp-hl', highlightText)

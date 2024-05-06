@@ -21,13 +21,8 @@ function getConstraint(id, data) {
     const q = data.getElementById(id); 
     const type = q.nodeName; // equation, inequation or bottom
 
-    if (type === "entry") {
-        if (q.querySelector("key").innerHTML === "⊥") {
-            return { id, "bottom" : "⊥" }
-        } else {
-            console.error("faulty constraintID")
-            return;
-        }
+    if (type === "contradiction") {
+        return { id, "bottom" : "⊥" };
     }
 
     function extractTerm(term) {
@@ -58,7 +53,7 @@ function getConstraint(id, data) {
 
         let constants = 0;
         const terms = q.querySelectorAll("lhs > term, rhs > term");
-        terms.forEach((t) => {
+        terms.forEach(t => {
             const term = extractTerm(t);
             if (term.type === "constant") {
                 constraint[t.parentNode.nodeName].constant = term.value;
@@ -69,10 +64,10 @@ function getConstraint(id, data) {
             constraint.type = q.getAttribute("type");
         });
         if (constants > 1) {
-            console.error("more than 1 constant")
+            console.error("more than 1 constant");
         }
 
-    } else { // equations only have variables on lhs and a constant on rhs
+    } else if (type === "equation")  { // equations only have variables on lhs and a constant on rhs
         const lhs = q.querySelectorAll("lhs > term");
         lhs.forEach((t) => {
             const term = extractTerm(t);
@@ -81,6 +76,9 @@ function getConstraint(id, data) {
 
         const rhs = q.querySelector("rhs > term").getAttribute("con");
         constraint._rhs = rhs;
+    } else {
+        console.error("faulty constraintID");
+        return;
     }
 
     return constraint;
@@ -120,7 +118,11 @@ function getNodes(data, edgeData) {
         const node = { id: d.id };
         const dataNodes = d.childNodes; // querySelectorAll(`[*|id='${d.id}']>data`);
 
+        const sp = d.getAttribute && d.getAttribute("subProofID");
+        node.subProof = sp;
+
         dataNodes.forEach((item) => {
+            
             const key = item.getAttribute && item.getAttribute("key");
             const children = item.childNodes;
 
@@ -140,7 +142,7 @@ function getNodes(data, edgeData) {
         });
 
         if (node.type === "CDRule") {
-            node.data = [buildCDRule({ d, data })];
+            node.data = buildCDRule({ d, data });
         }
 
         const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);

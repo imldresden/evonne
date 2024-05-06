@@ -1,15 +1,21 @@
 import { LinearCD } from "./linear.js";
 import { DifferenceCD } from "./diff.js";
 
-function text(data, type) {
-    const ops = data.map(d => d.op);
-    const text_data = {};
+function getIndexedData(data, type) {
+    let current = -1;
+    data.ops.forEach((op,i) => {
+        if (op.id === data.current) {
+            current = i
+        }
+    });
+    const ops = data.ops;
+    const indexed_data = {};
 
     ops.forEach((op, i) => {
-        text_data[i] = op;
+        indexed_data[i] = op;
     });
 
-    return text_data;
+    return { indexed_data, current };
 }
 
 function controls({ prevFn, currentFn, nextFn, replayFn }, where, params) {
@@ -81,16 +87,16 @@ class CDRules {
     showObvious = false;
 
     draw({ ruleName, div, data, params }) {
-        console.log(data);
+        console.log({ ruleName, div, data, params });
 
         if (this.diff.isDifference(ruleName)) {
             this.diff.draw(data, ruleName, params, div);
         } else if (data) {
             this.linear.draw(data, ruleName, params, div);
         } else {
-            console.error("unknown cd rule")
+            console.error("unknown cd rule");
         }
     }
 }
 
-export { CDRules, text, controls, createVisContainer }
+export { CDRules, getIndexedData, controls, createVisContainer }

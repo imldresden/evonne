@@ -1,11 +1,11 @@
 import { utils } from "../rules.js";
-import { text, controls, createVisContainer } from "./cd-rules.js";
+import { getIndexedData, controls, createVisContainer } from "./cd-rules.js";
 import { stylesheet } from "../../../../style/cy-cd-style.js";
 import { params as cola } from "../../../layouts/cola.js";
 import { bellmanFord } from "./bellman-ford.js";
 
 const EPSILON = " - Є";
-const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? EPSILON : ` - ${n}Є`);
+const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? ` -Є` : ` -${n}Є`);
 const epsilon_value = 0.000000000000001;
 
 export class DifferenceCD {
@@ -377,7 +377,7 @@ export class DifferenceCD {
                             cycleValue += eval(current.data().label);
                         }
 
-                        d3.select("#cycle-val").text(`${cycleValue}${EPSILONS(ep)}`);
+                        d3.select("#cycle-val").text(`${cycleValue !== 0 ? cycleValue : ""}${EPSILONS(ep)}`);
                         i += 1;
                         if (i < ncycle.length) {
                             timeout = setTimeout(highlightNextEle, 1000);
@@ -392,41 +392,48 @@ export class DifferenceCD {
 
         utils.addTitle("Difference Logic: " + ruleName);
 
-        let current = 0;
-
-        const text_data = text(data);
-        const exp = createVisContainer(params, where, 50 + 45 * text_data[current].conclusion.negs.length);
+        let { indexed_data, current } = getIndexedData(data);
+        const exp = createVisContainer(params, where, 50 + 45 * indexed_data[current].conclusion.negs.length);
         const showObvious = this.showObvious;
         const types = this.types;
 
-        displayRule(text_data[current]);
-        const graph = getDiffGrammarEqs(text_data[current], types);
-        const container = document.getElementById("explanation-container");
-        container.innerHTML = "";
+        function drawGraph() {
+            displayRule(indexed_data[current]);
+            const graph = getDiffGrammarEqs(indexed_data[current], types);
+            const container = document.getElementById("explanation-container");
+            container.innerHTML = "";
+    
+            const cyp = structuredClone(cola);
+            cyp.animate = false;
+    
+            const cy = cytoscape({
+                container,
+                style: stylesheet,
+                layout: cyp,
+                wheelSensitivity: 0.3,
+                elements: graph,
+            });
+            cy.elements().filter(e => e.data().negated).addClass("negated");
+            cy.fit();
+            return cy;
+        }
 
-        const cyp = structuredClone(cola);
-        cyp.animate = false;
-
-        const cy = cytoscape({
-            container,
-            style: stylesheet,
-            layout: cyp,
-            wheelSensitivity: 0.3,
-            elements: graph,
-        });
-        cy.elements().filter(e => e.data().negated).addClass("negated");
-        cy.fit();
-
+        let cy = drawGraph();
         animateNegativeCycle(cy);
+
         controls({
             prevFn: (e, d) => {
-
+                current = Math.max(0, current - 1);
+                cy = drawGraph();
+                animateNegativeCycle(cy);
             },
             currentFn: () => {
                 animateNegativeCycle(cy);
             },
             nextFn: (e, d) => {
-
+                current = Math.min(current + 1, Object.keys(indexed_data).length - 1);
+                cy = drawGraph();
+                animateNegativeCycle(cy);
             },
             replayFn: (e, d) => {
                 animateNegativeCycle(cy);

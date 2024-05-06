@@ -128,11 +128,30 @@ class RulesHelper {
         } 
 
         const ruleName = proof.nodeVisuals.getLabel(data.source);
-
+        
         if (data.source.type === "rule" || data.source.type === "DLRule") {
             rule_sets.dl.draw({ ruleName, div, premises, conclusion });
         } else if (data.source.type === "CDRule") {
-            rule_sets.cd.draw({ ruleName, div, data: data.source.data, params });
+            const subproof = proof.tree.hierarchy.find(p => p.data.source.subProof !== "" && p.data.source.subProof === data.source.subProof)
+        
+            if (subproof) {
+                const steps = subproof.descendants()
+                    .filter(d => d.data.source.type === "CDRule")
+                    .map(cd => cd.data.source.data.op) // `cd.data.source.id` matches `cd.data.source.data.op.id`
+                    .flat(1)
+                    .reverse();
+                rule_sets.cd.draw({ ruleName, div, data: { 
+                    type: data.source.data.type,
+                    current: data.source.id, 
+                    ops: steps,
+                }, params });
+            } else {
+                rule_sets.cd.draw({ ruleName, div, data: { 
+                    type: data.source.data.type,
+                    current:  data.source.id, 
+                    ops: [ data.source.data.op ],
+                }, params });
+            }
         } else if (data.source.type === "mrule" || data.source.type === "krule") {
             return;
         } else {

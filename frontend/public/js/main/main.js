@@ -12,6 +12,7 @@ const computeAxiomsBtn = document.getElementById('computeAxiomPairBtn');
 
 window.onload = function () {
   //Mapping elements with events to their functions
+  cytoscape.warnings(false);
   const thingsWithListeners = [
     { type: 'click', thing: clearSigFilePath, fn: clearSigFilePathFunction },
     { type: 'click', thing: computeAxiomsBtn, fn: computeAxiomsBtnFunction },
