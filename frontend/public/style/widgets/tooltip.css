@@ -61,9 +61,11 @@
     display: flex;
 }
 
-#cd-left, #cd-right {
+#cd-left { 
     text-align: left;
     margin-left: 25px;
+}
+#cd-right {
     margin-right: 25px;
 }
 
