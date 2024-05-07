@@ -57,6 +57,16 @@
     margin: 8px 10px 10px 10px;
 }
 
+.tooltiptext.flexy {
+    display: flex;
+}
+
+#cd-left, #cd-right {
+    text-align: left;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
 .tooltip-light {
     background: transparent;
     color: var(--color-gray);

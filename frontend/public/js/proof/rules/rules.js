@@ -22,7 +22,6 @@ const utils = {
             .html("close")
             .on("click", () => proof.rules.destroyExplanation())
         
-            
         title.append("i")
             .attr("class", "material-icons left modal-button")
             .attr("title", params.large? "Minimize":"Maximize")
@@ -31,7 +30,10 @@ const utils = {
             .html(params.large? "fullscreen_exit":"fullscreen")
             .on("click", () => proof.rules.enlargeExplanation())
 
-        title.append("h2").attr("align", "center").text(text);
+        title.append("h2")
+            .attr("align", "center")
+            .attr("id", "ruleName")
+            .text(text);
     }, 
     
     addSeparator: function () {
@@ -127,30 +129,39 @@ class RulesHelper {
                 .style("right", 0);
         } 
 
-        const ruleName = proof.nodeVisuals.getLabel(data.source);
+        params.ruleName = proof.nodeVisuals.getLabel(data.source);
         
         if (data.source.type === "rule" || data.source.type === "DLRule") {
-            rule_sets.dl.draw({ ruleName, div, premises, conclusion });
+            rule_sets.dl.draw({ div, premises, conclusion, params });
         } else if (data.source.type === "CDRule") {
-            const subproof = proof.tree.hierarchy.find(p => p.data.source.subProof !== "" && p.data.source.subProof === data.source.subProof)
+            params.subproof = data.source.subProof;
+
+            const subproof = proof.tree.hierarchy.find(
+                p => p.data.source.subProof !== "" 
+                && p.data.source.subProof === data.source.subProof
+            );
         
             if (subproof) {
-                const steps = subproof.descendants()
-                    .filter(d => d.data.source.type === "CDRule")
-                    .map(cd => cd.data.source.data.op) // `cd.data.source.id` matches `cd.data.source.data.op.id`
-                    .flat(1)
-                    .reverse();
-                rule_sets.cd.draw({ ruleName, div, data: { 
-                    type: data.source.data.type,
+                let steps;
+                if (proof.showRules) {
+                    steps = subproof.descendants()
+                        .filter(d => d.data.source.type === data.source.type 
+                            && d.data.source.subProof === data.source.subProof
+                        ).map(cd => cd.data.source.data.op); // `cd.data.source.id` matches `cd.data.source.data.op.id`
+                } else {
+                    steps = subproof.descendants()
+                        .filter(d => d.data.source.rule.type === data.source.type
+                            && d.data.source.rule.subProof === data.source.subProof
+                        ).map(cd => cd.data.source.rule.data.op);
+                }
+                steps = steps.flat(1).reverse();
+                params.completeFn = proof.rules.completeExplanation;
+                rule_sets.cd.draw({ div, data: { 
                     current: data.source.id, 
                     ops: steps,
                 }, params });
             } else {
-                rule_sets.cd.draw({ ruleName, div, data: { 
-                    type: data.source.data.type,
-                    current:  data.source.id, 
-                    ops: [ data.source.data.op ],
-                }, params });
+                console.error("no subproof identified");
             }
         } else if (data.source.type === "mrule" || data.source.type === "krule") {
             return;
@@ -187,6 +198,16 @@ class RulesHelper {
         } else {
             params.large = true;
             this.renderExplanation();
+        }
+    }
+
+    completeExplanation() {
+        if (params.isSubProof) {
+            params.isSubProof = false;
+            proof.rules.renderExplanation();
+        } else {
+            params.isSubProof = true;
+            proof.rules.renderExplanation();
         }
     }
 

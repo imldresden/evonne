@@ -523,12 +523,13 @@ export class AxiomsHelper {
 				conclusion,
 				data: {
 					source: {
-						id: nodeData.data.id,
+						id: nodeData.data.rule.id,
 						element: nodeData.data.rule.element,
 						type: nodeData.data.rule.type,
-						data: nodeData.data.rule.data
+						data: nodeData.data.rule.data,
+						subProof: nodeData.data.rule.subProof,
 					}
-				}
+				},
 			});
 		} else {
 			btn.text("\ue1b7");

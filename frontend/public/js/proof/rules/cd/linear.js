@@ -1,4 +1,4 @@
-import { getIndexedData, controls, createVisContainer } from "./cd-rules.js";
+import { controls, createVisContainer } from "./cd-rules.js";
 import { utils } from "../rules.js";
 import { parallelCoords } from "../../../parallel-coords/parallel-coords-svg.js";
 
@@ -8,12 +8,13 @@ export class LinearCD {
 
     draw(data, name, params, where) {
         function getVariables(data) {
-            const set = new Set(data.ops.map(d => [
+            const set = new Set(Object.values(data.ops).map(d => [
                 ...(d.premises.map(p => Object.keys(p.constraint))).flat(1),
                 ...Object.keys(d.conclusion.constraint)
             ]).flat(1));
 
             set.delete("_rhs");
+            set.delete("_asserted");
             return Array.from(set);
         }
 
@@ -28,16 +29,18 @@ export class LinearCD {
             Object.keys(eq)
                 .sort((a, b) => a.localeCompare(b))
                 .forEach(k => {
-                    const value = eval(eq[k])
-                    polyline[k] = {
-                        value: value,
-                        dest: value,
-                        type: 'numbers'
+                    if (k !== "_asserted") {
+                        const value = eval(eq[k])
+                        polyline[k] = {
+                            value: value,
+                            dest: value,
+                            type: 'numbers'
+                        }
+                        polyline.nuid += eq[k]
+                            .replaceAll(" ", "")
+                            .replaceAll("-", "min")
+                            .replaceAll("/", "div") + k;
                     }
-                    polyline.nuid += eq[k]
-                        .replaceAll(" ", "")
-                        .replaceAll("-", "min")
-                        .replaceAll("/", "div") + k;
                 });
 
             return polyline;
@@ -138,13 +141,8 @@ export class LinearCD {
             style.getPropertyValue('--color-lime'),
             style.getPropertyValue('--color-purple-dark'),
         ];
-        const finalC = getPolyline(
-            data.ops[data.ops.length - 1].conclusion.constraint,
-            data.ops[data.ops.length - 1].conclusion.id,
-            colors[2]
-        );
 
-        data.ops.forEach((op, i) => {
+        Object.values(data.ops).forEach((op, i) => {
             pcp_data[i] = [];
 
             op.premises.forEach(premise => {
@@ -152,13 +150,23 @@ export class LinearCD {
                 pcp_data[i].push(pr);
             });
 
-            const conclusion = getPolyline(op.conclusion.constraint, op.conclusion.id, colors[1]);
+            const conclusion = getPolyline(op.conclusion.constraint, op.conclusion.id, colors[2]);
+
+            pcp_data[i].push(conclusion);
+            /* // To distinguish between the final conclusion of the subproof, 
+            // also change the color of `conclusion` to e.g., colors[1]
+            const keys = Object.keys(data.ops);
+            const finalC = getPolyline(
+                data.ops[keys.length - 1].conclusion.constraint,
+                data.ops[keys.length - 1].conclusion.id,
+                colors[2]
+            );
 
             if (conclusion.nuid !== finalC.nuid) {
                 pcp_data[i].push(conclusion);
             }
 
-            pcp_data[i].push(finalC);
+            pcp_data[i].push(finalC);*/
 
             if (pcp_data[i.length !== 3] || pcp_data[i.length !== 4]) {
                 console.error("linear inferences should only have 2 premises leading to 1 conclusion + optional final conclusion");
@@ -182,36 +190,18 @@ export class LinearCD {
         });
 
         let pcp;
-
         const showObvious = this.showObvious;
         
-        let { indexed_data, current } = getIndexedData(data);
         controls({
-            prevFn: (e, d) => {
-                current = Math.max(0, current - 1);
-                pcp.update(pcp_data[current]);
+            data, 
+            plotFn: (data) => {
                 pcp.destroy();
-                makePCP(pcp_data[current]);/**/
-                
-                displayRowOperation(indexed_data[current]);
-            },
-            currentFn: () => { },
-            nextFn: (e, d) => {
-                current = Math.min(current + 1, Object.keys(pcp_data).length - 1);
-                pcp.update(pcp_data[current]);
-                pcp.destroy();
-                makePCP(pcp_data[current]);/**/
-
-                displayRowOperation(indexed_data[current]);
-            },
-            replayFn: (e, d) => {
-                pcp.destroy();
-                makePCP(pcp_data[current]);
-                displayRowOperation(indexed_data[current]);
-            },
+                makePCP(pcp_data[data.current]);
+                displayRowOperation(data.ops[data.current]);
+            }
         }, where, params);
-        displayRowOperation(indexed_data[current]);
-        makePCP(pcp_data[current]);
+        displayRowOperation(data.ops[data.current]);
+        makePCP(pcp_data[data.current]);
         document.removeEventListener('pcp-hl', highlightText)
         document.addEventListener('pcp-hl', highlightText)
     }

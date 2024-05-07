@@ -46,7 +46,9 @@ function getConstraint(id, data) {
     }
 
     const constraint = {};
-
+    const ass = q.getAttribute("asserted");
+    constraint._asserted = ass === "true";
+    
     if (type === "inequation") {
         constraint.lhs = {};
         constraint.rhs = {};
@@ -104,11 +106,8 @@ function buildCDRule({ d, data }) {
 
     op.premises = ms.filter(m => m.t === "premise");
     op.conclusion = ms.filter(m => m.t === "conclusion")[0]
-
-    // TODO: distinguish between linear and diff in a better way
-    const type = op.premises[0].coe === null ? "diff" : "linear";
     
-    return { op, type };
+    return { op };
 }
 
 function getNodes(data, edgeData) {

@@ -34,8 +34,9 @@ export class DLRules {
         "Top Superclass" : (_, c) => this.topSuperClass(c),  
     }
 
-    draw({ ruleName, div, premises, conclusion }) {
+    draw({ div, premises, conclusion, params }) {
         this.displayObject = div;
+        const ruleName = params.ruleName;
         
         if (this.rules[ruleName]) {
             utils.addTitle(ruleName);

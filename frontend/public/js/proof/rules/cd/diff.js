@@ -1,5 +1,5 @@
 import { utils } from "../rules.js";
-import { getIndexedData, controls, createVisContainer } from "./cd-rules.js";
+import { controls, createVisContainer } from "./cd-rules.js";
 import { stylesheet } from "../../../../style/cy-cd-style.js";
 import { params as cola } from "../../../layouts/cola.js";
 import { bellmanFord } from "./bellman-ford.js";
@@ -7,6 +7,8 @@ import { bellmanFord } from "./bellman-ford.js";
 const EPSILON = " - Є";
 const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? ` -Є` : ` -${n}Є`);
 const epsilon_value = 0.000000000000001;
+
+let timeout;
 
 export class DifferenceCD {
 
@@ -40,10 +42,13 @@ export class DifferenceCD {
         return this.rules[name];
     }
 
-    async draw(data, name, params, where) {
-        const ruleName = this.rules[name]
+    async draw(data, params, where) {
+        const getRuleName = (rn) => this.rules[rn] ? this.rules[rn] : rn;
+        const ruleName = getRuleName(params.ruleName);
+
         function displayRule(op) {
-            exp.selectAll("*").remove();
+            input.selectAll("*").remove();
+            output.selectAll("*").remove();
 
             let length = 0;
             function printTerms(terms, where) {
@@ -88,47 +93,54 @@ export class DifferenceCD {
                 });
             }
 
-            exp.append("span").attr("class", "text-red").text("[" + ruleName + "] ");
+            input.append("span").text("Premises:")
+            input.append("br");
 
             op.premises.forEach((pr, i) => {
                 if (i !== 0) {
-                    exp.append("span").attr("class", "tab");
+                    input.append("br");
                 }
 
+                input.append("span").attr("class", "tab");
+                
                 if (pr.constraint.bottom) {
-                    exp.append("span")
+                    input.append("span").attr("class", "tab");
+                    input.append("span") 
                         .attr("id", "eq-" + pr.bottom.id)
-                        .attr("class", "text-red").text("⊥")
+                        .attr("class", "text-red").text("⊥");
                 } else {
-                    const constraint = exp.append("span").attr("id", "eq-" + pr.id);
+                    const constraint = input.append("span").attr("id", "eq-" + pr.id);
                     printTerms(pr.constraint.lhs, constraint);
                     constraint.append("span").attr("class", "text-black").text(" " + types[pr.constraint.type] + " ");
                     printTerms(pr.constraint.rhs, constraint);
                 }
             });
 
-            utils.addMidRule([length + name.length], exp);
             if (op.conclusion.constraint.bottom) {
-                exp.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-red").text("⊥");
+                input.append("br");
+                output.append("span").text("Conclusion:");
+                output.append("br");
+                output.append("span").attr("class", "tab");
+                output.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-red").text("⊥");
             } else {
-                const constraint = exp.append("span").attr("id", "eq-" + op.conclusion.id);
+                output.append("span").text("Conclusion:");
+                output.append("br");
+                output.append("span").attr("class", "tab");
+                const constraint = output.append("span").attr("id", "eq-" + op.conclusion.id);
                 printTerms(op.conclusion.constraint.lhs, constraint);
                 constraint.append("span").attr("class", "text-black").text(" " + types[op.conclusion.constraint.type] + " ");
                 printTerms(op.conclusion.constraint.rhs, constraint);
 
                 if (op.conclusion.negs.length > 0) {
-                    const neg = exp.append("span")
+                    const neg = output.append("span")
                         .attr("class", "text-black")
                         .style("display", "block")
                         .style("text-align", "left")
-                    neg.append("br");
-                    neg.append("span").attr("class", "tab");
-                    neg.append("span").attr("class", "text-black").text("Negation of Conclusion:");
+                    neg.append("span").attr("class", "text-black").text("Negated:");
 
                     op.conclusion.negs.forEach((c, i) => {
                         const cons = neg.append("span").attr("id", "eq-" + op.conclusion.id + "-n" + i);
                         cons.append("br");
-                        cons.append("span").attr("class", "tab");
                         cons.append("span").attr("class", "tab");
                         printTerms(c.lhs, cons);
                         cons.append("span").attr("class", "text-black").text(" " + types[c.type] + " ")
@@ -137,15 +149,13 @@ export class DifferenceCD {
                 }
             }
 
-            const negCValue = exp.append("span")
+            const negCValue = input.append("span")
                 .attr("class", "text-black")
                 .style("display", "block")
                 .style("text-align", "left")
-            negCValue.append("span").attr("class", "tab");
+            negCValue.append("br");
             negCValue.append("span").attr("class", "text-black").text("Negative Cycle Value: ");
             negCValue.append("span").attr("class", "text-red").attr("id", "cycle-val").text("0");
-            negCValue.append("br");
-            negCValue.append("span").attr("class", "tab");
         }
 
         function getDiffGrammarEqs(op) {
@@ -173,7 +183,7 @@ export class DifferenceCD {
                     }
                 }
 
-                const negated = p.negated; 
+                const negated = p.negated;
 
                 if (p.type === "plus") { // x+c=y is the same as y-x=c
                     const c = +lhs.constant;
@@ -191,14 +201,14 @@ export class DifferenceCD {
                     edges.push({
                         data: {
                             id: `e-${i++}`,
-                            source: nodes[x], target: nodes[y], 
+                            source: nodes[x], target: nodes[y],
                             label: c, weight: c, negated
                         } // x-y<=c : (y,x),c 
                     });
                     edges.push({
                         data: {
                             id: `e-${i++}`,
-                            source: nodes[y], target: nodes[x], 
+                            source: nodes[y], target: nodes[x],
                             label: -c, weight: -c, negated
                         } // y-x<=-c : (x,y),-c 
                     });
@@ -243,7 +253,7 @@ export class DifferenceCD {
                     edges.push({
                         data: {
                             id: `e-${i++}`,
-                            source: nodes[x], target: nodes[x0], 
+                            source: nodes[x], target: nodes[x0],
                             label: -c, weight: -c, negated
                         } // y−x < −c  ... (x, y) -c 
                     });
@@ -258,8 +268,8 @@ export class DifferenceCD {
 
                         const edge = {
                             id: `e-${i++}`,
-                            label: `${c}${_epsilon}`, 
-                            weight: c - (_epsilon !== "" ? epsilon_value : 0), 
+                            label: `${c}${_epsilon}`,
+                            weight: c - (_epsilon !== "" ? epsilon_value : 0),
                             negated
                         }
 
@@ -272,12 +282,12 @@ export class DifferenceCD {
                             edge.target = nodes[x];
                             // x-x0 <= c ... (x0, x) c
                         }
-                        edges.push({ data: edge }); 
+                        edges.push({ data: edge });
                     } else if (klhs.length === 2) {
                         const x = klhs[0];
                         const y = klhs[1];
                         const c = +rhs.constant;
-                        
+
                         nodes[x] = nodes[x] || `n-${i++}`;
                         nodes[y] = nodes[y] || `n-${i++}`;
 
@@ -298,7 +308,7 @@ export class DifferenceCD {
 
                 // x − y >= c is the same as y − x < −c. This is not considered and should not happen!
             });
-            
+
             const cynodes = Object.keys(nodes).map(n => {
                 return {
                     data: {
@@ -311,7 +321,6 @@ export class DifferenceCD {
             return { nodes: cynodes, edges };
         }
 
-        let timeout;
         function animateNegativeCycle(cy) {
             const edges = new Set();
             const nodes = new Set();
@@ -340,10 +349,10 @@ export class DifferenceCD {
                 const elementsWithJustOneNegated = cy.elements().filter(e => {
                     if (e.data().negated) {
                         negs++;
-                    } 
-                    return negs < 2; 
+                    }
+                    return negs < 2;
                 });
-                
+
                 const bf = bellmanFord({
                     root: `#${start.data().id}`,
                     directed: true,
@@ -390,22 +399,22 @@ export class DifferenceCD {
             }
         }
 
-        utils.addTitle("Difference Logic: " + ruleName);
+        utils.addTitle(ruleName);
 
-        let { indexed_data, current } = getIndexedData(data);
-        const exp = createVisContainer(params, where, 50 + 45 * indexed_data[current].conclusion.negs.length);
+        const { input, output } = createVisContainer(params, where, 24 + 24 * data.ops[data.current].premises.length);
         const showObvious = this.showObvious;
+        console.log(input)
         const types = this.types;
 
-        function drawGraph() {
-            displayRule(indexed_data[current]);
-            const graph = getDiffGrammarEqs(indexed_data[current], types);
+        function drawGraph(data) {
+            displayRule(data);
+            const graph = getDiffGrammarEqs(data, types);
             const container = document.getElementById("explanation-container");
             container.innerHTML = "";
-    
+
             const cyp = structuredClone(cola);
             cyp.animate = false;
-    
+
             const cy = cytoscape({
                 container,
                 style: stylesheet,
@@ -418,26 +427,16 @@ export class DifferenceCD {
             return cy;
         }
 
-        let cy = drawGraph();
-        animateNegativeCycle(cy);
-
         controls({
-            prevFn: (e, d) => {
-                current = Math.max(0, current - 1);
-                cy = drawGraph();
+            data,
+            plotFn: (data, name) => {
+                d3.select("#ruleName").text(getRuleName(name));
+                const cy = drawGraph(data.ops[data.current]);
                 animateNegativeCycle(cy);
-            },
-            currentFn: () => {
-                animateNegativeCycle(cy);
-            },
-            nextFn: (e, d) => {
-                current = Math.min(current + 1, Object.keys(indexed_data).length - 1);
-                cy = drawGraph();
-                animateNegativeCycle(cy);
-            },
-            replayFn: (e, d) => {
-                animateNegativeCycle(cy);
-            },
+            }
         }, where, params)
+
+        const cy = drawGraph(data.ops[data.current]);
+        animateNegativeCycle(cy);
     }
 }

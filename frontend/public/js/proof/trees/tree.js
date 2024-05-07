@@ -48,9 +48,7 @@ export class TreeNavigation {
             );
         } else { // rules always shown in magic
             if (!proof.showRules) {
-                this.hierarchy = this.createHierarchy(
-                    this.flattenRules(this.edgeData)
-                );
+                this.hierarchy = this.createHierarchy(this.flattenRules());
             } 
         }
 
@@ -75,12 +73,14 @@ export class TreeNavigation {
                 rules[e.source.id] = e;
                 rts[e.target.id] = e;
             } else {
-                targets.push(e)
+                targets.push(e);
             }
         })
+        
         targets.forEach(t => {
             t.source.rule = rts[t.source.id].source;
-            
+            t.source.subProof = t.source.rule.subProof;
+
             if (t.target !== "" && rules[t.target.id]) {
                 t.target = rules[t.target.id].target; // replaces rule with rule target
             }
