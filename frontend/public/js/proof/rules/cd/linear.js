@@ -6,7 +6,7 @@ export class LinearCD {
     
     showObvious = false;
 
-    draw(data, name, params, where) {
+    draw(data, params, where) {
         function getVariables(data) {
             const set = new Set(Object.values(data.ops).map(d => [
                 ...(d.premises.map(p => Object.keys(p.constraint))).flat(1),
@@ -131,7 +131,8 @@ export class LinearCD {
 
         utils.addTitle("Numerical Logic: Gaussian Elimination");
 
-        const exp = createVisContainer(params, where);
+        const { input } = createVisContainer(params, where);
+        const exp = input;
         const variables = getVariables(data);
         const header = [...variables, "_rhs"]; // ensures _rhs is at the end
         const pcp_data = {};
