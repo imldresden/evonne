@@ -147,14 +147,25 @@ class RulesHelper {
                     steps = subproof.descendants()
                         .filter(d => d.data.source.type === data.source.type 
                             && d.data.source.subProof === data.source.subProof
-                        ).map(cd => cd.data.source.data.op); // `cd.data.source.id` matches `cd.data.source.data.op.id`
+                        ).map(cd => { 
+                            const op = cd.data.source.data.op
+                            op.name = cd.data.source.element;
+                            op.node = cd; 
+                            return op;
+                        }); // `cd.data.source.id` matches `cd.data.source.data.op.id`
                 } else {
                     steps = subproof.descendants()
                         .filter(d => d.data.source.rule.type === data.source.type
                             && d.data.source.rule.subProof === data.source.subProof
-                        ).map(cd => cd.data.source.rule.data.op);
+                        ).map(cd => { 
+                            const op = cd.data.source.rule.data.op;
+                            console.log(cd)
+                            return op;
+                        });
                 }
                 steps = steps.flat(1).reverse();
+
+                console.log(steps)
                 params.completeFn = proof.rules.completeExplanation;
                 rule_sets.cd.draw({ div, data: { 
                     current: data.source.id, 

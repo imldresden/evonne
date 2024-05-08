@@ -64,8 +64,11 @@
 #cd-left { 
     text-align: left;
     margin-left: 25px;
+    margin-right: 10px;
 }
+
 #cd-right {
+    text-align: left;
     margin-right: 25px;
 }
 

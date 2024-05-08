@@ -44,7 +44,7 @@ function controls({ data, plotFn }, where, params) {
         .attr("class", "controls-bar");
 
     const lefted = buttons.append("a").attr("class", "bar-left");
-    const centered = buttons.append("a").attr("class", "bar-center");
+    //const centered = buttons.append("a").attr("class", "bar-center");
     const righted = buttons.append("a").attr("class", "bar-right");
 
     const complete = righted.append("a")

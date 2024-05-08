@@ -132,11 +132,9 @@ export class DifferenceCD {
                 printTerms(op.conclusion.constraint.rhs, constraint);
 
                 if (op.conclusion.negs.length > 0) {
-                    const neg = output.append("span")
-                        .attr("class", "text-black")
-                        .style("display", "block")
-                        .style("text-align", "left")
-                    neg.append("span").attr("class", "text-black").text("Negated:");
+                    const neg = output;
+                    neg.append("br")
+                    neg.append("span").text("Negated:");
 
                     op.conclusion.negs.forEach((c, i) => {
                         const cons = neg.append("span").attr("id", "eq-" + op.conclusion.id + "-n" + i);
@@ -401,9 +399,11 @@ export class DifferenceCD {
 
         utils.addTitle(ruleName);
 
-        const { input, output } = createVisContainer(params, where, 24 + 24 * data.ops[data.current].premises.length);
+        const { input, output } = createVisContainer(
+            params, where, 
+            24 + 24 * data.ops[data.current].premises.length // each span line is 24 pixels high
+        );
         const showObvious = this.showObvious;
-        console.log(input)
         const types = this.types;
 
         function drawGraph(data) {
