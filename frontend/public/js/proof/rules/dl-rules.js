@@ -331,7 +331,6 @@ export class DLRules {
     existentialPropertyExpansion(premise, conclusion) {
         let lHS = premise[0].split(subsumes)[0].trim();
         let rHS = premise[0].split(subsumes)[1].trim();
-
         let filler = conclusion.substring(conclusion.lastIndexOf(".") + 1);
 
         //Add rule definition

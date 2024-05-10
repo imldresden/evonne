@@ -115,7 +115,7 @@ export class LinearCD {
             d3.select("#pcp").selectAll("*").remove();
             const dim = d3.select("#explanation-container").node().getBoundingClientRect()
 
-            pcp = parallelCoords(
+            parallelCoords(
                 { id: "pcp", details: "explanation-container", width: dim.width, height: dim.height },
                 data,
                 {
@@ -132,6 +132,7 @@ export class LinearCD {
         utils.addTitle("Numerical Logic: Gaussian Elimination");
 
         const { input } = createVisContainer(params, where);
+        d3.select('#cd-divider').style('height', 0);
         const exp = input;
         const variables = getVariables(data);
         const header = [...variables, "_rhs"]; // ensures _rhs is at the end
@@ -190,17 +191,8 @@ export class LinearCD {
             }
         });
 
-        let pcp;
-        const showObvious = this.showObvious;
-        
-        controls({
-            data, 
-            plotFn: (data) => {
-                pcp.destroy();
-                makePCP(pcp_data[data.current]);
-                displayRowOperation(data.ops[data.current]);
-            }
-        }, where, params);
+        const showObvious = this.showObvious;        
+        controls({data, }, where, params);
         displayRowOperation(data.ops[data.current]);
         makePCP(pcp_data[data.current]);
         document.removeEventListener('pcp-hl', highlightText)

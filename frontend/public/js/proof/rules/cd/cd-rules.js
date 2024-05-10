@@ -1,5 +1,6 @@
 import { LinearCD } from "./linear.js";
 import { DifferenceCD } from "./diff.js";
+import { proof } from "../../../proof/proof.js";
 
 function getIndexedData(data) {
     const indexed_data = {};
@@ -18,13 +19,13 @@ function getIndexedData(data) {
     return { ops: indexed_data, current };
 }
 
-function combineSteps(data) {
+function combineSteps(data, name) {
 
     const keys = Object.keys(data.ops);
     if (keys.length === 1) {
         return data;
     } else {
-        const d = { id: "combined", premises: [] };
+        const d = { id: "combined", premises: [], name: `Subproof: ${name}` };
         keys.forEach(id => {
             data.ops[id].premises.forEach(p => {
                 if (p.constraint._asserted) {
@@ -33,12 +34,13 @@ function combineSteps(data) {
             });
         });
         d.conclusion = data.ops[keys.length - 1].conclusion;
+        d.node = data.ops[keys.length - 1].node;
         
         return { ops: { 0: d }, current: 0 };
     }
 }
 
-function controls({ data, plotFn }, where, params) {
+function controls({ data }, where, params) {
     const buttons = where
         .append("div")
         .attr("class", "controls-bar");
@@ -82,22 +84,25 @@ function controls({ data, plotFn }, where, params) {
     
     prev.on("click", (e, d) => {
         data.current = Math.max(0, data.current - 1);
-        plotFn(data);
+        proof.rules.openExplanation(params.event, [data.ops[data.current].node])
     });
     next.on("click", (e, d) => {
         data.current = Math.min(data.current + 1, Object.keys(data.ops).length - 1);
-        plotFn(data);
+        proof.rules.openExplanation(params.event, [data.ops[data.current].node])
     });
     replay.on("click", (e, d) => {
-        plotFn(data);
+        proof.rules.openExplanation(params.event, [data.ops[data.current].node])
     });
-    complete.on("click", params.completeFn);    
+    complete.on("click", (e, d) => {
+        proof.rules.completeExplanation(Object.values(data.ops).map(d => d.node));
+    });
 }
 
 function createVisContainer(params, where, extra = 0) {
     const exp = where.append("div").attr("class", "tooltiptext flexy");
     exp.html(`
         <div id='cd-left'></div>
+        <div id='cd-divider'></div>
         <div id='cd-right'></div> 
     `);
 
@@ -121,13 +126,13 @@ class CDRules {
         let _data = getIndexedData(data);
         const ruleName = params.ruleName;
         if (params.isSubProof) {
-            _data = combineSteps(_data);
-            params.ruleName = params.subproof;
-        } 
+            _data = combineSteps(_data, params.subProof.name);
+        }
 
-        console.log({ div, _data, params });
-
-        if (this.diff.isDifference(ruleName)) { //TODO: this is only checked once using the const, the name changes!
+        if (this.diff.isDifference(ruleName)) { 
+            //TODO: come up with a better way to distinguish domains... 
+            // this is only checked once using the const, the name changes!
+            // cannot identify if its a subproof!
             this.diff.draw(_data, params, div);
         } else if (data) {
             this.linear.draw(_data, params, div);
@@ -137,4 +142,4 @@ class CDRules {
     }
 }
 
-export { CDRules, getIndexedData, combineSteps, controls, createVisContainer }
+export { CDRules, getIndexedData, controls, createVisContainer }

@@ -61,10 +61,9 @@ export class NodeVisualsHelper {
             this.renderConnectorsByType("Down");
         }
 
-        this.renderBoxes();
-        this.renderLabels();
-        //handle hover effect on axiom nodes
-        this.addShowHideMouseEvents();
+        this.renderBoxes(); 
+        this.renderLabels(); 
+        this.addShowHideMouseEvents(); //handle hover effect on axiom nodes
     }
 
     renderConnectorsByType(direction, alternate) {
@@ -206,7 +205,7 @@ export class NodeVisualsHelper {
         elements.append("rect")
             .attr("id", "frontRect")
             .attr("class", "bg-box")
-            .attr("x", -BOX_WIDTH / 2)
+            .attr("x", d=> -(d.width) / 2) // d.width is calculated from the labels
             .attr("y", 0)
             .attr("width", d => d.width)
             .attr("height", BOX_HEIGHT);
@@ -246,9 +245,6 @@ export class NodeVisualsHelper {
                     }
 
                     return label;
-                })
-                .each((d, i, nodes) => {
-                    d3.select(`#${nodes[i].parentNode.id} #frontRect`).attr("x", () => -(d.width) / 2);
                 });
         }
     }
@@ -556,7 +552,7 @@ export class NodeVisualsHelper {
                 });
             }
         } else {
-            console.error('received null node')
+            console.error('received null node');
         }
     }
 

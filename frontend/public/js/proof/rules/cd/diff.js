@@ -43,9 +43,8 @@ export class DifferenceCD {
     }
 
     async draw(data, params, where) {
-        const getRuleName = (rn) => this.rules[rn] ? this.rules[rn] : rn;
-        const ruleName = getRuleName(params.ruleName);
-
+        const getRuleName = (rn) => this.rules[rn] ? `${rn} (${this.rules[rn]})` : rn;
+        
         function displayRule(op) {
             input.selectAll("*").remove();
             output.selectAll("*").remove();
@@ -152,7 +151,7 @@ export class DifferenceCD {
                 .style("display", "block")
                 .style("text-align", "left")
             negCValue.append("br");
-            negCValue.append("span").attr("class", "text-black").text("Negative Cycle Value: ");
+            negCValue.append("span").attr("class", "text-black").text("Cycle Value: ");
             negCValue.append("span").attr("class", "text-red").attr("id", "cycle-val").text("0");
         }
 
@@ -397,12 +396,16 @@ export class DifferenceCD {
             }
         }
 
+        const ruleName = getRuleName(data.ops[data.current].name);
         utils.addTitle(ruleName);
 
-        const { input, output } = createVisContainer(
-            params, where, 
-            24 + 24 * data.ops[data.current].premises.length // each span line is 24 pixels high
-        );
+        function getHeight(data) {
+            return 24 + 24 * data.ops[data.current].premises.length; // each span line is 24 pixels high
+        }
+
+        const operationHeight = getHeight(data);
+        const { input, output } = createVisContainer(params, where, operationHeight);
+        d3.select('#cd-divider').style('height', operationHeight);
         const showObvious = this.showObvious;
         const types = this.types;
 
@@ -427,14 +430,7 @@ export class DifferenceCD {
             return cy;
         }
 
-        controls({
-            data,
-            plotFn: (data, name) => {
-                d3.select("#ruleName").text(getRuleName(name));
-                const cy = drawGraph(data.ops[data.current]);
-                animateNegativeCycle(cy);
-            }
-        }, where, params)
+        controls({ data, }, where, params)
 
         const cy = drawGraph(data.ops[data.current]);
         animateNegativeCycle(cy);
