@@ -67,34 +67,44 @@ function controls({ data }, where, params) {
         .style("font-size", "23px");
     //const centered = buttons.append("a").attr("class", "bar-center");
 
-    const prev = lefted.append("a")
-        .attr("class", "bar-button")
-        .attr("title", "Previous Inference");
-    prev.append("i")
-        .attr("class", "material-icons")
-        .text("skip_previous");
+    if (!params.isSubProof) {
+        const prev = lefted.append("a")
+            .attr("class", "bar-button")
+            .attr("title", "Previous Inference");
+        prev.append("i")
+            .attr("class", "material-icons")
+            .text("skip_previous");
 
-    const next = lefted.append("a")
-        .attr("class", "bar-button")
-        .attr("title", "Next Inference");
-    next.append("i")
-        .attr("class", "material-icons")
-        .text("skip_next");
+        const next = lefted.append("a")
+            .attr("class", "bar-button")
+            .attr("title", "Next Inference");
+        next.append("i")
+            .attr("class", "material-icons")
+            .text("skip_next");
 
-    
-    prev.on("click", (e, d) => {
-        data.current = Math.max(0, data.current - 1);
-        proof.rules.openExplanation(params.event, [data.ops[data.current].node])
-    });
-    next.on("click", (e, d) => {
-        data.current = Math.min(data.current + 1, Object.keys(data.ops).length - 1);
-        proof.rules.openExplanation(params.event, [data.ops[data.current].node])
-    });
+        
+        prev.on("click", (e, d) => {
+            data.current = Math.max(0, data.current - 1);
+            proof.rules.openExplanation(params, [data.ops[data.current].node])
+        });
+        next.on("click", (e, d) => {
+            data.current = Math.min(data.current + 1, Object.keys(data.ops).length - 1);
+            proof.rules.openExplanation(params, [data.ops[data.current].node])
+        });
+    }
+
     replay.on("click", (e, d) => {
-        proof.rules.openExplanation(params.event, [data.ops[data.current].node])
+        proof.rules.openExplanation(params, [data.ops[data.current].node])
     });
+    
     complete.on("click", (e, d) => {
-        proof.rules.completeExplanation(Object.values(data.ops).map(d => d.node));
+        if (params.isSubProof) {
+            params.isSubProof = false;
+        } else {
+            params.isSubProof = true;
+        }
+        proof.rules.openExplanation(params, [data.ops[data.current].node])
+        proof.rules.highlightNodes(Object.values(data.ops).map(d => d.node));
     });
 }
 

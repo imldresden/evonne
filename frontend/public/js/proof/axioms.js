@@ -502,7 +502,7 @@ export class AxiomsHelper {
 		let state = btn.text();
     
 		if (state === this.help_icon) {
-			proof.rules.openExplanation(event, [node]);
+			proof.rules.openExplanation({ event }, [node]);
 			btn.text(this.close_help_icon);
 		} else {
 			proof.rules.destroyExplanation();

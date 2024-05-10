@@ -227,7 +227,7 @@ class RulesHelper {
         proofView.selectAll(".rule").each(x => {
             proofView.select("#N" + x.data.source.id).on("click", (event, node) => {// } 
                 if (node.data.source.id !== proof.rules.#lastToolTipTriggerID) {
-                    proof.rules.openExplanation(event, [node]);
+                    proof.rules.openExplanation({ event }, [node]);
                     proof.rules.#lastToolTipTriggerID = node.data.source.id;
                 } else {
                     proof.rules.destroyExplanation();
@@ -276,20 +276,22 @@ class RulesHelper {
         return { data, premises, conclusion };
     }
 
-    openExplanation(event, nodes) {
+    openExplanation(_params, nodes) {
         const { data, premises, conclusion } = this.highlightNodes(nodes);
         const ruleName = proof.nodeVisuals.getLabel(data.source);
         const subProof = proof.rules.#getSubProof(data);
 
         params = {
-            event,
+            event: _params.event,
             premises,
             conclusion,
-            data,
+            data: _params?.data ? _params.data : data,
             subProof,
-            large: false,
+            isSubProof: _params?.isSubProof || false,
+            large: _params?.large || false,
             ruleName // source of explanation trigger
         };
+        
         this.#renderExplanation();
     }
 
@@ -302,18 +304,6 @@ class RulesHelper {
             proof.rules.#renderExplanation();
         }
     }
-
-    completeExplanation(nodes) {
-        if (params.isSubProof) {
-            params.isSubProof = false;
-        } else {
-            params.isSubProof = true;
-        }
-
-        proof.rules.highlightNodes(nodes)
-        proof.rules.#renderExplanation();
-    }
-
 }
 
 export { RulesHelper, utils };
