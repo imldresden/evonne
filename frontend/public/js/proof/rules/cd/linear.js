@@ -102,13 +102,9 @@ export class LinearCD {
             printEquation(op.conclusion.constraint, exp.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-eq conclusion"))
         }
 
-        function highlightText(d) {
-            const allEqs = d3.selectAll(".text-eq")
-            allEqs.classed("hl-text", false)
-
-            Array.from(d.detail.ids).forEach(id => {
-                d3.select(`#eq-${id}`).classed("hl-text", true)
-            })
+        function highlightText(e) {
+            d3.selectAll(".text-eq").classed("hl-text", false);
+            d3.selectAll(`#eq-${Array.from(e.detail.ids).join(', #eq-')}`).classed("hl-text", true)
         }
 
         function makePCP(data) {

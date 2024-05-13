@@ -10,6 +10,31 @@ const epsilon_value = 0.000000000000001;
 
 let timeout;
 
+function ineqGraphHighlight (ev) {
+    const eid = ev.detail.eid; 
+    d3.selectAll(".text-eq").classed("hl-text", false);
+    d3.select(`#${eid}`).classed("hl-text", true);
+
+    const cy = ev.detail.cy;
+    const target = ev.detail.target;
+    if (cy) {
+        cy.elements().removeClass("thick");
+        if (target) {
+            target.addClass("thick");
+        } else {
+            cy.elements().filter(e => e.data().eid === eid).addClass("thick");
+        }
+    }
+}
+
+function undoGraphHighlight (ev) { 
+    d3.selectAll(".text-eq").classed("hl-text", false);
+    const cy = ev.detail.cy;
+    if (cy) {
+        cy.elements().removeClass("thick");
+    }
+}
+
 export class DifferenceCD {
 
     showObvious = false;
@@ -44,6 +69,7 @@ export class DifferenceCD {
 
     async draw(data, params, where) {
         const getRuleName = (rn) => this.rules[rn] ? `${rn} (${this.rules[rn]})` : rn;
+        let cy;
         
         function displayRule(op) {
             input.selectAll("*").remove();
@@ -104,11 +130,14 @@ export class DifferenceCD {
                 
                 if (pr.constraint.bottom) {
                     input.append("span").attr("class", "tab");
-                    input.append("span") 
-                        .attr("id", "eq-" + pr.bottom.id)
-                        .attr("class", "text-red").text("⊥");
+                    input.append("span").attr("id", `eq-${pr.bottom.id}`).attr("class", "text-red").text("⊥");
                 } else {
-                    const constraint = input.append("span").attr("id", "eq-" + pr.id);
+                    const cid = `eq-${pr.id}`;
+                    const constraint = input.append("span")
+                        .attr("id", cid)
+                        .attr("class", "text-eq premise")
+                        .on('mouseover', ()=> dispatchHighlightCustomEvent(cid))
+                        .on('mouseout', ()=> dispatchHighlightCustomEvent(cid));
                     printTerms(pr.constraint.lhs, constraint);
                     constraint.append("span").attr("class", "text-black").text(" " + types[pr.constraint.type] + " ");
                     printTerms(pr.constraint.rhs, constraint);
@@ -120,12 +149,17 @@ export class DifferenceCD {
                 output.append("span").text("Conclusion:");
                 output.append("br");
                 output.append("span").attr("class", "tab");
-                output.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-red").text("⊥");
+                output.append("span").attr("id", `eq-${op.conclusion.id}`).attr("class", "text-red").text("⊥");
             } else {
                 output.append("span").text("Conclusion:");
                 output.append("br");
                 output.append("span").attr("class", "tab");
-                const constraint = output.append("span").attr("id", "eq-" + op.conclusion.id);
+                const cid = `eq-${op.conclusion.id}`;
+                const constraint = output.append("span")
+                    .attr("id", cid)
+                    .attr("class", "text-eq conclusion")
+                    .on('mouseover', ()=> dispatchHighlightCustomEvent(cid))
+                    .on('mouseout', () => dispatchUndoHighlightCustomEvent(cid));
                 printTerms(op.conclusion.constraint.lhs, constraint);
                 constraint.append("span").attr("class", "text-black").text(" " + types[op.conclusion.constraint.type] + " ");
                 printTerms(op.conclusion.constraint.rhs, constraint);
@@ -136,7 +170,12 @@ export class DifferenceCD {
                     neg.append("span").text("Negated:");
 
                     op.conclusion.negs.forEach((c, i) => {
-                        const cons = neg.append("span").attr("id", "eq-" + op.conclusion.id + "-n" + i);
+                        const nid = `eq-${op.conclusion.id}-n${i}`;
+                        const cons = neg.append("span")
+                            .attr("id", nid)
+                            .attr("class", "text-eq conclusion")
+                            .on('mouseover', () => dispatchHighlightCustomEvent(nid))
+                            .on('mouseout', () => dispatchUndoHighlightCustomEvent(nid));
                         cons.append("br");
                         cons.append("span").attr("class", "tab");
                         printTerms(c.lhs, cons);
@@ -162,8 +201,15 @@ export class DifferenceCD {
             const x0 = "(0)";
 
             const constraints = [
-                ...op.premises.map(p => p.constraint),
-                ...op.conclusion.negs.map(n => { n.negated = true; return n; })
+                ...op.premises.map(p => { 
+                    p.constraint.eid = `eq-${p.id}`; 
+                    return p.constraint; 
+                }),
+                ...op.conclusion.negs.map((n,i) => { 
+                    n.negated = true; 
+                    n.eid = `eq-${op.conclusion.id}-n${i}`
+                    return n; 
+                })
             ].filter(p => !p.bottom);
             let i = 1;
 
@@ -197,14 +243,14 @@ export class DifferenceCD {
                     nodes[y] = nodes[y] || `n-${i++}`;
                     edges.push({
                         data: {
-                            id: `e-${i++}`,
+                            id: `e-${i++}`, eid: p.eid,
                             source: nodes[x], target: nodes[y],
                             label: c, weight: c, negated
                         } // x-y<=c : (y,x),c 
                     });
                     edges.push({
                         data: {
-                            id: `e-${i++}`,
+                            id: `e-${i++}`, eid: p.eid,
                             source: nodes[y], target: nodes[x],
                             label: -c, weight: -c, negated
                         } // y-x<=-c : (x,y),-c 
@@ -223,7 +269,7 @@ export class DifferenceCD {
 
                     edges.push({
                         data: {
-                            id: `e-${i++}`,
+                            id: `e-${i++}`, eid: p.eid,
                             source: nodes[x0], target: nodes[x],
                             label: c, weight: c, negated
                         } // x-y<=c : (y,x) c 
@@ -232,7 +278,7 @@ export class DifferenceCD {
                     if (p.type === "equal") {
                         edges.push({
                             data: {
-                                id: `e-${i++}`,
+                                id: `e-${i++}`, eid: p.eid,
                                 source: nodes[x], target: nodes[x0],
                                 label: -c, weight: -c, negated
                             } // include opposite edge: (x,y)-c
@@ -249,7 +295,7 @@ export class DifferenceCD {
 
                     edges.push({
                         data: {
-                            id: `e-${i++}`,
+                            id: `e-${i++}`, eid: p.eid,
                             source: nodes[x], target: nodes[x0],
                             label: -c, weight: -c, negated
                         } // y−x < −c  ... (x, y) -c 
@@ -264,7 +310,7 @@ export class DifferenceCD {
                         nodes[x0] = nodes[x0] || `n-${i++}`;
 
                         const edge = {
-                            id: `e-${i++}`,
+                            id: `e-${i++}`, eid: p.eid,
                             label: `${c}${_epsilon}`,
                             weight: c - (_epsilon !== "" ? epsilon_value : 0),
                             negated
@@ -290,7 +336,7 @@ export class DifferenceCD {
 
                         edges.push({
                             data: {
-                                id: `e-${i++}`, negated,
+                                id: `e-${i++}`, eid: p.eid, negated,
                                 source: nodes[y], target: nodes[x],
                                 label: `${c}${_epsilon}`,
                                 weight: c - (_epsilon !== "" ? epsilon_value : 0),
@@ -409,6 +455,14 @@ export class DifferenceCD {
         const showObvious = this.showObvious;
         const types = this.types;
 
+        const dispatchHighlightCustomEvent = _.throttle((eid, target) => {
+            document.dispatchEvent(new CustomEvent("ineq-graph-hl", { detail: { eid, cy, target }, }))
+        }, 50);
+
+        const dispatchUndoHighlightCustomEvent = _.throttle(eid => {
+            document.dispatchEvent(new CustomEvent("undo-ineq-graph-hl", { detail: { cy }, }))
+        }, 50);
+        
         function drawGraph(data) {
             displayRule(data);
             const graph = getDiffGrammarEqs(data, types);
@@ -425,14 +479,28 @@ export class DifferenceCD {
                 wheelSensitivity: 0.3,
                 elements: graph,
             });
-            cy.elements().filter(e => e.data().negated).addClass("negated");
+
+            cy.elements().filter(e => e.group() === "edges")
+                .on("tapdragover", e => {
+                    dispatchHighlightCustomEvent(e.target.data().eid, e.target)
+                })
+                .on("tapdragout", e => {
+                    dispatchUndoHighlightCustomEvent(e.target.data().eid);
+                })     
+                .filter(e => e.data().negated).addClass("negated");
+            
             cy.fit();
             return cy;
         }
 
         controls({ data, }, where, params)
 
-        const cy = drawGraph(data.ops[data.current]);
+        cy = drawGraph(data.ops[data.current]);
         animateNegativeCycle(cy);
+
+        document.removeEventListener('undo-ineq-graph-hl', undoGraphHighlight)
+        document.addEventListener('undo-ineq-graph-hl', undoGraphHighlight)
+        document.removeEventListener('ineq-graph-hl', ineqGraphHighlight)
+        document.addEventListener('ineq-graph-hl', ineqGraphHighlight)
     }
 }

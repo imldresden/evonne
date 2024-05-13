@@ -62,12 +62,16 @@ const stylesheet = [
       'line-style': 'dashed',
     },
   }, {
+    "selector": "edge.thick",
+    "style": {
+      'width': 1.5,
+    },
+  }, {
     "selector": "edge.highlighted",
     "style": {
       'color': colors.edgeWeightTextColor,
       'line-color': colors.edgeColor,
       'target-arrow-color': colors.edgeColor,
-      'width': .5,
     }
   }
 ];
