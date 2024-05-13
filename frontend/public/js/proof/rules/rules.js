@@ -179,12 +179,13 @@ class RulesHelper {
     }
 
     #getSubProof(node) {
-        const subproof = proof.tree.hierarchy.find(
-            p => p.data.source.subProof !== ""
-                && p.data.source.subProof === node.source.subProof
-        );
+        const subproof = proof.tree.hierarchy.find(p => {
+            const sp = p.data.source.subProof;
+            return sp && sp !== "" && sp === node.source.subProof;
+        });
 
         if (subproof) {
+            console.log(subproof)
             let steps;
             if (proof.showRules) {
                 steps = subproof.descendants()
@@ -215,7 +216,7 @@ class RulesHelper {
                 ops: steps,
             };
         } else {
-            console.error("no subproof identified");
+            console.warn("no subproof identified");
         }
     }
 
@@ -291,7 +292,7 @@ class RulesHelper {
             large: _params?.large || false,
             ruleName // source of explanation trigger
         };
-        
+
         this.#renderExplanation();
     }
 

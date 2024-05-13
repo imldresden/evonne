@@ -137,7 +137,8 @@ export class DifferenceCD {
                         .attr("id", cid)
                         .attr("class", "text-eq premise")
                         .on('mouseover', ()=> dispatchHighlightCustomEvent(cid))
-                        .on('mouseout', ()=> dispatchHighlightCustomEvent(cid));
+                        .on('mouseout', ()=> dispatchHighlightCustomEvent(cid))
+                        .on('click', ()=> animateNegativeCycle(cy, cid));
                     printTerms(pr.constraint.lhs, constraint);
                     constraint.append("span").attr("class", "text-black").text(" " + types[pr.constraint.type] + " ");
                     printTerms(pr.constraint.rhs, constraint);
@@ -157,9 +158,8 @@ export class DifferenceCD {
                 const cid = `eq-${op.conclusion.id}`;
                 const constraint = output.append("span")
                     .attr("id", cid)
-                    .attr("class", "text-eq conclusion")
-                    .on('mouseover', ()=> dispatchHighlightCustomEvent(cid))
-                    .on('mouseout', () => dispatchUndoHighlightCustomEvent(cid));
+                    .attr("class", "text-eq conclusion"); // no hover event because only negations appear in ineq graph
+
                 printTerms(op.conclusion.constraint.lhs, constraint);
                 constraint.append("span").attr("class", "text-black").text(" " + types[op.conclusion.constraint.type] + " ");
                 printTerms(op.conclusion.constraint.rhs, constraint);
@@ -175,13 +175,16 @@ export class DifferenceCD {
                             .attr("id", nid)
                             .attr("class", "text-eq conclusion")
                             .on('mouseover', () => dispatchHighlightCustomEvent(nid))
-                            .on('mouseout', () => dispatchUndoHighlightCustomEvent(nid));
+                            .on('mouseout', () => dispatchUndoHighlightCustomEvent(nid))
+                            .on('click', ()=> animateNegativeCycle(cy, nid));
                         cons.append("br");
                         cons.append("span").attr("class", "tab");
                         printTerms(c.lhs, cons);
                         cons.append("span").attr("class", "text-black").text(" " + types[c.type] + " ")
                         printTerms(c.rhs, cons);
                     });
+                } else {
+                    console.error("no conclusion negation found for non-⊥ conclusion")
                 }
             }
 
@@ -364,18 +367,16 @@ export class DifferenceCD {
             return { nodes: cynodes, edges };
         }
 
-        function animateNegativeCycle(cy) {
-            const edges = new Set();
-            const nodes = new Set();
-
+        function animateNegativeCycle(cy, sid) {
             clearTimeout(timeout);
             cy.elements().removeClass("highlighted");
             d3.select("#cycle-val").text("0");
 
             const l = cy.elements("node").length;
 
-            function sortCycleEdges(edges) {
-                let s = edges[0];
+            function sortCycleEdges(edges, sid) {
+                let s = sid ? edges.filter(n => n.data().eid === sid)[0] : edges[0];
+                
                 const r = [s];
                 while (edges.length !== r.length) {
                     const next = edges.filter(e => e.data().source === s.data().target)[0];
@@ -386,7 +387,10 @@ export class DifferenceCD {
             }
 
             if (l > 0) {
-                const start = cy.elements("node")[Math.floor(Math.random() * (l))] // starts at random node 
+                let start = cy.elements("node")[Math.floor(Math.random() * (l))]; // starts at random node 
+                if (sid) {
+                    start = cy.elements("edge").filter(n => n.data().eid === sid)[0].target();
+                }
 
                 let negs = 0;
                 const elementsWithJustOneNegated = cy.elements().filter(e => {
@@ -412,8 +416,7 @@ export class DifferenceCD {
 
                 if (bf.hasNegativeWeightCycle) {
                     const ncycle = sortCycleEdges(
-                        bf.negativeWeightCycles[0]
-                            .filter(el => el.group() === "edges")
+                        bf.negativeWeightCycles[0].filter(el => el.group() === "edges"), sid
                     );
 
                     let i = 0, ep = 0, cycleValue = 0, current;
