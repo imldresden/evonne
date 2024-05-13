@@ -34,6 +34,7 @@ function readRepairs({ axiom, file, cy } = {}) {
   const repairs = [];
 
   d3.dsv(";", file).then((txt) => {
+    console.log(txt)
     Object.keys(txt).forEach((key) => {
       if (key !== "columns") {
         repair = [];
@@ -216,7 +217,7 @@ function showRepairs(repairs, cy) {
 
 //Highlight affected modules by the selected repair
 function highlightOntology(data, cy) {
-  restoreColor(true, cy);
+  restoreColor(false, cy);
   cy.diagnoses = new Set();
 
   data.forEach((repairAxiom) => {
@@ -244,7 +245,6 @@ function restoreColor(resetButtons = false, cy) {
   cy.nodes().removeClass("justification").removeClass("diagnoses");
   cy.diagnoses = undefined;
   cy.justification = undefined;
-  
 }
 
 //Highlight all affected modules
@@ -264,7 +264,7 @@ function highlightPredecessors(id, cy) {
 //Highlight axioms and nodes of the justification
 function highlightNodesOf(data, cy) {
   
-  restoreColor(true, cy)
+  restoreColor(false, cy)
   cy.justification = new Set();
 
   data.forEach((axiom) => {

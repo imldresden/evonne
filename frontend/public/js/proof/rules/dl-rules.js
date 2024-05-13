@@ -34,8 +34,9 @@ export class DLRules {
         "Top Superclass" : (_, c) => this.topSuperClass(c),  
     }
 
-    draw({ ruleName, div, premises, conclusion }) {
+    draw({ div, premises, conclusion, params }) {
         this.displayObject = div;
+        const ruleName = params.ruleName;
         
         if (this.rules[ruleName]) {
             utils.addTitle(ruleName);
@@ -330,7 +331,6 @@ export class DLRules {
     existentialPropertyExpansion(premise, conclusion) {
         let lHS = premise[0].split(subsumes)[0].trim();
         let rHS = premise[0].split(subsumes)[1].trim();
-
         let filler = conclusion.substring(conclusion.lastIndexOf(".") + 1);
 
         //Add rule definition

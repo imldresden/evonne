@@ -19,6 +19,7 @@ const conf = {
   shortenAll: false,
   allowOverlap: false,
   showRules: true,
+  showSubProofs: false,
   isMagic: false,
   isRuleShort: false,
   isLinear: false,
@@ -82,6 +83,7 @@ function init_proof({
     proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
     proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
     proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
+    proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
 
     globals.shorteningMethod = external.shorteningMethod || globals.shorteningMethod;
     proof.shortenAll = external.shortenAll === undefined ? proof.shortenAll : external.shortenAll; 

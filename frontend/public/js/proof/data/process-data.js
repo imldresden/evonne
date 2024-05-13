@@ -1,28 +1,35 @@
 import { proof } from "../proof.js";
 
-function getConstraint(id, data) {
-    const node = data.getElementById(id);
-    const q = node.querySelectorAll("equation, inequation"); 
 
-    if (q.length > 1) {
-        console.error("multiple constraints in a single entry")
-    }
+function getNegs(id, data) {
+    const nid = `~${id}`;
+    if (!data.getElementById(nid)) {
+        const n1id = nid+"-1";
+        const n2id = nid+"-2";
 
-    const c = node.querySelectorAll("equation, inequation")[0]
-    if (!c) {
-        if (node.querySelector("key").innerHTML === "⊥") {
-            return { id, "bottom" : "⊥" }
+        if (data.getElementById(n1id) && data.getElementById(n2id)) {
+            return [n1id, n2id];
         } else {
-            console.error("faulty constraintID")
-            return;
+            return [];
         }
+    }
+    return [nid];
+}
+
+function getConstraint(id, data) {
+
+    const q = data.getElementById(id); 
+    const type = q.nodeName; // equation, inequation or bottom
+
+    if (type === "contradiction") {
+        return { id, "bottom" : "⊥" };
     }
 
     function extractTerm(term) {
         const coe = term.getAttribute("coe");
 
         if (coe === null) { // constant
-            const con = term.getAttribute("con");
+            let con = term.getAttribute("con");
             if (con === null) {
                 console.error("malformed term");
             }
@@ -38,39 +45,42 @@ function getConstraint(id, data) {
         }
     }
 
-    const type = c.nodeName; // equation or inequation
     const constraint = {};
-
+    const ass = q.getAttribute("asserted");
+    constraint._asserted = ass === "true";
+    
     if (type === "inequation") {
         constraint.lhs = {};
         constraint.rhs = {};
 
         let constants = 0;
-        const terms = c.querySelectorAll("lhs > term, rhs > term");
-        terms.forEach((t) => {
+        const terms = q.querySelectorAll("lhs > term, rhs > term");
+        terms.forEach(t => {
             const term = extractTerm(t);
-
             if (term.type === "constant") {
                 constraint[t.parentNode.nodeName].constant = term.value;
                 constants++;
             } else {
                 constraint[t.parentNode.nodeName][term.name] = term.coe;
             }
-            constraint.type = c.getAttribute("type");
+            constraint.type = q.getAttribute("type");
         });
         if (constants > 1) {
-            console.error("more than 1 constant")
+            console.error("more than 1 constant");
         }
 
-    } else { // equations only have variables on lhs and a constant on rhs
-        const lhs = c.querySelectorAll("lhs > term");
+    } else if (type === "equation")  { // equations only have variables on lhs and a constant on rhs
+        const lhs = q.querySelectorAll("lhs > term");
         lhs.forEach((t) => {
             const term = extractTerm(t);
             constraint[term.name] = term.coe;
         });
 
-        const rhs = c.querySelector("rhs > term").getAttribute("con");
+        const rhs = q.querySelector("rhs > term").getAttribute("con");
         constraint._rhs = rhs;
+    } else {
+        console.error("faulty constraintID");
+        return;
     }
 
     return constraint;
@@ -89,17 +99,15 @@ function buildCDRule({ d, data }) {
             id, 
             t: m.getAttribute("type"),
             coe: m.getAttribute("coe"),
-            constraint: getConstraint(id, data)
+            constraint: getConstraint(id, data),
+            negs: getNegs(id, data).map(n => getConstraint(n, data))
         }
     });
 
     op.premises = ms.filter(m => m.t === "premise");
     op.conclusion = ms.filter(m => m.t === "conclusion")[0]
-
-    // TODO: distinguish between linear and diff in a better way
-    const type = op.premises[0].coe === null ? "diff" : "linear";
     
-    return { op, type };
+    return { op };
 }
 
 function getNodes(data, edgeData) {
@@ -107,11 +115,14 @@ function getNodes(data, edgeData) {
     return [].map.call(data.querySelectorAll("node"), (d) => {
 
         const node = { id: d.id };
-        const dataNodes = d.childNodes;//querySelectorAll("data");
+        const dataNodes = d.childNodes; // querySelectorAll(`[*|id='${d.id}']>data`);
 
-        
+        const sp = d.getAttribute && d.getAttribute("subProofID");
+        node.subProof = sp;
+
         dataNodes.forEach((item) => {
-            const key = item.getAttribute("key");            
+            
+            const key = item.getAttribute && item.getAttribute("key");
             const children = item.childNodes;
 
             if (key) {
@@ -120,7 +131,7 @@ function getNodes(data, edgeData) {
                 } else {
                     node[key] = {};
                     children.forEach(c => {
-                        const ckey = c.getAttribute("key");
+                        const ckey = c.getAttribute && c.getAttribute("key");
                         if (ckey) {
                             node[key][ckey] = c.textContent;
                         }
@@ -130,7 +141,7 @@ function getNodes(data, edgeData) {
         });
 
         if (node.type === "CDRule") {
-            node.data = [buildCDRule({ d, data })];
+            node.data = buildCDRule({ d, data });
         }
 
         const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);

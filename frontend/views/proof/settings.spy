@@ -45,6 +45,16 @@
       </div>
     </div>
 
+    <div class="modal-option" id="show-rules-div-wrapper">
+      <label class="label-toggle">Show Sub-Proofs</label>
+      <div class="switch">
+        <label>
+          <input id="toggleSubproofsDisplay" type="checkbox">
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+
     <div id="proof-overlap-allowing-settings">
       <!-- Proof width range-->
       <div class="input-wrapper input-range-wrapper modal-option modal-option-range">

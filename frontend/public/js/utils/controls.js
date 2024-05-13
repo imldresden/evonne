@@ -217,7 +217,12 @@ function resizable(resizer) {
     if (e.altKey) { // option for mac, must be disabled on windows
       e.preventDefault();
     }
+
+    if (e.key === "Escape" || e.key === "Esc") {
+      document.dispatchEvent(new CustomEvent("destroy_explanation", {}));
+    }
   }
+
   document.onkeyup = function(e) {
     startRedrawCSS();
     const which = e.which || e.buttons;

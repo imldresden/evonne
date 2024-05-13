@@ -1,15 +1,5 @@
 @import '../colors.css';
 
-.pcp-container {
-  display: block;
-  background-color: var(--pcp-bg);
-}
-
-.pcp-container text {
-  font-family: 'Source Sans Pro', sans-serif;
-  font-size: 12px;
-}
-
 .background,
 .background path {
   fill: none;
@@ -58,17 +48,6 @@ path.highlighted-path {
   fill: var(--pcp-text-fill);
   /*text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;*/
   cursor: move;
-}
-
-.pcp-container canvas,
-.pcp-container svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.pcp-container {
-  position: absolute;
 }
 
 line {

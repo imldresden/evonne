@@ -20,6 +20,7 @@ const tooltipPositionSelection = document.getElementById("toolTipPosition");
 //Toggle buttons
 const allowOverlapBtn = document.getElementById("toggleAllowOverlap");
 const showRulesBtn = document.getElementById("toggleRulesDisplay");
+const showSubProofsBtn = document.getElementById("toggleSubproofsDisplay");
 const magicToggleBtn = document.getElementById("toggleMagicMode");
 const layoutToggleBtn = document.getElementById("toggleLayoutMode");
 const shortenRules = document.getElementById("toggleRuleNamesShortening");
@@ -43,6 +44,12 @@ const controls = [
         name: "showRulesBtn",
         el: showRulesBtn,
         fn: showRulesBtnFunction,
+        type: 'click'
+    },
+    {
+        name: "showSubProofsBtn",
+        el: showSubProofsBtn,
+        fn: showSubProofsBtnFunction,
         type: 'click'
     },
     {
@@ -181,6 +188,11 @@ function allowOverlapBtnFunction() {
 
 function showRulesBtnFunction() {
     proof.showRules = showRulesBtn.checked;
+    proof.update(true);
+}
+
+function showSubProofsBtnFunction() {
+    proof.showSubProofs = showSubProofsBtn.checked;
     proof.update(true);
 }
 

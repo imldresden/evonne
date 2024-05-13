@@ -406,12 +406,8 @@ export class AxiomsHelper {
 			b.classList.remove("active");
 			b.parentElement.dispatchEvent(new MouseEvent("mouseleave"));
 		});
-		const active = button.classList.toggle("active");
-		if (active) {
-			this.highlightJustificationInOntology(d);
-		} else {
-			restoreColor();
-		}
+		button.classList.add("active");
+		this.highlightJustificationInOntology(d);
 	}
 
 	getAllPreviousAxioms(treeRoot, axioms, fn) {
@@ -471,6 +467,9 @@ export class AxiomsHelper {
 			})
 	}
 
+	help_icon = "help_outline";
+	close_help_icon = "highlight_off";
+
 	addHighlightCurrentInference() {
 		if (proof.showRules) {
 			return; 
@@ -480,7 +479,7 @@ export class AxiomsHelper {
 
 		let group = this.axioms
 			.append("g").attr("id", "H1")
-			.attr("class", "axiomButton btn-round")
+			.attr("class", "axiomButton btn-round btn-help")
 			.attr("transform", d => `translate(${-d.width / 2}, ${BOX_HEIGHT})`)
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")
@@ -492,50 +491,20 @@ export class AxiomsHelper {
 			.attr("x", 0)
 			.attr("y", 0)
 			.style("font-size", "1.2em")
-			.text("\ue1b7");
+			.text(this.help_icon);
 		group.append("title")
 			.text("Highlight inference")
 	}
 
-	highlightCurrentInference(event, nodeData) {
+	highlightCurrentInference(event, node) {
 		
-		let btn = d3.select("#N" + nodeData.data.source.id).select("#H1 text");
+		let btn = d3.select("#N" + node.data.source.id).select("#H1 text");
 		let state = btn.text();
-        
-		if (state === "\ue1b7") {
-			proof.rules.destroyExplanation();
-			btn.text("\ue1b6");
-			let conclusion = nodeData.data.source.element;
-			let premises = [];
-			let iDsToHighlight = [nodeData.data.source.id];
-
-			if (nodeData.children) {
-				nodeData.children.forEach(child => { 
-					premises.push(child.data.source.element);
-					iDsToHighlight.push(child.data.source.id);
-				});
-			}
-			proof.nodeVisuals.changeOpacities(iDsToHighlight);
-
-			// this is only useful if the button doesn't appear with rule nodes
-			if (!proof.showRules || !nodeData.data.rule && nodeData.data.source.rule) {
-				nodeData.data.rule = nodeData.data.source.rule
-			}
-
-			proof.rules.showExplanation(event, {
-				premises,
-				conclusion,
-				data: {
-					source: {
-						id: nodeData.data.id,
-						element: nodeData.data.rule.element,
-						type: nodeData.data.rule.type,
-						data: nodeData.data.rule.data
-					}
-				}
-			});
+    
+		if (state === this.help_icon) {
+			proof.rules.openExplanation({ event }, [node]);
+			btn.text(this.close_help_icon);
 		} else {
-			btn.text("\ue1b7");
 			proof.rules.destroyExplanation();
 		}
 	}

@@ -2,7 +2,7 @@ import { globals } from "../shared-data.js";
 import { upload } from '../utils/upload-file.js';
 import { progress } from '../main/main.js';
 import { BasicShorteningFunctions } from "../shortening/basic.js";
-import { colors, stylesheet } from "../../style/cy-style.js";
+import { colors, stylesheet } from "../../style/cy-ontology-style.js";
 import { params } from "../layouts/cola.js";
 import { showRepairsTab } from "../utils/controls.js";
 
@@ -59,14 +59,13 @@ async function createContent(data) {
   container.innerHTML = "";
 
   const elements = processData(data);
+
   cy = cytoscape({
     container,
     style: stylesheet,
     layout: params,
     wheelSensitivity: 0.3
   });
-
-
 
   const handleLayoutEvent = function (enabled) {
     return function () {
@@ -75,6 +74,7 @@ async function createContent(data) {
       cy.autoungrabify(!enabled);
     };
   };
+
   cy.on('layoutstart', handleLayoutEvent(false));
   setTimeout(function () {
     cy.on('layoutstop', handleLayoutEvent(true));
@@ -85,7 +85,6 @@ async function createContent(data) {
     const newPosition = event.target.position();
     // Store the last dragged position of the node
     lastDraggedPositions[nodeId] = newPosition;
-    // console.log(lastDraggedPositions);
   });
 
   cy.on('tap', 'node', function (event) {
@@ -96,6 +95,7 @@ async function createContent(data) {
       enable_eye(data, node);
     }
   });
+  
   cy.params = structuredClone(params);
   cy.stylesheet = stylesheet;
   cy.add(elements);
@@ -174,7 +174,6 @@ function enable_eye(data, node) {
 
 function getNodeText(data) {
   const tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
-  console.log(tmpText)
   const text = data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
   return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
 }
@@ -494,7 +493,7 @@ function init_ontology({
   };
 
   socket.on('highlight axioms', (data) => {
-    restoreColor(true, cy);
+    restoreColor(false, cy);
     if (data && data.id === getSessionId()) {
       highlightNodesOf(data.pre, cy);
     }

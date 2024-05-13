@@ -23,35 +23,30 @@ export class TreeNavigation {
     init(processedData) {
         let nodeData = processedData.nodes;
         let edgeData = processedData.edges;
-      
+
         // add a custom link from the root node, needed for the stratify function
         edgeData.push({
-          id: "L-1",
-          source: nodeData.filter((x) => x.isRoot)[0],
-          target: "",
+            id: "L-1",
+            source: nodeData.filter((x) => x.isRoot)[0],
+            target: "",
         });
 
         //Store original data
         this.edgeData = edgeData;
-      
+
         this.restart();
         this.update();
     }
 
     restart() { // this.edgeData must have been set 
         proof.svgRootLayer.selectAll("*").remove();
-        this.hierarchy = this.createHierarchy(this.edgeData); 
 
-        if (proof.isMagic) {
+        if (proof.isMagic) { // rules always shown in magic
             this.hierarchy = this.createHierarchy(
                 proof.magic.getInitialMagicalHierarchy(this.edgeData)
             );
-        } else { // rules always shown in magic
-            if (!proof.showRules) {
-                this.hierarchy = this.createHierarchy(
-                    this.flattenRules(this.edgeData)
-                );
-            } 
+        } else {
+            this.hierarchy = this.createHierarchy(this.processRules());
         }
 
         this.links = proof.svgRootLayer
@@ -67,26 +62,30 @@ export class TreeNavigation {
         this.labels = proof.svg.selectAll("#nodes");
     }
 
-    flattenRules() {
+    processRules() {
         const data = structuredClone(this.edgeData);
-        const rules = {}, rts = {}, targets = []; 
+        const rules = {}, rts = {}, targets = [];
         data.forEach(e => {
             if (ruleUtils.isRule(e.source.type)) {
                 rules[e.source.id] = e;
                 rts[e.target.id] = e;
             } else {
-                targets.push(e)
+                targets.push(e);
             }
-        })
-        targets.forEach(t => {
-            t.source.rule = rts[t.source.id].source;
-            
-            if (t.target !== "" && rules[t.target.id]) {
-                t.target = rules[t.target.id].target; // replaces rule with rule target
-            }
-        })
-        
-        return targets;
+        });
+
+        if (!proof.showRules) {
+            targets.forEach(t => {
+                t.source.rule = rts[t.source.id].source; // copies the rule into the nodes that are made from it
+                t.source.subProof = t.source.rule.subProof;
+                if (t.target !== "" && rules[t.target.id]) {
+                    t.target = rules[t.target.id].target; // replaces rule with rule target
+                }
+            });
+            return targets;
+        }
+
+        return data;
     }
 
     update(reset = false) {
@@ -115,19 +114,19 @@ export class TreeNavigation {
     createHierarchy(data) {
         function updateHierarchyVars(someHierarchy, currentHierarchy) {
             if (!currentHierarchy) {
-                currentHierarchy = someHierarchy; 
+                currentHierarchy = someHierarchy;
             }
-            
+
             let common = [];
             let commonElement;
-            
+
             someHierarchy.descendants().forEach(x => {
                 commonElement = currentHierarchy.descendants().find(y => y.data.id === x.data.id);
                 if (commonElement) {
                     common.push(commonElement);
                 }
             });
-    
+
             if (proof.isMagic && someHierarchy !== currentHierarchy) {
                 someHierarchy.descendants().forEach((d, i) => {
                     let originalSource = common.find(x => x.data.target.id === d.data.source.id);
@@ -182,7 +181,7 @@ export class TreeNavigation {
                 x.children = null;
             }
         });
-        
+
         //update the graph
         this.hierarchy = newHierarchy;
         proof.nodeVisuals.initVarsAxiomFunctions();
@@ -252,12 +251,12 @@ export class TreeNavigation {
             });
 
         const root = this.root;
-        
+
         function getInteractionSource() {
             let returnable = { id: root.data.source.id, x: root.x, y: root.y };
             if (proof.nodeInteracted) {
                 if (proof.nodeInteracted.search) { // magic nodes
-                    const selection = d3.select("#N"+proof.nodeInteracted.id)
+                    const selection = d3.select("#N" + proof.nodeInteracted.id)
                     const node = selection.data()[0];
                     if (node) {
                         returnable = { id: proof.nodeInteracted.id, x: node.x, y: node.y }
@@ -265,8 +264,8 @@ export class TreeNavigation {
                 } else {
                     returnable = { id: proof.nodeInteracted.data.source.id, x: proof.nodeInteracted.x, y: proof.nodeInteracted.y };
                 }
-            } 
-            d3.select("#N"+returnable.id).raise();
+            }
+            d3.select("#N" + returnable.id).raise();
             return returnable;
         }
 
@@ -309,22 +308,22 @@ export class TreeNavigation {
                 .data(this.root.links(), d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
                 .join(
                     enter => this.lineAttributes(enter.append("line"))
-                            // init on the source node 
-                            .attr("x1", _ => sn.x)
-                            .attr("y1", _ => proof.height - sn.y)
-                            .attr("x2", _ => sn.x)
-                            .attr("y2", _ => proof.height - sn.y)
-                            // move to destinations (expand, pull)
-                            .transition(t)
-                            .attr("x1", d => d.target.x)
-                            .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
-                            .attr("x2", d => d.source.x)
-                            .attr("y2", d => proof.height - d.source.y),
+                        // init on the source node 
+                        .attr("x1", _ => sn.x)
+                        .attr("y1", _ => proof.height - sn.y)
+                        .attr("x2", _ => sn.x)
+                        .attr("y2", _ => proof.height - sn.y)
+                        // move to destinations (expand, pull)
+                        .transition(t)
+                        .attr("x1", d => d.target.x)
+                        .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                        .attr("x2", d => d.source.x)
+                        .attr("y2", d => proof.height - d.source.y),
                     update => update.transition(t)
-                            .attr("x1", d => d.target.x)
-                            .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
-                            .attr("x2", d => d.source.x)
-                            .attr("y2", d => proof.height - d.source.y),
+                        .attr("x1", d => d.target.x)
+                        .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                        .attr("x2", d => d.source.x)
+                        .attr("y2", d => proof.height - d.source.y),
                     exit => {
                         // return nodes to the source of the interaction (collapse, push)
                         exit.transition(t)
@@ -335,7 +334,7 @@ export class TreeNavigation {
                             .style("opacity", 0)
                         exit.remove()
                     }
-                );    
+                );
         } else {
             proof.linear.drawLinks(t, sn);
         }
@@ -344,7 +343,7 @@ export class TreeNavigation {
             if (link.source.element === "Asserted Conclusion") {
                 d3.select("#N" + link.target.id).attr("class", "node axiom asserted");
             }
-            
+
             if (link.source.element === "Known") {
                 d3.select("#N" + link.source.id).attr("class", "node rule krule");
             }
