@@ -36,7 +36,8 @@ uploadOntologyTriggers.forEach(trigger => {
   document.getElementById("reasoner-choice-upload").style.display = "block";
   trigger.addEventListener("click", () => {
     adaptUploadFileModal('n ontology for a new project');
-    fileUploadInput.accept = '.xml, .owl';
+    //We now allow the user to upload any file format. We internally convert to OWL XML format
+    fileUploadInput.accept = '';//'.xml, .owl';
     fileUploadInput.addEventListener("change", loadOntology);
   });
 });

@@ -239,8 +239,21 @@ app.post('/upload', (req, res) => {
       return res.status(500).send(err);
     }
 
+    // res.send('File uploaded!');
+  });
+
+  //Try to translate the ontology file to OWL XML format.
+  const owlFileName = convertOntology(file, uploadsDir)
+
+  file.mv(owlFileName, function (err) {
+    if (err) {
+      return res.status(500).send(err);
+    }
+
     res.send('File uploaded!');
   });
+
+  //TODO delete the original ontology file after we convert the ontology
 });
 
 app.get('/create', (req, res) => {
@@ -438,7 +451,7 @@ io_.on('connection', function (socket) {
       ]);
       printOutput(repairs);
       repairs.on("exit", ()=> {
-        io_.sockets.emit('read repairs', { id, axiom: data.axiom, msg: "mDs.txt is now available!" });
+        io_.sockets.emit('read repairs', { id, axiom: data.readableAxiom, msg: "mDs.txt is now available!" });
         //removeFile(path.join(projectPath, "pi.txt"));
         delete sessions[id];
       });
@@ -587,6 +600,24 @@ function getProofType(genMethod, sigPath) {
       proofType = 'MinWTreeSize';
   }
   return proofType;
+}
+
+function convertOntology(ontFile, ontDir) {
+  console.log("CONVERTING TO OWL XML FORMAT");
+  const owlFileName = ontFile.name +".owl";
+
+  const exitCode = spawn('java',  [
+    '-jar', 'externalTools/explain.jar',
+    '-o', ontFile.name,
+    '-od', ontDir,
+    '-on', owlFileName,
+  ], { encoding: 'utf-8' });
+
+  if(exitCode === 5)
+      //TODO code 5 means that the translation failed (that is the uploaded ontology file uses unknown or nonstandard format)
+    console.log("Could not convert the ontology file into OWL XML format!");
+  else
+    return path.join(ontDir, owlFileName);
 }
 
 function generateProofs(ontPath,axiom, projPath,sigPath,genMethod,translate2NL) {
