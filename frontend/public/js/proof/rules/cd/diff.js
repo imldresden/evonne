@@ -387,11 +387,8 @@ export class DifferenceCD {
             }
 
             if (l > 0) {
-                let start = cy.elements("node")[Math.floor(Math.random() * (l))]; // starts at random node 
-                if (sid) {
-                    start = cy.elements("edge").filter(n => n.data().eid === sid)[0].target();
-                }
-
+                const start = cy.elements("node")[Math.floor(Math.random() * (l))]; // starts at random node 
+                
                 let negs = 0;
                 const elementsWithJustOneNegated = cy.elements().filter(e => {
                     if (e.data().negated) {

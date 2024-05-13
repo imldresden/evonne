@@ -185,7 +185,6 @@ class RulesHelper {
         });
 
         if (subproof) {
-            console.log(subproof)
             let steps;
             if (proof.showRules) {
                 steps = subproof.descendants()
