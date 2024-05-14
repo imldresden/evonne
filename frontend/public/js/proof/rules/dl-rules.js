@@ -94,7 +94,7 @@ export class DLRules {
 
             //Add the premise
             if(i>0)
-                this.displayObject.append("span").attr("class", "tab" );
+                this.displayObject.append("span").attr("class", "tab");
 
             this.displayObject
                 .append("span").attr("class", "text-toolTip")
@@ -109,7 +109,7 @@ export class DLRules {
         }
 
         //For alignment
-        this.displayObject.append("span").attr("class", "tab" );
+        this.displayObject.append("span").attr("class", "tab");
 
         //Add the line
         utils.addMidRule(midLengths);
@@ -163,7 +163,7 @@ export class DLRules {
         utils.addMidRule(midLengths);
 
         this.displayObject
-            .append("span").attr("class", "text-black").text(names[0] + subsumesDisplay + names[premiseLengths-1]);
+            .append("span").attr("class", "text-black").text(names[0] + subsumesDisplay + names[names.length-1]);
     }
 
     assertedConclusion(conclusion) {
@@ -569,10 +569,10 @@ export class DLRules {
 
         //Add the current instantiation of the rule
         //Add the premise
-        let x = this.displayObject.append("span")//.attr("class", "tab");
+        let x = this.displayObject.append("span");
 
         //For alignment
-        x.append("span").attr("class", "tab" )
+        x.append("span").attr("class", "tab")
 
         x.append("span").attr("class", "text-black").text(disjoint + "(");
         for (let i = 0; i < premiseRoleNames.length; i++) {
@@ -585,7 +585,7 @@ export class DLRules {
         }
         x.append("span").attr("class", "text-black").text(")")
         //For alignment
-        .append("span").attr("class", "tab" );
+        .append("span").attr("class", "tab");
 
 
         //Add the line
