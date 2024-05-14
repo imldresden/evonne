@@ -47,14 +47,6 @@ export class DLRules {
     }
 
     classHierarchy(premise, conclusion) {
-        function getColors(premiseSize) {
-            let colors = [];
-            for(let i = 0; i < premiseSize; i+=80){
-                colors.push(utils.getColor(i));
-            }
-            return colors;
-        }
-
         let conLHS, conRHS, premiseAxioms, colors;
 
         conLHS = conclusion.split(subsumes)[0].trim();
@@ -81,12 +73,8 @@ export class DLRules {
         }
 
         premiseAxioms = orderAxioms(premise, conLHS);
-        console.log("ordered axioms")
-        console.log(premiseAxioms)
 
-        colors = getColors(premiseAxioms.length - 1);
-        console.log("colors")
-        console.log(colors)
+        colors = utils.getColors(premiseAxioms.length - 1);
 
         //Add rule definition
         this.addClassHierarchyAbstract(premiseAxioms.length, colors);
@@ -119,35 +107,41 @@ export class DLRules {
     }
 
     addClassHierarchyAbstract(premiseLengths, colors) {
-        let l1,r1;
-        for(let i = 0; i < premiseAxioms.length; i++){
 
-            l1 = premiseAxioms[i].split(subsumes)[0].trim();
-            r1 = premiseAxioms[i].split(subsumes)[1].trim();
+        function getAbstractNames(limit) {
+            let names = [];
+            for(let i = 0; i <= limit; i++){
+                if(i === 0)
+                    names.push(c1);
+                else if( i === limit)
+                    names.push(c3);
+                else if (limit > 2)
+                    names.push(c2+i)
+                else
+                    names.push(c2)
+            }
+            return names;
+        }
+        let lhs,rhs;
+
+        let names = getAbstractNames(premiseLengths);
+        for(let i = 0; i < premiseLengths; i++){
+
+            lhs = names[i]
+            rhs = names[i+1]
 
             //Add the premise
             this.displayObject
                 .append("span").attr("class", "tab")
-                .append("span").style("color", l1 === conLHS?"#000000":colors[i-1]).text(l1)
+                .append("span").style("color", i === 0?"#000000":colors[i-1]).text(lhs)
                 .append("span").attr("class", "text-black").text(subsumesDisplay)
-                .append("span").style("color", r1 === conRHS?"#000000":colors[i]).text(r1);
+                .append("span").style("color", i === premiseLengths?"#000000":colors[i]).text(rhs);
         }
-
-        //TODO add an arg for total number of premise elements. If greater than 2, then use c2_1, c2_2 and so on
-        this.displayObject
-            .append("span").attr("class", "tab")
-            .append("span").attr("class", "text-black").text(c1 + subsumesDisplay)
-            .append("span").attr("class", "text-green").text(c2);
-
-        this.displayObject
-            .append("span")
-            .append("span").attr("class", "text-green").text(c2)
-            .append("span").attr("class", "text-black").text(subsumesDisplay + c3);
 
         utils.addMidRule(premiseLengths);
 
         this.displayObject
-            .append("span").attr("class", "text-black").text(c1 + subsumesDisplay + c3);
+            .append("span").attr("class", "text-black").text(names[0] + subsumesDisplay + names[premiseLengths-1]);
     }
 
     assertedConclusion(conclusion) {
