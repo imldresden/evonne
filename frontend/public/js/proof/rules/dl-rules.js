@@ -23,7 +23,7 @@ export class DLRules {
 
     rules = {
         "Asserted Conclusion" : (_, c) => this.assertedConclusion(c),
-        "Class Hierarchy" : (p, _) => this.classHierarchy(p), 
+        "Class Hierarchy" : (p, c) => this.classHierarchy(p,c),
         "Existential Property Expansion" : (p, c) => this.existentialPropertyExpansion(p, c),  
         "Intersection Composition" : (p, _) => this.intersectionComposition(p),  
         "Existential Filler Expansion" : (p, c) => this.existentialFillerExpansion(p, c),  
@@ -46,46 +46,94 @@ export class DLRules {
         }
     }
 
-    classHierarchy(premise) {
-        let leftAxiomLHS, commonPart, rightAxiomRHS;
-
-        if (premise[0].split(subsumes)[1].trim() === premise[1].split(subsumes)[0].trim()) {
-            leftAxiomLHS = premise[0].split(subsumes)[0];
-            commonPart = premise[0].split(subsumes)[1];
-            rightAxiomRHS = premise[1].split(subsumes)[1];
-        } else {
-            leftAxiomLHS = premise[1].split(subsumes)[0];
-            commonPart = premise[0].split(subsumes)[0];
-            rightAxiomRHS = premise[0].split(subsumes)[1];
+    classHierarchy(premise, conclusion) {
+        function getColors(premiseSize) {
+            let colors = [];
+            for(let i = 0; i < premiseSize; i+=80){
+                colors.push(utils.getColor(i));
+            }
+            return colors;
         }
 
-        //Add rule definition
-        this.addClassHierarchyAbstract();
+        let conLHS, conRHS, premiseAxioms, colors;
 
-        let premiseLengths = [premise[0].length, premise[1].length];
+        conLHS = conclusion.split(subsumes)[0].trim();
+        conRHS = conclusion.split(subsumes)[1].trim();
+
+        function orderAxioms(premise, conLHS) {
+            function findIn(lhs, premise, orderedAxioms, visited) {
+                for(let i = 0; i < premise.length; i++){
+                    if (premise[i].split(subsumes)[0].trim() === lhs){
+                        if(visited.includes(premise[i]))
+                            break;
+
+                        visited.push(premise[i]);
+                        orderedAxioms.push(premise[i]);
+
+                        findIn(premise[i].split(subsumes)[1].trim(), premise, orderedAxioms, visited);
+                    }
+                }
+            }
+
+            let orderedAxioms = [], visited = [];
+            findIn(conLHS, premise, orderedAxioms, visited);
+            return orderedAxioms;
+        }
+
+        premiseAxioms = orderAxioms(premise, conLHS);
+        console.log("ordered axioms")
+        console.log(premiseAxioms)
+
+        colors = getColors(premiseAxioms.length - 1);
+        console.log("colors")
+        console.log(colors)
+
+        //Add rule definition
+        this.addClassHierarchyAbstract(premiseAxioms.length, colors);
+
         utils.addSeparator();
 
         //Add the current instantiation of the rule
-        //Add the premise
-        this.displayObject
-            .append("span").attr("class", "tab")
-            .append("span").attr("class", "text-black").text(leftAxiomLHS + subsumesDisplay)
-            .append("span").attr("class", "text-green").text(commonPart);
+        let premiseLengths = []
+        let l1,r1;
+        for(let i = 0; i < premiseAxioms.length; i++){
+            premiseLengths.push(premiseAxioms.length);
 
-        this.displayObject
-            .append("span")
-            .append("span").attr("class", "text-green").text(commonPart)
-            .append("span").attr("class", "text-black").text(subsumesDisplay + rightAxiomRHS);
+            l1 = premiseAxioms[i].split(subsumes)[0].trim();
+            r1 = premiseAxioms[i].split(subsumes)[1].trim();
+
+            //Add the premise
+            this.displayObject
+                .append("span").attr("class", "tab")
+                .append("span").style("color", l1 === conLHS?"#000000":colors[i-1]).text(l1)
+                .append("span").attr("class", "text-black").text(subsumesDisplay)
+                .append("span").style("color", r1 === conRHS?"#000000":colors[i]).text(r1);
+        }
 
         //Add the line
         utils.addMidRule(premiseLengths);
 
         //Add the conclusion
         this.displayObject
-            .append("span").attr("class", "text-black").text(leftAxiomLHS + subsumesDisplay + rightAxiomRHS);
+            .append("span").attr("class", "text-black").text(conLHS + subsumesDisplay + conRHS);
     }
 
-    addClassHierarchyAbstract() {
+    addClassHierarchyAbstract(premiseLengths, colors) {
+        let l1,r1;
+        for(let i = 0; i < premiseAxioms.length; i++){
+
+            l1 = premiseAxioms[i].split(subsumes)[0].trim();
+            r1 = premiseAxioms[i].split(subsumes)[1].trim();
+
+            //Add the premise
+            this.displayObject
+                .append("span").attr("class", "tab")
+                .append("span").style("color", l1 === conLHS?"#000000":colors[i-1]).text(l1)
+                .append("span").attr("class", "text-black").text(subsumesDisplay)
+                .append("span").style("color", r1 === conRHS?"#000000":colors[i]).text(r1);
+        }
+
+        //TODO add an arg for total number of premise elements. If greater than 2, then use c2_1, c2_2 and so on
         this.displayObject
             .append("span").attr("class", "tab")
             .append("span").attr("class", "text-black").text(c1 + subsumesDisplay)
@@ -96,7 +144,7 @@ export class DLRules {
             .append("span").attr("class", "text-green").text(c2)
             .append("span").attr("class", "text-black").text(subsumesDisplay + c3);
 
-        utils.addMidRule([5, 5]);
+        utils.addMidRule(premiseLengths);
 
         this.displayObject
             .append("span").attr("class", "text-black").text(c1 + subsumesDisplay + c3);
