@@ -146,7 +146,7 @@ export class DLRules {
 
             //Add the premise
             if(i>0)
-                this.displayObject.append("span").attr("class", "tab" )
+                this.displayObject.append("span").attr("class", "tab")
 
             this.displayObject
                 .append("span").attr("class", "text-toolTip")
