@@ -9,7 +9,7 @@ const subsumes = "⊑", subsumesDisplay = " ⊑ ",
     dot = ".",
     equivalence = "≡", equivalenceDisplay = " ≡ ", 
     disjoint = "disjoint",
-    c1 = "Φ", 
+    c1 = "Φ",
     c2 = "Ψ", 
     c3 = "Ω", 
     r1 = "ρ", 
@@ -81,25 +81,38 @@ export class DLRules {
 
         utils.addSeparator();
 
+        //For alignment
+        this.displayObject.append("span").attr("class", "tab" )
+
         //Add the current instantiation of the rule
-        let premiseLengths = []
+        let midLengths = [];
         let l1,r1;
         for(let i = 0; i < premiseAxioms.length; i++){
-            premiseLengths.push(premiseAxioms.length);
 
             l1 = premiseAxioms[i].split(subsumes)[0].trim();
             r1 = premiseAxioms[i].split(subsumes)[1].trim();
 
             //Add the premise
+            if(i>0)
+                this.displayObject.append("span").attr("class", "tab" );
+
             this.displayObject
-                .append("span").attr("class", "tab")
-                .append("span").style("color", l1 === conLHS?"#000000":colors[i-1]).text(l1)
+                .append("span").attr("class", "text-toolTip")
+                    .style("color", l1 === conLHS?"#000000":colors[i-1]).text(l1)
+
                 .append("span").attr("class", "text-black").text(subsumesDisplay)
-                .append("span").style("color", r1 === conRHS?"#000000":colors[i]).text(r1);
+
+                .append("span").attr("class", "text-toolTip")
+                    .style("color", r1 === conRHS?"#000000":colors[i]).text(r1);
+
+            midLengths.push(l1.length+subsumesDisplay.length+r1.length);
         }
 
+        //For alignment
+        this.displayObject.append("span").attr("class", "tab" );
+
         //Add the line
-        utils.addMidRule(premiseLengths);
+        utils.addMidRule(midLengths);
 
         //Add the conclusion
         this.displayObject
@@ -125,20 +138,29 @@ export class DLRules {
         let lhs,rhs;
 
         let names = getAbstractNames(premiseLengths);
+        let midLengths = [];
         for(let i = 0; i < premiseLengths; i++){
 
             lhs = names[i]
             rhs = names[i+1]
 
             //Add the premise
+            if(i>0)
+                this.displayObject.append("span").attr("class", "tab" )
+
             this.displayObject
-                .append("span").attr("class", "tab")
-                .append("span").style("color", i === 0?"#000000":colors[i-1]).text(lhs)
+                .append("span").attr("class", "text-toolTip")
+                    .style("color", i === 0?"#000000":colors[i-1]).text(lhs)
+
                 .append("span").attr("class", "text-black").text(subsumesDisplay)
-                .append("span").style("color", i === premiseLengths?"#000000":colors[i]).text(rhs);
+
+                .append("span").attr("class", "text-toolTip")
+                    .style("color", i === premiseLengths?"#000000":colors[i]).text(rhs);
+
+            midLengths.push(lhs.length+subsumesDisplay.length+rhs.length)
         }
 
-        utils.addMidRule(premiseLengths);
+        utils.addMidRule(midLengths);
 
         this.displayObject
             .append("span").attr("class", "text-black").text(names[0] + subsumesDisplay + names[premiseLengths-1]);
@@ -549,6 +571,9 @@ export class DLRules {
         //Add the premise
         let x = this.displayObject.append("span")//.attr("class", "tab");
 
+        //For alignment
+        x.append("span").attr("class", "tab" )
+
         x.append("span").attr("class", "text-black").text(disjoint + "(");
         for (let i = 0; i < premiseRoleNames.length; i++) {
             let color = conclusionRoleNames.includes(premiseRoleNames[i]) ? "text-green" : "text-black";
@@ -558,7 +583,10 @@ export class DLRules {
                 x = x.append("span").attr("class", "text-black").text(", ");
             }
         }
-        x.append("span").attr("class", "text-black").text(")");
+        x.append("span").attr("class", "text-black").text(")")
+        //For alignment
+        .append("span").attr("class", "tab" );
+
 
         //Add the line
         utils.addMidRule(premiseLengths);
@@ -584,7 +612,7 @@ export class DLRules {
             .append("span").attr("class", "text-green ").text(r3)
             .append("span").attr("class", "text-black normal").text(`, ... , ${r4})`);
 
-        utils.addMidRule([9, 9]);
+        utils.addMidRule([33]);
 
         this.displayObject
             .append("span").attr("class", "text-black").text("(")

@@ -80,3 +80,8 @@ svg#proof-view {
 	font-weight: bold;
 	background-color: transparent !important;
 }
+
+.text-toolTip {
+	font-weight: normal;
+	background-color: transparent !important;
+}
