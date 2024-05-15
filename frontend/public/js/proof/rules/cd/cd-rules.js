@@ -26,10 +26,12 @@ function combineSteps(data, name) {
         return data;
     } else {
         const d = { id: "combined", premises: [], name: `Subproof: ${name}` };
+        const s = new Set();
         keys.forEach(id => {
             data.ops[id].premises.forEach(p => {
-                if (p.constraint._asserted) {
-                    d.premises.push(p)
+                if (!s.has(p.id) && p.constraint._asserted) {
+                    d.premises.push(p);
+                    s.add(p.id);
                 }
             });
         });
