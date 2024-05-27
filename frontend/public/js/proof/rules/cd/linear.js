@@ -3,15 +3,18 @@ import { utils } from "../rules.js";
 import { parallelCoords } from "../../../parallel-coords/parallel-coords-svg.js";
 
 export class LinearCD {
-    
+
     showObvious = false;
 
     draw(data, params, where) {
         function getVariables(data) {
-            const set = new Set(Object.values(data.ops).map(d => [
-                ...(d.premises.map(p => Object.keys(p.constraint))).flat(1),
-                ...Object.keys(d.conclusion.constraint)
-            ]).flat(1));
+            const set = new Set(Object.values(data.ops).map(d => {
+                const premises = (d.premises.map(p => Object.keys(p.constraint))).flat(1);
+                if (!d.conclusion.constraint.bottom) {
+                    return [...premises, ...Object.keys(d.conclusion.constraint)];
+                }
+                return [...premises];
+            }).flat(1));
 
             set.delete("_rhs");
             set.delete("_asserted");
@@ -26,10 +29,11 @@ export class LinearCD {
             });
 
             const polyline = { id, color, nuid: "" };
+            const sheader = new Set(header);
             Object.keys(eq)
                 .sort((a, b) => a.localeCompare(b))
                 .forEach(k => {
-                    if (k !== "_asserted") {
+                    if (sheader.has(k)) {
                         const value = eval(eq[k])
                         polyline[k] = {
                             value: value,
@@ -51,6 +55,12 @@ export class LinearCD {
 
             let length = 0;
             function printEquation(eq, where) {
+
+                if (eq.bottom) {
+                    where.append("span").attr("class", "tab");
+                    where.append("span").attr("id", `eq-${eq.bottom.id}`).attr("class", "text-red").text("⊥");
+                }
+
                 let first = true;
                 // use header instead of (Object.keys(eq) to ensure same order)
                 header.forEach(variable => {
@@ -148,26 +158,14 @@ export class LinearCD {
                 pcp_data[i].push(pr);
             });
 
-            const conclusion = getPolyline(op.conclusion.constraint, op.conclusion.id, colors[2]);
-
-            pcp_data[i].push(conclusion);
-            /* // To distinguish between the final conclusion of the subproof, 
-            // also change the color of `conclusion` to e.g., colors[1]
-            const keys = Object.keys(data.ops);
-            const finalC = getPolyline(
-                data.ops[keys.length - 1].conclusion.constraint,
-                data.ops[keys.length - 1].conclusion.id,
-                colors[2]
-            );
-
-            if (conclusion.nuid !== finalC.nuid) {
+            if (!op.conclusion.constraint.bottom) {
+                const conclusion = getPolyline(op.conclusion.constraint, op.conclusion.id, colors[2]);
                 pcp_data[i].push(conclusion);
             }
 
-            pcp_data[i].push(finalC);*/
-
-            if (pcp_data[i.length !== 3] || pcp_data[i.length !== 4]) {
-                console.error("linear inferences should only have 2 premises leading to 1 conclusion + optional final conclusion");
+            if (pcp_data[i].length !== 3) {
+                delete pcp_data[i];
+                console.error("linear inferences should only have 2 premises leading to 1 conclusion");
             }
         });
 
@@ -176,22 +174,28 @@ export class LinearCD {
                 if (pcp_data[i][0][k].hasOwnProperty("value")) {
                     pcp_data[i][0][k].dest = pcp_data[i][2][k].value; // 1st premise will become conclusion
                 }
-            })
-        })
+            });
+        });
 
         const domains = {};
 
         header.forEach(v => {
             if (!domains[v]) {
-                domains[v] = d3.extent(Object.values(pcp_data).reduce((a, b) => a.concat(b), []).map(d => d[v].value));
+                domains[v] = d3.extent(
+                    Object.values(pcp_data)
+                        .reduce((a, b) => a.concat(b), [])
+                        .map(d => d[v].value)
+                );
             }
         });
 
-        const showObvious = this.showObvious;        
-        controls({data, }, where, params);
-        displayRowOperation(data.ops[data.current]);
-        makePCP(pcp_data[data.current]);
-        document.removeEventListener('pcp-hl', highlightText)
-        document.addEventListener('pcp-hl', highlightText)
+        const showObvious = this.showObvious; 
+        if (data.ops[data.current] && pcp_data[data.current]) {
+            controls({ data, }, where, params);
+            displayRowOperation(data.ops[data.current]);
+            makePCP(pcp_data[data.current]);
+            document.removeEventListener('pcp-hl', highlightText)
+            document.addEventListener('pcp-hl', highlightText)
+        }
     }
 }

@@ -375,7 +375,13 @@ export class DifferenceCD {
             const l = cy.elements("node").length;
 
             function sortCycleEdges(edges, sid) {
-                let s = sid ? edges.filter(n => n.data().eid === sid)[0] : edges[0];
+                let s = edges[0]; 
+                if (sid) {
+                    const sp = edges.filter(n => n.data().eid === sid); 
+                    if (sp.length === 1) { 
+                        s = sp[0];
+                    }
+                }  
                 
                 const r = [s];
                 while (edges.length !== r.length) {
