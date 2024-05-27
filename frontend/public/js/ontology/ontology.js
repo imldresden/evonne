@@ -396,6 +396,20 @@ function labelNodes(layout = true) {
   }
 }
 
+//Same function exists in server.js
+export function getOWlFileName(name) {
+  let n = name;
+  if(name.endsWith(".owl"))
+    return n;
+
+  if (name.includes("."))
+    n = name.substring(0, name.lastIndexOf("."));
+  else
+    n = name
+
+  return n + ".owl";
+}
+
 function loadOntology(e) {
   const ontology = e.target.files[0];
   progress('Uploading...');
@@ -404,7 +418,8 @@ function loadOntology(e) {
     progress('Ontology uploaded.');
     progress('Extracting concept names...');
 
-    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + ontology.name + '&reasoner=' +
+    //Ontology file name changes after translating to OWL/XML format
+    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + getOWlFileName(ontology.name) + '&reasoner=' +
       document.getElementById('classificationReasoner').value)
       .then(computed => {
         console.log('concepts extracted: ', computed);

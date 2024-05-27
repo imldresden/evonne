@@ -16,6 +16,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from "module";
 import * as path from 'path';
 
+//Same function exists in ontology.js
+function getOWlFileName(name) {
+  let n = name;
+  if(name.endsWith(".owl"))
+    return n;
+
+  if (name.includes("."))
+    n = name.substring(0, name.lastIndexOf("."));
+  else
+    n = name
+
+  return n + ".owl";
+}
+
 const require = createRequire(import.meta.url);
 require('dotenv').config();
 const upload = require('express-fileupload');
@@ -170,7 +184,7 @@ app.get('/project', (req, res) => {
 
     if ((file.endsWith('.xml') || file.endsWith('.owl')) 
     && !file.startsWith('atomic ') && !file.startsWith('proof_') && !file.endsWith('t.xml')) {
-      status.ontology = file; // there is more than one
+      status.ontology = getOWlFileName(file); // there is more than one
       flags.ontology = true;
     }
   });
@@ -249,11 +263,19 @@ app.post('/upload', (req, res) => {
     if (err) {
       return res.status(500).send(err);
     }
+    //Delete the original ontology file
+    if(owlFileName !== uploadPath)
+      fs.unlink(uploadPath, function (err) {
+        if (err) {
+          //TODO Please take a look and adapt handling the error if needed
+          throw err
+        }
+        console.log("Original ontology file was deleted successfully");
+      });
 
     res.send('File uploaded!');
   });
 
-  //TODO delete the original ontology file after we convert the ontology
 });
 
 app.get('/create', (req, res) => {
@@ -604,7 +626,8 @@ function getProofType(genMethod, sigPath) {
 
 function convertOntology(ontFile, ontDir) {
   console.log("CONVERTING TO OWL XML FORMAT");
-  const owlFileName = ontFile.name +".owl";
+
+  const owlFileName = getOWlFileName(ontFile.name);
 
   const exitCode = spawn('java',  [
     '-jar', 'externalTools/explain.jar',
