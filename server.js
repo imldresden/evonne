@@ -15,20 +15,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from "module";
 import * as path from 'path';
-
-//Same function exists in ontology.js
-function getOWlFileName(name) {
-  let n = name;
-  if(name.endsWith(".owl"))
-    return n;
-
-  if (name.includes("."))
-    n = name.substring(0, name.lastIndexOf("."));
-  else
-    n = name
-
-  return n + ".owl";
-}
+import {owlFunctions} from "./frontend/public/js/utils/myOWL.js";
 
 const require = createRequire(import.meta.url);
 require('dotenv').config();
@@ -184,7 +171,7 @@ app.get('/project', (req, res) => {
 
     if ((file.endsWith('.xml') || file.endsWith('.owl')) 
     && !file.startsWith('atomic ') && !file.startsWith('proof_') && !file.endsWith('t.xml')) {
-      status.ontology = getOWlFileName(file); // there is more than one
+      status.ontology = owlFunctions.getOWlFileName(file); // there is more than one
       flags.ontology = true;
     }
   });
@@ -627,7 +614,7 @@ function getProofType(genMethod, sigPath) {
 function convertOntology(ontFile, ontDir) {
   console.log("CONVERTING TO OWL XML FORMAT");
 
-  const owlFileName = getOWlFileName(ontFile.name);
+  const owlFileName = owlFunctions.getOWlFileName(ontFile.name);
 
   const exitCode = spawn('java',  [
     '-jar', 'externalTools/explain.jar',

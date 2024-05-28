@@ -5,6 +5,7 @@ import { BasicShorteningFunctions } from "../shortening/basic.js";
 import { colors, stylesheet } from "../../style/cy-ontology-style.js";
 import { params } from "../layouts/cola.js";
 import { showRepairsTab } from "../utils/controls.js";
+import {owlFunctions} from "../utils/myOWL.js";
 
 const socket = io();
 
@@ -396,20 +397,6 @@ function labelNodes(layout = true) {
   }
 }
 
-//Same function exists in server.js
-export function getOWlFileName(name) {
-  let n = name;
-  if(name.endsWith(".owl"))
-    return n;
-
-  if (name.includes("."))
-    n = name.substring(0, name.lastIndexOf("."));
-  else
-    n = name
-
-  return n + ".owl";
-}
-
 function loadOntology(e) {
   const ontology = e.target.files[0];
   progress('Uploading...');
@@ -419,7 +406,7 @@ function loadOntology(e) {
     progress('Extracting concept names...');
 
     //Ontology file name changes after translating to OWL/XML format
-    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + getOWlFileName(ontology.name) + '&reasoner=' +
+    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + owlFunctions.getOWlFileName(ontology.name) + '&reasoner=' +
       document.getElementById('classificationReasoner').value)
       .then(computed => {
         console.log('concepts extracted: ', computed);
