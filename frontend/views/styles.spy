@@ -6,3 +6,4 @@
 <link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">
 <link rel="stylesheet" href="/style/widgets/general.css">
 <link rel="stylesheet" href="/style/widgets/parallel-coords.css">
+<link rel="stylesheet" href="/libs/cytoscape-context-menus/cytoscape-context-menus.css">

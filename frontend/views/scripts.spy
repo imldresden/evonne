@@ -11,7 +11,12 @@
 <!-- utils -->
 <script src="/libs/cytoscape-undo-redo/cytoscape-undo-redo.js"></script> <!-- undo/redo -->
 <script src="/libs/cytoscape-node-html-label/dist/cytoscape-node-html-label.js"></script> <!-- node html -->
-
+<script src="/libs/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
+<script src="/libs/cytoscape-lasso/dist/cytoscape-lasso.min.js"></script>
+<script src="/libs/cytoscape-context-menus/cytoscape-context-menus.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/cytoscape-popper/cytoscape-popper.js"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
 
 <script src="/libs/d3/dist/d3.min.js"></script>
 <script src="/libs/materialize-css/dist/js/materialize.min.js"></script>

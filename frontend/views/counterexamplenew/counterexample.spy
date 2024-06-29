@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html lang="en">
+
+<head>
+  <title>evonne - Counter example</title>
+
+  << styles >>
+
+  <link rel="stylesheet" href="/style/counterexamplenew.css">
+</head>
+
+<body>
+
+  << menus/menu >>
+
+  <main id="counter-example-container">
+  <button id="open_toolbar", style="display: inline-block">></button>
+
+  <div id="toolbar" style="position: fixed; top: 50px; width: 15%; height: 100%; background-color: lightgrey; z-index: 9999; display: none">
+  <button id="close_toolbar">Close Toolbar</button>
+         <div>
+            <label>Selection Mode</label><br>
+            <button id="redo">Redo</button>
+            <button id="undo">Undo</button>
+         </div>
+
+         <div style="display:none;">
+            <label>Group</label><br>
+            <button id="add-compound">Group</button>
+         </div>
+
+         <div>
+            <label>Hide</label><br>
+            <button id="hide">Hide</button>
+            <button id="show_hidden_nodes">Show hidden nodes</button>
+         </div>
+          <div><label>Selection Mode</label><br>
+
+         <button id="clear_selection">Clear</button>
+         <button id="lasso_selection">Lasso</button>
+         <button id="rectangle_selection">Rectangle</button>
+             <button id="normal_selection">Normal</button>
+             </div>
+        <div>
+         <label>Edges</label><br>
+         <button style="display:none" id="toggle_edge_bundle"> Bundling</button>
+            <input type="checkbox" style="position:relative;opacity:1;pointer-events:all" id="edge_bundle" name="edge bundling" checked>
+            <label for="edge_bundle">Edge bundled</label><br>
+            <input type="checkbox" style="position:relative;opacity:1;pointer-events:all" id="edge_labels" name="edge labels" checked>
+            <label for="edge_labels">Edge labels</label>
+        </div>
+         <div>
+         <label>Shortening mode</label><br>
+         <button style="display:none" id="toggle_shortening_mode">Shortening Mode</button>
+            <input type="checkbox" style="position:relative;opacity:1;pointer-events:all" id="shortening_mode" name="shortening mode">
+            <label for="shortening_mode">Shortening mode</label>
+            <input type="range" min="0" max="100" value="2" id="shortening_mode_value">
+        </div>
+
+         <input type="text" id="counter-example-search-bar-tags" placeholder="Search label"></input>
+         <div id="counter-example-selected-tags-container"></div>
+         <div id="counter-example-search-result-container"></div>
+
+         </div>
+
+
+    << menus/thumbnail >>
+
+  </main>
+
+  << scripts >>
+
+  <script src="/js/counterexamplenew/counterexample.js" type="module"></script>
+</body>
+
+</html>

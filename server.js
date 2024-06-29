@@ -122,7 +122,9 @@ app.get('/inference', (request, response) => {
 app.get("/counterexample", (request, response) => {
   response.render("counterexample/counterexample.spy", {settings_specific: '<< counterexample/settings >>'});
 });
-
+app.get("/counterexamplenew", (request, response) => {
+  response.render("counterexamplenew/counterexample.spy", {settings_specific: '<< counterexamplenew/settings >>'});
+});
 // resources
 app.get('/project', (req, res) => {
   const id = req.query.id;
