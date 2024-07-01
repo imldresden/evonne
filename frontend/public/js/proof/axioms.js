@@ -51,7 +51,7 @@ export class AxiomsHelper {
 	addShowPrevious() {
 		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 		let group = this.axioms
-			.filter(d => proof.showRules ? d._children[0]._children : d._children) //remove tautologies
+			.filter(d => proof.showRules ? d._children?.[0]._children : d._children) //remove tautologies
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2}, ${BOX_HEIGHT})`)
@@ -104,7 +104,7 @@ export class AxiomsHelper {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.axioms
-			.filter(d => proof.showRules ? d._children[0]._children : d._children) //remove tautologies
+			.filter(d => proof.showRules ? d._children?.[0]._children : d._children) //remove tautologies
 			.append("g").attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2 - BTN_CIRCLE_SIZE - 1}, 0)`)
@@ -137,7 +137,7 @@ export class AxiomsHelper {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.axioms
-			.filter(d => proof.showRules ? d._children[0]._children : d._children) //remove tautologies
+			.filter(d => proof.showRules ? d._children?.[0]._children : d._children) //remove tautologies
 			.append("g").attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2}, 0)`)
