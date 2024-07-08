@@ -16,6 +16,12 @@ export class AxiomsHelper {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
 		this.axioms = proof.svg.selectAll(".axiom")
+		this.axioms.each(d => {
+			if (!d._maxDepth) {
+				d._maxDepth = this.countAxioms(d, 0, "_children");
+			}
+			d.maxDepth = this.countAxioms(d, 0, "children");
+		});
 
 		//Show rule name and premise that led to this conclusion
 		this.addShowPrevious();
@@ -48,10 +54,18 @@ export class AxiomsHelper {
 		this.addCollapsedIndicator();
 	}
 
+	countAxioms(d, i, prop) {
+		if (d[prop]) {
+			return Math.max(...d[prop].map(c => this.countAxioms(c, ruleUtils.isRule(c.data.source.type) ? i : i + 1, prop)))
+		} else {
+			return i;
+		}
+	}
+	
 	addShowPrevious() {
 		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 		let group = this.axioms
-			.filter(d => proof.showRules ? d._children?.[0]._children : d._children) //remove tautologies
+			.filter(d => d.maxDepth !== 1 && d._maxDepth > 0)
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2}, ${BOX_HEIGHT})`)
@@ -104,10 +118,10 @@ export class AxiomsHelper {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.axioms
-			.filter(d => proof.showRules ? d._children?.[0]._children : d._children) //remove tautologies
+			.filter(d => d.maxDepth > 0)
 			.append("g").attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2 - BTN_CIRCLE_SIZE - 1}, 0)`)
+			.attr("transform", d => `translate(${d.width / 2 - (d.maxDepth !== d._maxDepth ? BTN_CIRCLE_SIZE : 0) - 1}, 0)`)
 			.on("click", (_, d) => this.hideAllPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -137,7 +151,7 @@ export class AxiomsHelper {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.axioms
-			.filter(d => proof.showRules ? d._children?.[0]._children : d._children) //remove tautologies
+			.filter(d => d.maxDepth !== d._maxDepth)
 			.append("g").attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2}, 0)`)

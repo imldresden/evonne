@@ -279,8 +279,8 @@ class RulesHelper {
                 iDsToHighlight.push(node.data.source.id); // axiom
             }
 
-            if (node.children) {
-                node.children.forEach(child => {
+            if (node._children) { // _children queries the tree regardless of collapsing or expanding
+                node._children.forEach(child => {
                     premises.push(proof.nodeVisuals.getLabel(child.data.source));
                     iDsToHighlight.push(child.data.source.id);
                 });
