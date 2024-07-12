@@ -1,6 +1,5 @@
 import thumbnailViewer from "../utils/pan-zoom.js";
 import { getTreeFromXML, getTreeFromJSON } from "./data/process-data.js";
-import { upload } from '../utils/upload-file.js';
 
 import { AxiomsHelper } from "./axioms.js";
 import { RulesHelper } from "./rules/rules.js";
@@ -133,8 +132,10 @@ function init_proof({
   proof.axioms.socket = socket;
   proof.magic.currentMagicAction = "";
 
-  initControls();
-
+  if (!external) {
+    initControls();
+  }
+  
   proof.svg
     .append("defs")
     .append("marker")
@@ -172,18 +173,5 @@ function getFileName() {
   return fileName;
 }
 
-function loadProof(event) {
-  proof.proofFile = event.target.files[0];
-  proof.nodeVisuals.initVarsAxiomFunctions();
 
-  upload(proof.proofFile, _ => {
-    init_proof();//proof.load();
-  });
-}
-
-function loadSignature(event) {
-  proof.signatureFile = event.target.files[0];
-  upload(proof.signatureFile);
-}
-
-export { init_proof, loadProof, loadSignature, conf as proof }
+export { init_proof, conf as proof }

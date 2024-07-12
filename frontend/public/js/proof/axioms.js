@@ -15,7 +15,7 @@ export class AxiomsHelper {
 	addFunctionButtonsToNodes() {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
-		this.axioms = proof.svg.selectAll(".axiom")
+		this.axioms = proof.svg.selectAll(".axiom")	
 		this.axioms.each(d => {
 			if (!d._maxDepth) {
 				d._maxDepth = this.countAxioms(d, 0, "_children");

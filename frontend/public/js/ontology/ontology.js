@@ -421,8 +421,7 @@ function loadOntology(e) {
         console.error('Error:', error);
       });
     document.getElementById("reasoner-choice-upload").style.display = "none";
-  });
-
+  }, 'ontology' );
 }
 
 function loadAtomicDecomposition(e) {

@@ -1,5 +1,6 @@
 import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
+import { upload } from '../utils/upload-file.js';
 
 let status = {};
 let interval = undefined;
@@ -236,3 +237,16 @@ function blockProofMethods(reasoner) {
     options[i].disabled = valuesToBlock.includes((i + 1).toString());
   }
 }
+
+function loadProof(event) {
+  proof.proofFile = event.target.files[0];
+  proof.nodeVisuals.initVarsAxiomFunctions();
+  upload(proof.proofFile, _ => init_proof());
+}
+
+function loadSignature(event) {
+  proof.signatureFile = event.target.files[0];
+  upload(proof.signatureFile);
+}
+
+export { loadProof, loadSignature }

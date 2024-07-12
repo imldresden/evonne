@@ -40,7 +40,7 @@
 
             <div class="card-reveal">
               <span class="card-title grey-text text-darken-4">
-                <i class="material-icons right">close</i>
+                <i class="material-icons right modal-close">close</i>
               </span>    
               <div class="collection" id="current-projects">
                 
@@ -65,7 +65,7 @@
             </div>
             <div class="card-reveal">
               <span class="card-title grey-text text-darken-4">
-                <i class="material-icons right">close</i>
+                <i class="material-icons right modal-close">close</i>
               </span>
               {{ examples }}
             </div>
