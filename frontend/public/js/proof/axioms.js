@@ -16,8 +16,8 @@ export class AxiomsHelper {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
 		this.axioms = proof.svg.selectAll(".axiom")
-        this.countChildrenAxioms(proof.tree.root, 0, '_children');
-        this.countChildrenAxioms(proof.tree.root, 0, 'children');
+		this.countChildrenAxioms(proof.tree.root, 0, '_children');
+		this.countChildrenAxioms(proof.tree.root, 0, 'children');
 
 		//Show rule name and premise that led to this conclusion
 		this.addShowPrevious();
@@ -46,28 +46,28 @@ export class AxiomsHelper {
 
 		//Hide all buttons
 		proof.nodeVisuals.initHideAllButtons();
-		
+
 		//Double-clicking a button should not trigger the expand functionality of the node
 		d3.selectAll(".axiomButton").on("dblclick", (e) => e.stopPropagation());
 		//Add pulse effect for unexplored nodes
 		this.addCollapsedIndicator();
 	}
-	
+
 	countChildrenAxioms(d, i, prop) {
-        if (!d[prop]) { 
-			d[prop+'Max'] = i;
-            return i;
-        } 
-        return d[prop]
-            .map(c => {
-                const r = 
-					this.countChildrenAxioms(c, i, prop) 
+		if (!d[prop]) {
+			d[prop + 'Max'] = i;
+			return i;
+		}
+		return d[prop]
+			.map(c => {
+				const r =
+					this.countChildrenAxioms(c, i, prop)
 					+ (ruleUtils.isRule(c.data.source.type) ? 0 : 1)
-                d[prop+'Max'] = r - i;
-                return r;
-            })
-            .reduce((a,b)=>a+b, 0);
-    }
+				d[prop + 'Max'] = r - i;
+				return r;
+			})
+			.reduce((a, b) => a + b, 0);
+	}
 
 	conditionToShowPrevious(d) {
 		return d.childrenMax !== this.get1StepCount(d) && d._childrenMax > 0
@@ -210,13 +210,13 @@ export class AxiomsHelper {
 		let axioms = [];
 		this.getAllPreviousAxioms(treeRoot, axioms, (node) => node.id);
 		axioms.forEach(nodeID => {
-		  nodeID = "N" + nodeID;
-		  const displayFormat = proof.nodeVisuals.nodesDisplayFormat.get(nodeID);
-		  if (displayFormat !== "textual") {
-			const newFormat = proof.shortenAll ? "shortened" : "original";
-			proof.nodeVisuals.nodesDisplayFormat.set(nodeID, newFormat);
-			proof.nodeVisuals.nodesCurrentDisplayFormat.set(nodeID, newFormat);
-		  }
+			nodeID = "N" + nodeID;
+			const displayFormat = proof.nodeVisuals.nodesDisplayFormat.get(nodeID);
+			if (displayFormat !== "textual") {
+				const newFormat = proof.shortenAll ? "shortened" : "original";
+				proof.nodeVisuals.nodesDisplayFormat.set(nodeID, newFormat);
+				proof.nodeVisuals.nodesCurrentDisplayFormat.set(nodeID, newFormat);
+			}
 		});
 		this.resetAllChildren(treeRoot);
 		proof.update();
@@ -224,7 +224,7 @@ export class AxiomsHelper {
 
 	addHighlightJustificationInOntology() {
 		const { BOTTOM_TRAY_WIDTH, BOX_HEIGHT_Expanded, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
-		
+
 		let group = d3.selectAll(".axiom")
 			.append("g")
 			.style("display", "none")
@@ -388,7 +388,7 @@ export class AxiomsHelper {
 			})
 			.append("g").attr("opacity", 0).attr("id", "B03")
 			.attr("class", "axiomButton btn-view")
-			.attr("transform", d=> `translate(${-(d.width / 2) + BOX_PADDING}, ${BOX_HEIGHT - BOX_PADDING_BOTTOM})`)
+			.attr("transform", d => `translate(${-(d.width / 2) + BOX_PADDING}, ${BOX_HEIGHT - BOX_PADDING_BOTTOM})`)
 			.on("click", (e, d) => {
 				showFullAxiom(e.currentTarget.parentNode);
 				proof.update();
@@ -519,7 +519,7 @@ export class AxiomsHelper {
 
 	addHighlightCurrentInference() {
 		if (proof.showRules) {
-			return; 
+			return;
 		}
 
 		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
@@ -544,10 +544,10 @@ export class AxiomsHelper {
 	}
 
 	highlightCurrentInference(event, node) {
-		
+
 		let btn = d3.select("#N" + node.data.source.id).select("#H1 text");
 		let state = btn.text();
-    
+
 		if (state === this.help_icon) {
 			proof.rules.openExplanation({ event }, [node]);
 			btn.text(this.close_help_icon);
