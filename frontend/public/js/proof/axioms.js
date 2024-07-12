@@ -15,13 +15,9 @@ export class AxiomsHelper {
 	addFunctionButtonsToNodes() {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
-		this.axioms = proof.svg.selectAll(".axiom")	
-		this.axioms.each(d => {
-			if (!d._maxDepth) {
-				d._maxDepth = this.countAxioms(d, 0, "_children");
-			}
-			d.maxDepth = this.countAxioms(d, 0, "children");
-		});
+		this.axioms = proof.svg.selectAll(".axiom")
+        this.countChildrenAxioms(proof.tree.root, 0, '_children');
+        this.countChildrenAxioms(proof.tree.root, 0, 'children');
 
 		//Show rule name and premise that led to this conclusion
 		this.addShowPrevious();
@@ -29,12 +25,14 @@ export class AxiomsHelper {
 		this.addHideAllPrevious();
 		//Show everything before the selected node
 		this.addShowAllPrevious();
+		//Add a button for highlighting the current inference
+		this.addHighlightCurrentInference();
+
 		//Highlight the axiom's justification in the ontology
 		this.addHighlightJustificationInOntology();
-		//Add a button for highlighting the current inference. !Only for linear proofs
-		this.addHighlightCurrentInference();
 		//Create and display repairs for the axiom that corresponds to the selected node
 		this.addShowRepairs();
+
 		//Initializing format buttons
 		this.initializeMaps();
 		//Set axiom to be displayed in its original format
@@ -45,27 +43,40 @@ export class AxiomsHelper {
 		this.addSetAxiomTextual();
 		//Extend the width of the button to show the full axiom
 		this.addShowFullAxiom();
+
 		//Hide all buttons
 		proof.nodeVisuals.initHideAllButtons();
+		
 		//Double-clicking a button should not trigger the expand functionality of the node
-		d3.selectAll(".axiomButton")
-			.on("dblclick", (e) => e.stopPropagation());
+		d3.selectAll(".axiomButton").on("dblclick", (e) => e.stopPropagation());
 		//Add pulse effect for unexplored nodes
 		this.addCollapsedIndicator();
 	}
-
-	countAxioms(d, i, prop) {
-		if (d[prop]) {
-			return Math.max(...d[prop].map(c => this.countAxioms(c, ruleUtils.isRule(c.data.source.type) ? i : i + 1, prop)))
-		} else {
-			return i;
-		}
-	}
 	
+	countChildrenAxioms(d, i, prop) {
+        if (!d[prop]) { 
+			d[prop+'Max'] = i;
+            return i;
+        } 
+        return d[prop]
+            .map(c => {
+                const r = 
+					this.countChildrenAxioms(c, i, prop) 
+					+ (ruleUtils.isRule(c.data.source.type) ? 0 : 1)
+                d[prop+'Max'] = r - i;
+                return r;
+            })
+            .reduce((a,b)=>a+b, 0);
+    }
+
+	conditionToShowPrevious(d) {
+		return d.childrenMax !== this.get1StepCount(d) && d._childrenMax > 0
+	}
+
 	addShowPrevious() {
 		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 		let group = this.axioms
-			.filter(d => d.maxDepth !== 1 && d._maxDepth > 0)
+			.filter(d => this.conditionToShowPrevious(d))
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2}, ${BOX_HEIGHT})`)
@@ -81,7 +92,21 @@ export class AxiomsHelper {
 			.style("font-size", "1.2em")
 			.text("\ue314");
 		group.append("title")
-			.text("Show previous")
+			.text("Show One Previous")
+	}
+
+	get1StepCount(treeRoot) {
+		if (!treeRoot._children) {
+			return 0;
+		}
+		if (proof.showRules) {
+			if (!treeRoot._children[0]._children) {
+				return 0;
+			}
+			return treeRoot._children[0]._children.length;
+		} else {
+			return treeRoot._children.length;
+		}
 	}
 
 	showPrevious(treeRoot) {
@@ -114,14 +139,18 @@ export class AxiomsHelper {
 		proof.update();
 	}
 
+	conditionToHideAllPrevious(d) {
+		return d.childrenMax > 0;
+	}
+
 	addHideAllPrevious() {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.axioms
-			.filter(d => d.maxDepth > 0)
+			.filter(d => this.conditionToHideAllPrevious(d))
 			.append("g").attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2 - (d.maxDepth !== d._maxDepth ? BTN_CIRCLE_SIZE : 0) - 1}, 0)`)
+			.attr("transform", d => `translate(${d.width / 2 - (d.childrenMax !== d._childrenMax ? BTN_CIRCLE_SIZE : 0) - 1}, 0)`)
 			.on("click", (_, d) => this.hideAllPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -147,11 +176,15 @@ export class AxiomsHelper {
 		}
 	}
 
+	conditionToShowAllPrevious(d) {
+		return d.childrenMax !== d._childrenMax
+	}
+
 	addShowAllPrevious() {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.axioms
-			.filter(d => d.maxDepth !== d._maxDepth)
+			.filter(d => this.conditionToShowAllPrevious(d))
 			.append("g").attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => `translate(${d.width / 2}, 0)`)
@@ -578,25 +611,23 @@ export class AxiomsHelper {
 			type: 'section'
 		},
 		{
-			title: 'Show previous',
+			title: 'Show one previous',
 			type: 'button',
-			action: (_, d) => {
-				this.showPrevious(d);
-			}
+			action: (_, d) => this.showPrevious(d),
+			filter: (d) => this.conditionToShowPrevious(d)
 		},
 		{
 			title: 'Show all previous',
 			type: 'button',
-			action: (_, d) => {
-				this.showAllPrevious(d)
-			}
+			action: (_, d) => this.showAllPrevious(d),
+			filter: (d) => this.conditionToShowAllPrevious(d)
+
 		},
 		{
 			title: 'Hide all previous',
 			type: 'button',
-			action: (_, d) => {
-				this.hideAllPrevious(d)
-			}
+			action: (_, d) => this.hideAllPrevious(d),
+			filter: (d) => this.conditionToHideAllPrevious(d)
 		},
 		{
 			title: 'Axiom Transformations',
@@ -605,23 +636,17 @@ export class AxiomsHelper {
 		{
 			title: 'Show original',
 			type: 'button',
-			action: (_, d) => {
-				this.setAxiomOriginal(d);
-			}
+			action: (_, d) => this.setAxiomOriginal(d)
 		},
 		{
 			title: 'Show shortened',
 			type: 'button',
-			action: (_, d) => {
-				this.setAxiomShortened(d);
-			}
+			action: (_, d) => this.setAxiomShortened(d)
 		},
 		{
 			title: 'Show textual',
 			type: 'button',
-			action: (_, d) => {
-				this.setAxiomTextual(d);
-			}
+			action: (_, d) => this.setAxiomTextual(d)
 		},
 		{
 			title: 'Ontology Actions',
@@ -630,16 +655,12 @@ export class AxiomsHelper {
 		{
 			title: 'Compute Diagnoses',
 			type: 'button',
-			action: (_, d) => {
-				this.showAxiomRepairs(d);
-			}
+			action: (_, d) => this.showAxiomRepairs(d)
 		},
 		{
 			title: 'Highlight Justification',
 			type: 'button',
-			action: (_, d) => {
-				this.showJustification(d);
-			}
+			action: (_, d) => this.showJustification(d)
 		}
 	];
 }

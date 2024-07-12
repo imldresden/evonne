@@ -1,8 +1,6 @@
 ----
 
 #### Table of contents
-- [Description](#description)
-- [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Proof View](#proof-view)
 - [Ontology View](#ontology-view)
@@ -85,7 +83,7 @@ Every axiom node in a proof is equipped with its own buttons and are the followi
 
 * *Navigation Buttons* (Buttons 3, 4 and 5) which manipulate the structure of a proof (available on *hover*)
 	
-	* **Show Previous** (Button 3): clicking this button hides all inferences in the corresponding subtree except the immediate inference.
+	* **Show One Previous** (Button 3): clicking this button hides all inferences in the corresponding subtree except the immediate inference.
 	* **Show All Previous** (Button 4): clicking this button shows all inferences in the corresponding subtree.
 	* **Hide All Previous** (Button 5): clicking this button hides all inferences in the corresponding subtree.
 

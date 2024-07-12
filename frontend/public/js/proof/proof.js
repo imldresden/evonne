@@ -165,13 +165,10 @@ function getFileName() {
   if (proof.proofFile) {
     fileName = proof.proofFile.name;
   } else {
-    proof.proofFile = {
-      name: fileName
-    };
+    proof.proofFile = { name: fileName };
   }
 
   return fileName;
 }
-
 
 export { init_proof, conf as proof }

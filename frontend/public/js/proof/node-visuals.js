@@ -118,20 +118,15 @@ export class NodeVisualsHelper {
         let connectorType = undefined;
         let attributes = undefined;
         
-        //get axioms nodes
-        let elements = this.nodes.selectAll(".node");
-        //add new connectors
-        elements.each(function () {
+        
+        this.nodes.selectAll(".node").each(function (node) {
             selection = d3.select(this);
             //Skip conclusion for bottom connectors
             if (selection.classed("conclusion") && direction === "Down") {
                 return;
             }
 
-            //Skip first rules for top connectors
-            let hasChildren;
-            selection.each(d => hasChildren = !!d.children || !!d._children);
-            if (!hasChildren && direction === "Up") {
+            if (!node.children && direction === "Up") {
                 return;
             }
 
@@ -332,7 +327,7 @@ export class NodeVisualsHelper {
             })
             .on("contextmenu", (e, d) => {
                 const menuItems = proof.axioms.menuItems;
-                globals.contextMenu.create(e, d, menuItems, "#proof-view");
+                globals.contextMenu.create(e, d, menuItems.filter(m => m.filter && m.filter(d)), "#proof-view");
             })
     }
 

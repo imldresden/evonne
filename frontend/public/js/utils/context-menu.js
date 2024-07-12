@@ -69,7 +69,9 @@ export class ContextMenu {
     }
 
     create(event, data, menuItems, svgId) {
-        this.menuFactory(event.pageX, event.pageY - 40, menuItems, data, svgId);
-        event.preventDefault();
+        if (menuItems.length > 0) {
+            this.menuFactory(event.pageX, event.pageY - 40, menuItems, data, svgId);
+            event.preventDefault();
+        }
     }
 }
