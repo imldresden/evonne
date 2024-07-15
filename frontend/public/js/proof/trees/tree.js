@@ -1,5 +1,4 @@
 import { proof } from "../proof.js";
-import { nodeVisualsDefaults } from "../node-visuals.js";
 import { computeTreeLayout } from "../data/process-data.js";
 import { utils as ruleUtils } from "../rules/rules.js";
 
@@ -48,7 +47,7 @@ export class TreeNavigation {
         } else {
             this.hierarchy = this.createHierarchy(this.processRules());
         }
-
+        
         this.links = proof.svgRootLayer
             .append("g")
             .attr("id", "links")
@@ -94,7 +93,7 @@ export class TreeNavigation {
         }
 
         const drawTime = proof.drawTime;
-        proof.nodeVisuals.setNodeWidthsAndMax(this.hierarchy);
+        proof.nodeVisuals.setNodeDimsAndMax(this.hierarchy);
         this.root = computeTreeLayout(this.hierarchy);
         this.drawTree(drawTime);
 
@@ -316,12 +315,12 @@ export class TreeNavigation {
                         // move to destinations (expand, pull)
                         .transition(t)
                         .attr("x1", d => d.target.x)
-                        .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                        .attr("y1", d => proof.height - d.target.y + d.target.height + 1)
                         .attr("x2", d => d.source.x)
                         .attr("y2", d => proof.height - d.source.y),
                     update => update.transition(t)
                         .attr("x1", d => d.target.x)
-                        .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                        .attr("y1", d => proof.height - d.target.y + d.target.height + 1)
                         .attr("x2", d => d.source.x)
                         .attr("y2", d => proof.height - d.source.y),
                     exit => {

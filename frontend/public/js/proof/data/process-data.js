@@ -210,7 +210,10 @@ function computeTreeLayout(hierarchy) {
             (hierarchy);
     } else {
         tree_layout = d3.tree()
-            .nodeSize([proof.nodeVisuals.maxNodeWidth, proof.nodeVisuals.maxNodeHeight * 1.2])
+            .nodeSize([
+                proof.nodeVisuals.maxNodeWidth, 
+                proof.nodeVisuals.maxNodeHeight * (proof.isCompact ? 2 : 2.5)
+            ])
             .separation((a, b) => separation(a, b))
             (hierarchy);
         

@@ -84,14 +84,12 @@ export class MagicNavigation {
 	}
 
 	addPushDown() {
-		const { BOX_HEIGHT } = nodeVisualsDefaults;
-
 		let group = axiomNodesButConclusion
 			.filter(d => d ? d.children[0].children : false)
 			.append("g")
 			.attr("id", "B4")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2}, ${BOX_HEIGHT})`)
+			.attr("transform", d => `translate(${d.width / 2}, ${d.height})`)
 			.on("click", (_, d) => this.pushDown(d))
 			.on("hover", (_, d) => this.pushDownHover(d));
 
@@ -99,14 +97,12 @@ export class MagicNavigation {
 	}
 
 	addPullUp() {
-		const { BOX_HEIGHT } = nodeVisualsDefaults;
-
 		let group = axiomNodesButConclusion
 			.filter(d =>  d ? d.data.target.type === "mrule" : false)
 			.append("g")
 			.attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d =>`translate(${-d.width / 2}, ${BOX_HEIGHT})`)
+			.attr("transform", d =>`translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (_, d) => this.pullUp(d))
 			.on("hover", (_, d) => this.pullUpHover(d));
 

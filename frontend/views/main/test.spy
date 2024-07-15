@@ -34,6 +34,8 @@
                 drawTime: 500,
                 isLinear: true,
                 showRules: false,
+                isCompact: false,
+                trays: { upper:true, lower:false }
             } 
         });
     </script>

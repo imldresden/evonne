@@ -74,12 +74,12 @@ export class AxiomsHelper {
 	}
 
 	addShowPrevious() {
-		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 		let group = this.axioms
 			.filter(d => this.conditionToShowPrevious(d))
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2}, ${BOX_HEIGHT})`)
+			.attr("transform", d => `translate(${d.width / 2}, ${d.height})`)
 			.on("click", (_, d) => this.showPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -223,16 +223,14 @@ export class AxiomsHelper {
 	}
 
 	addHighlightJustificationInOntology() {
-		const { BOTTOM_TRAY_WIDTH, BOX_HEIGHT_Expanded, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
+		const { BOTTOM_TRAY_WIDTH, TRAY_HEIGHT, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
 
 		let group = d3.selectAll(".axiom")
 			.append("g")
 			.style("display", "none")
 			.attr("id", "B01")
 			.attr("class", "axiomButton btn-round btn-highlight")
-			.attr("transform", () =>
-				`translate(${-BOTTOM_TRAY_WIDTH / 2 + 6 * BOX_PADDING}, ${1.7 * BOX_HEIGHT_Expanded})`
-			)
+			.attr("transform", d => `translate(${-BOTTOM_TRAY_WIDTH / 2 + 6 * BOX_PADDING}, ${d.height + BTN_CIRCLE_SIZE / 2 + 2})`)
 			.on("click", (_, d) => this.showJustification(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -248,14 +246,14 @@ export class AxiomsHelper {
 	}
 
 	addShowRepairs() {
-		const { BOTTOM_TRAY_WIDTH, BOX_HEIGHT_Expanded, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
+		const { BOTTOM_TRAY_WIDTH, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
 
 		let group = d3.selectAll(".axiom")
 			.append("g")
 			.style("display", "none")
 			.attr("id", "B02")
 			.attr("class", "axiomButton btn-round btn-repairs")
-			.attr("transform", `translate(${-BOTTOM_TRAY_WIDTH / 2 + 2 * BOX_PADDING}, ${1.7 * BOX_HEIGHT_Expanded})`)
+			.attr("transform", d => `translate(${-BOTTOM_TRAY_WIDTH / 2 + 2 * BOX_PADDING}, ${d.height + BTN_CIRCLE_SIZE - 5})`)
 			.on("click", (_, d) => this.showAxiomRepairs(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -271,14 +269,14 @@ export class AxiomsHelper {
 	}
 
 	addSetAxiomOriginal() {
-		const { BOX_HEIGHT_Expanded, BTN_CIRCLE_SIZE, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
+		const { TRAY_HEIGHT, BTN_CIRCLE_SIZE, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
 
 		let group = d3.selectAll(".axiom")
 			.append("g")
 			.style("display", "none")
 			.attr("id", "B06")
 			.attr("class", "axiomButton btn-round btn-set-axiom-string")
-			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3}, ${-BOX_HEIGHT_Expanded / 2})`)
+			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3}, ${-BTN_CIRCLE_SIZE + 5})`)
 			.on("click", (_, d) => this.setAxiomOriginal(d))
 			.each((_, i, n) =>
 				this.switchStateOnDraw(n[i], "original"));
@@ -304,14 +302,14 @@ export class AxiomsHelper {
 	}
 
 	addSetAxiomShortened() {
-		const { BOX_HEIGHT_Expanded, BTN_CIRCLE_SIZE, BOX_PADDING, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
+		const { TRAY_HEIGHT, BTN_CIRCLE_SIZE, BOX_PADDING, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
 
 		let group = d3.selectAll(".axiom")
 			.append("g")
 			.style("display", "none")
 			.attr("id", "B04")
 			.attr("class", "axiomButton btn-round btn-set-axiom-string")
-			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3 + 4 * BOX_PADDING}, ${-BOX_HEIGHT_Expanded / 2})`)
+			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3 + 4 * BOX_PADDING}, ${-BTN_CIRCLE_SIZE + 5})`)
 			.on("click", (_, d) => this.setAxiomShortened(d))
 			.each((_, i, n) =>
 				this.switchStateOnDraw(n[i], "shortened"));
@@ -337,14 +335,14 @@ export class AxiomsHelper {
 	}
 
 	addSetAxiomTextual() {
-		const { BOX_HEIGHT_Expanded, BTN_CIRCLE_SIZE, BOX_PADDING, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
+		const { TRAY_HEIGHT, BTN_CIRCLE_SIZE, BOX_PADDING, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
 
 		let group = d3.selectAll(".axiom")
 			.append("g")
 			.style("display", "none")
 			.attr("id", "B05")
 			.attr("class", "axiomButton btn-round btn-set-axiom-string")
-			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3 + 8 * BOX_PADDING}, ${-BOX_HEIGHT_Expanded / 2})`)
+			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3 + 8 * BOX_PADDING}, ${-BTN_CIRCLE_SIZE + 5})`)
 			.on("click", (_, d) => this.setAxiomTextual(d))
 			.each((_, i, n) =>
 				this.switchStateOnDraw(n[i], "textual"));
@@ -379,7 +377,7 @@ export class AxiomsHelper {
 			}
 		}
 
-		const { BOX_HEIGHT, BOX_PADDING_BOTTOM, BOX_PADDING } = nodeVisualsDefaults;
+		const { BOX_PADDING } = nodeVisualsDefaults;
 
 		const group = d3.selectAll(".axiom")
 			.filter((d) => d)
@@ -388,7 +386,7 @@ export class AxiomsHelper {
 			})
 			.append("g").attr("opacity", 0).attr("id", "B03")
 			.attr("class", "axiomButton btn-view")
-			.attr("transform", d => `translate(${-(d.width / 2) + BOX_PADDING}, ${BOX_HEIGHT - BOX_PADDING_BOTTOM})`)
+			.attr("transform", d => `translate(${-(d.width / 2) + BOX_PADDING}, ${d.height})`) // - BOX_PADDING_BOTTOM
 			.on("click", (e, d) => {
 				showFullAxiom(e.currentTarget.parentNode);
 				proof.update();
@@ -522,12 +520,12 @@ export class AxiomsHelper {
 			return;
 		}
 
-		const { BOX_HEIGHT, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.axioms
 			.append("g").attr("id", "H1")
 			.attr("class", "axiomButton btn-round btn-help")
-			.attr("transform", d => `translate(${-d.width / 2}, ${BOX_HEIGHT})`)
+			.attr("transform", d => `translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)

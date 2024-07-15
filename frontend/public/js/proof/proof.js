@@ -22,7 +22,9 @@ const conf = {
   isMagic: false,
   isRuleShort: false,
   isLinear: false,
+  isCompact: false, 
   drawTime: 750,
+  trays: {upper: false, lower: true},
 
   proofFile: undefined,
   signatureFile: undefined,
@@ -81,6 +83,7 @@ function init_proof({
     proof.div = external.div || proof.div,
     proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
     proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
+    proof.isCompact = external.isCompact  === undefined ? proof.isCompact : external.isCompact; 
     proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
     proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
 
@@ -88,6 +91,7 @@ function init_proof({
     proof.shortenAll = external.shortenAll === undefined ? proof.shortenAll : external.shortenAll; 
     proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
     proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
+    proof.trays = external.trays === undefined ? proof.trays : external.trays;
     
     proof.drawTime = external.drawTime || proof.drawTime; 
   }

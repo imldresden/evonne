@@ -38,7 +38,7 @@ export class LinearNavigation {
                 }
             });    
         } else {
-            const itemY = proof.nodeVisuals.maxNodeHeight * 1.1;
+            const itemY = proof.nodeVisuals.maxNodeHeight * (proof.isCompact ? 1 : 1.5);
             const maxHeight = itemY * c;
             linearLayout.each(d => {
                 if (ruleUtils.isRule(d.data.source.type)) {
@@ -102,7 +102,6 @@ export class LinearNavigation {
     }
 
     position(d, zero) {
-        const { BOX_HEIGHT } = nodeVisualsDefaults;
         //Note: "-0.01" was added to make the drawing works properly for the arrow of the highest node
         let x2, y2, x1, y1, targetX, targetY, sourceX, sourceY;
 
@@ -118,8 +117,8 @@ export class LinearNavigation {
             sourceY = d.source.y - 0.01;
         }
 
-        y2 = proof.height - targetY + BOX_HEIGHT / 2;
-        y1 = proof.height - sourceY + BOX_HEIGHT / 2;
+        y2 = proof.height - targetY + d.target.height / 2;
+        y1 = proof.height - sourceY + d.source.height / 2;
 
         if (proof.showRules) { // showing rules
             if (ruleUtils.isRule(d.source.data.source.type)) { // src is rule
