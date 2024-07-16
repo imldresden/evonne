@@ -55,7 +55,11 @@ export class NodeVisualsHelper {
         proof.nodeVisuals.nodes = what;
 
         if (proof.isLinear) {
-            this.renderConnectorsByType("Right", "Left");
+            if (proof.isCompact) {
+                this.renderConnectorsByType("Left");
+            } else {
+                this.renderConnectorsByType("Right", "Left");
+            }
         } else {
             this.renderConnectorsByType("Up");
             this.renderConnectorsByType("Down");
@@ -200,7 +204,7 @@ export class NodeVisualsHelper {
         //Add a rectangle for the label
         elements.append("rect")
             .attr("id", "frontRect")
-            .attr("class", "bg-box")
+            .attr("class", `bg-box ${proof.isCompact ?  "": "rounded-box" }` )
             .attr("x", d=> -(d.width) / 2)
             .attr("y", 0)
             .attr("width", d => d.width)
@@ -243,7 +247,7 @@ export class NodeVisualsHelper {
             elements[i].append("text")
                 .attr("id", elementsID[i])
                 .attr("class", elementsClass[i])
-                .attr("x", d => -(d.width) / 2 + (proof.isCompact ? 0 : TEXT_PAD))
+                .attr("x", d => -(d.width) / 2 + (proof.isCompact ? TEXT_PAD /2 : TEXT_PAD))
                 .attr("y", d => d.height / 1.5)
                 .text((d, i, nodes) => {
                     const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
@@ -299,7 +303,7 @@ export class NodeVisualsHelper {
     }
 
     initHideAllButtons() {
-        d3.selectAll(".axiom")
+        proof.svg.selectAll(".axiom")
             .filter(() => this.id !== this.nodeWithVisibleButtons.id)
             .selectAll(".axiomButton")
             .attr("cursor", "pointer")
@@ -310,12 +314,14 @@ export class NodeVisualsHelper {
     // Mouse Events function     
     activeNodes = {};
     addShowHideMouseEvents() {
-        d3.selectAll(".axiom")
+        proof.svg.selectAll(".axiom")
             .on("dblclick", (e, d) => {
-                if (!proof.isDrawing) {
+                if (!proof.isDrawing && (proof.trays.upper || proof.trays.lower)) {
                     this.expandCollapseNode(e.currentTarget.id, d);
                 }
-            })
+            });
+
+        proof.svg.selectAll(".node")
             .on("mouseenter", (e, d) => {
                 this.activeNodes[d.id] && clearTimeout(this.activeNodes[d.id]);
                 this.shiftLabelShowButtons(e.currentTarget);
@@ -337,6 +343,7 @@ export class NodeVisualsHelper {
             })
             .on("contextmenu", (e, d) => {
                 const menuItems = proof.axioms.menuItems;
+                e.preventDefault();
                 globals.contextMenu.create(e, d, menuItems.filter(m => m.filter && m.filter(d)), "#proof-view");
             })
     }
@@ -556,7 +563,9 @@ export class NodeVisualsHelper {
         if (!proof.isCompact) {
             node.width += nodeVisualsDefaults.TEXT_PAD * 2;
             node.height += nodeVisualsDefaults.TEXT_PAD;
-        } 
+        } else {
+            node.width += nodeVisualsDefaults.TEXT_PAD;
+        }
         
         return node;
     }

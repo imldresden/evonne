@@ -25,6 +25,7 @@ const conf = {
   isCompact: false, 
   drawTime: 750,
   trays: {upper: false, lower: true},
+  stepNavigator: true, 
 
   proofFile: undefined,
   signatureFile: undefined,
@@ -92,6 +93,8 @@ function init_proof({
     proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
     proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
     proof.trays = external.trays === undefined ? proof.trays : external.trays;
+    proof.linear.isDistancePriority = external.isDistancePriority === undefined ? false : external.isDistancePriority;
+    proof.stepNavigator = external.stepNavigator === undefined ? proof.stepNavigator : external.stepNavigator;
     
     proof.drawTime = external.drawTime || proof.drawTime; 
   }

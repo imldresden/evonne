@@ -1,5 +1,4 @@
 import { proof } from "../proof.js";
-import { nodeVisualsDefaults } from "../node-visuals.js";
 import { utils as ruleUtils } from "../rules/rules.js";
 
 export class LinearNavigation {
@@ -9,7 +8,7 @@ export class LinearNavigation {
 
     isDistancePriority = true;
 
-    computeLinearLayout(linearLayout, overlapAllowed) {
+    computeLinearLayout(linearLayout) {
         let orderedElements = [];
         if (!this.isDistancePriority) {
             this.getDFOrder(linearLayout, orderedElements);
@@ -20,14 +19,16 @@ export class LinearNavigation {
 
         const al = {};
         let c = 0;
+        let maxHeight = 0;
         orderedElements.forEach(d => {
-            if (!ruleUtils.isRule(d.data.source.type)) {
-                al[d.data.source.id] = { axiom: d, pos: c };
+            if (proof.isCompact || !ruleUtils.isRule(d.data.source.type)) {
+                al[d.data.source.id] = { axiom: d, pos: c, y: maxHeight};
                 c += 1;
+                maxHeight += (d.height + (proof.isCompact ? 5 : 15));
             }
         });
-
-        if (overlapAllowed) {
+        
+        if (proof.allowOverlap) {
             const itemY = proof.height / (orderedElements.length < 2 ? 1 : orderedElements.length - 1);
             linearLayout.each(d => {
                 d.x = 0.7 * proof.width - d.width / 2;
@@ -38,15 +39,18 @@ export class LinearNavigation {
                 }
             });    
         } else {
-            const itemY = proof.nodeVisuals.maxNodeHeight * (proof.isCompact ? 1 : 1.5);
-            const maxHeight = itemY * c;
             linearLayout.each(d => {
-                if (ruleUtils.isRule(d.data.source.type)) {
-                    d.x = 0.7 * proof.width - d.width / 2 + d.width + 50;
-                    d.y = maxHeight - (al[d.data.target.id].pos * itemY) + 15;    
+                if (proof.isCompact) {
+                    d.x = d.width / 2 + d.depth * 15;
+                    d.y = maxHeight - al[d.data.source.id].y;
                 } else {
-                    d.x = 0.7 * proof.width - d.width / 2 - 15;
-                    d.y = maxHeight - (al[d.data.source.id].pos  * itemY);
+                    if (ruleUtils.isRule(d.data.source.type)) {
+                        d.x = 0.7 * proof.width - d.width / 2 + d.width + 50;
+                        d.y = maxHeight - al[d.data.target.id].y + 15;    
+                    } else {
+                        d.x = 0.7 * proof.width - d.width / 2 - 15;
+                        d.y = maxHeight - al[d.data.source.id].y;
+                    }
                 }
             });
         }
@@ -120,6 +124,13 @@ export class LinearNavigation {
         y2 = proof.height - targetY + d.target.height / 2;
         y1 = proof.height - sourceY + d.source.height / 2;
 
+        if (proof.isCompact) { 
+            x2 = targetX - .5 * d.target.width;
+            x1 = sourceX - .5 * d.source.width - 3;
+            
+            return "M" + x1 + "," + y1 + "V" + y2 + "H" + x2;
+        }
+        
         if (proof.showRules) { // showing rules
             if (ruleUtils.isRule(d.source.data.source.type)) { // src is rule
                 x2 = targetX + .5 * d.target.width;
@@ -130,28 +141,28 @@ export class LinearNavigation {
             }
 
             return "M" + x2 + "," + y2 + "L" + x1 + "," + y1; // straight lines
-        } else {
-
-            x2 = targetX + .5 * d.target.width;
-            x1 = sourceX + .5 * d.source.width;
+        } 
         
-            let offset = Math.abs(y2 - y1) / 2;
 
-            let midpoint_x = (x1 + x2) / 2;
-            let midpoint_y = (y1 + y2) / 2;
+        x2 = targetX + .5 * d.target.width;
+        x1 = sourceX + .5 * d.source.width;
     
-            let dx = (x1 - x2);
-            let dy = (y1 - y2);
-    
-            let normalise = Math.sqrt((dx * dx) + (dy * dy));
-            if (normalise === 0) {
-                normalise = 1; // avoid division by zero
-            }
-    
-            let offSetX = midpoint_x + offset * (dy / normalise);
-            let offSetY = midpoint_y - offset * (dx / normalise);
-    
-            return "M" + x2 + "," + y2 + "S" + offSetX + "," + offSetY + " " + x1 + "," + y1; // bezier curves
+        let offset = Math.abs(y2 - y1) / 2;
+
+        let midpoint_x = (x1 + x2) / 2;
+        let midpoint_y = (y1 + y2) / 2;
+
+        let dx = (x1 - x2);
+        let dy = (y1 - y2);
+
+        let normalise = Math.sqrt((dx * dx) + (dy * dy));
+        if (normalise === 0) {
+            normalise = 1; // avoid division by zero
         }
+
+        let offSetX = midpoint_x + offset * (dy / normalise);
+        let offSetY = midpoint_y - offset * (dx / normalise);
+
+        return "M" + x2 + "," + y2 + "S" + offSetX + "," + offSetY + " " + x1 + "," + y1; // bezier curves
     }
 }

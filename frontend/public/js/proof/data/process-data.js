@@ -223,7 +223,7 @@ function computeTreeLayout(hierarchy) {
     }
     
     if (proof.isLinear) {
-        return proof.linear.computeLinearLayout(tree_layout, proof.allowOverlap);
+        return proof.linear.computeLinearLayout(tree_layout);
     }
     
     return tree_layout;

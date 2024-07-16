@@ -43,8 +43,11 @@ svg g.node > rect.bg-box {
 	fill: var(--color-node-rule-fill);
 	stroke: var(--color-node-rule-stroke);
 	stroke-width: 1;
+}
+
+.rounded-box {
 	rx: 6px;
-	ry: 6px;
+	ry: 6px;	
 }
 
 .lock-sign {
@@ -179,6 +182,11 @@ svg g.node > g.btn-view > text {
 
 .asserted .axiomButton {
 	fill: #36afa3;
+}
+
+.node.rule .axiomButton {
+	fill: #797979;
+	opacity: 0;
 }
 
 .axiom:not(.asserted, .conclusion) .axiomButton {

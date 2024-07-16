@@ -16,11 +16,14 @@ export class ContextMenu {
 
             
         let orient = [true, true];
-        const maxWidth = menuItems.reduce((a, b) => {
-            const c = a.title ? a.title.length : a;
-            const d = b.title ? b.title.length : b;
-            return (c > d ? c : d)
-        }) * 9;
+        
+        let maxWidth = 0;
+        menuItems.forEach(a => {
+            const l = a.title.length * 9;
+            if (l > maxWidth) {
+                maxWidth = l;
+            } 
+        })
         
         if (x + maxWidth + 30 > svgBBox.width) {
             orient[0] = false;
@@ -71,7 +74,6 @@ export class ContextMenu {
     create(event, data, menuItems, svgId) {
         if (menuItems.length > 0) {
             this.menuFactory(event.pageX, event.pageY - 40, menuItems, data, svgId);
-            event.preventDefault();
         }
     }
 }
