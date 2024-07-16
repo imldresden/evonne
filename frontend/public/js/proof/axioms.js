@@ -533,7 +533,9 @@ export class AxiomsHelper {
 		let group = this.nodes
 			.append("g").attr("id", "H1")
 			.attr("class", "axiomButton btn-round btn-help")
-			.attr("transform", d => `translate(${-d.width / 2}, ${d.height})`)
+			.attr("transform", d => proof.isCompact ? 
+				`translate(${-d.width / 2 - BTN_CIRCLE_SIZE}, ${d.height / 2})` : 
+				`translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
