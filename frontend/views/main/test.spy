@@ -27,19 +27,19 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
     
     <script type="module">
-        //import { init_proof } from "https://unpkg.com/evonne@0.0.6/frontend/public/js/proof/proof.js";
-        import { init_proof } from "http://localhost:3030/js/proof/proof.js";
+        //import { init_proof, proof } from "https://unpkg.com/evonne@0.0.6/frontend/public/js/proof/proof.js";
+        import { init_proof, proof } from "http://localhost:3030/js/proof/proof.js";
         init_proof({ 
             external: {
                 div: "my-reasoning-tree",
-                //path: "../data/test/4th-trace.xml",
-                path: "../data/test/test.t.xml",
+                path: "../data/test/4th-trace.xml",
+                //path: "../data/test/test.t.xml",
                 drawTime: 500,
 
                 showRules: true,
 
                 isLinear: true,
-                    isDistancePriority: false,
+                    isDepthFirst: false,
                     bottomRoot: false,
 
                 isCompact: true,
@@ -54,7 +54,7 @@
                 /*showRules: true,
 
                 isLinear: true,
-                    isDistancePriority: true,
+                    isDepthFirst: true,
                     bottomRoot: false,
                 
                 isCompact: true,

@@ -41,8 +41,6 @@ export class DLRules {
         if (this.rules[ruleName]) {
             utils.addTitle(ruleName);
             this.rules[ruleName](premises, conclusion);
-        } else {
-            console.error("unknown dl rule");
         }
     }
 

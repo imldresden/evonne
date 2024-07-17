@@ -230,8 +230,6 @@ class RulesHelper {
                 current: node.source.id,
                 ops: steps,
             };
-        } else {
-            console.warn("no subproof identified");
         }
     }
 

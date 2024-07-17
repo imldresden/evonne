@@ -4,16 +4,16 @@ import { utils as ruleUtils } from "../rules/rules.js";
 export class LinearNavigation {
     constructor() { }
 
-    isDistancePriority = true;
+    isDepthFirst = true;
     bottomRoot = true;
 
     computeLinearLayout(linearLayout) {
         let orderedElements = [];
-        if (!this.isDistancePriority) {
-            this.getDFOrder(linearLayout, orderedElements);
-        } else {
+        if (!this.isDepthFirst) {
             this.getBFOrder([linearLayout], orderedElements);
             orderedElements.push(linearLayout);
+        } else {
+            this.getDFOrder(linearLayout, orderedElements);
         }
 
         orderedElements.reverse();
@@ -48,9 +48,9 @@ export class LinearNavigation {
                 } else {
                     if (ruleUtils.isRule(d.data.source.type)) {
                         d.x = 0.7 * proof.width - d.width / 2 + d.width + 50;
-                        d.y = al[d.data.target.id].y + 15;    
+                        d.y = al[d.data.target.id].y - 15;    
                     } else {
-                        d.x = 0.7 * proof.width - d.width / 2 - 15;
+                        d.x = 0.7 * proof.width - d.width / 2 + 15;
                         d.y = al[d.data.source.id].y;
                     }
                 }
@@ -83,6 +83,7 @@ export class LinearNavigation {
 
     getBFOrder(hierarchy, orderedElements) {
         let nodesAtLevel = this.getNodesAtLevel(hierarchy);
+        nodesAtLevel.reverse(); // TODO balance tree...
         if (nodesAtLevel.length !== 0) {
             this.getBFOrder(nodesAtLevel, orderedElements);
         }

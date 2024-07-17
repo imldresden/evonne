@@ -92,7 +92,7 @@ function init_proof({
     proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
     
     proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
-    proof.linear.isDistancePriority = external.isDistancePriority === undefined ? false : external.isDistancePriority;
+    proof.linear.isDepthFirst = external.isDepthFirst === undefined ? false : external.isDepthFirst;
     proof.linear.bottomRoot = external.bottomRoot === undefined ? false : external.bottomRoot;
     
     proof.isCompact = external.isCompact  === undefined ? proof.isCompact : external.isCompact; 
