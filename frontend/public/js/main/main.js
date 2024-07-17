@@ -240,7 +240,6 @@ function blockProofMethods(reasoner) {
 
 function loadProof(event) {
   proof.proofFile = event.target.files[0];
-  proof.nodeVisuals.initVarsAxiomFunctions();
   upload(proof.proofFile, _ => init_proof());
 }
 

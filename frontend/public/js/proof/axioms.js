@@ -16,15 +16,17 @@ export class AxiomsHelper {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
 		this.nodes = proof.svg.selectAll(proof.stepNavigator ? ".axiom" : ".node");
-		this.countChildren(proof.tree.root, 0, '_children');
-		this.countChildren(proof.tree.root, 0, 'children');
+		
+		//Collapse node children
+		this.addCollapse();
+		//Expand node children
+		this.addExpand();
 
+		
 		//Show rule name and premise that led to this conclusion
 		this.addShowPrevious();
-		//Hide everything before the selected node
-		this.addHideAllPrevious();
-		//Show everything before the selected node
-		this.addShowAllPrevious();
+
+
 		//Add a button for highlighting the current inference
 		this.addHighlightCurrentInference();
 
@@ -84,7 +86,10 @@ export class AxiomsHelper {
 	}
 
 	conditionToShowPrevious(d) {
-		return proof.stepNavigator && d.childrenMax !== this.get1StepCount(d) && d._childrenMax > 0
+		return proof.stepNavigator 
+			&& this.get1StepCount(d, 'children') !== this.get1StepCount(d, '_children') 
+			&& d._children
+			&& d._children.length > 0
 	}
 
 	addShowPrevious() {
@@ -109,17 +114,17 @@ export class AxiomsHelper {
 			.text("Show One Previous")
 	}
 
-	get1StepCount(treeRoot) {
-		if (!treeRoot._children) {
+	get1StepCount(treeRoot, prop) {
+		if (!treeRoot[prop]) {
 			return 0;
 		}
 		if (proof.showRules) {
-			if (!treeRoot._children[0]._children) {
+			if (!treeRoot[prop][0][prop]) {
 				return 0;
 			}
-			return treeRoot._children[0]._children.length;
+			return treeRoot[prop][0][prop].length;
 		} else {
-			return treeRoot._children.length;
+			return treeRoot[prop].length;
 		}
 	}
 
@@ -153,73 +158,102 @@ export class AxiomsHelper {
 		proof.update();
 	}
 
-	conditionToHideAllPrevious(d) {
-		return d.childrenMax > 0;
+	conditionToCollapse(d) {
+		return d.children;
 	}
 
-	addHideAllPrevious() {
+	addCollapse() {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.nodes
-			.filter(d => this.conditionToHideAllPrevious(d))
+			.filter(d => this.conditionToCollapse(d))
 			.append("g").attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => proof.isCompact ? 
-				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${d.height / 2})` : 
-				`translate(${d.width / 2 - (this.conditionToShowAllPrevious(d) ? BTN_CIRCLE_SIZE : 0) - 1}, 0)`
+				`translate(${- d.width / 2 - BTN_CIRCLE_SIZE - 5}, ${d.height / 2})` : 
+				`translate(${d.width / 2}, 0)`
 			)
-			.on("click", (e, d) => this.hideAllPrevious(d, e))
+			.on("click", (e, d) => this.collapse(d, e))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
 			.attr("cy", 0);
+		let icon = "\ue5db"; 
+		if (proof.isLinear && !proof.linear.bottomRoot) {
+			icon = "\ue5d8";
+
+			if (proof.isCompact) {
+				icon = "keyboard_arrow_down";
+			}
+		}
 		group.append("text")
 			.attr("class", "material-icons")
 			.attr("x", 0)
 			.attr("y", 0)
-			.text((proof.isLinear && !proof.linear.bottomRoot) ? "\ue5d8" : "\ue5db");
+			.text(icon);
 		group.append("title")
-			.text("Hide all previous")
+			.text("Hide Children")
 	}
 
-	hideAllPrevious(treeRoot, e) {
+	collapse(treeRoot, e) {
 		e.stopPropagation();
-		if (proof.isDrawing) {
-			return;
-		}
 		proof.nodeInteracted = treeRoot;
+		
 		if (treeRoot.children) {
 			treeRoot.children = null;
 			proof.update();
 		}	
 	}
 
-	conditionToShowAllPrevious(d) {
-		return d.childrenMax !== d._childrenMax
+	conditionToExpand(d) {
+		return !d.children && d._children;
 	}
 
-	addShowAllPrevious() {
+	addExpand() {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.nodes
-			.filter(d => this.conditionToShowAllPrevious(d))
-			.append("g").attr("id", "B3")
+			.filter(d => this.conditionToExpand(d))
+			.append("g").attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => proof.isCompact ? 
-				`translate(${d.width / 2 + (this.conditionToHideAllPrevious(d) ? BTN_CIRCLE_SIZE * 2 + 1 : BTN_CIRCLE_SIZE)}, ${d.height / 2})` : 
-				`translate(${d.width / 2}, 0)`)
-			.on("click", (e, d) => this.showAllPrevious(d, e))
+				`translate(${- d.width / 2 - BTN_CIRCLE_SIZE - 5}, ${d.height / 2})` : 
+				`translate(${d.width / 2}, 0)`
+			)
+			.on("click", (e, d) => this.expand(d, e))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
 			.attr("cx", 0)
 			.attr("cy", 0);
+		let icon = "\ue5d8"; 
+		if (proof.isLinear && !proof.linear.bottomRoot) {
+			icon = "\ue5db";
+
+			if (proof.isCompact) {
+				icon = "keyboard_arrow_right";
+			}
+		}	
 		group.append("text")
 			.attr("class", "material-icons")
 			.attr("x", 0)
 			.attr("y", 0)
-			.text((proof.isLinear && !proof.linear.bottomRoot) ? "\ue5db" : "\ue5d8");
+			.text(icon);
 		group.append("title")
-			.text("Show all previous")
+			.text("Expand Children")
+	}
+
+	expand(treeRoot, e) {
+		e.stopPropagation();
+		proof.nodeInteracted = treeRoot;
+		
+		if (treeRoot._children) {
+			treeRoot.children = treeRoot._children;
+			proof.update();
+		}
+	}
+
+	conditionToShowAllPrevious(d) {
+		return d.childrenMax !== d._childrenMax
 	}
 
 	showAllPrevious(treeRoot, e) {
@@ -547,7 +581,7 @@ export class AxiomsHelper {
 			.append("g").attr("id", "H1")
 			.attr("class", "axiomButton btn-round btn-help")
 			.attr("transform", d => proof.isCompact ? 
-				`translate(${-d.width / 2 - BTN_CIRCLE_SIZE}, ${d.height / 2})` : 
+				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${d.height / 2})` : 
 				`translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")
@@ -632,23 +666,29 @@ export class AxiomsHelper {
 			type: 'section'
 		},
 		{
-			title: 'Show one previous',
+			title: 'Show Step',
 			type: 'button',
 			action: (_, d) => this.showPrevious(d),
 			filter: (d) => this.conditionToShowPrevious(d)
 		},
 		{
-			title: 'Show all previous',
+			title: 'Expand All Children',
 			type: 'button',
 			action: (e, d) => this.showAllPrevious(d, e),
 			filter: (d) => this.conditionToShowAllPrevious(d)
 
 		},
 		{
-			title: 'Hide all previous',
+			title: 'Collapse Children',
 			type: 'button',
-			action: (e, d) => this.hideAllPrevious(d, e),
-			filter: (d) => this.conditionToHideAllPrevious(d)
+			action: (e, d) => this.collapse(d, e),
+			filter: (d) => this.conditionToCollapse(d)
+		},
+		{
+			title: 'Expand Children',
+			type: 'button',
+			action: (e, d) => this.expand(d, e),
+			filter: (d) => this.conditionToExpand(d)
 		},
 		{
 			title: 'Axiom Transformations',

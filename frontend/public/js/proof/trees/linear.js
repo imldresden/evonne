@@ -1,18 +1,20 @@
+import { nodeVisualsDefaults } from "../node-visuals.js";
 import { proof } from "../proof.js";
 import { utils as ruleUtils } from "../rules/rules.js";
 
 export class LinearNavigation {
     constructor() { }
 
-    isDepthFirst = true;
+    isBreadthFirst = false;
     bottomRoot = true;
 
     computeLinearLayout(linearLayout) {
         let orderedElements = [];
-        if (!this.isDepthFirst) {
+        if (this.isBreadthFirst) {
             this.getBFOrder([linearLayout], orderedElements);
             orderedElements.push(linearLayout);
         } else {
+            // no intersections
             this.getDFOrder(linearLayout, orderedElements);
         }
 
@@ -43,7 +45,8 @@ export class LinearNavigation {
         } else {
             linearLayout.each(d => {
                 if (proof.isCompact) {
-                    d.x = d.width / 2 + d.depth * 15 - 20;
+                    const m = 0 //!d.parent || ruleUtils.isRule(d.parent.data.source.type) ? 1 : 0;
+                    d.x = d.width / 2 + (d.depth - m)*10 - 10;
                     d.y = al[d.data.source.id].y;
                 } else {
                     if (ruleUtils.isRule(d.data.source.type)) {
@@ -83,7 +86,6 @@ export class LinearNavigation {
 
     getBFOrder(hierarchy, orderedElements) {
         let nodesAtLevel = this.getNodesAtLevel(hierarchy);
-        nodesAtLevel.reverse(); // TODO balance tree...
         if (nodesAtLevel.length !== 0) {
             this.getBFOrder(nodesAtLevel, orderedElements);
         }
@@ -134,11 +136,11 @@ export class LinearNavigation {
         
         if (proof.isCompact) { 
             x2 = targetX - .5 * d.target.width;
-            x1 = sourceX - .5 * d.source.width - 3;
+            x1 = sourceX - .5 * d.source.width + 1;    
             
             return "M" + x1 + "," + y1 + "V" + y2 + "H" + x2;
         }
-        
+
         if (proof.showRules) { // showing rules
             if (ruleUtils.isRule(d.source.data.source.type)) { // src is rule
                 x2 = targetX + .5 * d.target.width;
@@ -151,7 +153,6 @@ export class LinearNavigation {
             return "M" + x2 + "," + y2 + "L" + x1 + "," + y1; // straight lines
         } 
         
-
         x2 = targetX + .5 * d.target.width;
         x1 = sourceX + .5 * d.source.width;
     

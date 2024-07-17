@@ -34,31 +34,30 @@
                 div: "my-reasoning-tree",
                 path: "../data/test/4th-trace.xml",
                 //path: "../data/test/test.t.xml",
-                drawTime: 500,
+                drawTime: 0,
 
                 showRules: true,
 
                 isLinear: true,
-                    isDepthFirst: false,
+                    isBreadthFirst: false, // no intersections
                     bottomRoot: false,
 
                 isCompact: true,
-                    fixedUpperRight: true, 
                     isZoomPan: true, 
 
                 trays: { upper:false, lower:false },
 
-                stepNavigator: true, /**/
+                stepNavigator: false, /**/
 
                 // compact linear mode, used in Nemo
                 /*showRules: true,
 
                 isLinear: true,
-                    isDepthFirst: true,
+                    isBreadthFirst: true,
                     bottomRoot: false,
                 
                 isCompact: true,
-                    fixedUpperRight: true, 
+                    fixedUpperLeft: true, 
                     isZoomPan: false, 
                 
                 trays: { upper:false, lower:false },

@@ -18,6 +18,7 @@ export class TreeNavigation {
     root = undefined;
     edgeData = undefined;
     restOfProofNode = { id: "r0", element: "", type: "rest" }
+    cuts = [];
 
     init(processedData) {
         let nodeData = processedData.nodes;
@@ -47,6 +48,8 @@ export class TreeNavigation {
         } else {
             this.hierarchy = this.createHierarchy(this.processRules());
         }
+
+        this.cuts.push(this.hierarchy)
 
         this.links = proof.svgRootLayer
             .append("g")
@@ -92,10 +95,9 @@ export class TreeNavigation {
             this.restart();
         }
 
-        const drawTime = proof.drawTime;
         proof.nodeVisuals.setNodeDimsAndMax(this.hierarchy);
         this.root = computeTreeLayout(this.hierarchy);
-        this.drawTree(drawTime);
+        this.drawTree(proof.drawTime);
 
 
         // add axiom buttons depending on the navigation mode (Normal vs Magic)
@@ -182,10 +184,16 @@ export class TreeNavigation {
             }
         });
 
-        //update the graph
+        this.cuts.push(this.hierarchy);
         this.hierarchy = newHierarchy;
-        proof.nodeVisuals.initVarsAxiomFunctions();
         this.update();
+    }
+
+    restoreFromSubProof() {
+        if (this.cuts.length > 0) {
+            this.hierarchy = this.cuts.pop();
+            this.update();
+        } 
     }
 
     extractOriginalData(root) {
@@ -220,7 +228,7 @@ export class TreeNavigation {
 
     lineAttributes(input) {
         return input
-            .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
+            .attr("marker-end", d => d.source.data.source.type === "rest" || proof.isCompact ? "" : "url(#arrowhead)")
             .attr("class", d =>
                 (d.source.data.source.type === "rest" ? "link torest" : "link") +
                 (d.source.data.target.type === "axiom" && !proof.isMagic ? " from-axiom " : "")

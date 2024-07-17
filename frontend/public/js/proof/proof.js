@@ -26,7 +26,7 @@ const conf = {
   bottomRoot: false,
 
   isCompact: false, 
-  fixedUpperRight: false, 
+  fixedUpperLeft: false, 
   
   drawTime: 750,
   trays: {upper: false, lower: true},
@@ -92,11 +92,11 @@ function init_proof({
     proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
     
     proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
-    proof.linear.isDepthFirst = external.isDepthFirst === undefined ? false : external.isDepthFirst;
-    proof.linear.bottomRoot = external.bottomRoot === undefined ? false : external.bottomRoot;
+    proof.linear.isBreadthFirst = external.isBreadthFirst === undefined ? proof.linear.isBreadthFirst : external.isBreadthFirst;
+    proof.linear.bottomRoot = external.bottomRoot === undefined ? proof.linear.bottomRoot : external.bottomRoot;
     
     proof.isCompact = external.isCompact  === undefined ? proof.isCompact : external.isCompact; 
-    proof.fixedUpperRight = external.fixedUpperRight  === undefined ? proof.fixedUpperRight : external.fixedUpperRight;
+    proof.fixedUpperLeft = external.fixedUpperLeft  === undefined ? proof.fixedUpperLeft : external.fixedUpperLeft;
 
     proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
     proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
@@ -108,7 +108,7 @@ function init_proof({
     proof.trays = external.trays === undefined ? proof.trays : external.trays;
     proof.stepNavigator = external.stepNavigator === undefined ? proof.stepNavigator : external.stepNavigator;
     
-    proof.drawTime = external.drawTime || proof.drawTime; 
+    proof.drawTime = external.drawTime === undefined ? proof.drawTime : external.drawTime; 
   }
 
   if (proof.svgRootLayer) {

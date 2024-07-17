@@ -43,7 +43,6 @@ export class NodeVisualsHelper {
         return this._svg;
     }
 
-    nodeWithVisibleButtons = { id: "nothing" }
     nodesCurrentDisplayFormat = new Map()
     nodesDisplayFormat = new Map()
     maxNodeWidth = 200;
@@ -57,15 +56,22 @@ export class NodeVisualsHelper {
         this.resetConnectors();
 
         if (proof.isLinear) {
-            if (proof.isCompact) {
-                this.renderConnectorsByType("Left");
-            } else {
+            if (!proof.isCompact) {
                 this.renderConnectorsByType("Right", "Left");
             }
         } else {
             this.renderConnectorsByType("Up");
             this.renderConnectorsByType("Down");
         }
+
+        
+        // Draw the rest-of-proof node
+        this.nodes.select(".rest")
+            .append("circle")
+            .attr("r", 10)
+            .attr("cy", 15)
+            .attr("cx", proof.isCompact ? -5:0)
+            .on("click", () => proof.tree.restoreFromSubProof());
 
         this.renderBoxes(); 
         this.renderLabels(); 
@@ -174,12 +180,6 @@ export class NodeVisualsHelper {
                 selection.select("." + directionClass).attr(k, attributes[k]);
             });
         });
-
-        // Draw the rest-of-proof node
-        this.nodes.select(".rest")
-            .append("circle")
-            .attr("r", 10).attr("cy", 15)
-            .on("click", () => proof.tree.update(true));
     }
 
     renderBoxes() {
@@ -309,17 +309,16 @@ export class NodeVisualsHelper {
             .style("opacity", 1);
     }
 
-    initVarsAxiomFunctions() {
-        this.nodeWithVisibleButtons = { id: "nothing" };
-    }
-
     initHideAllButtons() {
-        proof.svg.selectAll(".axiom")
-            .filter(() => this.id !== this.nodeWithVisibleButtons.id)
+
+        if (!proof.isCompact) {
+            proof.svg.selectAll(".node")
             .selectAll(".axiomButton")
             .attr("cursor", "pointer")
             .attr("pointer-events", "all")
             .style("opacity", 0);
+        }
+        
     }
 
     // Mouse Events function     
@@ -341,15 +340,17 @@ export class NodeVisualsHelper {
                 const node = e.currentTarget;
                 const inactive = d3.selectAll(`#${node.id} .axiomButton.active`).empty();
                 if (inactive) {
-                    this.activeNodes[d.id] = setTimeout(() => {
-                        this.shiftLabelHideButtons(node);
-                        try {
-                            const nd = d3.select("#" + node.id)
-                            if (nd && nd.classed("expanded")) {
-                                this.collapseNode(nd, d);
-                            }
-                        } catch (_) { } // tray becomes undefined despite the check due to timeout
-                    }, 1500);
+                    if (!proof.isCompact) {
+                        this.activeNodes[d.id] = setTimeout(() => {
+                            this.shiftLabelHideButtons(node);
+                            try {
+                                const nd = d3.select("#" + node.id)
+                                if (nd && nd.classed("expanded")) {
+                                    this.collapseNode(nd, d);
+                                }
+                            } catch (_) { } // tray becomes undefined despite the check due to timeout
+                        }, 1500);
+                    }
                 }
             })
             .on("contextmenu", (e, d) => {

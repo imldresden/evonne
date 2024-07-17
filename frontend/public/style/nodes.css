@@ -186,7 +186,6 @@ svg g.node > g.btn-view > text {
 
 .node.rule .axiomButton {
 	fill: #797979;
-	opacity: 0;
 }
 
 .axiom:not(.asserted, .conclusion) .axiomButton {

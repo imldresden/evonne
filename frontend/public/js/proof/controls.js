@@ -246,7 +246,7 @@ function layoutToggleBtnFunction() {
 }
 
 function planarToggleBtnFunction() {
-    proof.linear.isDepthFirst = planarToggleBtn.checked;
+    proof.linear.isBreadthFirst = planarToggleBtn.checked;
     proof.update();
 }
 
@@ -455,7 +455,7 @@ function init() {
 
     magicToggleBtn.checked = proof.isMagic || false;
     layoutToggleBtn.checked = proof.isLinear || false;
-    planarToggleBtn.checked = proof.linear.isDepthFirst || false;
+    planarToggleBtn.checked = proof.linear.isBreadthFirst || false;
     showRulesBtn.checked = proof.showRules || false;
     getPlanarWrapper() ? getPlanarWrapper().style.display = "none" : "";
 
