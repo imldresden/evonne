@@ -16,8 +16,8 @@ export class AxiomsHelper {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
 		this.nodes = proof.svg.selectAll(proof.stepNavigator ? ".axiom" : ".node");
-		this.countChildrenAxioms(proof.tree.root, 0, '_children');
-		this.countChildrenAxioms(proof.tree.root, 0, 'children');
+		this.countChildren(proof.tree.root, 0, '_children');
+		this.countChildren(proof.tree.root, 0, 'children');
 
 		//Show rule name and premise that led to this conclusion
 		this.addShowPrevious();
@@ -53,20 +53,34 @@ export class AxiomsHelper {
 		this.addCollapsedIndicator();
 	}
 
-	countChildrenAxioms(d, i, prop) {
-		if (!d[prop]) {
-			d[prop + 'Max'] = i;
-			return i;
+	countChildren(d, i, prop) {
+		if (proof.showRules) {
+			if (!d[prop]) {
+				d[prop + 'Max'] = i;
+				return i;
+			}
+			return d[prop]
+				.map(c => {
+					const r =
+						this.countChildren(c, i, prop)
+						+ (proof.stepNavigator && ruleUtils.isRule(c.data.source.type) ? 0 : 1)
+					d[prop + 'Max'] = r - i;
+					return r;
+				})
+				.reduce((a, b) => a + b, 0);
+		} else {
+			if (!d[prop]) {
+				d[prop + 'Max'] = i;
+				return i;
+			}
+			return d[prop]
+				.map(c => {
+					const r = this.countChildren(c, i, prop) + 1
+					d[prop + 'Max'] = r - i;
+					return r;
+				})
+				.reduce((a, b) => a + b, 0);
 		}
-		return d[prop]
-			.map(c => {
-				const r =
-					this.countChildrenAxioms(c, i, prop)
-					+ (proof.stepNavigator && ruleUtils.isRule(c.data.source.type) ? 0 : 1)
-				d[prop + 'Max'] = r - i;
-				return r;
-			})
-			.reduce((a, b) => a + b, 0);
 	}
 
 	conditionToShowPrevious(d) {
@@ -144,15 +158,15 @@ export class AxiomsHelper {
 	}
 
 	addHideAllPrevious() {
-		const { BTN_CIRCLE_SIZE, CONNECTOR_SIZE } = nodeVisualsDefaults;
+		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.nodes
 			.filter(d => this.conditionToHideAllPrevious(d))
 			.append("g").attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => proof.isCompact ? 
-				`translate(${d.width / 2 + (d.childrenMax !== d._childrenMax ? BTN_CIRCLE_SIZE : 0) + CONNECTOR_SIZE + 1}, ${d.height / 2})` : 
-				`translate(${d.width / 2 - (d.childrenMax !== d._childrenMax ? BTN_CIRCLE_SIZE : 0) - 1}, 0)`
+				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${d.height / 2})` : 
+				`translate(${d.width / 2 - (this.conditionToShowAllPrevious(d) ? BTN_CIRCLE_SIZE : 0) - 1}, 0)`
 			)
 			.on("click", (e, d) => this.hideAllPrevious(d, e))
 		group.append("circle")
@@ -163,7 +177,7 @@ export class AxiomsHelper {
 			.attr("class", "material-icons")
 			.attr("x", 0)
 			.attr("y", 0)
-			.text("\ue5db");
+			.text((proof.isLinear && !proof.linear.bottomRoot) ? "\ue5d8" : "\ue5db");
 		group.append("title")
 			.text("Hide all previous")
 	}
@@ -177,8 +191,7 @@ export class AxiomsHelper {
 		if (treeRoot.children) {
 			treeRoot.children = null;
 			proof.update();
-		}
-		
+		}	
 	}
 
 	conditionToShowAllPrevious(d) {
@@ -186,14 +199,14 @@ export class AxiomsHelper {
 	}
 
 	addShowAllPrevious() {
-		const { CONNECTOR_SIZE, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.nodes
 			.filter(d => this.conditionToShowAllPrevious(d))
 			.append("g").attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
 			.attr("transform", d => proof.isCompact ? 
-				`translate(${d.width / 2 + CONNECTOR_SIZE}, ${d.height / 2})` : 
+				`translate(${d.width / 2 + (this.conditionToHideAllPrevious(d) ? BTN_CIRCLE_SIZE * 2 + 1 : BTN_CIRCLE_SIZE)}, ${d.height / 2})` : 
 				`translate(${d.width / 2}, 0)`)
 			.on("click", (e, d) => this.showAllPrevious(d, e))
 		group.append("circle")
@@ -204,7 +217,7 @@ export class AxiomsHelper {
 			.attr("class", "material-icons")
 			.attr("x", 0)
 			.attr("y", 0)
-			.text("\ue5d8");
+			.text((proof.isLinear && !proof.linear.bottomRoot) ? "\ue5db" : "\ue5d8");
 		group.append("title")
 			.text("Show all previous")
 	}
@@ -231,7 +244,7 @@ export class AxiomsHelper {
 	}
 
 	addHighlightJustificationInOntology() {
-		const { BOTTOM_TRAY_WIDTH, TRAY_HEIGHT, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
+		const { BOTTOM_TRAY_WIDTH, BTN_CIRCLE_SIZE, BOX_PADDING } = nodeVisualsDefaults;
 
 		let group = proof.svg.selectAll(".axiom")
 			.append("g")

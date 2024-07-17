@@ -47,7 +47,7 @@ export class TreeNavigation {
         } else {
             this.hierarchy = this.createHierarchy(this.processRules());
         }
-        
+
         this.links = proof.svgRootLayer
             .append("g")
             .attr("id", "links")
@@ -97,9 +97,10 @@ export class TreeNavigation {
         this.root = computeTreeLayout(this.hierarchy);
         this.drawTree(drawTime);
 
+
         // add axiom buttons depending on the navigation mode (Normal vs Magic)
         if (proof.isMagic) {
-            let originalHierarchy = this.createHierarchy(this.edgeData);
+            const originalHierarchy = this.createHierarchy(this.edgeData);
             proof.magic.entireProofHierarchy = originalHierarchy;
             proof.magic.addMagicNavButtonsToNodes();
         } else {

@@ -54,6 +54,8 @@ export class NodeVisualsHelper {
         proof.nodeVisuals.svg = where;
         proof.nodeVisuals.nodes = what;
 
+        this.resetConnectors();
+
         if (proof.isLinear) {
             if (proof.isCompact) {
                 this.renderConnectorsByType("Left");
@@ -68,6 +70,14 @@ export class NodeVisualsHelper {
         this.renderBoxes(); 
         this.renderLabels(); 
         this.addShowHideMouseEvents(); //handle hover effect on axiom nodes
+    }
+
+    resetConnectors() {
+        this.nodes.selectAll(".node").each(function () {
+            const s = d3.select(this);
+            s.selectAll("circle").remove();
+            s.selectAll("rect").remove();
+        });
     }
 
     renderConnectorsByType(direction, alternate) {
@@ -125,6 +135,7 @@ export class NodeVisualsHelper {
         
         this.nodes.selectAll(".node").each(function (node) {
             selection = d3.select(this);
+
             //Skip conclusion for bottom connectors
             if (selection.classed("conclusion") && direction === "Down") {
                 return;

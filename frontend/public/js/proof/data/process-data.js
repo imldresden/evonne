@@ -197,9 +197,6 @@ function computeTreeLayout(hierarchy) {
         return ((a.width + b.width) / 2) / proof.nodeVisuals.maxNodeWidth + 0.03;
     }
 
-    // Layout and draw the tree
-    hierarchy.dx = 50;
-    hierarchy.dy = proof.width / (hierarchy.height + 1);
     let tree_layout;
 
     if (proof.allowOverlap) {

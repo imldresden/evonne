@@ -2,11 +2,10 @@ import { proof } from "../proof.js";
 import { utils as ruleUtils } from "../rules/rules.js";
 
 export class LinearNavigation {
-    constructor() {
-        this._entireProofHierarchy = undefined;
-    }
+    constructor() { }
 
     isDistancePriority = true;
+    bottomRoot = true;
 
     computeLinearLayout(linearLayout) {
         let orderedElements = [];
@@ -17,17 +16,20 @@ export class LinearNavigation {
             orderedElements.push(linearLayout);
         }
 
+        orderedElements.reverse();
+
         const al = {};
         let c = 0;
-        let maxHeight = 0;
+        let maxHeight = proof.height + 30;
         orderedElements.forEach(d => {
             if (proof.isCompact || !ruleUtils.isRule(d.data.source.type)) {
                 al[d.data.source.id] = { axiom: d, pos: c, y: maxHeight};
                 c += 1;
-                maxHeight += (d.height + (proof.isCompact ? 5 : 15));
+                maxHeight -= (d.height + (proof.isCompact ? 5 : 15));
             }
         });
-        
+
+            
         if (proof.allowOverlap) {
             const itemY = proof.height / (orderedElements.length < 2 ? 1 : orderedElements.length - 1);
             linearLayout.each(d => {
@@ -41,17 +43,21 @@ export class LinearNavigation {
         } else {
             linearLayout.each(d => {
                 if (proof.isCompact) {
-                    d.x = d.width / 2 + d.depth * 15;
-                    d.y = maxHeight - al[d.data.source.id].y;
+                    d.x = d.width / 2 + d.depth * 15 - 20;
+                    d.y = al[d.data.source.id].y;
                 } else {
                     if (ruleUtils.isRule(d.data.source.type)) {
                         d.x = 0.7 * proof.width - d.width / 2 + d.width + 50;
-                        d.y = maxHeight - al[d.data.target.id].y + 15;    
+                        d.y = al[d.data.target.id].y + 15;    
                     } else {
                         d.x = 0.7 * proof.width - d.width / 2 - 15;
-                        d.y = maxHeight - al[d.data.source.id].y;
+                        d.y = al[d.data.source.id].y;
                     }
                 }
+
+                if (this.bottomRoot) {
+                    d.y = proof.height - d.y;
+                }                
             });
         }
         
@@ -124,6 +130,7 @@ export class LinearNavigation {
         y2 = proof.height - targetY + d.target.height / 2;
         y1 = proof.height - sourceY + d.source.height / 2;
 
+        
         if (proof.isCompact) { 
             x2 = targetX - .5 * d.target.width;
             x1 = sourceX - .5 * d.source.width - 3;
@@ -160,7 +167,7 @@ export class LinearNavigation {
             normalise = 1; // avoid division by zero
         }
 
-        let offSetX = midpoint_x + offset * (dy / normalise);
+        let offSetX = midpoint_x + ((this.bottomRoot ? 1 : -1) * offset * (dy / normalise));
         let offSetY = midpoint_y - offset * (dx / normalise);
 
         return "M" + x2 + "," + y2 + "S" + offSetX + "," + offSetY + " " + x1 + "," + y1; // bezier curves

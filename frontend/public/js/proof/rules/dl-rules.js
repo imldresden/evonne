@@ -255,14 +255,9 @@ export class DLRules {
     intersectionDecomposition(conclusion) {
         let lHS, rHS, lHSConjuncts, indexOfMatch;
 
-        // console.log(conclusion.replace(regPar, ""));
-        if (conclusion[0] === "(" && conclusion[conclusion.length-1] === ")")
-            // conclusion = conclusion.replace(regPar, "");
+        if (conclusion[0] === "(" && conclusion[conclusion.length-1] === ")") {
             conclusion = conclusion.substring(1,conclusion[conclusion.length-1])
-
-        console.log("conclusion after removing outer = " + conclusion)
-
-        //let lHSRaw =  conclusion.split(subsumes)[0].trim();
+        }
         
         lHS = conclusion.substring(1, conclusion.indexOf(")")).split(subsumes)[0].trim();
         rHS = conclusion.split(subsumes)[1].trim();

@@ -15,6 +15,7 @@ import { globals } from "../shared-data.js";
 
 const conf = {
   div: "proof-container",
+  isZoomPan: true,
   shortenAll: false,
   allowOverlap: false,
   showRules: true,
@@ -22,7 +23,11 @@ const conf = {
   isMagic: false,
   isRuleShort: false,
   isLinear: false,
+  bottomRoot: false,
+
   isCompact: false, 
+  fixedUpperRight: false, 
+  
   drawTime: 750,
   trays: {upper: false, lower: true},
   stepNavigator: true, 
@@ -82,9 +87,17 @@ function init_proof({
 } = {}) {
   if (external) {
     proof.div = external.div || proof.div,
+    proof.isZoomPan = external.isZoomPan === undefined ? proof.isZoomPan : external.isZoomPan;
+
     proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
+    
     proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
+    proof.linear.isDistancePriority = external.isDistancePriority === undefined ? false : external.isDistancePriority;
+    proof.linear.bottomRoot = external.bottomRoot === undefined ? false : external.bottomRoot;
+    
     proof.isCompact = external.isCompact  === undefined ? proof.isCompact : external.isCompact; 
+    proof.fixedUpperRight = external.fixedUpperRight  === undefined ? proof.fixedUpperRight : external.fixedUpperRight;
+
     proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
     proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
 
@@ -93,7 +106,6 @@ function init_proof({
     proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
     proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
     proof.trays = external.trays === undefined ? proof.trays : external.trays;
-    proof.linear.isDistancePriority = external.isDistancePriority === undefined ? false : external.isDistancePriority;
     proof.stepNavigator = external.stepNavigator === undefined ? proof.stepNavigator : external.stepNavigator;
     
     proof.drawTime = external.drawTime || proof.drawTime; 
@@ -139,7 +151,7 @@ function init_proof({
   proof.axioms.socket = socket;
   proof.magic.currentMagicAction = "";
 
-  if (!external) {
+  if (!external || (external && external.controls)) {
     initControls();
   }
   
@@ -164,7 +176,11 @@ function init_proof({
     proof.load();
   }
   
-  proof.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: `#${proof.div}` });
+  if (proof.isZoomPan) {
+    proof.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: `#${proof.div}` });
+  } else {
+    // TODO: set overflows
+  }
 }
 
 function getFileName() {
