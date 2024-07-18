@@ -26,7 +26,7 @@ const conf = {
   bottomRoot: false,
 
   isCompact: false, 
-  fixedUpperLeft: false, 
+  highlightCollapses: false, 
   
   drawTime: 750,
   trays: {upper: false, lower: true},
@@ -93,7 +93,7 @@ function setFromExternal(external) {
   proof.linear.bottomRoot = external.bottomRoot === undefined ? proof.linear.bottomRoot : external.bottomRoot;
   
   proof.isCompact = external.isCompact  === undefined ? proof.isCompact : external.isCompact; 
-  proof.fixedUpperLeft = external.fixedUpperLeft  === undefined ? proof.fixedUpperLeft : external.fixedUpperLeft;
+  proof.highlightCollapses = external.highlightCollapses  === undefined ? proof.highlightCollapses : external.highlightCollapses;
 
   proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
   proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;

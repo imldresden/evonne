@@ -111,7 +111,7 @@ export class AxiomsHelper {
 			.style("font-size", "1.2em")
 			.text("\ue314");
 		group.append("title")
-			.text("Show One Previous")
+			.text("Show Step")
 	}
 
 	get1StepCount(treeRoot, prop) {
