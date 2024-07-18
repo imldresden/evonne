@@ -16,13 +16,13 @@ export class AxiomsHelper {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
 		this.nodes = proof.svg.selectAll(proof.stepNavigator ? ".axiom" : ".node");
-		
+
 		//Collapse node children
 		this.addCollapse();
 		//Expand node children
 		this.addExpand();
 
-		
+
 		//Show rule name and premise that led to this conclusion
 		this.addShowPrevious();
 
@@ -86,8 +86,8 @@ export class AxiomsHelper {
 	}
 
 	conditionToShowPrevious(d) {
-		return proof.stepNavigator 
-			&& this.get1StepCount(d, 'children') !== this.get1StepCount(d, '_children') 
+		return proof.stepNavigator
+			&& this.get1StepCount(d, 'children') !== this.get1StepCount(d, '_children')
 			&& d._children
 			&& d._children.length > 0
 	}
@@ -129,9 +129,6 @@ export class AxiomsHelper {
 	}
 
 	showPrevious(treeRoot) {
-		if (proof.isDrawing) {
-			return;
-		}
 		proof.nodeInteracted = treeRoot;
 		if (!treeRoot.children) {
 			treeRoot.children = treeRoot._children;
@@ -168,41 +165,50 @@ export class AxiomsHelper {
 		let group = this.nodes
 			.filter(d => this.conditionToCollapse(d))
 			.append("g").attr("id", "B2")
-			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => proof.isCompact ? 
-				`translate(${- d.width / 2 - BTN_CIRCLE_SIZE - 5}, ${d.height / 2})` : 
-				`translate(${d.width / 2}, 0)`
-			)
 			.on("click", (e, d) => this.collapse(d, e))
-		group.append("circle")
-			.attr("r", BTN_CIRCLE_SIZE / 2)
-			.attr("cx", 0)
-			.attr("cy", 0);
-		let icon = "\ue5db"; 
-		if (proof.isLinear && !proof.linear.bottomRoot) {
-			icon = "\ue5d8";
 
-			if (proof.isCompact) {
-				icon = "keyboard_arrow_down";
+		if (proof.isCompact) {
+			group.attr("class", "axiomButton btn-borderless")
+				.attr("transform", d => `translate(${- d.width / 2 - BTN_CIRCLE_SIZE - 3}, ${d.height / 2})`)
+
+			group.append("text")
+				.attr("class", "material-icons")
+				.attr("x", 0)
+				.attr("y", 0)
+				.text("keyboard_arrow_down");
+		} else {
+			group.attr("class", "axiomButton btn-round")
+				.attr("transform", d => `translate(${d.width / 2}, 0)`)
+
+			group.append("circle")
+				.attr("r", BTN_CIRCLE_SIZE / 2)
+				.attr("cx", 0)
+				.attr("cy", 0);
+
+			let icon = "arrow_downward";
+			if (proof.isLinear && !proof.linear.bottomRoot) {
+				icon = "arrow_upward";
 			}
+
+			group.append("text")
+				.attr("class", "material-icons")
+				.attr("x", 0)
+				.attr("y", 0)
+				.text(icon);
 		}
-		group.append("text")
-			.attr("class", "material-icons")
-			.attr("x", 0)
-			.attr("y", 0)
-			.text(icon);
+
 		group.append("title")
-			.text("Hide Children")
+			.text("Collapse")
 	}
 
 	collapse(treeRoot, e) {
 		e.stopPropagation();
 		proof.nodeInteracted = treeRoot;
-		
+
 		if (treeRoot.children) {
 			treeRoot.children = null;
 			proof.update();
-		}	
+		}
 	}
 
 	conditionToExpand(d) {
@@ -215,37 +221,44 @@ export class AxiomsHelper {
 		let group = this.nodes
 			.filter(d => this.conditionToExpand(d))
 			.append("g").attr("id", "B2")
-			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => proof.isCompact ? 
-				`translate(${- d.width / 2 - BTN_CIRCLE_SIZE - 5}, ${d.height / 2})` : 
-				`translate(${d.width / 2}, 0)`
-			)
 			.on("click", (e, d) => this.expand(d, e))
-		group.append("circle")
-			.attr("r", BTN_CIRCLE_SIZE / 2)
-			.attr("cx", 0)
-			.attr("cy", 0);
-		let icon = "\ue5d8"; 
-		if (proof.isLinear && !proof.linear.bottomRoot) {
-			icon = "\ue5db";
 
-			if (proof.isCompact) {
-				icon = "keyboard_arrow_right";
+		if (proof.isCompact) {
+			group.attr("class", "axiomButton btn-borderless")
+				.attr("transform", d => `translate(${- d.width / 2 - BTN_CIRCLE_SIZE - 3}, ${d.height / 2})`)
+
+			group.append("text")
+				.attr("class", "material-icons")
+				.attr("x", 0)
+				.attr("y", 0)
+				.text("keyboard_arrow_right");
+		} else {
+			group.attr("class", "axiomButton btn-round")
+				.attr("transform", d => `translate(${d.width / 2}, 0)`)
+
+			group.append("circle")
+				.attr("r", BTN_CIRCLE_SIZE / 2)
+				.attr("cx", 0)
+				.attr("cy", 0);
+
+			let icon = "arrow_upward";
+			if (proof.isLinear && !proof.linear.bottomRoot) {
+				icon = "arrow_downward";
 			}
-		}	
-		group.append("text")
-			.attr("class", "material-icons")
-			.attr("x", 0)
-			.attr("y", 0)
-			.text(icon);
+			group.append("text")
+				.attr("class", "material-icons")
+				.attr("x", 0)
+				.attr("y", 0)
+				.text(icon);
+		}
 		group.append("title")
-			.text("Expand Children")
+			.text("Expand")
 	}
 
 	expand(treeRoot, e) {
 		e.stopPropagation();
 		proof.nodeInteracted = treeRoot;
-		
+
 		if (treeRoot._children) {
 			treeRoot.children = treeRoot._children;
 			proof.update();
@@ -547,24 +560,35 @@ export class AxiomsHelper {
 
 	addCollapsedIndicator() {
 		d3.selectAll(".collapse-indicator").remove();
-		proof.svg
-			.selectAll(".axiom:not(.asserted) #frontRect")
+
+		
+		const offset = 3;
+
+		const collapsed = proof.svg
+			.selectAll(".node #frontRect")
 			.filter(y => !y.children && y._children)
+
+		const indicator = (node, amount = 2, hue = 207, sat = 89) => {
+			for (let i = 1; i <= amount; i++) {
+				d3.select(node.parentElement)
+					.append("rect")
+					.attr("class", "collapse-indicator")
+					.attr("x", parseInt(d3.select(node).attr("x")) + i * offset)
+					.attr("y", parseInt(d3.select(node).attr("y")) - i * offset)
+					.attr("width", d3.select(node).attr("width"))
+					.attr("height", d3.select(node).attr("height"))
+					.style("fill", `hsla(${hue}, ${sat}%, ${70 + i * 8}%, 1)`)
+					.lower()
+			}
+		}
+		const single = d => proof.showRules && !d._children[0]._children;
+		collapsed.filter(y => single(y))
 			.nodes()
-			.forEach(node => {
-				const offset = 3;
-				for (let i = 1; i < 3; i++) {
-					d3.select(node.parentElement)
-						.append("rect")
-						.attr("class", "collapse-indicator")
-						.attr("x", parseInt(d3.select(node).attr("x")) + i * offset)
-						.attr("y", parseInt(d3.select(node).attr("y")) - i * offset)
-						.attr("width", d3.select(node).attr("width"))
-						.attr("height", d3.select(node).attr("height"))
-						.style("fill", `hsla(207, 89%, ${70 + i * 8}%, 1)`)
-						.lower()
-				}
-			})
+			.forEach(node => indicator(node, 1, 207, 7))
+		
+		collapsed.filter(y => !single(y))
+			.nodes()
+			.forEach(node => indicator(node))
 	}
 
 	help_icon = "help_outline";
@@ -580,8 +604,8 @@ export class AxiomsHelper {
 		let group = this.nodes
 			.append("g").attr("id", "H1")
 			.attr("class", "axiomButton btn-round btn-help")
-			.attr("transform", d => proof.isCompact ? 
-				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${d.height / 2})` : 
+			.attr("transform", d => proof.isCompact ?
+				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${d.height / 2})` :
 				`translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")
@@ -599,7 +623,6 @@ export class AxiomsHelper {
 	}
 
 	highlightCurrentInference(event, node) {
-
 		let btn = d3.select("#N" + node.data.source.id).select("#H1 text");
 		let state = btn.text();
 
@@ -672,20 +695,20 @@ export class AxiomsHelper {
 			filter: (d) => this.conditionToShowPrevious(d)
 		},
 		{
-			title: 'Expand All Children',
+			title: 'Expand All',
 			type: 'button',
 			action: (e, d) => this.showAllPrevious(d, e),
 			filter: (d) => this.conditionToShowAllPrevious(d)
 
 		},
 		{
-			title: 'Collapse Children',
+			title: 'Collapse',
 			type: 'button',
 			action: (e, d) => this.collapse(d, e),
 			filter: (d) => this.conditionToCollapse(d)
 		},
 		{
-			title: 'Expand Children',
+			title: 'Expand',
 			type: 'button',
 			action: (e, d) => this.expand(d, e),
 			filter: (d) => this.conditionToExpand(d)

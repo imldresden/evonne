@@ -244,7 +244,7 @@ export class NodeVisualsHelper {
             elements[i].selectAll("text").remove();
             //add new ones
             /*elements[i].append("foreignObject")
-                .attr("x", d => -(d.width) / 2 + (proof.isCompact ? 0 : TEXT_PAD))
+                .attr("x", d => -(d.width) / 2 + TEXT_PAD)
                 .attr("y", 0)
                 .attr("width", d=> d.width)
                 .attr("height", d=> d.height)
@@ -258,7 +258,7 @@ export class NodeVisualsHelper {
             elements[i].append("text")
                 .attr("id", elementsID[i])
                 .attr("class", elementsClass[i])
-                .attr("x", d => -(d.width) / 2 + (proof.isCompact ? TEXT_PAD /2 : TEXT_PAD))
+                .attr("x", d => -(d.width) / 2 + TEXT_PAD)
                 .attr("y", d => d.height / 1.5)
                 .text((d, i, nodes) => {
                     const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
@@ -560,7 +560,7 @@ export class NodeVisualsHelper {
 
     getNodeDims(node) {
         // estimation of the size of each character
-        const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.data.source.id}`)
+        const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.data.source.id}`);
         
         let label = this.getLabel(node.data.source);
         

@@ -94,7 +94,7 @@ export class TreeNavigation {
         if (reset) {
             this.restart();
         }
-
+        proof.rules.destroyExplanation();
         proof.nodeVisuals.setNodeDimsAndMax(this.hierarchy);
         this.root = computeTreeLayout(this.hierarchy);
         this.drawTree(proof.drawTime);
@@ -227,12 +227,27 @@ export class TreeNavigation {
     }
 
     lineAttributes(input) {
+
+        if (proof.isCompact && proof.showRules) {
+            return input
+                .attr("marker-end", "")
+                .attr("class", d => `link cuttable dim ${(d.source.data.source.type === "rest" ? "torest" : "")
+                } ${(d.source.data.target === "" || ruleUtils.isRule(d.source.data.target.type) ? " hidden " : "")
+                }`)
+                .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
+                .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
+                .on("click", (_, d) => {
+                    if (!proof.isMagic && d.source.data.target.type === "axiom") {
+                        proof.tree.showSubTree(d.target);
+                    }
+                })    
+        }
+
         return input
-            .attr("marker-end", d => d.source.data.source.type === "rest" || proof.isCompact ? "" : "url(#arrowhead)")
-            .attr("class", d =>
-                (d.source.data.source.type === "rest" ? "link torest" : "link") +
-                (d.source.data.target.type === "axiom" && !proof.isMagic ? " from-axiom " : "")
-            )
+            .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
+            .attr("class", d => `link ${(d.source.data.source.type === "rest" ? "torest" : "")
+            } ${(d.source.data.target.type === "axiom" && !proof.isMagic ? "cuttable" : "")
+            }`)
             .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
             .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
             .on("click", (_, d) => {

@@ -45,8 +45,8 @@ export class LinearNavigation {
         } else {
             linearLayout.each(d => {
                 if (proof.isCompact) {
-                    const m = 0 //!d.parent || ruleUtils.isRule(d.parent.data.source.type) ? 1 : 0;
-                    d.x = d.width / 2 + (d.depth - m)*10 - 10;
+                    const m = ruleUtils.isRule(d.data.source.type) ? 1 : 0;
+                    d.x = d.width / 2 + (d.depth - m)*5 - 10;
                     d.y = al[d.data.source.id].y;
                 } else {
                     if (ruleUtils.isRule(d.data.source.type)) {
@@ -136,7 +136,7 @@ export class LinearNavigation {
         
         if (proof.isCompact) { 
             x2 = targetX - .5 * d.target.width;
-            x1 = sourceX - .5 * d.source.width + 1;    
+            x1 = sourceX - .5 * d.source.width + 2;    
             
             return "M" + x1 + "," + y1 + "V" + y2 + "H" + x2;
         }

@@ -44,25 +44,11 @@
 
                 isCompact: true,
                     isZoomPan: true, 
+                    highlightCollapses: true,
 
                 trays: { upper:false, lower:false },
 
-                stepNavigator: false, /**/
-
-                // compact linear mode, used in Nemo
-                /*showRules: true,
-
-                isLinear: true,
-                    isBreadthFirst: true,
-                    bottomRoot: false,
-                
-                isCompact: true,
-                    fixedUpperLeft: true, 
-                    isZoomPan: false, 
-                
-                trays: { upper:false, lower:false },
-                
-                stepNavigator: false, */
+                stepNavigator: false, 
             } 
         });
     </script>

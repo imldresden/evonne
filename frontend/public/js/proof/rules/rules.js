@@ -250,14 +250,6 @@ class RulesHelper {
         });
     }
 
-    destroyExplanation() {
-        if (tooltip) { tooltip.remove(); }
-
-        proof.rules.#lastToolTipTriggerID = null;
-        proof.nodeVisuals.setFullOpacityToAll();
-        d3.selectAll("#H1 text").text("help_outline");
-    }
-
     highlightNodes(nodes) {
         let premises = [];
         let iDsToHighlight = [];
@@ -291,6 +283,14 @@ class RulesHelper {
     }
 
     openExplanation(_params, nodes) {
+        if (proof.isCompact && proof.highlightCollapses) {
+			nodes[0].children = nodes[0]._children; // expand rule
+            nodes[0].children?.forEach(c => {
+                c.children = null; // collapse children of rule
+            });
+            proof.update();
+		}
+
         const { data, premises, conclusion } = this.highlightNodes(nodes);
         const ruleName = proof.nodeVisuals.getLabel(data.source);
         const subProof = proof.rules.#getSubProof(data);
@@ -307,6 +307,15 @@ class RulesHelper {
         };
 
         this.#renderExplanation();
+    }
+
+    destroyExplanation() {
+        if (tooltip) { tooltip.remove(); }
+
+        proof.rules.#lastToolTipTriggerID = null;
+        proof.nodeVisuals.setFullOpacityToAll();
+        d3.selectAll("#H1 text").text("help_outline");
+        
     }
 
     enlargeExplanation() {

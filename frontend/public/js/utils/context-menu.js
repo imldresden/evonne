@@ -19,7 +19,7 @@ export class ContextMenu {
         
         let maxWidth = 0;
         menuItems.forEach(a => {
-            const l = a.title.length * 9;
+            const l = a.title.length * 12;
             if (l > maxWidth) {
                 maxWidth = l;
             } 

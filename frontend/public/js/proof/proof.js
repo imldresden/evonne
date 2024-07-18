@@ -76,9 +76,36 @@ const conf = {
     }
   },
 
-  update: function (reset) {
+  update: function ({ reset=false, ext=undefined } = {}) {
+    ext && setFromExternal(ext);
     proof.tree.update(reset);
   }
+}
+
+function setFromExternal(external) {
+  proof.div = external.div || proof.div,
+  proof.isZoomPan = external.isZoomPan === undefined ? proof.isZoomPan : external.isZoomPan;
+
+  proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
+  
+  proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
+  proof.linear.isBreadthFirst = external.isBreadthFirst === undefined ? proof.linear.isBreadthFirst : external.isBreadthFirst;
+  proof.linear.bottomRoot = external.bottomRoot === undefined ? proof.linear.bottomRoot : external.bottomRoot;
+  
+  proof.isCompact = external.isCompact  === undefined ? proof.isCompact : external.isCompact; 
+  proof.fixedUpperLeft = external.fixedUpperLeft  === undefined ? proof.fixedUpperLeft : external.fixedUpperLeft;
+
+  proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
+  proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
+
+  globals.shorteningMethod = external.shorteningMethod || globals.shorteningMethod;
+  proof.shortenAll = external.shortenAll === undefined ? proof.shortenAll : external.shortenAll; 
+  proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
+  proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
+  proof.trays = external.trays === undefined ? proof.trays : external.trays;
+  proof.stepNavigator = external.stepNavigator === undefined ? proof.stepNavigator : external.stepNavigator;
+  
+  proof.drawTime = external.drawTime === undefined ? proof.drawTime : external.drawTime; 
 }
 
 function init_proof({
@@ -86,29 +113,7 @@ function init_proof({
   external,
 } = {}) {
   if (external) {
-    proof.div = external.div || proof.div,
-    proof.isZoomPan = external.isZoomPan === undefined ? proof.isZoomPan : external.isZoomPan;
-
-    proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
-    
-    proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
-    proof.linear.isBreadthFirst = external.isBreadthFirst === undefined ? proof.linear.isBreadthFirst : external.isBreadthFirst;
-    proof.linear.bottomRoot = external.bottomRoot === undefined ? proof.linear.bottomRoot : external.bottomRoot;
-    
-    proof.isCompact = external.isCompact  === undefined ? proof.isCompact : external.isCompact; 
-    proof.fixedUpperLeft = external.fixedUpperLeft  === undefined ? proof.fixedUpperLeft : external.fixedUpperLeft;
-
-    proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
-    proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
-
-    globals.shorteningMethod = external.shorteningMethod || globals.shorteningMethod;
-    proof.shortenAll = external.shortenAll === undefined ? proof.shortenAll : external.shortenAll; 
-    proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
-    proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
-    proof.trays = external.trays === undefined ? proof.trays : external.trays;
-    proof.stepNavigator = external.stepNavigator === undefined ? proof.stepNavigator : external.stepNavigator;
-    
-    proof.drawTime = external.drawTime === undefined ? proof.drawTime : external.drawTime; 
+    setFromExternal(external);
   }
 
   if (proof.svgRootLayer) {

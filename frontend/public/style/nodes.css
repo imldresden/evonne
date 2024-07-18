@@ -144,11 +144,16 @@ svg g.node > g.btn-extend > rect {
 }
 
 svg g.node > g.btn-round > text {
-	color: white;
-	fill: white !important;
+	fill: white;
 	text-anchor: middle;
 	dominant-baseline: central;
 	font-size: 0.9em;
+}
+
+svg g.node > g.btn-borderless > text {
+	text-anchor: middle;
+	dominant-baseline: central;
+	font-size: 2em;
 }
 
 text.rotated {
@@ -229,7 +234,12 @@ svg g.node > g.btn-view > text {
 	fill: none;
 }
 
-#proof-view .link.from-axiom:hover {
+.link.dim {
+	stroke: #d6d5d5;
+	stroke-width: 1px;
+}
+
+#proof-view .link.cuttable:hover {
 	stroke-width: 5px !important;
 	stroke: var(--color-remove-link);
 }
