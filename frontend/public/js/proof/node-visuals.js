@@ -591,7 +591,7 @@ export class NodeVisualsHelper {
             }
 
             if (node.height > this.maxNodeHeight) {
-                this.maxNodeHeight = node.height;   
+                this.maxNodeHeight = node.height;
             }
 
             if (node.children) {

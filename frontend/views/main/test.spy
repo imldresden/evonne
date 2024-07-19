@@ -43,7 +43,7 @@
                     bottomRoot: false,
 
                 isCompact: true,
-                    isZoomPan: true, 
+                    isZoomPan: false, 
                     highlightCollapses: true,
 
                 trays: { upper:false, lower:false },

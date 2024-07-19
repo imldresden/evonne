@@ -125,10 +125,22 @@ function init_proof({
     d3.select(`#${proof.div}`).insert("svg", ":first-child").attr("id", "proof-view"); 
     proof.svg = d3.select("#proof-view");
 
-    proof.BBox = proof.svg.node().getBoundingClientRect();
+    const svgNode = proof.svg.node();
+    if (!proof.isZoomPan) {
+      proof.svg.attr("width", 500); 
+      proof.svg.attr("height", 500); 
+      svgNode.parentElement.style.overflow= "scroll";
+    } else {
+      proof.svg.style("flex", 1);
+      svgNode.parentElement.style.display= "flex";
+      svgNode.parentElement.style.overflow= "hidden";
+    }
+
+    proof.BBox = svgNode.getBoundingClientRect();
     proof.SVGwidth = proof.BBox.width;
     proof.SVGheight = proof.BBox.height;
     proof.margin = { top: 50, right: 50, bottom: 100, left: 50 };
+
     proof.width = proof.SVGwidth - proof.margin.left - proof.margin.right;
     proof.height = proof.SVGheight - proof.margin.top - proof.margin.bottom;
     proof.svg
@@ -181,11 +193,7 @@ function init_proof({
     proof.load();
   }
   
-  if (proof.isZoomPan) {
-    proof.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: `#${proof.div}` });
-  } else {
-    // TODO: set overflows
-  }
+  proof.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: `#${proof.div}`, isZoomPan : proof.isZoomPan });
 }
 
 function getFileName() {
