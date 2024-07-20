@@ -68,7 +68,7 @@ export class NodeVisualsHelper {
         // Draw the restOfProof node
         const r = this.nodes.select(".rest").on("click", () => proof.tree.restoreFromSubProof());
         const circle = r.append("circle").attr("r", 10)
-        const text = r.append("text").text(proof.tree.cuts.length-1);
+        const text = r.append("text").text(proof.tree.cuts.length);
         
         if (proof.isCompact) {
             circle.attr("cy", 10).attr("cx", -15);
@@ -191,7 +191,7 @@ export class NodeVisualsHelper {
         const { BOTTOM_TRAY_WIDTH, TOP_TRAY_WIDTH, TRAY_HEIGHT } = nodeVisualsDefaults;
         let elements = this._nodes.selectAll(".node:not(.rest)");
 
-        elements.on("click", (e, d) => e.ctrlKey && proof.compactInteraction && proof.tree.showSubTree(d))
+        elements.filter(":not(.conclusion)").on("click", (e, d) => e.ctrlKey && proof.compactInteraction && proof.tree.showSubTree(d))
         //Remove old rectangles
         elements.selectAll(".bg-box").remove();
         //Add a rectangle for the tray of communication buttons

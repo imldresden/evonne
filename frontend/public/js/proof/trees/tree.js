@@ -49,7 +49,7 @@ export class TreeNavigation {
             this.hierarchy = this.createHierarchy(this.processRules());
         }
 
-        this.cuts.push(this.hierarchy)
+        this.cuts = []; 
 
         this.links = proof.svgRootLayer
             .append("g")
@@ -174,6 +174,9 @@ export class TreeNavigation {
     }
 
     showSubTree(root) {
+        if (root.data.id === "rest") { 
+            return;
+        }
         //extract the current data
         let originalEdgeData = this.extractOriginalData(root);
         //reset all children to show the entire subtree, defined in axiomFunctions.js
@@ -202,6 +205,7 @@ export class TreeNavigation {
             this.hierarchy = this.cuts.pop();
             this.update();
         } 
+        console.log(this.cuts)
     }
 
     extractOriginalData(root) {
