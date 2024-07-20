@@ -45,9 +45,10 @@ export class NodeVisualsHelper {
 
     nodesCurrentDisplayFormat = new Map()
     nodesDisplayFormat = new Map()
-    maxNodeWidth = 200;
+    maxNodeWidth = 20;
     nodeLineHeight = 20;
     maxNodeHeight = 20;
+    totalHeight = 0;
 
     renderNodes(where, what) {
         proof.nodeVisuals.svg = where;
@@ -64,14 +65,18 @@ export class NodeVisualsHelper {
             this.renderConnectorsByType("Down");
         }
 
+        // Draw the restOfProof node
+        const r = this.nodes.select(".rest").on("click", () => proof.tree.restoreFromSubProof());
+        const circle = r.append("circle").attr("r", 10)
+        const text = r.append("text").text(proof.tree.cuts.length-1);
         
-        // Draw the rest-of-proof node
-        this.nodes.select(".rest")
-            .append("circle")
-            .attr("r", 10)
-            .attr("cy", 15)
-            .attr("cx", proof.isCompact ? -5:0)
-            .on("click", () => proof.tree.restoreFromSubProof());
+        if (proof.isCompact) {
+            circle.attr("cy", 10).attr("cx", -15);
+            text.attr("y", 14).attr("x", -19);
+        } else {
+            circle.attr("cy", 15).attr("cx", 0);
+            text.attr("y", 19).attr("x", -4);
+        }
 
         this.renderBoxes(); 
         this.renderLabels(); 
@@ -139,7 +144,7 @@ export class NodeVisualsHelper {
         let attributes = undefined;
         
         
-        this.nodes.selectAll(".node").each(function (node) {
+        this.nodes.selectAll(".node:not(.rest)").each(function (node) {
             selection = d3.select(this);
 
             //Skip conclusion for bottom connectors
@@ -186,6 +191,7 @@ export class NodeVisualsHelper {
         const { BOTTOM_TRAY_WIDTH, TOP_TRAY_WIDTH, TRAY_HEIGHT } = nodeVisualsDefaults;
         let elements = this._nodes.selectAll(".node:not(.rest)");
 
+        elements.on("click", (e, d) => e.ctrlKey && proof.compactInteraction && proof.tree.showSubTree(d))
         //Remove old rectangles
         elements.selectAll(".bg-box").remove();
         //Add a rectangle for the tray of communication buttons
@@ -235,7 +241,7 @@ export class NodeVisualsHelper {
         elementsClass.push("axiomLabel");
         elementsID.push("axiomText");
 
-        elements.push(this.nodes.selectAll(".node:not(.axiom)"));
+        elements.push(this.nodes.selectAll(".node:not(.axiom, .rest)"));
         elementsClass.push("ruleLabel");
         elementsID.push("ruleText");
 
@@ -331,7 +337,7 @@ export class NodeVisualsHelper {
                 }
             });
 
-        proof.svg.selectAll(".node")
+        proof.svg.selectAll(".node:not(.rest)")
             .on("mouseenter", (e, d) => {
                 this.activeNodes[d.id] && clearTimeout(this.activeNodes[d.id]);
                 this.shiftLabelShowButtons(e.currentTarget);
@@ -586,6 +592,7 @@ export class NodeVisualsHelper {
         // computes all widths, saves them per node and sets max
         if (node !== null) {
             this.getNodeDims(node);
+            this.totalHeight += node.height + (proof.isCompact ? 5 : 15);
             if (node.width > this.maxNodeWidth) {
                 this.maxNodeWidth = node.width;   
             }

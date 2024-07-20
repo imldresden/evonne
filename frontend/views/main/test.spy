@@ -44,7 +44,7 @@
 
                 isCompact: true,
                     isZoomPan: false, 
-                    highlightCollapses: true,
+                    compactInteraction: true,
 
                 trays: { upper:false, lower:false },
 

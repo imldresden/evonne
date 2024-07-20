@@ -26,7 +26,7 @@ const conf = {
   bottomRoot: false,
 
   isCompact: false, 
-  highlightCollapses: false, 
+  compactInteraction: false, 
   
   drawTime: 750,
   trays: {upper: false, lower: true},
@@ -92,8 +92,8 @@ function setFromExternal(external) {
   proof.linear.isBreadthFirst = external.isBreadthFirst === undefined ? proof.linear.isBreadthFirst : external.isBreadthFirst;
   proof.linear.bottomRoot = external.bottomRoot === undefined ? proof.linear.bottomRoot : external.bottomRoot;
   
-  proof.isCompact = external.isCompact  === undefined ? proof.isCompact : external.isCompact; 
-  proof.highlightCollapses = external.highlightCollapses  === undefined ? proof.highlightCollapses : external.highlightCollapses;
+  proof.isCompact = external.isCompact === undefined ? proof.isCompact : external.isCompact; 
+  proof.compactInteraction = external.compactInteraction === undefined ? proof.compactInteraction : external.compactInteraction;
 
   proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
   proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
@@ -127,11 +127,9 @@ function init_proof({
 
     const svgNode = proof.svg.node();
     if (!proof.isZoomPan) {
-      proof.svg.attr("width", 500); 
-      proof.svg.attr("height", 500); 
-      svgNode.parentElement.style.overflow= "scroll";
+      svgNode.parentElement.style.overflow= "auto";
     } else {
-      proof.svg.style("flex", 1);
+      svgNode.style.flex = 1;
       svgNode.parentElement.style.display= "flex";
       svgNode.parentElement.style.overflow= "hidden";
     }
@@ -143,14 +141,17 @@ function init_proof({
 
     proof.width = proof.SVGwidth - proof.margin.left - proof.margin.right;
     proof.height = proof.SVGheight - proof.margin.top - proof.margin.bottom;
-    proof.svg
-      .attr("viewBox", [
-        -proof.margin.left,
-        -proof.margin.top,
-        proof.SVGwidth,
-        proof.SVGheight,
-      ])
-      .style("user-select", "none");
+
+    if (proof.isZoomPan) {
+      proof.svg
+        .attr("viewBox", [
+          -proof.margin.left,
+          -proof.margin.top,
+          proof.SVGwidth,
+          proof.SVGheight,
+        ])
+    }
+    proof.svg.style("user-select", "none");
     proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport");
   }
 

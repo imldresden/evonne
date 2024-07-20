@@ -94,12 +94,19 @@ export class TreeNavigation {
         if (reset) {
             this.restart();
         }
+        
         proof.rules.destroyExplanation();
+        proof.nodeVisuals.totalHeight = 0;
         proof.nodeVisuals.setNodeDimsAndMax(this.hierarchy);
         this.root = computeTreeLayout(this.hierarchy);
+
+        if (!proof.isZoomPan) {
+            proof.svg.attr("width", proof.nodeVisuals.maxNodeWidth + 100); 
+            proof.svg.attr("height", proof.nodeVisuals.totalHeight + 20); 
+        }
+
         this.drawTree(proof.drawTime);
-
-
+        
         // add axiom buttons depending on the navigation mode (Normal vs Magic)
         if (proof.isMagic) {
             const originalHierarchy = this.createHierarchy(this.edgeData);
@@ -111,6 +118,7 @@ export class TreeNavigation {
 
         // add tooltips to rule names
         proof.rules.addTooltipToNodes();
+        
     }
 
     createHierarchy(data) {
@@ -227,27 +235,21 @@ export class TreeNavigation {
     }
 
     lineAttributes(input) {
-
         if (proof.isCompact && proof.showRules) {
-            return input
+            input
                 .attr("marker-end", "")
                 .attr("class", d => `link cuttable dim ${(d.source.data.source.type === "rest" ? "torest" : "")
                 } ${(d.source.data.target === "" || ruleUtils.isRule(d.source.data.target.type) ? " hidden " : "")
                 }`)
-                .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
-                .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
-                .on("click", (_, d) => {
-                    if (!proof.isMagic && d.source.data.target.type === "axiom") {
-                        proof.tree.showSubTree(d.target);
-                    }
-                })    
+        } else {
+            input
+                .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
+                .attr("class", d => `link ${(d.source.data.source.type === "rest" ? "torest" : "")
+                } ${(d.source.data.target.type === "axiom" && !proof.isMagic ? "cuttable" : "")
+                }`)
         }
-
+        
         return input
-            .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
-            .attr("class", d => `link ${(d.source.data.source.type === "rest" ? "torest" : "")
-            } ${(d.source.data.target.type === "axiom" && !proof.isMagic ? "cuttable" : "")
-            }`)
             .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
             .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
             .on("click", (_, d) => {

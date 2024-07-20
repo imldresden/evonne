@@ -29,14 +29,15 @@
 	fill: #696969;
 }
 
-.node.rest * {
+.node.rest circle{
 	fill: var(--color-node-axiom-conclusion-fill);
 	stroke: var(--color-node-axiom-conclusion-stroke);
 	stroke-width: 1;
 }
 
-.node.rest *:not(circle:first-of-type) {
-	display: none;
+
+.node.rest text {
+	fill: var(--color-node-axiom-conclusion-stroke);
 }
 
 svg g.node > rect.bg-box {

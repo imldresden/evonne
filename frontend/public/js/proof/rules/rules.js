@@ -244,7 +244,7 @@ class RulesHelper {
                     proof.rules.openExplanation({ event }, [node]);
                     proof.rules.#lastToolTipTriggerID = node.data.source.id;
                 } else {
-                    proof.rules.destroyExplanation();
+                    proof.rules.destroyExplanation({ event, node });
                 }
             });
         });
@@ -283,7 +283,7 @@ class RulesHelper {
     }
 
     openExplanation(_params, nodes) {
-        if (proof.isCompact && proof.highlightCollapses) {
+        if (_params.event.ctrlKey && proof.compactInteraction) {
 			nodes[0].children = nodes[0]._children; // expand rule
             nodes[0].children?.forEach(c => {
                 c.children = null; // collapse children of rule
@@ -309,7 +309,15 @@ class RulesHelper {
         this.#renderExplanation();
     }
 
-    destroyExplanation() {
+    destroyExplanation({ event={ctrlKey:false}, node } = {}) {
+        if (event.ctrlKey && proof.compactInteraction) {
+			node.children = node._children; // expand rule
+            node.children?.forEach(c => {
+                c.children = c._children; // expand children of rule
+            });
+            proof.update();
+		}
+
         if (tooltip) { tooltip.remove(); }
 
         proof.rules.#lastToolTipTriggerID = null;

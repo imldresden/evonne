@@ -15,7 +15,7 @@ export class AxiomsHelper {
 	addFunctionButtonsToNodes() {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
-		this.nodes = proof.svg.selectAll(proof.stepNavigator ? ".axiom" : ".node");
+		this.nodes = proof.svg.selectAll(proof.stepNavigator ? ".axiom" : ".node:not(.rest)");
 
 		//Collapse node children
 		this.addCollapse();
