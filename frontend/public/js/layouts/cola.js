@@ -40,7 +40,7 @@ const counter = {
 
   flow: {
     axis: 'x',
-    minSeparation: 30,
+    minSeparation: 60,
   },
 
   /*

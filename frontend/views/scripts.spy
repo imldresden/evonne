@@ -14,6 +14,7 @@
 <script src="/libs/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
 <script src="/libs/cytoscape-lasso/dist/cytoscape-lasso.min.js"></script>
 <script src="/libs/cytoscape-context-menus/cytoscape-context-menus.js"></script>
+<script src="/libs/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://unpkg.com/@popperjs/core@2"></script>
 <script src="https://unpkg.com/cytoscape-popper/cytoscape-popper.js"></script>
 <script src="https://unpkg.com/tippy.js@6"></script>
@@ -25,3 +26,4 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/utils/session-id.js"></script>
+<script src="/js/counterexamplenew/controls.js"></script>

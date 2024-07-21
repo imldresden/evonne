@@ -103,6 +103,13 @@ const colors = {
         "shape": "round-rectangle",
         "border-color":"#64b5f6"
       }
+    },{
+      selector: ".red-edge",
+      style: {
+      'line-color': 'red',
+      'target-arrow-color': 'red',
+      'source-arrow-color': 'red'
+      }
     },
     // {
     //   selector: '.editable-group',

@@ -79,7 +79,7 @@ async function createContent(mapper, model) {
       const contextNode = event.target || event.cyTarget;
       const selectedElems = cy.nodes(':selected').union(contextNode);
       let isGroupSelected = false;
-    
+
       selectedElems.forEach(node => {
         if (node.isParent() || node.parent().isParent()) {
           isGroupSelected = true;
@@ -91,14 +91,14 @@ async function createContent(mapper, model) {
       } else {
         contextMenu.hideMenuItem('remove-compound');
       }
-      if (allSelected('node')) {
-        contextMenu.hideMenuItem('select-all-nodes');
-        contextMenu.showMenuItem('unselect-all-nodes');
-      }
-      else {
-        contextMenu.hideMenuItem('unselect-all-nodes');
-        contextMenu.showMenuItem('select-all-nodes');
-      }
+      // if (allSelected('node')) {
+      //   contextMenu.hideMenuItem('select-all-nodes');
+      //   contextMenu.showMenuItem('unselect-all-nodes');
+      // }
+      // else {
+      //   contextMenu.hideMenuItem('unselect-all-nodes');
+      //   contextMenu.showMenuItem('select-all-nodes');
+      // }
       const hiddenNodesExist = cy.nodes(':hidden').length > 0;
       if (hiddenNodesExist) {
         contextMenu.showMenuItem('show-hidden-nodes');
@@ -113,10 +113,12 @@ async function createContent(mapper, model) {
     document.getElementById('clear_selection').addEventListener('click', function() {
       cy.nodes().unselect();
     });
-
+    const shortened_rangeInput = document.getElementById('shortening_mode_value');
+    const shortened_badge = document.getElementById('shortened-value');
     document.getElementById('shortening_mode_value').addEventListener('input', function(){
       // Check if the checkbox is checked
       UpdateNodeslabel();
+      shortened_badge.textContent = shortened_rangeInput.value;
       // Now you can use the isChecked variable to perform actions based on whether the checkbox is checked or not
     });
 
@@ -174,8 +176,8 @@ async function createContent(mapper, model) {
     
     document.getElementById('rectangle_selection').addEventListener('click', disableLassoSelection);
     document.getElementById('normal_selection').addEventListener('click', disableLassoSelection);
-    document.getElementById('hide').addEventListener('click', hideNodes);
-    document.getElementById('show_hidden_nodes').addEventListener('click', showHiddenNodes);
+    // document.getElementById('hide').addEventListener('click', viewAllHiddenNodes);
+    document.getElementById('show_hidden_nodes').addEventListener('click', showAllHiddenNodes);
 
     var allSelected = function (type) {
       if (type == 'node') {
@@ -205,6 +207,7 @@ async function createContent(mapper, model) {
 
    var contextMenu = cy.contextMenus({
         menuItems: [
+
           {
             id: 'group-nodes',
             content: 'Group Nodes',
@@ -222,13 +225,25 @@ async function createContent(mapper, model) {
               const parentNodes = selectedElems.parents();
               const uniqueParentNodes = new Set(parentNodes.map(node => node.id()));
           
-              if (uniqueParentNodes.size > 1 || (uniqueParentNodes.size === 1 && selectedElems.not(':parent').length > 0)) {
+              const createGroup = (groupName) => {
                 const id = new Date().getTime();
-                const groupName = prompt("Enter group name:", "Group") || "Group";
                 const groupId = addParentNode(id, null, groupName);
                 
                 selectedElems.forEach(elem => {
                   elem.move({ parent: groupId });
+                });
+              };
+          
+              if (uniqueParentNodes.size > 1 || (uniqueParentNodes.size === 1 && selectedElems.not(':parent').length > 0)) {
+                swal({
+                  text: 'Enter group name:',
+                  content: "input",
+                  buttons: ["Cancel", "OK"]
+                })
+                .then(groupName => {
+                  if (groupName !== null) {
+                    createGroup(groupName || "Group");
+                  }
                 });
               } else {
                 const groupNode = selectedElems.filter(':parent');
@@ -239,13 +254,20 @@ async function createContent(mapper, model) {
                   const groupId = groupNode[0].id();
                   nonGroupNodes.move({ parent: groupId });
                 } else {
-                  // Create a new group
                   const parent = selectedElems[0].parent().id();
-                  const id = new Date().getTime();
-                  const groupName = prompt("Enter group name:", "Group") || "Group";
-                  const groupId = addParentNode(id, parent, groupName);
-                  selectedElems.forEach(elem => {
-                    elem.move({ parent: groupId });
+                  swal({
+                    text: 'Enter group name:',
+                    content: "input",
+                    buttons: ["Cancel", "OK"]
+                  })
+                  .then(groupName => {
+                    if (groupName !== null) {
+                      const id = new Date().getTime();
+                      const groupId = addParentNode(id, parent, groupName || "Group");
+                      selectedElems.forEach(elem => {
+                        elem.move({ parent: groupId });
+                      });
+                    }
                   });
                 }
               }
@@ -388,32 +410,32 @@ async function createContent(mapper, model) {
           //   hasTrailingDivider: true
           // },
           
-          {
-            id: 'select-all-nodes',
-            content: 'select all nodes',
-            selector: 'node',
-            coreAsWell: false,
-            show: true,
-            onClickFunction: function (event) {
-              selectAllOfTheSameType('node');
+          // {
+          //   id: 'select-all-nodes',
+          //   content: 'select all nodes',
+          //   selector: 'node',
+          //   coreAsWell: false,
+          //   show: true,
+          //   onClickFunction: function (event) {
+          //     selectAllOfTheSameType('node');
 
-              contextMenu.hideMenuItem('select-all-nodes');
-              contextMenu.showMenuItem('unselect-all-nodes');
-            }
-          },
-          {
-            id: 'unselect-all-nodes',
-            content: 'unselect all nodes',
-            selector: 'node',
-            coreAsWell: false,
-            show: false,
-            onClickFunction: function (event) {
-              unselectAllOfTheSameType('node');
+          //     contextMenu.hideMenuItem('select-all-nodes');
+          //     contextMenu.showMenuItem('unselect-all-nodes');
+          //   }
+          // },
+          // {
+          //   id: 'unselect-all-nodes',
+          //   content: 'unselect all nodes',
+          //   selector: 'node',
+          //   coreAsWell: false,
+          //   show: false,
+          //   onClickFunction: function (event) {
+          //     unselectAllOfTheSameType('node');
 
-              contextMenu.showMenuItem('select-all-nodes');
-              contextMenu.hideMenuItem('unselect-all-nodes');
-            }
-          },
+          //     contextMenu.showMenuItem('select-all-nodes');
+          //     contextMenu.hideMenuItem('unselect-all-nodes');
+          //   }
+          // },
         ],
         menuItemClasses: ['custom-menu-item'],
         contextMenuClasses: ['custom-context-menu'],
@@ -457,6 +479,12 @@ async function createContent(mapper, model) {
       selectedNodes.forEach(node => {
         node.hide();
         hiddenNodeIds.add(node.id());
+        // Remove indicator for the node being hidden
+        const indicatorId = `${node.id()}-indicator`;
+        const indicator = document.getElementById(indicatorId);
+        if (indicator) {
+          indicator.remove();
+        }
       });
     
       // Update hiddenNeighbors data for all nodes
@@ -478,10 +506,7 @@ async function createContent(mapper, model) {
       });
     
       updateIndicators();
-    }
-    
-    
-    
+    }    
     
     // function hideNode(hiddenNodeId) {
     //   const hiddenNode = cy.$(`#${hiddenNodeId}`);
@@ -517,9 +542,11 @@ async function createContent(mapper, model) {
     
       updateIndicators();
     }
-
+    
     function showHiddenNodes(hiddenNodeId) {
       const hiddenNode = cy.$(`#${hiddenNodeId}`);
+      const indicatorId = `${hiddenNodeId}-indicator`;
+    
       if (hiddenNode.hidden()) {
         // Show the hidden node
         hiddenNode.show();
@@ -535,6 +562,8 @@ async function createContent(mapper, model) {
           neighborsHidden = neighborsHidden.filter(id => id !== hiddenNodeId);
           neighbor.data('hiddenNeighbors', neighborsHidden);
         });
+    
+        updateIndicators(); // Update indicators to ensure consistency
       } else {
         // Hide the node
         hiddenNode.hide();
@@ -551,13 +580,23 @@ async function createContent(mapper, model) {
             hiddenNeighbors.push(hiddenNodeId);
           }
         });
+        
         removeHtmlLabels([hiddenNode]); // Call the removeHtmlLabels function when hiding
+    
+        // Remove the indicator immediately
+        const indicator = document.getElementById(indicatorId);
+        if (indicator) {
+          indicator.remove();
+        }
+    
+        updateIndicators(); // Update indicators to ensure consistency
       }
+    
       updateIndicators(); // Ensure all indicators are updated
-    }
+    }    
     
     function updateIndicators() {
-      cy.nodes().forEach(node => {
+      cy.nodes(':visible').forEach(node => {
         const hiddenNeighbors = node.data('hiddenNeighbors') || [];
         const indicatorId = `${node.id()}-indicator`;
     
@@ -600,20 +639,12 @@ async function createContent(mapper, model) {
       });
     }
     
-    
     cy.on('zoom pan', () => {
       updateIndicators();
     });
     
     updateIndicators();
     
-    // cy.on('tap', 'node', event => {
-    //   const node = event.target;
-    //   if (node.hasClass('ghost-node')) {
-    //     node.removeClass('ghost-node');
-    //     node.connectedEdges().removeClass('ghost-node');
-    //   }
-    // });
     
     cy.on('position', 'node', () => {
       updateIndicators();
@@ -623,18 +654,19 @@ async function createContent(mapper, model) {
         const nodeData = node.data();
         const text = shortenLabels(nodeData);
         let html = "";
-    
+        let color = 'black';
         if (!Array.isArray(text)){
           html += `<p style="margin:0;padding:0">${text}</p>`;
         } else {
           for (let i = 0; i < text.length; i++) {
-            let color = 'black'; 
-            if (cy.justification && cy.justification.has(text[i])) {
-              color = colors.justNodeStroke;
+            const label = text[i];
+            // Check if label has a specific color assigned
+            if (labelColorMap[label]) {
+              color = labelColorMap[label];
             }
-            if (cy.diagnoses && cy.diagnoses.has(text[i])) {
-              color = colors.diagNodeStroke;
-            } 
+            else {
+              color = 'black';
+            }
             const fontStyle = i === 0 ? 'font-style: italic;' : '';
             html += `<p style="color:${color};margin:0;padding:0;${fontStyle}">${text[i]}</p>`;
           }
@@ -699,24 +731,45 @@ function initializeEdgeLabels() {
 
 function shortenLabels(data) {
   let labels = data.labels;
-  let shortenedLabels;
-  var isChecked = document.getElementById('shortening_mode').checked;
-  if (isChecked) {
-    let shortening_mode_value = document.getElementById('shortening_mode_value').value;
-    if (Array.isArray(labels)){
-      if(shortening_mode_value > 0) {
-        shortenedLabels = labels.slice(0, shortening_mode_value); 
-          if (labels.length > shortening_mode_value) {
-            shortenedLabels.push("...");
-          }
-        }
+  let importantLabel = data.importantLabel;
+  let shortenedLabels = [];
+  const isChecked = document.getElementById('shortening_mode').checked;
+  const shortening_mode_value = parseInt(document.getElementById('shortening_mode_value').value, 10);
+
+  const important = new Set();
+  const highlighted = [];
+  const otherLabels = [];
+
+  if (Array.isArray(importantLabel)) {
+    importantLabel.forEach(label => important.add(label));
+  } else if (importantLabel) {
+    important.add(importantLabel);
+  }
+
+  labels.forEach(label => {
+    if (important.has(label)) {
+      shortenedLabels.push(label);
+    } else if (highlightedLabels.has(label)) {
+      highlighted.push(label);
+    } else {
+      otherLabels.push(label);
     }
-  else {
-    shortenedLabels = labels;
-  }
+  });
+
+  if (isChecked && shortening_mode_value > 0) {
+    const maxLabelsToShow = Math.max(shortening_mode_value, shortenedLabels.length + highlighted.length);
+    shortenedLabels.push(...highlighted);
+    shortenedLabels.push(...otherLabels);
+
+    if (shortenedLabels.length > maxLabelsToShow) {
+      shortenedLabels = shortenedLabels.slice(0, maxLabelsToShow);
+      shortenedLabels.push("...");
+    }
   } else {
-    shortenedLabels = labels;
+    shortenedLabels.push(...highlighted);
+    shortenedLabels.push(...otherLabels);
   }
+
   return shortenedLabels;
 }
 
@@ -735,6 +788,8 @@ async function initHTML() {
         // console.log(data);
         if (!data.id.startsWith('gr')) {
         const text = shortenLabels(data);
+        let italic;
+        data.importantLabel !== null ? italic = 'italic' : '' ;
         let html = "";
         // let html = !showOriginal && text.filter(element => element.trim() !== '').length > 0 ? "<div class='eye-on'><img src='../icons/eye.svg' class='node-eye' width='14' height='14'></div><div class='node-title'>" : '';
         if (!Array.isArray(text)){
@@ -746,15 +801,17 @@ async function initHTML() {
         else {
         for (let i = 0; i < text.length; i++) {
           let color = 'black'; 
-          if (cy.justification && cy.justification.has(text[i])) {
-            color = colors.justNodeStroke;
+          let bold = ''; 
+          const label = text[i];
+
+          // Check if label has a specific color assigned
+          if (labelColorMap[label]) {
+            color = labelColorMap[label];
+            bold = "font-weight:bold";
           }
-          if (cy.diagnoses && cy.diagnoses.has(text[i])) {
-            color = colors.diagNodeStroke;
-          } 
-          const fontStyle = i === 0 ? 'font-style: italic;' : '';
+          const fontStyle = i === 0 ? 'font-style:'+italic+';' : '';
           html += `
-            <p style="color:${color};margin:0;padding:0;${fontStyle}">
+            <p style="color:${color};${bold};margin:0;padding:0;${fontStyle}">
                 ${text[i]}
             </p>`;
         }
@@ -787,11 +844,6 @@ async function initHTML() {
 var redEdgeClass = 'red-edge';
 
 // Define the CSS rules for the red color
-var redEdgeStyle = {
-    'line-color': 'red',
-    'target-arrow-color': 'red',
-    'source-arrow-color': 'red'
-};
 
 // Apply red color on hover
 cy.on('mouseover', 'edge', function(event) {
@@ -813,7 +865,6 @@ cy.on('mouseover', 'edge', function(event) {
 
     // Add the CSS class for red color
     edge.addClass(redEdgeClass);
-    edge.style(redEdgeStyle);
     edge.style('label', '');
   });
 
@@ -826,9 +877,9 @@ cy.on('mouseout', 'edge', function(event) {
     const showLabels = document.getElementById('edge_labels').checked;
     // Remove the CSS class and style for red color
     edge.removeClass(redEdgeClass);
-    edge.removeStyle('line-color');
-    edge.removeStyle('target-arrow-color');
-    edge.removeStyle('source-arrow-color');
+    // edge.removeStyle('line-color');
+    // edge.removeStyle('target-arrow-color');
+    // edge.removeStyle('source-arrow-color');
     if (!showLabels) {
       edge.style('label', '');
     } else {
@@ -908,11 +959,13 @@ function processData(mapper, model) {
 
       // Initialize importantLabel and importantValue
       let importantLabel = null;
+      let labelStructure;
       // Loop through each key in the mapper
       Object.entries(mapper["Concept2Representative"]).forEach(([value, key]) => {
         // If the element value of the node matches a key in the mapper
         if (element === key) {
           let labelFound = checkIfImportantLabelMatchesWholeLabel(labels, value);
+          labelStructure = value;
             if (labelFound) {
                 importantLabel = labelFound;
                 return;
@@ -941,6 +994,7 @@ function processData(mapper, model) {
           element,
           elements,
           importantLabel,
+          labelStructure,
           parentId,
           boxH: calcBoxHeight(text),
           boxW: calcBoxWidth(longest)
@@ -1086,5 +1140,400 @@ function checkAndRemoveEmptyGroups() {
     }
   });
 }
+
+// For Sidebar Controls
+const sidebarToggles = document.getElementsByClassName("toggles-sidebar");
+const btnToggleSideBar = document.getElementById("btnToggleSideBar");
+
+function slideIn() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.classList.remove("bar-sliding-out");
+  sidebar.classList.add("bar-sliding-in");
+
+  const icon = document.getElementById("iconToggleSideBar");
+  icon.classList.remove("icon-sliding-out");
+  icon.classList.add("icon-sliding-in");
+}
+
+function slideOut() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.classList.remove("bar-sliding-in");
+  sidebar.classList.add("bar-sliding-out");
+
+  const icon = document.getElementById("iconToggleSideBar");
+  icon.classList.remove("icon-sliding-in");
+  icon.classList.add("icon-sliding-out");
+}
+
+function toggleSidebar() {
+  if (btnToggleSideBar.classList.contains("active")) {
+    slideOut();
+  } else {
+    slideIn();
+  }
+  btnToggleSideBar.classList.toggle("active");
+  
+  setTimeout(() => {
+    document.dispatchEvent(new CustomEvent("reinit-minimap"));
+  }, 250); // wait for animation to finish
+}
+
+function setTabFromDirectControl(srcID, toggleIfOpen=true) {
+  if (document.getElementById(srcID).classList.contains("active") && toggleIfOpen) {
+    toggleSidebar();
+  } else {
+    const tabs = document.querySelector(".tabs");
+    M.Tabs.getInstance(tabs).select(srcID);
+    !btnToggleSideBar.classList.contains("active") && toggleSidebar();
+  }
+}
+
+
+function showSettingsTab(toggleIfOpen=true) {
+  setTabFromDirectControl("sidebarSettings", toggleIfOpen);
+}
+
+for (const c of sidebarToggles) {
+  c.addEventListener("click", toggleSidebar);
+}
+
+const settingsSidebar = document.getElementById("sidebarSettings");
+const settingsButton = document.getElementById("showSettingsMenuButton");
+
+if (settingsButton) {
+  if (settingsSidebar !== null) { 
+    settingsButton.addEventListener("click", showSettingsTab);
+  } else {
+    settingsButton.style.display = "none";
+  }
+}
+
+const searchBar = document.getElementById('search-bar');
+const tagsContainer = document.getElementById('tags');
+const labelColorMap = {};
+const highlightedLabels = new Set();
+
+searchBar.addEventListener('input', handleSearch);
+tagsContainer.addEventListener('click', handleTagClick);
+
+function handleSearch(event) {
+  const query = event.target.value.toLowerCase();
+  const resultsContainer = document.getElementById('search-results');
+
+  if (!query) {
+    resultsContainer.innerHTML = ''; // Clear search results if query is empty
+    return;
+  }
+
+  const results = new Set(); // Use a Set to collect unique labels
+
+  // Search node labels
+  cy.nodes().forEach(node => {
+    const labels = node.data('labels');
+    if (Array.isArray(labels)) {
+      labels.forEach(label => {
+        if (label.toLowerCase().includes(query)) {
+          results.add(label);
+        }
+      });
+    }
+  });
+
+  // Search edge labels
+  cy.edges().forEach(edge => {
+    const labels = edge.data('label');
+    if (Array.isArray(labels)) {
+      labels.forEach(label => {
+        if (label.toLowerCase().includes(query)) {
+          results.add(label);
+        }
+      });
+    } else if (typeof labels === 'string') {
+      if (labels.toLowerCase().includes(query)) {
+        results.add(labels);
+      }
+    }
+  });
+
+  showSearchResults(Array.from(results)); // Convert the Set to an Array
+}
+
+function showSearchResults(results) {
+  const resultsContainer = document.getElementById('search-results');
+  resultsContainer.innerHTML = ''; // Clear previous results
+
+  results.forEach(label => {
+    const resultItem = document.createElement('div');
+    resultItem.textContent = label;
+    resultItem.style.cursor = 'pointer';
+    resultItem.addEventListener('click', () => {
+      highlightLabel(label);
+      resultsContainer.innerHTML = ''; // Close search results
+      searchBar.value = ''; // Clear search bar
+
+      // Highlight label in graph with tag color
+      const tagColor = getTagColor(label); // Function to get color assigned to tag
+      applyColorToLabelInGraph(label, tagColor); // Function to apply color to label in Cytoscape
+    });
+    resultsContainer.appendChild(resultItem);
+  });
+}
+
+function highlightLabel(label) {
+  let color = localStorage.getItem(`labelColor_${label}`);
+  if (!color) {
+    color = getRandomColor();
+    localStorage.setItem(`labelColor_${label}`, color);
+  }
+  labelColorMap[label] = color;
+  cy.nodes().forEach(node => {
+    const nodeLabels = node.data('labels');
+    if (Array.isArray(nodeLabels) && nodeLabels.includes(label)) {
+      node.style('color', labelColorMap[label]); // Update color style for the node
+    }1
+  });
+
+  if (!highlightedLabels.has(label)) {
+    highlightedLabels.add(label);
+    addTag(label, labelColorMap[label]);
+  }
+
+  updateSearchResults();
+}
+
+function addTag(label, color) {
+  const tag = document.createElement('div');
+  tag.className = 'counter-search-tag';
+  tag.title = 'remove';
+  tag.style.backgroundColor = color;
+  tag.textContent = label;
+  tag.addEventListener('click', () => removeHighlight(label));
+  tagsContainer.appendChild(tag);
+}
+
+function removeHighlight(label) {
+  cy.nodes().forEach(node => {
+    const nodeLabels = node.data('labels');
+    if (Array.isArray(nodeLabels) && nodeLabels.includes(label)) {
+      node.style('color', '');
+    }
+  });
+  cy.edges().forEach(edge => {
+    const labels = edge.data('label');
+    if (Array.isArray(labels) && labels.includes(label) || labels === label ) {
+      edge.style('line-color', '');
+      edge.style('target-arrow-color', '');
+      edge.style('source-arrow-color', '');
+    }
+  });
+  highlightedLabels.delete(label);
+  removeTag(label);
+  updateSearchResults();
+  delete labelColorMap[label];
+}
+
+function removeTag(label) {
+  const tags = document.querySelectorAll('.counter-search-tag');
+  tags.forEach(tag => {
+    if (tag.textContent === label) {
+      tag.remove();
+    }
+  });
+}
+
+function handleTagClick(event) {
+  if (event.target.classList.contains('tag')) {
+    const label = event.target.textContent;
+    removeHighlight(label);
+  }
+}
+
+function updateSearchResults() {
+  const resultsContainer = document.getElementById('search-results');
+  if (!resultsContainer) return;
+
+  const query = searchBar.value.toLowerCase();
+  cy.nodes().forEach(node => {
+    const nodeLabels = node.data('labels');
+    const labels = Array.isArray(nodeLabels) ? nodeLabels.map(label => label.toLowerCase()) : [];
+    const resultItem = Array.from(resultsContainer.children).find(item => 
+      labels.includes(item.textContent.toLowerCase())
+    );
+    if (resultItem) {
+      resultItem.style.color = labelColorMap[resultItem.textContent] || '';
+    }
+  });
+}
+
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+function getTagColor(label) {
+  if (!labelColorMap[label]) {
+    labelColorMap[label] = getRandomColor();
+  }
+  return labelColorMap[label];
+}
+function applyColorToLabelInGraph(label, color) {
+  // Apply color to edges in Cytoscape based on label
+  cy.edges().forEach(edge => {
+    const labels = edge.data('label');
+    if (Array.isArray(labels) && labels.includes(label) || labels === label) {
+      edge.style('line-color', color);
+      edge.style('target-arrow-color', color);
+      edge.style('source-arrow-color', color);
+    }
+  });
+}
+
+// Function to calculate dimensions using existing functions
+function getDimensionsForLabel(label) {
+  let longestStringLength = 0;
+  let heightString = '';
+
+  if (Array.isArray(label)) {
+    longestStringLength = label.reduce((max, line) => Math.max(max, line.length), 0);
+    heightString = label.join('\n');
+  } else if (typeof label === 'string') {
+    longestStringLength = label.length;
+    heightString = label;
+  }
+
+  return {
+    boxW: calcBoxWidth(longestStringLength),
+    boxH: calcBoxHeight([heightString])
+  };
+}
+
+// Render the subgraph with calculated dimensions
+function renderSubgraph(currentNode, connectedNodes) {
+  const currentNodeLabel = currentNode.data('importantLabel') || currentNode.id();
+  const connectedLabels = connectedNodes.map(node => node.data('importantLabel') || node.id());
+
+  const elements = [
+    {
+      data: {
+        id: currentNode.id(),
+        label: currentNodeLabel,
+        ...getDimensionsForLabel(currentNodeLabel)
+      }
+    },
+    ...connectedNodes.map(node => ({
+      data: {
+        id: node.id(),
+        label: node.data('importantLabel') || node.id(),
+        ...getDimensionsForLabel(node.data('importantLabel') || node.id())
+      }
+    })),
+    ...connectedNodes.map(node => {
+      const edge = currentNode.edgesTo(node);
+      let edgeLabel = edge.data('label');
+      let formattedLabel = '';
+      if (typeof edgeLabel === 'string') {
+        formattedLabel = edgeLabel.split(',').join('<br>');
+    } else if (Array.isArray(edgeLabel)) {
+        formattedLabel = edgeLabel.join(', ');
+    }
+      return {
+        data: { 
+          id: `${currentNode.id()}-${node.id()}`, 
+          source: currentNode.id(), 
+          target: node.id(),
+          label: formattedLabel // Add edge label here
+        }
+      };
+    })
+  ];
+  const subgraph = cytoscape({
+    container: document.getElementById('subgraph'),
+    elements: elements,
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(label)',
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'shape': 'round-rectangle',
+          'background-color': 'hsl(31, 87%, 94%)',
+          'border-style': 'solid',
+          'border-width': '1px',
+          'border-color': 'hsl(30, 89%, 68%)',
+          'height': 'data(boxH)',
+          'width': 'data(boxW)',
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          'label': 'data(label)',
+          'width': 1.5,
+          'line-color': '#ccc',
+          'target-arrow-shape': 'triangle',
+          'source-arrow-color': '#ccc',
+          'source-arrow-shape': 'none',
+          'curve-style': 'bezier'
+        }
+      }
+    ],
+    layout: counter
+  });
+}
+
+// Event listener for double click on a node
+cy.on('dblclick', 'node', (event) => {
+  const node = event.target;
+  const labelStructure = node.data('labelStructure');
+  const importantLabel = node.data('importantLabel');
+
+  // Get connected nodes with importantLabel where the edge is directed from the current node
+  const connectedImportantNodes = node.outgoers('node').filter(n => n.data('importantLabel') && n.data('importantLabel') !== null);
+
+  let content = `<h6>${labelStructure || ''}</h6>`;
+
+  if (importantLabel === null || connectedImportantNodes.length === 0) {
+    content += `<p>No structure could be found for this node.</p>`;
+  } else {
+    content += `<div id="subgraph" style="width: 100%; height: 300px;"></div>`;
+  }
+
+  // SweetAlert popup
+  swal({
+    title: 'Important Structure',
+    text: ' ',
+    className: 'importantStructure',
+    content: {
+      element: "div",
+      attributes: {
+        innerHTML: content
+      }
+    },
+    buttons: {
+      confirm: {
+        text: 'OK',
+        value: true,
+        visible: true,
+        className: '',
+        closeModal: true
+      }
+    },
+    closeOnClickOutside: false,
+    width: 800
+  });
+
+  // Ensure the content is injected
+  setTimeout(() => {
+    if (importantLabel !== null && connectedImportantNodes.length > 0) {
+      renderSubgraph(node, connectedImportantNodes);
+    }
+  }, 100);
+});
+
+
 console.log(DATA_STRUCTURE.originalData);
 export{createContent, cy, calcGroupHeight, calcBoxWidth}

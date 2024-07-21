@@ -652,15 +652,15 @@ class DataStructure {
             TOOL_MANAGER.execute(TOOL_TOGGLE_SHORTENING_MODE);
         }
 
-        document.getElementById("open_toolbar").onclick = function () {
-            document.getElementById("toolbar").style.display = "block"
-            document.getElementById("open_toolbar").style.display = "none"
-        }
+        // document.getElementById("open_toolbar").onclick = function () {
+        //     document.getElementById("toolbar").style.display = "block"
+        //     document.getElementById("open_toolbar").style.display = "none"
+        // }
 
-        document.getElementById("close_toolbar").onclick = function () {
-            document.getElementById("toolbar").style.display = "none"
-            document.getElementById("open_toolbar").style.display = "inline-block"
-        }
+        // document.getElementById("close_toolbar").onclick = function () {
+        //     document.getElementById("toolbar").style.display = "none"
+        //     document.getElementById("open_toolbar").style.display = "inline-block"
+        // }
     }
 
     /**

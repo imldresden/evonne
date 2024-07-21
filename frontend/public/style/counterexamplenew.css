@@ -53,3 +53,106 @@ input#group_name::placeholder {
   margin: 0;
   width: auto;                
 }  
+#sidebar{
+  z-index: 9999;
+  width: 300px;
+  right:calc(0px - 300px);
+}
+.counter-modal-option{
+  display: inline-block;
+  margin: 4px 0px;
+}
+.counter-modal-option button{
+  margin: 3px 0px;
+}
+.modal-option-range form:has(#shortening_mode_value) {
+  width: 100%;
+}
+@keyframes sideBarSlideOut {
+  from {
+      right: 0;
+  }
+
+  to {
+      right: calc(0px - 300px);
+  }
+}
+#search-container {
+  position: relative;
+}
+#search-bar:focus{
+  border-bottom: 1px solid #799c78;
+  -webkit-box-shadow: 0 1px 0 0 #799c78;
+  box-shadow: 0 1px 0 0 #799c78;
+}
+#search-results:not(:empty) {
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background-color: white;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+#search-results div {
+  padding: 5px;
+  cursor: pointer;
+}
+
+#search-results div:hover {
+  background-color: #f0f0f0;
+}
+
+.counter-search-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 2px;
+  border-radius: 50px;
+  color: white;
+  cursor: pointer;
+}
+#subgraph canvas {
+  left:0;
+}
+.importantStructure {
+  width: 700px;
+}
+.importantStructure .swal-title {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+.importantStructure .swal-content {
+  margin-top: 0;
+}
+/* #counter-example-container .btn-side-toggle{
+  left: -66px;
+} */
+/* Custom CSS for SweetAlert popups */
+/* .swal-modal {
+  background-color: #f5f5f5 !important; 
+  border-radius: 10px !important;     
+  font-family: Arial, sans-serif;    
+}
+
+.swal-title {
+  color: #333 !important;        
+  font-size: 24px !important;     
+}
+
+.swal-text {
+  color: #666 !important;       
+  font-size: 18px !important;    
+}
+
+
+.swal-button--cancel {
+  background-color: #f44336 !important; 
+  color: white !important;              
+  border-radius: 5px !important;        
+} */
+.swal-button--confirm {
+  background-color: #799c78 !important;
+  color: white !important;           
+  border-radius: 5px !important;     
+}
