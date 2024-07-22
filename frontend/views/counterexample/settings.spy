@@ -1,98 +1,99 @@
+<div style="background-color:#a9a9a9; height:0.5px;"></div>
+<br>
 <header class="modal-section-header toggles-content" target="counterexample-settings">
-  <h3 class="modal-section-heading">Counterexample Settings</h3> <i class="material-icons">arrow_drop_down</i>
+  <h3 class="modal-section-heading">Counter Settings</h3> <i class="material-icons">arrow_drop_down</i>
 </header>
 
 <div class="slidering closed" id="counterexample-settings">
-  <fieldset>
-    <h4>Shortening</h4>
-    <!-- Line Breaks -->
-    <div class="modal-option">
-      <label>Line Wrap</label>
-      <div class="switch">
-        <label>
-          <input id="btnWrapLines" type="checkbox">
-          <span class="lever"></span>
-        </label>
-      </div>
+    <fieldset style="display:none">
+    <h4>Selection Mode</h4>
+    <div class="counter-modal-option">
+      <button id="redo" class="btn btn-small btn-primary">Redo</button>
+      <button id="undo" class="btn btn-small btn-primary">Undo</button>
     </div>
-    <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
-      <label class="label-range">Line Length</label>
-      <div>
-        <button class="btn btn-small btn-primary btn-range-reset waves-effect waves-light tooltipped"
-          data-position="right" data-tooltip="Reset Line Length" id="lineLengthReset">
-          <i class="material-icons">replay</i>
-        </button>
-        <form action="#">
-          <span class="new badge" data-badge-caption="characters">4</span>
-          <p class="range-field">
-            <input type="range" id="lineLength" style="border-color: transparent" min="3" max="30" value="7"
-              step="1" />
-          </p>
-        </form>
-      </div>
-    </div>
-    <div class="modal-option">
-      <label>Signature</label>
-      <div class="switch">
-        <label>
-          <input id="btnShowSignature" type="checkbox" checked>
-          <span class="lever"></span>
-        </label>
-      </div>
-    </div>
-    <button class="btn-small btn-primary" id="shortenAllInOntologyBtn" title="Shorten all text in the ontology">
-      Shorten All Nodes
-    </button>
   </fieldset>
-
+  
+  <fieldset style="display:none;">
+    <h4>Group</h4>
+    <div class="counter-modal-option">
+      <button id="add-compound" class="btn btn-small btn-primary">Group</button>
+    </div>
+  </fieldset>
   <fieldset>
-    <h4>Layout Simulation Settings</h4>
-    <label>Flow Direction</label>
-    <div class="input-wrapper modal-option">
-      <select id="flowDirection" class="browser-default">
-        <option value="y" selected>Vertical</option>
-        <option value="x">Horizontal</option>
-      </select>
+  <div id="search-container">
+    <input type="text" id="search-bar" placeholder="Search for labels...">
+    <div id="search-results"></div>
+  </div>
+  <div id="tags"></div>
+  </fieldset>
+  <fieldset style="display:none;">
+    <h4>Hide</h4>
+    <div class="counter-modal-option">
+      <button id="hide" class="btn btn-small btn-primary">Hide</button>
+      <button id="show_hidden_nodes" class="btn btn-small btn-primary">Show hidden nodes</button>
     </div>
-
-    <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
-      <label>Flow Strength</label>
-      <div>
-        <button class="btn btn-small btn-primary btn-range-reset waves-effect waves-light tooltipped"
-          data-position="right" data-tooltip="Reset Flow Strength" id="flowStrengthReset">
-          <i class="material-icons">replay</i>
-        </button>
+  </fieldset>
+  
+  <fieldset>
+    <h4>Selection Mode</h4>
+    <div class="counter-modal-option">
+      <button id="clear_selection" class="btn btn-small btn-primary">Clear</button>
+      <button id="lasso_selection" class="btn btn-small btn-primary">Lasso</button>
+      <button id="rectangle_selection" class="btn btn-small btn-primary">Rectangle</button>
+      <button id="normal_selection" class="btn btn-small btn-primary">Normal</button>
+    </div>
+  </fieldset>
+  
+  <fieldset>
+    <h4>Edges</h4>
+    <div class="modal-option">
+      <button style="display:none" id="toggle_edge_bundle" class="btn btn-small btn-primary">Bundling</button>
+        <label>
+          Edge bundled
+        </label>
+      <div class="switch">
+        <label>
+          <input id="edge_bundle" type="checkbox" checked>
+          <span class="lever"></span>
+        </label>
+      </div>
+          </div>
+           <div class="modal-option">
+        <label>
+          Edge labels
+        </label>
+      <div class="switch">
+        <label>
+          <input id="edge_labels" type="checkbox" checked>
+          <span class="lever"></span>
+        </label>
+      </div>
+    </div>
+  </fieldset>
+  
+  <fieldset>
+    <h4>Shortening mode</h4>
+      <button style="display:none" id="toggle_shortening_mode" class="btn btn-small btn-primary">Shortening Mode</button>
+      <div class="modal-option">
+         <label>
+          Shortening mode
+        </label>
+        <div class="switch">
+         <label>
+          <input id="shortening_mode" type="checkbox">
+          <span class="lever"></span>
+        </label>
+        </div>
+      </div>
+      <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
+        <label class="label-range">Shortening Value</label>
         <form action="#">
-          <span class="new badge" data-badge-caption="">4</span>
+          <span class="new badge" id="shortened-value" data-badge-caption="">2</span>
           <p class="range-field">
-            <input type="range" id="flowStrength" style="border-color: transparent" />
+            <input type="range" id="shortening_mode_value" style="border-color: transparent" min="1" max="100" value="2" />
           </p>
         </form>
       </div>
-    </div>
 
-    <label>Link Length Function</label>
-    <div class="input-wrapper modal-option">
-      <select id="linkLengthFunction" class="browser-default">
-        <option value="symmetric-diff" selected>Symmetric Difference</option>
-        <option value="jaccard">Jaccard</option>
-      </select>
-    </div>
-
-    <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
-      <label>Link Ideal Length</label>
-      <div>
-        <button class="btn btn-small btn-primary btn-range-reset waves-effect waves-light tooltipped"
-          data-position="right" data-tooltip="Reset Link Ideal Length" id="linkLengthIdealValueReset">
-          <i class="material-icons">replay</i>
-        </button>
-        <form action="#">
-          <span class="new badge" data-badge-caption="">4</span>
-          <p class="range-field">
-            <input type="range" id="linkLengthIdealValue" style="border-color: transparent" />
-          </p>
-        </form>
-      </div>
-    </div>
   </fieldset>
 </div>

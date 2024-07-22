@@ -2,13 +2,12 @@ import {readFiles} from "./fileReader.js";
 import { globals } from "../shared-data.js";
 import { colors, stylesheet } from "../../../style/counter-cy-style.js";
 import { counter } from "../layouts/cola.js";
+import { grouping } from "./grouping.js";
 
 let cy;
 const ontologyNodeId = "oN";
 let removed;
 let originalEdgeData = [];
-let div = "counter-example-container";
-
 Array.prototype.removeObject = function (object) {
     let index = this.indexOf(object);
     if (index > -1) {
@@ -36,10 +35,9 @@ async function createContent(mapper, model) {
     if (existingSVG) {
       existingSVG.remove();
     }
-
     const svg = document.createElement('svg');
     svg.id = 'counter-view';
-    document.getElementById(div).append(svg);
+    document.getElementById('counter-example-container').append(svg);
   
     const container = document.getElementById("counter-view");
     container.innerHTML = "";
@@ -88,7 +86,14 @@ async function createContent(mapper, model) {
       } else {
         contextMenu.hideMenuItem('remove-compound');
       }
-
+      // if (allSelected('node')) {
+      //   contextMenu.hideMenuItem('select-all-nodes');
+      //   contextMenu.showMenuItem('unselect-all-nodes');
+      // }
+      // else {
+      //   contextMenu.hideMenuItem('unselect-all-nodes');
+      //   contextMenu.showMenuItem('select-all-nodes');
+      // }
       const hiddenNodesExist = cy.nodes(':hidden').length > 0;
       if (hiddenNodesExist) {
         contextMenu.showMenuItem('show-hidden-nodes');
@@ -96,20 +101,6 @@ async function createContent(mapper, model) {
         contextMenu.hideMenuItem('show-hidden-nodes');
       }
     });
-
-    const handleLayoutEvent = function (enabled) {
-      return function () {
-        cy.userZoomingEnabled(enabled);
-        cy.userPanningEnabled(enabled);
-        cy.autoungrabify(!enabled);
-      };
-    };
-  
-    cy.on('layoutstart', handleLayoutEvent(false));
-    setTimeout(function () {
-      cy.on('layoutstop', handleLayoutEvent(true));
-    }, 100);
-
     document.getElementById('lasso_selection').addEventListener('click', function() {
       cy.lassoSelectionEnabled(true);
     });
@@ -390,6 +381,7 @@ async function createContent(mapper, model) {
         contextMenuClasses: ['custom-context-menu'],
         submenuIndicator: { src: '../icons/submenu-indicator-default.svg', width: 12, height: 12 }
       });
+    // console.log(instance.isActive());
     function removeHtmlLabels(nodes) {
       nodes.forEach(node => {
         const htmlElement = document.getElementById(ontologyNodeId + node.id());
@@ -398,6 +390,21 @@ async function createContent(mapper, model) {
         }
       });
     }
+
+   // function showHiddenNodes() {
+    //   const hiddenNodes = cy.nodes(':hidden');
+    //   hiddenNodes.show();
+    //   cy.edges(':hidden').show();
+    
+    //   hiddenNodes.addClass('ghost-node');
+    
+    //   // Clear hiddenNeighbors data for all nodes
+    //   cy.nodes().forEach(node => {
+    //     node.data('hiddenNeighbors', []);
+    //   });
+    
+    //   updateIndicators();
+    // }
 
     function hideNodes(contextNode) {
       const selectedNodes = cy.nodes(':selected').not(':parent, [parent]').union(contextNode);
@@ -439,7 +446,7 @@ async function createContent(mapper, model) {
       });
     
       updateIndicators();
-    }
+    }    
     
     function showAllHiddenNodes() {
       const hiddenNodes = cy.nodes(':hidden');
@@ -476,12 +483,7 @@ async function createContent(mapper, model) {
           neighbor.data('hiddenNeighbors', neighborsHidden);
         });
     
-        // Remove hidden-nodes class and add showing-nodes class
-        const indicator = document.getElementById(indicatorId);
-        if (indicator) {
-          indicator.classList.remove('hidden-nodes');
-          indicator.classList.add('showing-nodes');
-        }
+        updateIndicators(); // Update indicators to ensure consistency
       } else {
         // Hide the node
         hiddenNode.hide();
@@ -498,31 +500,31 @@ async function createContent(mapper, model) {
             hiddenNeighbors.push(hiddenNodeId);
           }
         });
-    
+        
         removeHtmlLabels([hiddenNode]); // Call the removeHtmlLabels function when hiding
     
         // Remove the indicator immediately
         const indicator = document.getElementById(indicatorId);
         if (indicator) {
-          indicator.classList.remove('showing-nodes');
-          indicator.classList.add('hidden-nodes');
+          indicator.remove();
         }
+    
+        updateIndicators(); // Update indicators to ensure consistency
       }
     
       updateIndicators(); // Ensure all indicators are updated
-    }
+    }    
     
     function updateIndicators() {
       cy.nodes(':visible').forEach(node => {
         const hiddenNeighbors = node.data('hiddenNeighbors') || [];
         const indicatorId = `${node.id()}-indicator`;
     
-        let indicator = document.getElementById(indicatorId);
         if (hiddenNeighbors.length > 0) {
-          if (!indicator) {
-            indicator = document.createElement('div');
+          if (!document.getElementById(indicatorId)) {
+            const indicator = document.createElement('div');
             indicator.id = indicatorId;
-            indicator.className = 'indicator hidden-nodes';
+            indicator.className = 'indicator';
             indicator.style.position = 'absolute';
             indicator.style.zIndex = '1000';
             indicator.style.pointerEvents = 'auto';
@@ -537,29 +539,25 @@ async function createContent(mapper, model) {
             });
     
             document.getElementById('counter-view').appendChild(indicator);
-          } else {
-            // Ensure correct class is set based on the state
-            if (node.connectedEdges(':hidden').length > 0) {
-              indicator.classList.add('hidden-nodes');
-              indicator.classList.remove('showing-nodes');
-            } else {
-              indicator.classList.add('showing-nodes');
-              indicator.classList.remove('hidden-nodes');
-            }
           }
     
           // Update indicator position
+          const indicator = document.getElementById(indicatorId);
           const position = node.renderedPosition();
           const width = node.renderedWidth();
           const height = node.renderedHeight();
     
-          indicator.style.left = `${position.x + width / 2.12}px`; // Right side of the node
-          indicator.style.top = `${position.y - height / 2.12 - indicator.offsetHeight}px`; // Top side of the node
-        } else if (indicator) {
-          indicator.remove();
+          // Position the indicator at the right middle outer side of the node
+          indicator.style.left = `${position.x + width / 2 + 0}px`;
+          indicator.style.top = `${position.y - height / 2 + height / 2 - 0}px`;
+        } else {
+          const indicator = document.getElementById(indicatorId);
+          if (indicator) {
+            indicator.remove();
+          }
         }
       });
-    }    
+    }
     
     cy.on('zoom pan', () => {
       updateIndicators();
@@ -827,7 +825,7 @@ function calcBoxHeight(stringList) {
   }
 }
 function calcGroupHeight(stringList) {
-  return (35) + "px";
+  return (stringList.length + 35) + "px";
 }
 function processData(mapper, model) {
     // Compute edges
@@ -1456,15 +1454,4 @@ cy.on('dblclick', 'node', (event) => {
   }, 100);
 });
 
-function init_counter({
-  ad,
-  container = "proof-container",
-}) {
-  div = container;
-
-    let mappers = readJson("js/counterexamplenew/example/mapper.json");
-    let model = readXML("js/counterexamplenew/example/result.model.xml");
-    createContent(mappers, model);
-} 
-
-export{createContent, cy, calcGroupHeight, calcBoxWidth, init_counter}
+export{createContent, cy, calcGroupHeight, calcBoxWidth}

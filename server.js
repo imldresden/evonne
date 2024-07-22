@@ -40,6 +40,7 @@ const title = "evonne";
 const sessions = {};
 const dataDir = './frontend/public/data/';
 const examplesDir = './frontend/public/examples/';
+const counterExamplesDir = './frontend/public/js/counterexamplenew/example/';
 const fs = require('fs');
 
 if (!existsSync(dataDir)) {
@@ -68,7 +69,7 @@ app.get('/', (req, res) => {
     res.render('main/split.spy', {
       title,
       uuid: id,
-      settings_specific: '<< proof/settings >> << ontology/settings >>',
+      settings_specific: '<< proof/settings >> << ontology/settings >> << counterexample/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
       menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << proof/menu >> << ontology/menu >>`,
@@ -119,11 +120,11 @@ app.get('/inference', (request, response) => {
   response.render('inference/inference.spy');
 });
 
-app.get("/counterexample", (request, response) => {
-  response.render("counterexample/counterexample.spy", {settings_specific: '<< counterexample/settings >>'});
-});
+// app.get("/counterexample", (request, response) => {
+//   response.render("counterexample/counterexample.spy", {settings_specific: '<< counterexample/settings >>'});
+// });
 app.get("/counterexamplenew", (request, response) => {
-  response.render("counterexamplenew/counterexample.spy", {settings_specific: '<< counterexamplenew/settings >>'});
+  response.render("counterexample/counterexample.spy", {settings_specific: '<< counterexample/settings >>'});
 });
 // resources
 app.get('/project', (req, res) => {
@@ -149,6 +150,7 @@ app.get('/project', (req, res) => {
     names: {},
     proofs: [],
     reasoner:'',
+    counterShow:'',
   };
 
   const files = readdirSync(target);
@@ -186,13 +188,25 @@ app.get('/project', (req, res) => {
     const concepts = JSON.parse(readFileSync(namesPath));
     const hierarchy = JSON.parse(readFileSync(hierarchyPath));
 
+    // Collect all hierarchy values
+    const allHierarchyValues = new Set();
+    Object.values(hierarchy).forEach(values => {
+      values.forEach(value => {
+        allHierarchyValues.add(value);
+      });
+    });
+    
     Object.keys(concepts).forEach(key => {
+      const rhs = hierarchy[key] || [];
+      const rhh = Array.from(allHierarchyValues).filter(value => !rhs.includes(value));
+  
       status.names[key] = {
         conceptNameShort: concepts[key],
-        rhs: hierarchy[key]
-      };
-    });
-  }
+        rhs: rhs,
+        rhh: rhh
+        };
+      });
+    }
 
   const pending = !flags.proofs || !flags.ad;
   if (flags.proofs && flags.ad) {
@@ -402,6 +416,63 @@ app.post('/axiom', (req, res) => {
 
   res.status(200).send({ msg: 'processing request..' });
 });
+
+app.post('/counterexample', (req, res) => {
+  const id = req.body.id; // Ensure `id` is correctly extracted
+  console.log(req.body);
+
+  const projPath = path.join(dataDir, id);
+  const ontPath = path.join(projPath, ontology);
+  const axiom = req.body.lhs + " SubClassOf: " + req.body.rhs;
+
+  if (sessions[id]) {
+    return res.status(400).send({ msg: 'Session already exists' });
+  } else {
+    sessions[id] = true;
+  }
+
+  const module = spawn('java',  [
+    '-jar', 'externalTools/explain.jar',
+    '-o', ontPath,
+    '-a', axiom,
+    '-od', projPath,
+    'mt', 'diff',
+  ], { encoding: 'utf-8' });
+
+  module.on("exit", function () {
+    console.log("done extracting module.");
+    console.log('computing atomic decomposition...');
+
+    printOutput(ad);
+    ad.on("exit", function () {
+      console.log("done computing atomic decomposition.");
+      delete sessions[id];
+    });
+
+    ad.on('close', (code) => {
+      if (code !== 0) {
+        console.log('failed computing atomic decomposition: ' + code);
+      }
+    });
+  });
+
+  // // Simulating the counterexample process
+  // console.log('Simulating counterexample process...');
+  // setTimeout(() => {
+  //   console.log("done generating counterexample.");
+  //   delete sessions[id];
+
+  //   // Prepare the response object with counterShow set to "ON"
+  //   const response = {
+  //     ...req.body,
+  //     counterShow: "ON"
+  //   };
+
+  //   res.status(200).send(response);
+  // }, 1000); // Simulate some delay
+
+});
+
 
 // listening on the connection event for incoming sockets
 io_.on('connection', function (socket) {

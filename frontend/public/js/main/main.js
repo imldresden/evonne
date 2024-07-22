@@ -1,5 +1,6 @@
 import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
+// import { init_counter } from '../counterexamplenew/counterexample.js';
 
 let status = {};
 let interval = undefined;
@@ -76,18 +77,31 @@ function createConceptDropdowns(concepts) {
       }
     });
 
-  const updateRHS = function () {
-    const rhs = document.getElementById('rhsConcepts');
-    rhs.innerHTML = '';
-
-    const key = lhs.options[lhs.selectedIndex].value;
-    Object.entries(concepts[key].rhs).sort(([, s1], [, s2]) => sortNames(s1, s2)).forEach(rhsName => {
-      const rhsC = document.createElement('option');
-      rhsC.value = rhsName[1];
-      rhsC.innerHTML = concepts[rhsName[1]].conceptNameShort;
-      rhs.appendChild(rhsC);
-    });
-  }
+    const updateRHS = function () {
+      const rhs = document.getElementById('rhsConcepts');
+      rhs.innerHTML = '';
+  
+      const key = lhs.options[lhs.selectedIndex].value;
+      const currentConcept = concepts[key];
+  
+      // Add RHS options with one color
+      currentConcept.rhs.forEach(rhsKey => {
+        const rhsC = document.createElement('option');
+        rhsC.value = rhsKey;
+        rhsC.innerHTML = concepts[rhsKey].conceptNameShort;
+        rhsC.classList.add('option-rhs');
+        rhs.appendChild(rhsC);
+      });
+  
+      // Add RHH options with another color
+      currentConcept.rhh.forEach(rhhKey => {
+        const rhhC = document.createElement('option');
+        rhhC.value = rhhKey;
+        rhhC.innerHTML = concepts[rhhKey].conceptNameShort;
+        rhhC.classList.add('option-rhh');
+        rhs.appendChild(rhhC);
+      });
+    };
   updateRHS();
 
   lhs.removeEventListener('change', updateRHS);
@@ -141,6 +155,9 @@ function init_views(loop = false) {
         if (document.getElementById('proof-container')) {
           init_proof({ file: res.proofs[0] });
         }
+        // if (document.getElementById('proof-container')) {
+        //   init_counter({ ad: res.ad });
+        // }
         if (document.getElementById('ontology-container')) {
           init_ontology({ ad: res.ad, ontology: res.ontology });
         }
@@ -188,6 +205,8 @@ function computeAxiomsBtnFunction() {
 
   //Show computing indicator
   document.getElementById('computingGif').style.display = "inline-block";
+  const rhsElement = document.getElementById('rhsConcepts');
+  const isRhh = rhsElement.options[rhsElement.selectedIndex].classList.contains('option-rhh');
   const body = new FormData();
   body.append('id', getSessionId());
   body.append('ontology', status.ontology);
@@ -199,7 +218,9 @@ function computeAxiomsBtnFunction() {
     : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 
-  fetch('/axiom', {
+  const endpoint = isRhh ? '/counterexample' : '/axiom';
+
+  fetch(endpoint, {
     method: 'POST',
     body,
   })

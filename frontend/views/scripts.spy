@@ -26,4 +26,3 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/utils/session-id.js"></script>
-<script src="/js/counterexamplenew/controls.js"></script>
