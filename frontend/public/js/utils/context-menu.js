@@ -1,20 +1,19 @@
 export class ContextMenu {
     once = false;
     menuFactory(x, y, menuItems, data, svgId) {
+        menuItems = menuItems.filter(d => d);
+        console.log(menuItems)
         const svg = document.querySelector(svgId);
         const svgBBox = svg.getBoundingClientRect();
 
         d3.select(`.contextMenu`).remove();
-
+        
         // Draw the menu
-        d3.select(svgId)
+        const entries = d3.select(svgId)
             .append('g').attr('class', 'contextMenu')
             .selectAll('tmp')
             .data(menuItems).enter()
             .append('g').attr('class', d => `menuEntry ${d.type}`)
-            .style({ 'cursor': 'pointer' });
-
-            
         let orient = [true, true];
         
         let maxWidth = 0;
@@ -31,7 +30,7 @@ export class ContextMenu {
 
         const buttonHeight = 25;
         const sectionHeight = 2;
-        const heightF = d => d.type === 'button' ? buttonHeight : sectionHeight;
+        const heightF = d => d && d.type === 'button' ? buttonHeight : sectionHeight;
         const calcHeight = (items) => {
             let height = 0;
             items.forEach(e => height += heightF(e));
@@ -46,7 +45,11 @@ export class ContextMenu {
         const xF = () => { return x - (orient[0] ? 0 : maxWidth) };
         const yF = (d, i) => y + calcHeight(menuItems.filter((e, ie) => ie < i)) - (orient[1] ? 0 : totalHeight);
         
-        d3.selectAll(`.menuEntry`)
+  
+          
+        entries.style({ 'cursor': 'pointer' });
+
+        entries
             .append('rect')
             .attr('x', xF)
             .attr('y', yF)
@@ -54,7 +57,7 @@ export class ContextMenu {
             .attr('height', heightF)
             .on('click', (_, d) => { d.action(_, data) });
 
-        d3.selectAll(`.menuEntry`)
+        entries
             .append('text')
             .text((d) => { return d.type === 'button' ? d.title : ''; })
             .attr('x', xF)
@@ -65,6 +68,8 @@ export class ContextMenu {
 
         if (!this.once) {
             d3.select('body').on('click', () => {
+                d3.select(`.contextMenu`).remove();
+            }).on('ctxmenu', () => {
                 d3.select(`.contextMenu`).remove();
             });
             this.once = true;

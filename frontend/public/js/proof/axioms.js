@@ -129,6 +129,9 @@ export class AxiomsHelper {
 	}
 
 	showPrevious(treeRoot) {
+		if (proof.isDrawing) {
+			return;
+		}
 		proof.nodeInteracted = treeRoot;
 		if (!treeRoot.children) {
 			treeRoot.children = treeRoot._children;
@@ -202,6 +205,9 @@ export class AxiomsHelper {
 	}
 
 	collapse(treeRoot, e) {
+		if (proof.isDrawing) {
+			return;
+		}
 		e.stopPropagation();
 		proof.nodeInteracted = treeRoot;
 
@@ -256,6 +262,9 @@ export class AxiomsHelper {
 	}
 
 	expand(treeRoot, e) {
+		if (proof.isDrawing) {
+			return;
+		}
 		e.stopPropagation();
 		proof.nodeInteracted = treeRoot;
 
@@ -266,14 +275,16 @@ export class AxiomsHelper {
 	}
 
 	conditionToShowAllPrevious(d) {
-		return d.childrenMax !== d._childrenMax
+		return true;
 	}
 
 	showAllPrevious(treeRoot, e) {
-		e.stopPropagation();
 		if (proof.isDrawing) {
 			return;
 		}
+
+		e.stopPropagation();
+		
 		proof.nodeInteracted = treeRoot;
 		let axioms = [];
 		this.getAllPreviousAxioms(treeRoot, axioms, (node) => node.id);
@@ -689,6 +700,18 @@ export class AxiomsHelper {
 			type: 'section'
 		},
 		{
+			title: 'Collapse',
+			type: 'button',
+			action: (e, d) => this.collapse(d, e),
+			filter: (d) => this.conditionToCollapse(d)
+		},
+		{
+			title: 'Expand',
+			type: 'button',
+			action: (e, d) => this.expand(d, e),
+			filter: (d) => this.conditionToExpand(d)
+		},
+		{
 			title: 'Show Step',
 			type: 'button',
 			action: (_, d) => this.showPrevious(d),
@@ -700,18 +723,6 @@ export class AxiomsHelper {
 			action: (e, d) => this.showAllPrevious(d, e),
 			filter: (d) => this.conditionToShowAllPrevious(d)
 
-		},
-		{
-			title: 'Collapse',
-			type: 'button',
-			action: (e, d) => this.collapse(d, e),
-			filter: (d) => this.conditionToCollapse(d)
-		},
-		{
-			title: 'Expand',
-			type: 'button',
-			action: (e, d) => this.expand(d, e),
-			filter: (d) => this.conditionToExpand(d)
 		},
 		{
 			title: 'Axiom Transformations',

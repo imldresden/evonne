@@ -174,9 +174,9 @@ export class TreeNavigation {
     }
 
     showSubTree(root) {
-        if (root.data.id === "rest") { 
-            return;
-        }
+        if (proof.isDrawing || root.data.id === "rest") {
+			return;
+		}
         //extract the current data
         let originalEdgeData = this.extractOriginalData(root);
         //reset all children to show the entire subtree, defined in axiomFunctions.js
@@ -201,6 +201,9 @@ export class TreeNavigation {
     }
 
     restoreFromSubProof() {
+        if (proof.isDrawing) {
+			return;
+		}
         if (this.cuts.length > 0) {
             this.hierarchy = this.cuts.pop();
             this.update();
