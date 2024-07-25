@@ -18,8 +18,10 @@
 </head>
 
 <body>
-    <main id="my-reasoning-tree"></main>
     
+    <button id="change"> CLICK ME </button>
+    <div></div>
+    <main id="my-reasoning-tree"></main>
     <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
     <script src="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/js/materialize.min.js"></script>
     <script src="https://unpkg.com/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
@@ -29,28 +31,56 @@
     <script type="module">
         //import { init_proof, proof } from "https://unpkg.com/evonne@0.0.6/frontend/public/js/proof/proof.js";
         import { init_proof, proof } from "http://localhost:3030/js/proof/proof.js";
-        init_proof({ 
-            external: {
-                div: "my-reasoning-tree",
-                path: "../data/test/4th-trace.xml",
-                //path: "../data/test/test.t.xml",
-                drawTime: 0,
+        
+        const compact = {
+            div: "my-reasoning-tree",
+            path: "../data/test/4th-trace.xml",
+            //path: "../data/test/test.t.xml",
+            drawTime: 0,
 
-                showRules: true,
+            showRules: true,
 
-                isLinear: true,
-                    isBreadthFirst: false, // no intersections
-                    bottomRoot: false,
+            isLinear: true,
+                isBreadthFirst: false, // no intersections
+                bottomRoot: false,
 
-                isCompact: true,
-                    isZoomPan: false, 
-                    compactInteraction: true,
+            isCompact: true,
+                isZoomPan: false, 
+                compactInteraction: true,
 
-                trays: { upper:false, lower:false },
+            trays: { upper:false, lower:false },
 
-                stepNavigator: false, 
-            } 
-        });
+            stepNavigator: false, 
+        } 
+
+        const normal = {
+            div: "my-reasoning-tree",
+            path: "../data/test/4th-trace.xml",
+            //path: "../data/test/test.t.xml",
+            drawTime: 0,
+
+            showRules: true,
+
+            trays: { upper:false, lower:false },
+
+            stepNavigator: false, 
+        } 
+
+        init_proof({ external: compact });
+
+        let compactOrNormal = true;
+        const switchBtn = document.getElementById("change")
+        switchBtn.addEventListener("click", () => {
+            //document.getElementById("my-reasoning-tree").innerHTML = ""
+            if (compactOrNormal) {
+                console.log(compactOrNormal)
+                proof.update({ reset: true,  ext: normal });
+                compactOrNormal = false;
+            } else {
+                proof.update({ reset: true,  ext: compact });
+                compactOrNormal = true;
+            }
+        })
     </script>
 </body>
 
