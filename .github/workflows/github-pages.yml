@@ -23,15 +23,15 @@ concurrency:
 
 jobs:
   cleanup:
-      runs-on: ubuntu-latest
-      permissions: write-all
-      steps:
-        - name: Delete deployment
-          uses: strumwolf/delete-deployment-environment@v2
-          with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            environment: github-pages
-            onlyRemoveDeployments: true
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Delete deployment
+        uses: strumwolf/delete-deployment-environment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: github-pages
+          onlyRemoveDeployments: true
   
   build:
     needs: cleanup
