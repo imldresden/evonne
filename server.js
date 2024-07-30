@@ -40,7 +40,6 @@ const title = "evonne";
 const sessions = {};
 const dataDir = './frontend/public/data/';
 const examplesDir = './frontend/public/examples/';
-const counterExamplesDir = './frontend/public/js/counterexamplenew/example/';
 const fs = require('fs');
 
 if (!existsSync(dataDir)) {
@@ -120,10 +119,7 @@ app.get('/inference', (request, response) => {
   response.render('inference/inference.spy');
 });
 
-// app.get("/counterexample", (request, response) => {
-//   response.render("counterexample/counterexample.spy", {settings_specific: '<< counterexample/settings >>'});
-// });
-app.get("/counterexamplenew", (request, response) => {
+app.get("/counterexample", (request, response) => {
   response.render("counterexample/counterexample.spy", {settings_specific: '<< counterexample/settings >>'});
 });
 // resources
@@ -416,63 +412,6 @@ app.post('/axiom', (req, res) => {
 
   res.status(200).send({ msg: 'processing request..' });
 });
-
-app.post('/counterexample', (req, res) => {
-  const id = req.body.id; // Ensure `id` is correctly extracted
-  console.log(req.body);
-
-  const projPath = path.join(dataDir, id);
-  const ontPath = path.join(projPath, ontology);
-  const axiom = req.body.lhs + " SubClassOf: " + req.body.rhs;
-
-  if (sessions[id]) {
-    return res.status(400).send({ msg: 'Session already exists' });
-  } else {
-    sessions[id] = true;
-  }
-
-  const module = spawn('java',  [
-    '-jar', 'externalTools/explain.jar',
-    '-o', ontPath,
-    '-a', axiom,
-    '-od', projPath,
-    'mt', 'diff',
-  ], { encoding: 'utf-8' });
-
-  module.on("exit", function () {
-    console.log("done extracting module.");
-    console.log('computing atomic decomposition...');
-
-    printOutput(ad);
-    ad.on("exit", function () {
-      console.log("done computing atomic decomposition.");
-      delete sessions[id];
-    });
-
-    ad.on('close', (code) => {
-      if (code !== 0) {
-        console.log('failed computing atomic decomposition: ' + code);
-      }
-    });
-  });
-
-  // // Simulating the counterexample process
-  // console.log('Simulating counterexample process...');
-  // setTimeout(() => {
-  //   console.log("done generating counterexample.");
-  //   delete sessions[id];
-
-  //   // Prepare the response object with counterShow set to "ON"
-  //   const response = {
-  //     ...req.body,
-  //     counterShow: "ON"
-  //   };
-
-  //   res.status(200).send(response);
-  // }, 1000); // Simulate some delay
-
-});
-
 
 // listening on the connection event for incoming sockets
 io_.on('connection', function (socket) {

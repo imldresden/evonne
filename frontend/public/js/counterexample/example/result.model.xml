@@ -363,9 +363,7 @@
         </edge>
         <node id="975252">
             <data key="element">a44</data>
-            <data key="label">[CheeseTopping, ⊤, DomainConcept, VegetarianTopping, PizzaTopping, MozzarellaTopping,
-                Food]
-            </data>
+            <data key="label">[CheeseTopping, ⊤, DomainConcept, VegetarianTopping, PizzaTopping, MozzarellaTopping, Food]</data>
         </node>
         <edge source="975252" target="975251">
             <data key="label">hasSpiciness</data>
@@ -640,9 +638,7 @@
         </node>
         <node id="975448">
             <data key="element">a60</data>
-            <data key="label">[⊤, DomainConcept, VegetarianTopping, VegetableTopping, TomatoTopping, PizzaTopping,
-                Food]
-            </data>
+            <data key="label">[⊤, DomainConcept, VegetarianTopping, VegetableTopping, TomatoTopping, PizzaTopping, Food]</data>
         </node>
         <edge source="975448" target="975251">
             <data key="label">hasSpiciness</data>

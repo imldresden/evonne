@@ -7,7 +7,7 @@
 
   << styles >>
 
-  <link rel="stylesheet" href="/style/counterexamplenew.css">
+  <link rel="stylesheet" href="/style/counterexample.css">
 </head>
 
 <body class="counterexample">
@@ -63,7 +63,6 @@
       <button id="clear_selection" class="btn btn-small btn-primary">Clear</button>
       <button id="lasso_selection" class="btn btn-small btn-primary">Lasso</button>
       <button id="rectangle_selection" class="btn btn-small btn-primary">Rectangle</button>
-      <button id="normal_selection" class="btn btn-small btn-primary">Normal</button>
     </div>
   </fieldset>
   
@@ -131,7 +130,7 @@
 
   << scripts >>
 
-  <script src="/js/counterexamplenew/counterexample.js" type="module"></script>
+  <script src="/js/counterexample/counterexample.js" type="module"></script>
 </body>
 
 </html>

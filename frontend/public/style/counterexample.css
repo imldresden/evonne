@@ -1,88 +1,146 @@
-.background {
-    stroke: white;
-    stroke-width: 1px;
-    fill: white;
+/* Custom styles for the tooltip */
+#counter-view {
+	flex: 1;
+}
+.tippy-box {
+    background-color: #e3f2fd; /* Background color */
+    color: #000; /* Text color */
+    border: 1px solid #64b5f6; /* Border */
+    border-radius: 4px; /* Border radius */
+    padding: 3px 5px; /* Padding */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Box shadow */
+  }
+#counter-view {
+  position: relative;
+}
+.indicator {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 100%;
+  background-color: #999999; /* Default color */
+  cursor: pointer;
+  z-index: 1000;
+  pointer-events: auto;
 }
 
-.node {
-    stroke-width: 3px;
-    border: 4px;
-    rx: 5px;
-    ry: 5px;
-    cursor: pointer;
+.hidden-nodes {
+  background-color: #e0f2f1; 
+  border: 1px solid #80cbc4 ;
 }
 
-.link {
-    fill: none;
-    stroke-width: 3px;
-    opacity: 0.7;
-    marker-end: url(#end-arrow);
-    pointer-events: visibleStroke;
+.showing-nodes {
+  background-color: #80cbc4; 
+  border: 1px solid #e0f2f1 ;
 }
 
-.group_link {
-    stroke-dasharray: 10;
+input#group_name {
+  border:1px solid #767676;
+  width:80%;
+  line-height:2px;
+  height:24px;
+  border-radius:2px;
+  font-size:14px;
+}
+input#group_name::placeholder {
+  color:#000;
+}
+.custom-menu-item {
+  border-color: white !important;
+  color:rgba(0,0,0,0.87) !important;
+  filter:drop-shadow( 2px 2px 2px rgba(0, 0, 0, .5));
+  font-family:Hack, monospace;
+  font-size: 16px;
+  font-weight: 300;
+  background-color: #f2f2f2;
+}
+.custom-menu-item:hover {
+  background-color: #dddddd;
+}
+.custom-context-menu {
+  border-color: #f2f2f2 !important;   
+  z-index: 9999;   
+  padding: 0;
+  margin: 0;
+  width: auto;                
+}  
+.counterexample #sidebar{
+  z-index: 9999;
+  width: 300px;
+  right:calc(0px - 300px);
+}
+.counter-modal-option{
+  display: inline-block;
+  margin: 4px 0px;
+}
+.counter-modal-option button{
+  margin: 3px 0px;
+}
+.modal-option-range form:has(#shortening_mode_value) {
+  width: 100%;
+}
+@keyframes sideBarSlideOut {
+  from {
+      right: 0;
+  }
+
+  to {
+      right: calc(0px - 300px);
+  }
+}
+#search-container {
+  position: relative;
+}
+#search-bar:focus{
+  border-bottom: 1px solid #799c78;
+  -webkit-box-shadow: 0 1px 0 0 #799c78;
+  box-shadow: 0 1px 0 0 #799c78;
+}
+#search-results:not(:empty) {
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background-color: white;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
 }
 
-.group {
-    fill: rgba(109, 109, 255, 0.09);
-    opacity: .3;
-    stroke-width: 6px;
-    stroke: #0000ff;
+#search-results div {
+  padding: 5px;
+  cursor: pointer;
 }
 
-div.counter-example-search-result-item {
-    cursor: pointer;
+#search-results div:hover {
+  background-color: #f0f0f0;
 }
 
-div.counter-example-selected-tag-item {
-    color: white;
-    background-color: green;
-    border-radius: 100px;
-    padding: 5px;
+.counter-search-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 2px;
+  border-radius: 50px;
+  color: white;
+  cursor: pointer;
 }
-
-div.counter-example-search-result-item.selected {
-    font-weight: bold;
-    color: green;
+#subgraph canvas {
+  left:0;
 }
-
-div.tooltip {
-    position: absolute;
-    text-align: center;
-    padding: 10px;
-    font-family: sans-serif;
-    background: lightsteelblue;
-    border: 0px;
-    border-radius: 2px;
-    pointer-events: none;
+.importantStructure {
+  width: 700px;
 }
-
-.selection_mode_area {
-    fill: #3ca096;
-    opacity: 0.3;
-    stroke: #313131;
-    stroke-dasharray: 8;
-    stroke-width: 4px;
+.importantStructure .swal-title {
+  padding-bottom: 0;
+  margin-bottom: 0;
 }
-
-.hover_link {
-    stroke-width: 6px;
-    opacity: 1;
+.importantStructure .swal-content {
+  margin-top: 0;
 }
-
-.label {
-    font-size: 30px;
-    cursor: pointer;
+#counter-container {
+ display: none;
 }
-
-
-.label_edge {
-    fill: black;
-    font-size: 20px;
-    text-anchor: middle;
-}
-
-#counter-example-search-result-container {
-    overflow: auto;
+.swal-button--confirm {
+  background-color: #799c78 !important;
+  color: white !important;           
+  border-radius: 5px !important;     
 }

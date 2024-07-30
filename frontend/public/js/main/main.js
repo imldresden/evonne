@@ -1,6 +1,5 @@
 import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
-// import { init_counter } from '../counterexamplenew/counterexample.js';
 
 let status = {};
 let interval = undefined;

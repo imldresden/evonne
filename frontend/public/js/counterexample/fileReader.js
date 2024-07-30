@@ -2,7 +2,7 @@
  * this file handles the reading of the generated files
  */
 
-import {DATA_STRUCTURE} from "./datastructure.js";
+import { createContent } from "./counterexample.js";
 
 /**
  * Read the json file mapper.json
@@ -31,7 +31,7 @@ async function readXML(url) {
 async function readFiles() {
     let mappers = await readJson("js/counterexample/example/mapper.json");
     let model = await readXML("js/counterexample/example/result.model.xml");
-    DATA_STRUCTURE.importData(mappers, model);
+    createContent(mappers, model);
 }
 
 export {readFiles};
