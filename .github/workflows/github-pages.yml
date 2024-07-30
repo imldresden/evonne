@@ -25,31 +25,37 @@ jobs:
   cleanup:
       runs-on: ubuntu-latest
       permissions: write-all
-  
       steps:
-        - name: 🗑 Delete deployment
+        - name: Delete deployment
           uses: strumwolf/delete-deployment-environment@v2
           with:
             token: ${{ secrets.GITHUB_TOKEN }}
             environment: github-pages
             onlyRemoveDeployments: true
-  # Single deploy job since we're just deploying
-  deploy:
+  
+  build:
     needs: cleanup
+    steps:
+    - uses: actions/checkout@v4
+    - uses: wranders/markdown-to-pages-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |-
+          ./docs/README.md
+    - run: cp ./docs ./dist/
+    - uses: actions/upload-pages-artifact@v3
+      with:
+        path: dist
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: './docs'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
+      id: deployment
