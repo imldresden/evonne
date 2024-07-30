@@ -19,7 +19,7 @@
 
 <body>
     
-    <button id="change"> CLICK ME </button>
+    <button id="change"> Switch Layout </button>
     <div></div>
     <main id="my-reasoning-tree"></main>
     <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
@@ -33,51 +33,49 @@
         import { init_proof, proof } from "http://localhost:3030/js/proof/proof.js";
         
         const compact = {
-            div: "my-reasoning-tree",
-            path: "../data/test/4th-trace.xml",
-            //path: "../data/test/test.t.xml",
-            drawTime: 0,
-
-            showRules: true,
-
             isLinear: true,
-                isBreadthFirst: false, // no intersections
                 bottomRoot: false,
 
             isCompact: true,
                 isZoomPan: false, 
                 compactInteraction: true,
-
-            trays: { upper:false, lower:false },
-
-            stepNavigator: false, 
         } 
 
         const normal = {
+            isLinear: false,
+                bottomRoot: true,
+
+            isCompact: false,
+                isZoomPan: true, 
+                compactInteraction: false,
+        } 
+
+        const external = {
             div: "my-reasoning-tree",
             path: "../data/test/4th-trace.xml",
             //path: "../data/test/test.t.xml",
             drawTime: 0,
-
             showRules: true,
-
             trays: { upper:false, lower:false },
-
             stepNavigator: false, 
-        } 
+        }
 
-        init_proof({ external: compact });
+        init_proof({ external });
 
         let compactOrNormal = true;
         const switchBtn = document.getElementById("change")
         switchBtn.addEventListener("click", () => {
-            //document.getElementById("my-reasoning-tree").innerHTML = ""
+            
+            const layout = compactOrNormal ? compact : normal;
+
+            init_proof({ external: {
+                ...external,
+                ...layout
+            }}); 
+
             if (compactOrNormal) {
-                console.log(compactOrNormal)
-                proof.update({ reset: true,  ext: normal });
                 compactOrNormal = false;
             } else {
-                proof.update({ reset: true,  ext: compact });
                 compactOrNormal = true;
             }
         })

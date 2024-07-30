@@ -112,6 +112,7 @@ function init_proof({
   file,
   external,
 } = {}) {
+  d3.select(`#${proof.div}`).selectAll("*").remove();
   if (external) {
     setFromExternal(external);
   }
@@ -121,39 +122,38 @@ function init_proof({
   }
 
   // Configure SVG
-  if (!proof.svg) {
-    d3.select(`#${proof.div}`).insert("svg", ":first-child").attr("id", "proof-view"); 
-    proof.svg = d3.select("#proof-view");
+  d3.select(`#${proof.div}`).insert("svg", ":first-child").attr("id", "proof-view"); 
+  proof.svg = d3.select("#proof-view");
 
-    const svgNode = proof.svg.node();
-    if (!proof.isZoomPan) {
-      svgNode.parentElement.style.overflow= "auto";
-    } else {
-      svgNode.style.flex = 1;
-      svgNode.parentElement.style.display= "flex";
-      svgNode.parentElement.style.overflow= "hidden";
-    }
-
-    proof.BBox = svgNode.getBoundingClientRect();
-    proof.SVGwidth = proof.BBox.width;
-    proof.SVGheight = proof.BBox.height;
-    proof.margin = { top: 50, right: 50, bottom: 100, left: 50 };
-
-    proof.width = proof.SVGwidth - proof.margin.left - proof.margin.right;
-    proof.height = proof.SVGheight - proof.margin.top - proof.margin.bottom;
-
-    if (proof.isZoomPan) {
-      proof.svg
-        .attr("viewBox", [
-          -proof.margin.left,
-          -proof.margin.top,
-          proof.SVGwidth,
-          proof.SVGheight,
-        ])
-    }
-    proof.svg.style("user-select", "none");
-    proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport");
+  const svgNode = proof.svg.node();
+  if (!proof.isZoomPan) {
+    svgNode.parentElement.style.overflow= "auto";
+    svgNode.parentElement.style.display= "block";
+  } else {
+    svgNode.style.flex = 1;
+    svgNode.parentElement.style.display= "flex";
+    svgNode.parentElement.style.overflow= "hidden";
   }
+
+  proof.BBox = svgNode.getBoundingClientRect();
+  proof.SVGwidth = proof.BBox.width;
+  proof.SVGheight = proof.BBox.height;
+  proof.margin = { top: 50, right: 50, bottom: 100, left: 50 };
+
+  proof.width = proof.SVGwidth - proof.margin.left - proof.margin.right;
+  proof.height = proof.SVGheight - proof.margin.top - proof.margin.bottom;
+
+  if (proof.isZoomPan) {
+    proof.svg
+      .attr("viewBox", [
+        -proof.margin.left,
+        -proof.margin.top,
+        proof.SVGwidth,
+        proof.SVGheight,
+      ])
+  } 
+  proof.svg.style("user-select", "none");
+  proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport");
 
   if (file) {
     proof.proofFile = { name: file };

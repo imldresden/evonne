@@ -102,7 +102,7 @@ export class TreeNavigation {
 
         if (!proof.isZoomPan) {
             proof.svg.attr("width", proof.nodeVisuals.maxNodeWidth + 100); 
-            proof.svg.attr("height", proof.nodeVisuals.totalHeight + 20); 
+            proof.svg.attr("height", Math.max(proof.svg.attr("height"), proof.nodeVisuals.totalHeight + 20)); 
         }
 
         this.drawTree(proof.drawTime);

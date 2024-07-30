@@ -592,7 +592,7 @@ export class AxiomsHelper {
 					.lower()
 			}
 		}
-		const single = d => proof.showRules && !d._children[0]._children;
+		const single = d => proof.showRules && !d._children.reduce((a, b) => a?._children || b?._children, {});
 		collapsed.filter(y => single(y))
 			.nodes()
 			.forEach(node => indicator(node, 1, 207, 7))
