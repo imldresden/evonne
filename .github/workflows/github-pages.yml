@@ -41,7 +41,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         files: |-
           ./docs/README.md
-    - run: cp ./docs ./dist/
+    - run: cp -r ./docs ./dist/
     - uses: actions/upload-pages-artifact@v3
       with:
         path: dist
