@@ -39,8 +39,7 @@ jobs:
     - uses: wranders/markdown-to-pages-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        files: |-
-          ./docs/README.md
+        files: ./docs/README.md
     - run: cp -r ./docs ./dist/
     - uses: actions/upload-pages-artifact@v3
       with:
