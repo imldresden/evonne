@@ -302,6 +302,7 @@ class RulesHelper {
             premises,
             conclusion,
             data: _params?.data ? _params.data : data,
+            nodes: _params?.nodes ? _params.nodes : nodes,
             subProof,
             isSubProof: _params?.isSubProof || !proof.showSubProofs,
             large: _params?.large || false,

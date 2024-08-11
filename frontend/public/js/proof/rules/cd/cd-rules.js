@@ -65,11 +65,12 @@ function controls({ data }, where, params) {
         complete.on("click", (e, d) => {
             if (params.isSubProof) {
                 params.isSubProof = false;
+                params.nodes = [data.ops[data.current].node];
             } else {
                 params.isSubProof = true;
+                params.nodes = Object.values(data.ops).map(d => d.node);
             }
-            proof.rules.openExplanation(params, [data.ops[data.current].node])
-            proof.rules.highlightNodes(Object.values(data.ops).map(d => d.node));
+            proof.rules.openExplanation(params, params.nodes)
         });
     }
     
@@ -109,7 +110,7 @@ function controls({ data }, where, params) {
     }
 
     replay.on("click", (e, d) => {
-        proof.rules.openExplanation(params, [data.ops[data.current].node])
+        proof.rules.openExplanation(params, params.nodes)
     });
     
     
