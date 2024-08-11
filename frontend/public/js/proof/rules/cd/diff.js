@@ -63,8 +63,8 @@ export class DifferenceCD {
         "[From ⊥]": "From ⊥",
     }
 
-    isDifference(name) {
-        return this.rules[name];
+    isDifference(data) {
+        return data && data.ops && Object.values(data.ops)[0].domain === 'diff';
     }
 
     async draw(data, params, where) {

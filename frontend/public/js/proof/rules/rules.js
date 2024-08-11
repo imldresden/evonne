@@ -195,9 +195,11 @@ class RulesHelper {
     }
 
     #getSubProof(node) {
-        const subproof = proof.tree.hierarchy.find(p => {
+        const spID = node.source.subProof;
+        
+        const subproof = proof.tree._entire.find(p => {
             const sp = p.data.source.subProof;
-            return sp && sp !== "" && sp === node.source.subProof;
+            return sp && sp !== "" && sp === spID;
         });
 
         if (subproof) {
@@ -205,7 +207,7 @@ class RulesHelper {
             if (proof.showRules) {
                 steps = subproof.descendants()
                     .filter(d => d.data.source.type === node.source.type
-                        && d.data.source.subProof === node.source.subProof
+                        && d.data.source.subProof === spID
                     ).map(cd => {
                         const op = cd.data.source.data.op
                         op.name = cd.data.source.element;
@@ -215,7 +217,7 @@ class RulesHelper {
             } else {
                 steps = subproof.descendants()
                     .filter(d => d.data.source.rule.type === node.source.type
-                        && d.data.source.rule.subProof === node.source.subProof
+                        && d.data.source.rule.subProof === spID
                     ).map(cd => {
                         const op = cd.data.source.rule.data.op;
                         op.name = cd.data.source.rule.element;
@@ -226,7 +228,7 @@ class RulesHelper {
             steps = steps.flat(1).reverse();
 
             return {
-                name: node.source.subProof,
+                name: spID,
                 current: node.source.id,
                 ops: steps,
             };
@@ -301,7 +303,7 @@ class RulesHelper {
             conclusion,
             data: _params?.data ? _params.data : data,
             subProof,
-            isSubProof: _params?.isSubProof || false,
+            isSubProof: _params?.isSubProof || !proof.showSubProofs,
             large: _params?.large || false,
             ruleName // source of explanation trigger
         };

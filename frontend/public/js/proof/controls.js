@@ -188,12 +188,12 @@ function allowOverlapBtnFunction() {
 
 function showRulesBtnFunction() {
     proof.showRules = showRulesBtn.checked;
-    proof.update(true);
+    proof.update({ reset: true });
 }
 
 function showSubProofsBtnFunction() {
     proof.showSubProofs = showSubProofsBtn.checked;
-    proof.update(true);
+    proof.update({ reset: true });
 }
 
 function collapseAllBtnFunction() {
@@ -223,7 +223,7 @@ function magicToggleBtnFunction() {
         proof.magic.currentMagicAction = undefined;
     }
 
-    proof.update(true);
+    proof.update({ reset: true });
 }
 
 function getPlanarWrapper() {
@@ -242,7 +242,7 @@ function layoutToggleBtnFunction() {
         getPlanarWrapper().style.display = "none";
     }
     
-    proof.update(true);
+    proof.update({ reset: true });
 }
 
 function planarToggleBtnFunction() {

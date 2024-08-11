@@ -44,7 +44,8 @@
         const normal = {
             isLinear: false,
                 bottomRoot: true,
-
+            
+            isMagic: true,
             isCompact: false,
                 isZoomPan: true, 
                 compactInteraction: false,

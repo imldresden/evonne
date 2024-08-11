@@ -28,6 +28,7 @@ function combineSteps(data, name) {
         const d = { id: "combined", premises: [], name: `Subproof: ${name}` };
         const s = new Set();
         keys.forEach(id => {
+            d.domain = data.ops[id].domain;
             data.ops[id].premises.forEach(p => {
                 if (!s.has(p.id) && p.constraint._asserted) {
                     d.premises.push(p);
@@ -51,15 +52,27 @@ function controls({ data }, where, params) {
     //const centered = buttons.append("a").attr("class", "bar-center");
     const righted = buttons.append("a").attr("class", "bar-right");
 
-    const complete = righted.append("a")
-        .attr("class", "bar-button tooltipped")
-        .attr("id", "entire-subproof")
-        .attr("title", params.isSubProof?"Show Single Inference":"Show Entire Numerical Subproof");
-    complete.append("i")
-        .attr("class", "material-icons")
-        .text(params.isSubProof?"unfold_less":"unfold_more")
-        .style("font-size", "23px");
-
+    if (proof.showSubProofs) {
+        const complete = righted.append("a")
+            .attr("class", "bar-button tooltipped")
+            .attr("id", "entire-subproof")
+            .attr("title", params.isSubProof?"Show Single Inference":"Show Entire Numerical Subproof");
+        complete.append("i")
+            .attr("class", "material-icons")
+            .text(params.isSubProof?"unfold_less":"unfold_more")
+            .style("font-size", "23px");
+        
+        complete.on("click", (e, d) => {
+            if (params.isSubProof) {
+                params.isSubProof = false;
+            } else {
+                params.isSubProof = true;
+            }
+            proof.rules.openExplanation(params, [data.ops[data.current].node])
+            proof.rules.highlightNodes(Object.values(data.ops).map(d => d.node));
+        });
+    }
+    
     const replay = righted.append("a")
         .attr("class", "bar-button")
         .attr("title", "Replay animation");
@@ -99,15 +112,7 @@ function controls({ data }, where, params) {
         proof.rules.openExplanation(params, [data.ops[data.current].node])
     });
     
-    complete.on("click", (e, d) => {
-        if (params.isSubProof) {
-            params.isSubProof = false;
-        } else {
-            params.isSubProof = true;
-        }
-        proof.rules.openExplanation(params, [data.ops[data.current].node])
-        proof.rules.highlightNodes(Object.values(data.ops).map(d => d.node));
-    });
+    
 }
 
 function createVisContainer(params, where, extra = 0) {
@@ -136,12 +141,14 @@ class CDRules {
     draw({ div, data, params }) {
 
         let _data = getIndexedData(data);
-        const ruleName = params.ruleName;
+
         if (params.isSubProof) {
             _data = combineSteps(_data, params.subProof.name);
         }
 
-        if (this.diff.isDifference(ruleName)) { 
+        console.log(_data)
+
+        if (this.diff.isDifference(_data)) { 
             //TODO: come up with a better way to distinguish domains... 
             // this is only checked once using the const, the name changes!
             // cannot identify if its a subproof!
