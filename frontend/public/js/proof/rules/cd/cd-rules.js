@@ -149,9 +149,6 @@ class CDRules {
         console.log(_data)
 
         if (this.diff.isDifference(_data)) { 
-            //TODO: come up with a better way to distinguish domains... 
-            // this is only checked once using the const, the name changes!
-            // cannot identify if its a subproof!
             this.diff.draw(_data, params, div);
         } else if (data) {
             this.linear.draw(_data, params, div);

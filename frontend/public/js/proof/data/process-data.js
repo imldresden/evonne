@@ -89,7 +89,7 @@ function getConstraint(id, data) {
 function buildCDRule({ d, data }) {
     const op = {
         id: d.id,
-        domain: 'diff',
+        domain: 'diff', // TODO: get something from data that says which domain it is
         premises: [],
         conclusion: undefined
     }
