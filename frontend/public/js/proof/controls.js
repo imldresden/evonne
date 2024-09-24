@@ -188,12 +188,12 @@ function allowOverlapBtnFunction() {
 
 function showRulesBtnFunction() {
     proof.showRules = showRulesBtn.checked;
-    proof.update(true);
+    proof.update({ reset: true });
 }
 
 function showSubProofsBtnFunction() {
     proof.showSubProofs = showSubProofsBtn.checked;
-    proof.update(true);
+    proof.update({ reset: true });
 }
 
 function collapseAllBtnFunction() {
@@ -223,7 +223,7 @@ function magicToggleBtnFunction() {
         proof.magic.currentMagicAction = undefined;
     }
 
-    proof.update(true);
+    proof.update({ reset: true });
 }
 
 function getPlanarWrapper() {
@@ -242,11 +242,11 @@ function layoutToggleBtnFunction() {
         getPlanarWrapper().style.display = "none";
     }
     
-    proof.update(true);
+    proof.update({ reset: true });
 }
 
 function planarToggleBtnFunction() {
-    proof.linear.isDistancePriority = planarToggleBtn.checked;
+    proof.linear.isBreadthFirst = planarToggleBtn.checked;
     proof.update();
 }
 
@@ -455,7 +455,7 @@ function init() {
 
     magicToggleBtn.checked = proof.isMagic || false;
     layoutToggleBtn.checked = proof.isLinear || false;
-    planarToggleBtn.checked = proof.linear.isDistancePriority || false;
+    planarToggleBtn.checked = proof.linear.isBreadthFirst || false;
     showRulesBtn.checked = proof.showRules || false;
     getPlanarWrapper() ? getPlanarWrapper().style.display = "none" : "";
 

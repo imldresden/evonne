@@ -1,19 +1,14 @@
 import { nodeVisualsDefaults } from "../node-visuals.js";
 import { proof } from "../proof.js";
 
-let axiomNodesButConclusion, axiomNodes, inferredAxiomNodes;
-let newMagicBoxCounter = 0, newEdgeIDCounter = 0;
-
 export class MagicNavigation {
-	constructor() {
-		this._entireProofHierarchy = undefined;
-	}
-
-	set entireProofHierarchy(originalHierarchy) {
-		this._entireProofHierarchy = originalHierarchy;
-	}
-
+	
 	currentMagicAction = undefined;
+	axiomNodesButConclusion = undefined;
+	axiomNodes = undefined;
+	inferredAxiomNodes = undefined;
+	newMagicBoxCounter = 0;
+	newEdgeIDCounter = 0;
 
 	getInitialMagicalHierarchy(data) {
 		let result = [];
@@ -36,9 +31,9 @@ export class MagicNavigation {
 
 	addMagicNavButtonsToNodes() {
 		const div = proof.svg;
-		axiomNodes = div.selectAll(".axiom");
-		axiomNodesButConclusion = div.selectAll(".axiom:not(.conclusion)");
-		inferredAxiomNodes = div.selectAll(".axiom:not(.asserted)");
+		this.axiomNodes = div.selectAll(".axiom");
+		this.axiomNodesButConclusion = div.selectAll(".axiom:not(.conclusion)");
+		this.inferredAxiomNodes = div.selectAll(".axiom:not(.asserted)");
 
 		//Remove old buttons
 		div.selectAll(".axiomButton").remove();
@@ -70,7 +65,7 @@ export class MagicNavigation {
 	}
 
 	addPullDown() {
-		let group = inferredAxiomNodes.filter(d => {
+		let group = this.inferredAxiomNodes.filter(d => {
 			return d ? d.children[0].data.source.type === "mrule" : false;
 		})
 			.append("g")
@@ -84,14 +79,12 @@ export class MagicNavigation {
 	}
 
 	addPushDown() {
-		const { BOX_HEIGHT } = nodeVisualsDefaults;
-
-		let group = axiomNodesButConclusion
+		let group = this.axiomNodesButConclusion
 			.filter(d => d ? d.children[0].children : false)
 			.append("g")
 			.attr("id", "B4")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2}, ${BOX_HEIGHT})`)
+			.attr("transform", d => `translate(${d.width / 2}, ${d.height})`)
 			.on("click", (_, d) => this.pushDown(d))
 			.on("hover", (_, d) => this.pushDownHover(d));
 
@@ -99,14 +92,12 @@ export class MagicNavigation {
 	}
 
 	addPullUp() {
-		const { BOX_HEIGHT } = nodeVisualsDefaults;
-
-		let group = axiomNodesButConclusion
+		let group = this.axiomNodesButConclusion
 			.filter(d =>  d ? d.data.target.type === "mrule" : false)
 			.append("g")
 			.attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d =>`translate(${-d.width / 2}, ${BOX_HEIGHT})`)
+			.attr("transform", d =>`translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (_, d) => this.pullUp(d))
 			.on("hover", (_, d) => this.pullUpHover(d));
 
@@ -114,7 +105,7 @@ export class MagicNavigation {
 	}
 
 	addPushUp() {
-		let group = axiomNodesButConclusion.filter(d => {
+		let group = this.axiomNodesButConclusion.filter(d => {
 			return d ? d.children[0].children : false;
 		})
 			.append("g")
@@ -160,11 +151,10 @@ export class MagicNavigation {
 
 		//take a look ahead, if the new conclusion is a premise of for the next rule, and all that premise is 
 		//part of the rest of the premise of the magic rule, then it is not needed any more
-		newPremiseElement = this._entireProofHierarchy.descendants().find(x => x.data.source.id === currentAtOriginal.parent.data.target.id);
+		newPremiseElement = proof.tree._entire.descendants().find(x => x.data.source.id === currentAtOriginal.parent.data.target.id);
 		if (!newPremiseElement.parent) {
 			return false;
 		}
-
 
 		//if looking head does not give the current magic conclusion, then magic is needed
 		if (newPremiseElement.parent.data.target.id !== current.parent.data.target.id) {
@@ -238,7 +228,7 @@ export class MagicNavigation {
 		}
 		
 		let newData = [], usedMagicPremises = [], restMagicPremises = [];
-		let currentAtOriginal = this._entireProofHierarchy.descendants().find(x => x.data.source.id === treeRoot.data.source.id);
+		let currentAtOriginal = proof.tree._entire.descendants().find(x => x.data.source.id === treeRoot.data.source.id);
 
 		//add everything above the pulled axiom
 		treeRoot.descendants().filter(x => x !== treeRoot).forEach(x => {
@@ -270,9 +260,9 @@ export class MagicNavigation {
 				return;
 			}
 			let premiseNewMagicNeeded = this.checkIfNewMagicIsNeeded(x, this.getRoot(treeRoot));
-			console.log("is new Magic needed " + premiseNewMagicNeeded);
+			//console.log("is new Magic needed " + premiseNewMagicNeeded);
 			if (premiseNewMagicNeeded) {
-				newMagicBox = this.getNewMagicBox();
+				newMagicBox = this.getNewMagicBox(x);
 				newData.push(this.getNewEdge(newMagicBox, x.data.source));
 				x.descendants().filter(y => y !== x).forEach(y => {
 					found = childrenOfMagic.find(z => z.data.source.id === y.data.source.id);
@@ -308,7 +298,7 @@ export class MagicNavigation {
 		//decide if the current magic box is still needed.
 		//if yes, all premise elements that haven't been used so far should be added + their descendants
 		let currentMagicIsNeeded = this.isCurrentMagicNeeded(treeRoot, currentAtOriginal, usedMagicPremises, restMagicPremises);
-		console.log("is currentMagic Needed " + currentMagicIsNeeded);
+		//console.log("is currentMagic Needed " + currentMagicIsNeeded);
 		if (currentMagicIsNeeded) {
 			//add new edge from the new conclusion to the current magic box
 			newData.push(this.getNewEdge(currentAtOriginal.parent.data.target, treeRoot.data.target));
@@ -321,7 +311,7 @@ export class MagicNavigation {
 
 			newData.push(treeRoot.parent.data);
 		} else {
-			let conclusion = this._entireProofHierarchy.descendants().find(x => x.data.target.id === treeRoot.parent.data.target.id);
+			let conclusion = proof.tree._entire.descendants().find(x => x.data.target.id === treeRoot.parent.data.target.id);
 			if (!newData.includes(conclusion.data))
 				newData.push(conclusion.data);
 
@@ -378,7 +368,7 @@ export class MagicNavigation {
 		}
 
 		let newData = [];
-		let newMagicBox = this.getNewMagicBox();
+		let newMagicBox = this.getNewMagicBox(treeRoot);
 
 		//connect the premises to the new magic box and add all their descendants
 		treeRoot.children[0].children.forEach(x => {
@@ -436,7 +426,7 @@ export class MagicNavigation {
 		this.addAllBut(treeRoot, newData);
 
 		let childrenOfMagic = treeRoot.children[0].children;
-		let currentAtOriginal = this._entireProofHierarchy.descendants().find(x => x.data.source.id === treeRoot.data.source.id);
+		let currentAtOriginal = proof.tree._entire.descendants().find(x => x.data.source.id === treeRoot.data.source.id);
 		let newMagicBox, relevantPremise, relevantPremiseCount, found;
 
 		currentAtOriginal.children.forEach(child => {
@@ -473,7 +463,7 @@ export class MagicNavigation {
 				//if the number of relevant axioms that need a magic rule is higher than 0, create a magic rule
 				//otherwise, use the original rules
 				if (relevantPremiseCount > 0) {
-					newMagicBox = this.getNewMagicBox();
+					newMagicBox = this.getNewMagicBox(relevantPremise);
 					relevantPremise.forEach(p => {
 						newData.push(this.getNewEdge(p.data.source, newMagicBox));
 						p.descendants().filter(x => x !== p).forEach(y => {
@@ -528,7 +518,7 @@ export class MagicNavigation {
 			return;
 		}
 
-		let newData = [], newMagicBox = this.getNewMagicBox();
+		let newData = [], newMagicBox = this.getNewMagicBox(treeRoot);
 		
 		//connect the children of the current axiom and all their descendants to the new magic box
 		treeRoot.children[0].children.forEach(x => {
@@ -613,20 +603,18 @@ export class MagicNavigation {
 	}
 
 	//Create a new edge with a fresh ID
-	getNewEdge(sourceObject, TargetObject) {
+	getNewEdge(source, target) {
 		return {
-			id: "MNE" + newEdgeIDCounter++,
-			source: sourceObject,
-			target: TargetObject,
-			childrenIDs: [],
-			element: ""
+			id: "MNE" + this.newEdgeIDCounter++,
+			source,
+			target,
 		};
 	}
 
 	//Create a new magic rule with a fresh ID
 	getNewMagicBox() {
 		return {
-			id: "M" + newMagicBoxCounter++,
+			id: "M" + this.newMagicBoxCounter++,
 			element: "Magic Rule",
 			type: "mrule"
 		}
@@ -662,12 +650,33 @@ export class MagicNavigation {
 
 	getDFOrder(structure, currentRootData, orderedStructure) {
 		orderedStructure.push(currentRootData);
+		const children = [];
 		structure.forEach(d => {
 			if (d.target.id === currentRootData.source.id) {
-				this.getDFOrder(structure, d, orderedStructure);
+				children.push(d) 
 			}
 		});
+		children.sort((a, b) => +a.source.id - b.source.id).forEach(d => {
+			this.getDFOrder(structure, d, orderedStructure);
+		})
 	}
+
+	/*getDFOrder(hierarchy, orderedElements) {
+        hierarchy.children?.forEach(d => {
+            this.getDFOrder(d, orderedElements);
+        });
+        orderedElements.push(hierarchy);
+    }
+
+	getBFOrder(hierarchy, orderedElements) {
+        let nodesAtLevel = this.getNodesAtLevel(hierarchy);
+        if (nodesAtLevel.length !== 0) {
+            this.getBFOrder(nodesAtLevel, orderedElements);
+        }
+        nodesAtLevel.forEach(d => {
+            orderedElements.push(d);
+        });
+    }*/
 
 	incAdd(rootInOriginal, rootInCurrent, newData) {
 		if (!newData.includes(rootInOriginal.data)) {

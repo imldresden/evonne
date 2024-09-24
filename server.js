@@ -15,7 +15,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from "module";
 import * as path from 'path';
-import {owlFunctions} from "./frontend/public/js/utils/myOWL.js";
+import { owlFunctions } from "./frontend/public/js/utils/myOWL.js";
 
 const require = createRequire(import.meta.url);
 require('dotenv').config();
@@ -133,14 +133,6 @@ app.get('/project', (req, res) => {
     return;
   }
 
-  // check for existing processes running
-  /* if (sessions[id]) {
-    res.status(200).send({ status: 'busy' });
-    return;
-  } else {
-    sessions[id] = true;
-  }*/
-
   const status = {
     status: undefined,
     ontology: [],
@@ -169,8 +161,12 @@ app.get('/project', (req, res) => {
       flags.ad = true;
     }
 
-    if ((file.endsWith('.xml') || file.endsWith('.owl')) 
-    && !file.startsWith('atomic ') && !file.startsWith('proof_') && !file.endsWith('t.xml')) {
+    if (
+      (file.endsWith('.xml') || file.endsWith('.owl')) 
+      && !file.startsWith('atomic ') 
+      && !file.startsWith('proof_') 
+      && !file.endsWith('t.xml')
+    ) {
       status.ontology = owlFunctions.getOWlFileName(file); // there is more than one
       flags.ontology = true;
     }
@@ -210,7 +206,6 @@ app.get('/project', (req, res) => {
   const reasonerPath = path.join(target, 'reasoner.txt');
   status.reasoner = existsSync(reasonerPath) ? readFileSync(path.join(target, 'reasoner.txt')).toString() : "n/a";
 
-  // delete sessions[id]
   res.status(200).send(status);
 });
 
@@ -240,29 +235,30 @@ app.post('/upload', (req, res) => {
       return res.status(500).send(err);
     }
 
-    // res.send('File uploaded!');
-  });
-
-  //Try to translate the ontology file to OWL XML format.
-  const owlFileName = convertOntology(file, uploadsDir)
-
-  file.mv(owlFileName, function (err) {
-    if (err) {
-      return res.status(500).send(err);
-    }
-    //Delete the original ontology file
-    if(owlFileName !== uploadPath)
-      fs.unlink(uploadPath, function (err) {
+    if (req.body.type === 'ontology') {
+      //Try to translate the ontology file to OWL XML format.
+      const owlFileName = convertOntology(file, uploadsDir)
+    
+      file.mv(owlFileName, function (err) {
         if (err) {
-          //TODO Please take a look and adapt handling the error if needed
-          throw err
+          return res.status(500).send(err);
         }
-        console.log("Original ontology file was deleted successfully");
+        //Delete the original ontology file
+        if(owlFileName !== uploadPath)
+          fs.unlink(uploadPath, function (err) {
+            if (err) {
+              //TODO Please take a look and adapt handling the error if needed
+              throw err;
+            }
+            console.log("Original ontology file was deleted successfully");
+          });
+    
+        res.send('Ontology uploaded!');
       });
-
-    res.send('File uploaded!');
+    } else {
+      res.send('File uploaded!');
+    }
   });
-
 });
 
 app.get('/create', (req, res) => {
@@ -612,10 +608,7 @@ function getProofType(genMethod, sigPath) {
 }
 
 function convertOntology(ontFile, ontDir) {
-  console.log("CONVERTING TO OWL XML FORMAT");
-
   const owlFileName = owlFunctions.getOWlFileName(ontFile.name);
-
   const exitCode = spawn('java',  [
     '-jar', 'externalTools/explain.jar',
     '-o', ontFile.name,
@@ -623,11 +616,12 @@ function convertOntology(ontFile, ontDir) {
     '-on', owlFileName,
   ], { encoding: 'utf-8' });
 
-  if(exitCode === 5)
-      //TODO code 5 means that the translation failed (that is the uploaded ontology file uses unknown or nonstandard format)
-    console.log("Could not convert the ontology file into OWL XML format!");
-  else
+  if(exitCode === 5) {
+    //TODO code 5 means that the translation failed (that is the uploaded ontology file uses unknown or nonstandard format)
+    console.error("Could not convert the ontology file into OWL XML format!");
+  } else {
     return path.join(ontDir, owlFileName);
+  }
 }
 
 function generateProofs(ontPath,axiom, projPath,sigPath,genMethod,translate2NL) {

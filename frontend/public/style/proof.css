@@ -13,10 +13,6 @@
 	--color-text-white: white;
 }
 
-svg#proof-view {
-	flex: 1;
-}
-
 .connector.ruleConnector {
 	fill: var(--color-conn-rule);
 }

@@ -278,7 +278,7 @@ function calcBoxHeight(stringList) {
 
 function processData(data) {
   // Compute edges
-  const edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
+  const edges = [].map.call(data.querySelectorAll("edge"), (d) => {
     const id = d.getAttribute("id");
     const source = d.getAttribute("source");
     const target = d.getAttribute("target");
@@ -286,7 +286,7 @@ function processData(data) {
     return { data: { id, source, target } };
   });
 
-  const nodeData = [].map.call(data.querySelectorAll("node"), (d) => {
+  const nodes = [].map.call(data.querySelectorAll("node"), (d) => {
     let dataNodes, signature, axioms, axiomsMap, id;
 
     id = d.getAttribute("id");
@@ -304,7 +304,7 @@ function processData(data) {
       }
     });
 
-    const edgeFromParent = edgeData.find((edge) => edge.source === id);
+    const edgeFromParent = edges.find((edge) => edge.source === id);
     const parentId = edgeFromParent == null ? "" : edgeFromParent.target;
 
     const text = getNodeTextList({ signature, axioms });
@@ -329,8 +329,8 @@ function processData(data) {
   });
 
   return {
-    nodes: nodeData,
-    edges: edgeData,
+    nodes,
+    edges,
   };
 }
 
@@ -421,8 +421,7 @@ function loadOntology(e) {
         console.error('Error:', error);
       });
     document.getElementById("reasoner-choice-upload").style.display = "none";
-  });
-
+  }, 'ontology' );
 }
 
 function loadAtomicDecomposition(e) {
