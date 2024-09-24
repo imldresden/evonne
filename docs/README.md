@@ -12,6 +12,7 @@
 ### Description
 
 **Evonne** is a web-application for explaining Description Logic reasoning and ontology debugging.
+
 ---
 
 ### Getting Started
