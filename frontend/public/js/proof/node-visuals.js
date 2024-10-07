@@ -641,13 +641,14 @@ export class NodeVisualsHelper {
         proof.svg.selectAll("g.node,line.link,path.link").style("opacity", 1);
     }
 
-    getLabel(node, display = "original") {   
+    getLabel(node, display = "original") {
         if (node.labels) {
             if (display === "textual") {
                 return node.labels.naturalLanguage;
             }
             return node.labels.default;
         }
-        return node.element;
+        //Assuming node.labels is undefined for rule name nodes
+        return proof.ruleNameMapHelper.getAlternativeName(node.element);
     }
 }

@@ -126,7 +126,6 @@ function init_views(loop = false) {
 
       if (res.status === 'busy') {
         console.log('project is busy...')
-        return;
       } else if (res.status === 'pending') {
         if (res.axioms && res.axioms.length === 1) {
           console.error('atomic decomposition missing');
@@ -140,7 +139,7 @@ function init_views(loop = false) {
         modal.close();
 
         if (document.getElementById('proof-container')) {
-          init_proof({ file: res.proofs[0] });
+          init_proof({ file: res.proofs[0], ruleNamesMap:res.ruleNamesMap });
         }
         if (document.getElementById('ontology-container')) {
           init_ontology({ ad: res.ad, ontology: res.ontology });

@@ -12,6 +12,7 @@ import { MagicNavigation } from "./trees/magic.js";
 import { controls, init as initControls } from "./controls.js";
 import { proof } from "./proof.js";
 import { globals } from "../shared-data.js";
+import {RuleNameMapHelper} from "./ruleNamesMapHelper.js";
 
 const conf = {
   div: "proof-container",
@@ -57,6 +58,8 @@ const conf = {
   nodeVisuals: new NodeVisualsHelper(),
   rules: new RulesHelper(),
   axioms: new AxiomsHelper(),
+
+  ruleNameMapHelper : new RuleNameMapHelper(),
 
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
@@ -110,8 +113,17 @@ function setFromExternal(external) {
 
 function init_proof({
   file,
+  ruleNamesMap,
   external,
 } = {}) {
+  //Set a ruleNameMap to be used to replace the labels of rule nodes
+  conf.ruleNameMapHelper.setRuleNamesMaps(ruleNamesMap)
+
+  //By default, hide the ontology view
+  document.querySelectorAll('.resizer').forEach(function (element) {
+    element.previousElementSibling.style.width = '99%'
+  });
+
   d3.select(`#${proof.div}`).selectAll("*").remove();
   if (external) {
     setFromExternal(external);
@@ -193,7 +205,6 @@ function init_proof({
   } else {
     proof.load();
   }
-  
   proof.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: `#${proof.div}`, isZoomPan : proof.isZoomPan });
 }
 

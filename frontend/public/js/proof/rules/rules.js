@@ -145,7 +145,9 @@ class RulesHelper {
         }
 
         if (data.source.type === "rule" || data.source.type === "DLRule") {
-            rule_sets.dl.draw({ div, premises, conclusion, params });
+            const alternativeRuleName = params.ruleName;
+            const originalRuleName = proof.ruleNameMapHelper.getOriginalName(alternativeRuleName);
+            rule_sets.dl.draw({ div, premises, conclusion, alternativeRuleName, originalRuleName });
         } else if (data.source.type === "CDRule") {
             rule_sets.cd.draw({ div, data: sp, params });
         } else if (data.source.type === "mrule" || data.source.type === "krule") {

@@ -123,6 +123,17 @@ app.get("/counterexample", (request, response) => {
   response.render("counterexample/counterexample.spy", {settings_specific: '<< counterexample/settings >>'});
 });
 
+function parseMap(mapStr) {
+  const map = new Map();
+  const entries = mapStr.split("\n")
+  entries.forEach(e=>{
+    let a = []
+    e.split(':').forEach(x=>a.push(x.trim()))
+    map.set(a[0],a[1])
+  })
+  return Object.fromEntries(map)
+}
+
 // resources
 app.get('/project', (req, res) => {
   const id = req.query.id;
@@ -204,7 +215,11 @@ app.get('/project', (req, res) => {
   }
 
   const reasonerPath = path.join(target, 'reasoner.txt');
-  status.reasoner = existsSync(reasonerPath) ? readFileSync(path.join(target, 'reasoner.txt')).toString() : "n/a";
+  status.reasoner = existsSync(reasonerPath) ? readFileSync(reasonerPath).toString() : "n/a";
+
+  //Rule names can be replaced based on a map specified the "ruleNames.tmap" file
+  const ruleNamesMapPath = './ruleNames.tmap';
+  status.ruleNamesMap = parseMap(existsSync(ruleNamesMapPath) ? readFileSync(ruleNamesMapPath).toString() : "");
 
   res.status(200).send(status);
 });
