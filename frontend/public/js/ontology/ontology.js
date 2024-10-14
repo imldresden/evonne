@@ -68,12 +68,6 @@ async function createContent(data) {
     wheelSensitivity: 0.3
   });
 
-  //added because of the default behavior in proof.js
-  cy.on('layoutstop', () => {
-    cy.zoom(2)
-    cy.center()
-  });
-
   const handleLayoutEvent = function (enabled) {
     return function () {
       cy.userZoomingEnabled(enabled);
