@@ -1,7 +1,7 @@
-import express, {response} from 'express';
+import express from 'express';
 import sprightly from 'sprightly';
 import http from 'http';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { spawn } from 'child_process';
 import {
   unlink,

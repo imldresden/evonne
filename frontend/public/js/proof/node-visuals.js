@@ -568,7 +568,7 @@ export class NodeVisualsHelper {
         // estimation of the size of each character
         const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.data.source.id}`);
         
-        let label = this.getLabel(node.data.source);
+        let label = this.getLabel(node.data.source, display);
         
         if (display && display === "shortened") {
             label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);

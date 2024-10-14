@@ -42,7 +42,7 @@ export class AxiomsHelper {
 		//Set axiom to be displayed in its shortened format
 		this.addSetAxiomShortened();
 		//Set axiom to be displayed in its textual format
-		this.addSetAxiomTextual();
+		this.addSetAxiomNaturalLanguage();
 		//Extend the width of the button to show the full axiom
 		this.addShowFullAxiom();
 
@@ -380,6 +380,12 @@ export class AxiomsHelper {
 		this.switchStateOnClick(nodeID, nodeID);
 	}
 
+	conditionToShowAxiomOriginal(d) {
+		const node = d.data.source;
+		const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.id}`);
+		return node.labels && node.labels.default && display !== "original";
+	}
+
 	addSetAxiomShortened() {
 		const { BTN_CIRCLE_SIZE, BOX_PADDING, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
 
@@ -413,7 +419,12 @@ export class AxiomsHelper {
 		this.switchStateOnClick(nodeID, nodeID);
 	}
 
-	addSetAxiomTextual() {
+	conditionToShowShortened(d) {
+		const node = d.data.source;
+		return node.labels && node.labels.default && proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.id}`) !== "shortened";
+	}
+
+	addSetAxiomNaturalLanguage() {
 		const { BTN_CIRCLE_SIZE, BOX_PADDING, TOP_TRAY_WIDTH } = nodeVisualsDefaults;
 
 		let group = proof.svg.selectAll(".axiom")
@@ -422,7 +433,7 @@ export class AxiomsHelper {
 			.attr("id", "B05")
 			.attr("class", "axiomButton btn-round btn-set-axiom-string")
 			.attr("transform", `translate(${-TOP_TRAY_WIDTH / 3 + 8 * BOX_PADDING}, ${-BTN_CIRCLE_SIZE + 5})`)
-			.on("click", (_, d) => this.setAxiomTextual(d))
+			.on("click", (_, d) => this.setAxiomNaturalLanguage(d))
 			.each((_, i, n) =>
 				this.switchStateOnDraw(n[i], "textual"));
 		group.append("circle")
@@ -438,12 +449,18 @@ export class AxiomsHelper {
 			.text("Show text")
 	}
 
-	setAxiomTextual(d) {
+	setAxiomNaturalLanguage(d) {
 		let nodeID = "N" + d.data.source.id;
 		proof.nodeVisuals.nodesCurrentDisplayFormat.set(nodeID, "textual");
 		proof.nodeVisuals.nodesDisplayFormat.set(nodeID, "textual");
 		proof.update();
 		this.switchStateOnClick(nodeID, nodeID);
+	}
+
+	conditionToShowNaturalLanguage(d) {
+		const node = d.data.source;
+		const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.id}`);
+		return node.labels && node.labels.naturalLanguage && display !== "textual";
 	}
 
 	addShowFullAxiom() {
@@ -465,7 +482,7 @@ export class AxiomsHelper {
 			})
 			.append("g").attr("opacity", 0).attr("id", "B03")
 			.attr("class", "axiomButton btn-view")
-			.attr("transform", d => `translate(${-(d.width / 2) + BOX_PADDING}, ${d.height})`) // - BOX_PADDING_BOTTOM
+			.attr("transform", d => `translate(${-(d.width / 2) + BOX_PADDING}, ${d.height - 7})`) // 
 			.on("click", (e, d) => {
 				showFullAxiom(e.currentTarget.parentNode);
 				proof.update();
@@ -477,7 +494,7 @@ export class AxiomsHelper {
 			.attr("id", "B03Text")
 			.attr("class", "material-icons")
 			.attr("x", BOX_PADDING)
-			.attr("y", 2)
+			.attr("y", 0)
 			.text((d, i, nodes) =>
 				proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "\ue8f5" : "\ue8f4");
 
@@ -731,17 +748,20 @@ export class AxiomsHelper {
 		{
 			title: 'Show original',
 			type: 'button',
-			action: (_, d) => this.setAxiomOriginal(d)
+			action: (_, d) => this.setAxiomOriginal(d),
+			filter: (d) => this.conditionToShowAxiomOriginal(d)
 		},
 		{
 			title: 'Show shortened',
 			type: 'button',
-			action: (_, d) => this.setAxiomShortened(d)
+			action: (_, d) => this.setAxiomShortened(d),
+			filter: (d) => this.conditionToShowShortened(d)
 		},
 		{
 			title: 'Show textual',
 			type: 'button',
-			action: (_, d) => this.setAxiomTextual(d)
+			action: (_, d) => this.setAxiomNaturalLanguage(d),
+			filter: (d) => this.conditionToShowNaturalLanguage(d)
 		},
 		{
 			title: 'Ontology Actions',
