@@ -57,7 +57,7 @@ export class MagicNavigation {
 		//Set axiom to be displayed in its shortened format
 		proof.axioms.addSetAxiomShortened();
 		//Set axiom to be displayed in its textual format
-		proof.axioms.addSetAxiomTextual();
+		proof.axioms.addSetAxiomNaturalLanguage();
 		//Extend the width of the button to show the full axiom
 		proof.axioms.addShowFullAxiom();
 		//Hide all buttons
