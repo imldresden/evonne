@@ -56,11 +56,11 @@ export class BasicShorteningFunctions {
 
         if (text.includes(data.subsumes)) {
             return this.getFirstNChars(text.split(data.subsumes)[0].trim())
-                + data.subsumes
+                + " " + data.subsumes + " "
                 + this.getFirstNChars(text.split(data.subsumes)[1].trim());
         } else if (text.includes(data.equivalence)) {
             return this.getFirstNChars(text.split(data.equivalence)[0].trim())
-                + data.equivalence
+                + " " + data.equivalence + " "
                 + this.getFirstNChars(text.split(data.equivalence)[1].trim());
         } else if (text.includes(data.disjoint)) {
             return text.replace(data.regInnerPar, this.getMultiFirstNChars(text.match(data.regInnerPar)));
