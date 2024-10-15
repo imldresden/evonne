@@ -83,6 +83,7 @@ fieldset {
 
 .container-flex {
     display: flex;
+	height: 100%;
 }
 
 .welcome-container {

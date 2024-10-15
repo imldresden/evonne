@@ -10,6 +10,7 @@ const signaturePathFile = document.getElementById("uploadSignatureTrigger");
 const browseFilePathText = document.getElementById("browseFilePath");
 const clearSigFilePath = document.getElementById("clearSignatureFile");
 const computeAxiomsBtn = document.getElementById('computeAxiomPairBtn');
+const openSplit = document.getElementById('openSplitInNew');
 
 window.onload = function () {
   //Mapping elements with events to their functions
@@ -17,6 +18,7 @@ window.onload = function () {
   const thingsWithListeners = [
     { type: 'click', thing: clearSigFilePath, fn: clearSigFilePathFunction },
     { type: 'click', thing: computeAxiomsBtn, fn: computeAxiomsBtnFunction },
+    { type: 'click', thing: openSplit, fn: openSplitFunction },
   ];
 
   // Remove listeners
@@ -58,6 +60,14 @@ window.onload = function () {
     browseFilePathText.value = "";
     browseFilePathText.classList.remove("valid");
     proof.proofFile = undefined;
+  }
+
+  if (clearSigFilePath) {
+    clearSigFilePath.addEventListener("click", clearSigFilePathFunction);
+  }
+  
+  if (openSplit) {
+    openSplit.addEventListener("click", openSplitFunction)
   }
 
   init_views();
@@ -156,12 +166,8 @@ function init_views(loop = false) {
 }
 
 // for progress.spy
-export function progress(message) {
+function progress(message) {
   document.getElementById('custom-messages').innerHTML += "<br>" + message;
-}
-
-if (clearSigFilePath) {
-  clearSigFilePath.addEventListener("click", clearSigFilePathFunction);
 }
 
 function sortNames(c1, c2) {
@@ -183,6 +189,7 @@ function clearSigFilePathFunction() {
   signaturePathText.classList.remove("valid");
   proof.signatureFile = undefined;
 }
+
 
 function computeAxiomsBtnFunction() {
 
@@ -213,6 +220,11 @@ function computeAxiomsBtnFunction() {
     .catch(error => {
       console.error('Error:', error);
     });
+}
+
+function openSplitFunction() {
+  console.log("fuckc")
+  window.open('/?id=' + getSessionId())
 }
 
 function blockProofMethods(reasoner) {
@@ -247,4 +259,4 @@ function loadSignature(event) {
   upload(proof.signatureFile);
 }
 
-export { loadProof, loadSignature }
+export { progress, loadProof, loadSignature }

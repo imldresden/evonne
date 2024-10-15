@@ -16,8 +16,10 @@
   << modals/file-upload >>
   << modals/axiom >>
 
-  <main id="ontology-container">
-    << menus/minimap >>
+  <main>
+    <div class="container container-flex" id="ontology-container">
+      << menus/minimap >>
+    </div>
   </main>
   << menus/settings >> 
 
