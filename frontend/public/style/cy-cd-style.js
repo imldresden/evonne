@@ -38,11 +38,11 @@ const node = {
 
 const stylesheet = [
   {
-    "selector": "core",
+    "selector": ":active",
     "style": {
-      "selection-box-color": colors.SELECTED_NODE_COLOR,
-      "selection-box-border-color": "#fafafa",
-      "selection-box-opacity": "0",
+      "overlay-color": "black",
+      "overlay-padding": 0,
+      "overlay-opacity": 0
     }
   }, {
     "selector": "node",

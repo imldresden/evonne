@@ -4,7 +4,7 @@ import { proof } from "../../../proof/proof.js";
 
 function getIndexedData(data) {
     const indexed_data = {};
-    let current = -1;
+    let current = 0;
     data.ops.forEach((op,i) => {
         if (op.id === data.current) {
             current = i
@@ -128,7 +128,7 @@ function createVisContainer(params, where, extra = 0) {
     where.append("div")
         .attr("class", "explanation-container")
         .attr("id", "explanation-container")
-        .style("height", params.large ? `${params.p.height - (150 + extra)}px` : "200px")
+        .style("height", params.large ? `${params.p.height - (150 + extra)}px` : "350px")
         .style("width", "100%")
 
     return { input: d3.select('#cd-left'), output: d3.select('#cd-right'), };

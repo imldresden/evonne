@@ -138,15 +138,22 @@ export class AxiomsHelper {
 		}
 
 		if (proof.showRules) {
-			if (!treeRoot.children[0].children) {
-				treeRoot.children[0].children = treeRoot.children[0]._children
+			if (ruleUtils.isRule(treeRoot.data.source.type)) {
+				treeRoot.children.forEach(child => {
+					child.children = child._children;
+					child.children.forEach(cc => {
+						cc.children = null;
+					})
+				});	
+			} else {
+				treeRoot.children[0].children = treeRoot.children[0]._children;
+				treeRoot.children[0].children.forEach(child => {
+					if (child.children) { //&& child.children[0].children to not collapse Asserted Conclusions
+						child.children = null
+					}
+				});
 			}
-
-			treeRoot.children[0].children.forEach(child => {
-				if (child.children && child.children[0].children) {
-					child.children = null
-				}
-			});
+			
 		} else {
 			treeRoot.children.forEach(child => {
 				if (child.children) {
@@ -208,7 +215,7 @@ export class AxiomsHelper {
 		if (proof.isDrawing) {
 			return;
 		}
-		e.stopPropagation();
+
 		proof.nodeInteracted = treeRoot;
 
 		if (treeRoot.children) {
@@ -265,7 +272,7 @@ export class AxiomsHelper {
 		if (proof.isDrawing) {
 			return;
 		}
-		e.stopPropagation();
+
 		proof.nodeInteracted = treeRoot;
 
 		if (treeRoot._children) {
@@ -275,15 +282,33 @@ export class AxiomsHelper {
 	}
 
 	conditionToShowAllPrevious(d) {
-		return true;
+		let expand = this.conditionToExpand(d);
+		if (!expand) {	
+	        const s = [];
+        	let curr = d;
+ 
+        	while (curr != null || s.length > 0) {
+				curr.children && curr.children.forEach(c => {	
+					s.push(c);
+					curr = c;
+				})
+	
+				curr = s.pop();
+				expand = curr && this.conditionToExpand(curr);
+				
+				if (expand) {
+					return true;
+				}
+			}
+		}
+		
+		return expand;
 	}
 
 	showAllPrevious(treeRoot, e) {
 		if (proof.isDrawing) {
 			return;
 		}
-
-		e.stopPropagation();
 		
 		proof.nodeInteracted = treeRoot;
 		let axioms = [];

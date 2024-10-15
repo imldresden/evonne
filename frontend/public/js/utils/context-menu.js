@@ -2,7 +2,6 @@ export class ContextMenu {
     once = false;
     menuFactory(x, y, menuItems, data, svgId) {
         menuItems = menuItems.filter(d => d);
-        console.log(menuItems)
         const svg = document.querySelector(svgId);
         const svgBBox = svg.getBoundingClientRect();
 
