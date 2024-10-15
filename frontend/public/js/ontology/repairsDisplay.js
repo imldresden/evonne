@@ -227,8 +227,6 @@ function highlightOntology(data, cy) {
     
     cy.nodes().forEach((n) => {
       const node = n.data();
-      console.log(node.axiomsMap)
-      console.log(trimmedAxiom)
 
       if (!node || node.axiomsMap[trimmedAxiom] === undefined) {
         return;

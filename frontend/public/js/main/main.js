@@ -223,7 +223,6 @@ function computeAxiomsBtnFunction() {
 }
 
 function openSplitFunction() {
-  console.log("fuckc")
   window.open('/?id=' + getSessionId())
 }
 
