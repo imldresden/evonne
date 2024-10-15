@@ -3,6 +3,7 @@
 ## Using Docker:
 * Install docker, run `docker build . -t <your username>/evonne`. 
 * Run `docker run -dp <port>:3000 <your username>/evonne:latest` then open `http://localhost:<port>`.
+* Note that the host port (3000) should match between the `DockerFile` and  `.env` files!
 
 ## Local Installation: 
 ### Requirements:
