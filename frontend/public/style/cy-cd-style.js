@@ -18,6 +18,7 @@ const edge = {
   'curve-style': 'bezier', //taxi
   'width': .5,
   'line-color': '#ccc',
+  'line-outline-width': 0,
   'target-arrow-color': '#ccc',
   'target-arrow-shape': 'triangle',
   'arrow-scale': .5,
@@ -40,7 +41,6 @@ const stylesheet = [
   {
     "selector": ":active",
     "style": {
-      "overlay-color": "black",
       "overlay-padding": 0,
       "overlay-opacity": 0
     }

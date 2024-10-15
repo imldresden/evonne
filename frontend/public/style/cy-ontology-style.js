@@ -22,6 +22,12 @@ const stylesheet = [
       "selection-box-opacity": "0.5"
     }
   }, {
+    "selector": ":active",
+    "style": {
+      "overlay-padding": 0,
+      "overlay-opacity": 0
+    }
+  }, {
     "selector": "node",
     "style": {
       'shape':'round-rectangle',
@@ -49,7 +55,6 @@ const stylesheet = [
     "style": {
       'background-color': colors.fixedNodeFill,
       'border-color': colors.fixedNodeStroke,
-      'border-width': '3px',
       'background-image': '../icons/mui-lock.svg',
       'background-image-containment': 'over',
       'bounds-expansion': '20px',
@@ -71,6 +76,9 @@ const stylesheet = [
       'curve-style': 'bezier', //taxi
       'width': 1.5,
       'target-arrow-shape': 'triangle',
+      'target-arrow-color': '#ccc',
+      'line-color': '#ccc',
+      'line-outline-width': 0,
     }
   }
 ];
