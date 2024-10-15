@@ -52,10 +52,12 @@ const thingsWithListeners = [
 
 // creates the content of the view based on the chosen/read data
 async function createContent(data) {
-  const svg = document.createElement("svg");
-  svg.id = "ontology-view"
-  document.getElementById(div).append(svg)
-
+  if (!document.getElementById("ontology-view")) {
+    const svg = document.createElement("svg");
+    svg.id = "ontology-view"
+    document.getElementById(div).append(svg)  
+  }
+  
   const container = document.getElementById("ontology-view");
   container.innerHTML = "";
 

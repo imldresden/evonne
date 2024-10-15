@@ -261,7 +261,7 @@ export class TreeNavigation {
     }
 
     addFocusFunctionality() {
-        this.nodes.selectAll("g").on('mouseover', function (d) {
+        this.nodes.selectAll("g").on('mouseover', function (_, d) {
             const nodes = proof.svg.selectAll(".node");
             nodes.sort((a, b) => (a.id === d.id) ? 1 : (b.id === d.id) ? -1 : 0);
         });
