@@ -34,6 +34,7 @@ const showRepairsMenuButton = document.getElementById("showRepairsMenuButton");
 const shortenAllInOntologyBtn = document.getElementById("shortenAllInOntologyBtn");
 const openProof = document.getElementById('openProofInNew');
 
+
 const thingsWithListeners = [
   { type: 'click', thing: btnShowSignature, fn: btnShowSignatureFunction },
   { type: 'click', thing: btnWrapLines, fn: btnWrapLinesFunction },
@@ -43,10 +44,10 @@ const thingsWithListeners = [
   { type: 'click', thing: flowStrengthReset, fn: flowStrengthResetFunction },
   { type: 'click', thing: openProof, fn: openProofFunction },
   { type: 'click', thing: shortenAllInOntologyBtn, fn: shortenAllInOntology },
-  { type: 'input', thing: lineLengthInput, fn: labelNodes },
+  { type: 'input', thing: lineLengthInput, fn: throttle(labelNodes, 500) },
   { type: 'input', thing: maxLengthInput, fn: maxLengthInputFunction },
-  { type: 'input', thing: flowStrength, fn: rerunLayout },
-  { type: 'change', thing: flowDirection, fn: rerunLayout },
+  { type: 'input', thing: flowStrength, fn: throttle(rerunLayout, 500) },
+  { type: 'change', thing: flowDirection, fn: throttle(rerunLayout, 500) },
   { type: 'view_resize', thing: window, fn: () => cy.resize() },
 ];
 
@@ -92,13 +93,37 @@ async function createContent(data) {
 
   cy.on('tap', 'node', function (event) {
     const clickedElement = event.originalEvent.target;
-    const node = event.target.isNode() ? event.target : event.target.isEdge() ? event.target.source() : null;
-    if (clickedElement && (clickedElement.classList.contains('node-eye')) && node) {
-      const data = node.data();
-      enable_eye(data, node);
+
+    if (clickedElement && (clickedElement.classList.contains('eye-button'))) {
+      const data = event.target.data();
+
+      if (!data.revealed) {
+        data.revealed = true;
+      } else {
+        data.revealed = false;
+      }
     }
   });
   
+  const timeoutMap = {};
+  cy.on('mouseover', 'node', function (event) {
+    if (!showOriginal) {
+      const n = event.target.isNode() ? event.target : null
+      n.data("hovered", true)
+      clearTimeout(timeoutMap[n.data().id]) 
+    }
+  });
+
+  cy.on('mouseout', 'node', function (event) {
+    if (!showOriginal) {
+      const n = event.target.isNode() ? event.target : null
+      n.data("hovered", true)
+      timeoutMap[n.data().id] = setTimeout(() => {
+        n.data("hovered", false)  
+      }, 500);
+    }
+  });
+
   cy.params = structuredClone(params);
   cy.stylesheet = stylesheet;
   cy.add(elements);
@@ -109,88 +134,9 @@ async function createContent(data) {
   return cy;
 }
 
-function enable_eye(data, node) {
-  if (!showOriginal) {
-    const nodeHtmlElement = document.getElementById(ontologyNodeId + data.id);
-    if (nodeHtmlElement && nodeHtmlElement.parentNode) {
-      nodeHtmlElement.parentNode.remove();
-    }
-    if (data.revealed === undefined || data.revealed === false) {
-      data.revealed = true;
-    } else {
-      data.revealed = false;
-    }
-    const eyeIconClass = data.revealed ? 'eye-crossed' : 'eye-on';
-    const eyeIconSrc = data.revealed ? '../icons/eye-crossed.svg' : '../icons/eye.svg';
-
-    let html = `<div class='${eyeIconClass}'><img src='${eyeIconSrc}' class='node-eye' width='14' height='14'></div><div class='node-title'>`;
-    const text = getNodeText(data);
-
-    for (let i = 0; i < text.length; i++) {
-      let color = 'black';
-      if (cy.justification && cy.justification.has(text[i])) {
-        color = colors.justNodeStroke;
-      }
-      if (cy.diagnoses && cy.diagnoses.has(text[i])) {
-        color = colors.diagNodeStroke;
-      }
-      html += `
-      <p style="color:${color};margin:0;padding:0">
-          ${text[i]}
-      </p>`;
-    }
-    html += `</div>`;
-    let longestn = 1;
-    text.forEach(l => {
-      if (l.length > longestn) {
-        longestn = l.length;
-      }
-    });
-    data.boxH = calcBoxHeight(text);
-    data.boxW = calcBoxWidth(longestn);
-
-    node.style({
-      'width': data.boxW + 'px',
-      'height': data.boxH + 'px'
-    });
-    const template = `
-    <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
-      <div id="frontRect" style="padding: 5px; white-space:nowrap;">
-        ${html}
-      </div>
-    </div>
-  `;
-    // Replace the node's label with the new HTML template using cy.nodeHtmlLabel()
-    cy.nodeHtmlLabel([
-      {
-        query: '#' + node.id(),
-        valign: "center",
-        halign: "center",
-        tpl: function (data) {
-          return template;
-        }
-      }
-    ]);
-    // cy.layout(cy.params).run();
-  }
-}
-
-function getNodeText(data) {
-  const tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
-  const text = data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
-  return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
-}
-
 function getNodeTextList(data) {
   let tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
-  let text = [];
-
-  if (showOriginal) {
-    text = [...tmpText];
-  } else {
-    tmpText.forEach(x => text.push(globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod)));
-  }
-
+  const text = showOriginal || data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
   return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
 }
 
@@ -206,9 +152,20 @@ async function initHTML() {
     {
       query: 'node',
       tpl: function (data) {
+        //const text = getNodeText(data);
         const text = getNodeTextList(data);
-        let html = !showOriginal && text.filter(element => element.trim() !== '').length > 0 ? "<div class='eye-on'><img src='../icons/eye.svg' class='node-eye' width='14' height='14'></div><div class='node-title'>" : '';
+        
+        let html = `
+          <div>
+            <img src=${
+              (data.revealed ? '../icons/eye-crossed.svg' : '../icons/eye.svg')} 
+              class="eye-button ${
+              (data.hovered ? "eye-on" : "eye-off") 
+              }" width='14' height='14'>
+          </div>
+          <div class='node-title ${data.hovered ? "eye-on-text" : "eye-off-text"}'>`;
 
+        let longestn = 1;
         for (let i = 0; i < text.length; i++) {
           let color = 'black';
           if (cy.justification && cy.justification.has(text[i])) {
@@ -218,12 +175,17 @@ async function initHTML() {
             color = colors.diagNodeStroke;
           }
 
-          html += `
-            <p style="color:${color};margin:0;padding:0">
-                ${text[i]}
-            </p>`;
+          html += `<p style="color:${color};margin:0;padding:0"> ${text[i]} </p>`;
+
+          if (text[i].length > longestn) {
+            longestn = text[i].length;
+          }
         }
+        
         html += `</div>`;
+        data.boxH = calcBoxHeight(text);
+        data.boxW = calcBoxWidth(longestn);
+        
         const template = `
           <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
             <div id="frontRect" style="padding: 5px; white-space:nowrap;">
@@ -237,38 +199,6 @@ async function initHTML() {
     },
   ]);
 }
-
-setInterval(function () {
-  document.addEventListener('mouseover', function (event) {
-    var node = event.target.closest('.cy-html');
-    if (node) {
-      var domElem = node;
-      if (!showOriginal) {
-        var container = findContainerWithClass(domElem, 'node');
-        if (container && container.contains(domElem)) {
-          var imageElement = container.querySelector('img');
-          var nodeText = container.querySelector('.node-title');
-          if (imageElement) {
-            imageElement.style.transition = 'opacity 200ms ease-in-out, transform 50ms ease-in-out';
-            imageElement.style.opacity = 1;
-            nodeText.style.transform = 'translate(1px, 0)';
-          }
-        }
-      }
-    }
-  });
-
-  function findContainerWithClass(element, className) {
-    while (element && element !== document) {
-      if (element.classList && element.classList.contains(className)) {
-        return element;
-      }
-      element = element.parentNode;
-    }
-    return null;
-  }
-
-}, 500);
 
 function calcBoxWidth(longestString) {
   return (longestString * globals.fontCharacterWidth + 25) + "px";
@@ -366,6 +296,20 @@ function bindListeners() {
       socket.emit("euler view", { id: d.id, parent: d.parentId, axioms: d.axioms.split("\n") })
     });
   });
+}
+
+function throttle(mainFunction, delay) {
+  let timerFlag = null; // Variable to keep track of the timer
+
+  // Returning a throttled version 
+  return (...args) => {
+    if (timerFlag === null) { // If there is no timer currently running
+      mainFunction(...args); // Execute the main function 
+      timerFlag = setTimeout(() => { // Set a timer to clear the timerFlag after the specified delay
+        timerFlag = null; // Clear the timerFlag to allow the main function to be executed again
+      }, delay);
+    }
+  };
 }
 
 function labelNodes(layout = true) {
