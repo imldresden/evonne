@@ -680,7 +680,18 @@ export class AxiomsHelper {
 		let state = btn.text();
 
 		if (state === this.help_icon) {
-			proof.rules.openExplanation({ event }, [node]);
+			const rnode = proof.tree._entire.find(p => p.data.source.id === node.data.source.rule.id);
+			
+			if (rnode) {
+				proof.rules.openExplanation({ event }, [ rnode ]);
+			} else {
+				const rnodes = proof.tree._entire.find(
+					p => p.data.source.subProof !== '' && 
+					p.data.source.subProof === node.data.source.rule.subProof
+				);
+				proof.rules.openExplanation({ event, isSubProof: true }, [ rnodes ]);
+			}
+			
 			btn.text(this.close_help_icon);
 		} else {
 			proof.rules.destroyExplanation();

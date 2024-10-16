@@ -206,12 +206,14 @@ class RulesHelper {
 
         if (subproof) {
             let steps = subproof.descendants()
-                .filter(d => d.data.source.type === node.source.type
+                .filter(d => utils.isRule(d.data.source.type)
                     && d.data.source.subProof === spID
                 ).map(cd => {
-                    const op = cd.data.source.data.op
-                    op.name = cd.data.source.element;
+                    const source = cd.data.source;
+                    const op = source.data.op;
+                    op.name = source.element;
                     op.node = cd;
+                    
                     return op;
                 }); // `cd.data.source.id` matches `cd.data.source.data.op.id`
             steps = steps.flat(1).reverse();
@@ -245,21 +247,12 @@ class RulesHelper {
         let premises = [];
         let iDsToHighlight = [];
         let data, conclusion, cnode = nodes[nodes.length - 1];
-        if (proof.showRules) {
-            data = cnode.data;
-        } else {
-            data = { source: cnode.data.source.rule };
-        }
-
+        data = cnode.data;
+        
         nodes.forEach(node => {
-            if (proof.showRules) {
-                conclusion = proof.nodeVisuals.getLabel(node.parent.data.source);
-                iDsToHighlight.push(node.parent.data.source.id, node.data.source.id); // axiom, rule
-            } else {
-                conclusion = proof.nodeVisuals.getLabel(node.data.source);
-                iDsToHighlight.push(node.data.source.id); // axiom
-            }
-
+            conclusion = proof.nodeVisuals.getLabel(node.parent.data.source);
+            iDsToHighlight.push(node.parent.data.source.id, node.data.source.id); // axiom, rule
+            
             if (node._children) { // _children queries the tree regardless of collapsing or expanding
                 node._children.forEach(child => {
                     premises.push(proof.nodeVisuals.getLabel(child.data.source));
