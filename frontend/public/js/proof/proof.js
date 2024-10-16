@@ -117,7 +117,7 @@ function init_proof({
   external,
 } = {}) {
   //Set a ruleNameMap to be used to replace the labels of rule nodes
-  conf.ruleNameMapHelper.setRuleNamesMaps(ruleNamesMap)
+  ruleNamesMap && conf.ruleNameMapHelper.setRuleNamesMaps(ruleNamesMap)
 
   d3.select(`#${proof.div}`).selectAll("*").remove();
   if (external) {

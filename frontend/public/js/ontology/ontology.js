@@ -5,7 +5,8 @@ import { BasicShorteningFunctions } from "../shortening/basic.js";
 import { colors, stylesheet } from "../../style/cy-ontology-style.js";
 import { params } from "../layouts/cola.js";
 import { showRepairsTab } from "../utils/controls.js";
-import {owlFunctions} from "../utils/myOWL.js";
+import { owlFunctions } from "../utils/myOWL.js";
+import { throttle } from "../utils/throttle.js";
 
 const socket = io();
 
@@ -33,7 +34,8 @@ const saveLayoutButton = document.getElementById("saveLayoutButton");
 const showRepairsMenuButton = document.getElementById("showRepairsMenuButton");
 const shortenAllInOntologyBtn = document.getElementById("shortenAllInOntologyBtn");
 const openProof = document.getElementById('openProofInNew');
-
+const resetStickyPositionsBtn = document.getElementById('resetStickyPositions');
+const rerunSimulationBtn = document.getElementById('rerunSimulation');
 
 const thingsWithListeners = [
   { type: 'click', thing: btnShowSignature, fn: btnShowSignatureFunction },
@@ -44,6 +46,8 @@ const thingsWithListeners = [
   { type: 'click', thing: flowStrengthReset, fn: flowStrengthResetFunction },
   { type: 'click', thing: openProof, fn: openProofFunction },
   { type: 'click', thing: shortenAllInOntologyBtn, fn: shortenAllInOntology },
+  { type: 'click', thing: resetStickyPositionsBtn, fn: resetStickyPositions },
+  { type: 'click', thing: rerunSimulationBtn, fn: rerunSimulation },
   { type: 'input', thing: lineLengthInput, fn: throttle(labelNodes, 500) },
   { type: 'input', thing: maxLengthInput, fn: maxLengthInputFunction },
   { type: 'input', thing: flowStrength, fn: throttle(rerunLayout, 500) },
@@ -134,6 +138,21 @@ async function createContent(data) {
   return cy;
 }
 
+function resetStickyPositions() {
+  Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+    const node = cy.$id(nodeId);
+    node.unlock();
+    delete lastDraggedPositions[nodeId];
+  });
+  
+  labelNodes();
+}
+
+
+function rerunSimulation() {
+  labelNodes();
+}
+
 function getNodeTextList(data) {
   let tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
   const text = showOriginal || data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
@@ -185,7 +204,7 @@ async function initHTML() {
         html += `</div>`;
         data.boxH = calcBoxHeight(text);
         data.boxW = calcBoxWidth(longestn);
-        
+
         const template = `
           <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
             <div id="frontRect" style="padding: 5px; white-space:nowrap;">
@@ -298,21 +317,7 @@ function bindListeners() {
   });
 }
 
-function throttle(mainFunction, delay) {
-  let timerFlag = null; // Variable to keep track of the timer
-
-  // Returning a throttled version 
-  return (...args) => {
-    if (timerFlag === null) { // If there is no timer currently running
-      mainFunction(...args); // Execute the main function 
-      timerFlag = setTimeout(() => { // Set a timer to clear the timerFlag after the specified delay
-        timerFlag = null; // Clear the timerFlag to allow the main function to be executed again
-      }, delay);
-    }
-  };
-}
-
-function labelNodes(layout = true) {
+async function labelNodes(layout = true) {
   cy.startBatch();
   const nodesHTML = [...document.getElementsByClassName(`cy-html`)];
   nodesHTML.forEach(node => {
@@ -332,10 +337,9 @@ function labelNodes(layout = true) {
     });
     d.boxH = calcBoxHeight(text);
     d.boxW = calcBoxWidth(longest);
-    // Resetting data nodes to false for eye functionality removes all previous saved values and starts fresh.
     d.revealed = false;
   });
-  initHTML();
+  await initHTML();
   cy.style().update();
   cy.endBatch();
   if (layout) {
@@ -417,7 +421,7 @@ function loadLayout(e) {
     showOriginal = result.flags.original;
     showSignature = result.flags.signature;
     wrapLines = result.flags.wrap;
-    labelNodes(false);
+    await labelNodes(false);
     cy.json(result.cyExport);
   }
 
@@ -574,7 +578,7 @@ function keepNodes() {
       cy.params.animationDuration = undefined,
       cy.params.animationThreshold = 1,
       cy.params.fit = false;
-    cy.params.centerGrsaph = false;
+    cy.params.centerGraph = false;
   }
   else {
     cy.params.animate = true,

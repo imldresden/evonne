@@ -3,6 +3,7 @@ import { controls, createVisContainer } from "./cd-rules.js";
 import { stylesheet } from "../../../../style/cy-cd-style.js";
 import { params as cola } from "../../../layouts/cola.js";
 import { bellmanFord } from "./bellman-ford.js";
+import { throttle } from "../../../utils/throttle.js";
 
 const EPSILON = " - Є";
 const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? ` -Є` : ` -${n}Є`);
@@ -448,27 +449,10 @@ export class DifferenceCD {
             }
         }
 
-        const ruleName = getRuleName(data.ops[data.current].name);
-        utils.addTitle(ruleName);
-
         function getHeight(data) {
             return 24 + 24 * data.ops[data.current].premises.length; // each span line is 24 pixels high
         }
 
-        const operationHeight = getHeight(data);
-        const { input, output } = createVisContainer(params, where, operationHeight);
-        d3.select('#cd-divider').style('height', operationHeight);
-        const showObvious = this.showObvious;
-        const types = this.types;
-
-        const dispatchHighlightCustomEvent = _.throttle((eid, target) => {
-            document.dispatchEvent(new CustomEvent("ineq-graph-hl", { detail: { eid, cy, target }, }))
-        }, 50);
-
-        const dispatchUndoHighlightCustomEvent = _.throttle(eid => {
-            document.dispatchEvent(new CustomEvent("undo-ineq-graph-hl", { detail: { cy }, }))
-        }, 50);
-        
         function drawGraph(data) {
             displayRule(data);
             const graph = getDiffGrammarEqs(data, types);
@@ -499,6 +483,22 @@ export class DifferenceCD {
             return cy;
         }
 
+        const ruleName = getRuleName(data.ops[data.current].name);
+        utils.addTitle(ruleName);
+        const operationHeight = getHeight(data);
+        const { input, output } = createVisContainer(params, where, operationHeight);
+        d3.select('#cd-divider').style('height', operationHeight);
+        const showObvious = this.showObvious;
+        const types = this.types;
+
+        const dispatchHighlightCustomEvent = throttle((eid, target) => {
+            document.dispatchEvent(new CustomEvent("ineq-graph-hl", { detail: { eid, cy, target }, }))
+        }, 50);
+
+        const dispatchUndoHighlightCustomEvent = throttle(eid => {
+            document.dispatchEvent(new CustomEvent("undo-ineq-graph-hl", { detail: { cy }, }))
+        }, 50);
+        
         controls({ data, }, where, params)
 
         cy = drawGraph(data.ops[data.current]);

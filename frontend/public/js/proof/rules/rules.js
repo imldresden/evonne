@@ -205,28 +205,15 @@ class RulesHelper {
         });
 
         if (subproof) {
-            let steps;
-            if (proof.showRules) {
-                steps = subproof.descendants()
-                    .filter(d => d.data.source.type === node.source.type
-                        && d.data.source.subProof === spID
-                    ).map(cd => {
-                        const op = cd.data.source.data.op
-                        op.name = cd.data.source.element;
-                        op.node = cd;
-                        return op;
-                    }); // `cd.data.source.id` matches `cd.data.source.data.op.id`
-            } else {
-                steps = subproof.descendants()
-                    .filter(d => d.data.source.rule.type === node.source.type
-                        && d.data.source.rule.subProof === spID
-                    ).map(cd => {
-                        const op = cd.data.source.rule.data.op;
-                        op.name = cd.data.source.rule.element;
-                        op.node = cd;
-                        return op;
-                    });
-            }
+            let steps = subproof.descendants()
+                .filter(d => d.data.source.type === node.source.type
+                    && d.data.source.subProof === spID
+                ).map(cd => {
+                    const op = cd.data.source.data.op
+                    op.name = cd.data.source.element;
+                    op.node = cd;
+                    return op;
+                }); // `cd.data.source.id` matches `cd.data.source.data.op.id`
             steps = steps.flat(1).reverse();
 
             return {

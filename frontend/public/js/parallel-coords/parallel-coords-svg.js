@@ -1,7 +1,7 @@
 // Adapted from: https://gist.github.com/mbostock/1341021
 // d3v7 brushing example https://observablehq.com/@d3/brushable-parallel-coordinates
 
-// import throttle from "/libs/underscore/modules/throttle.js";
+import { throttle } from "../utils/throttle.js";
 
 const parallelCoords = function (pane, data, metadata) {
     const selections = new Map(); // stores dimension -> brush selection
@@ -344,14 +344,14 @@ const parallelCoords = function (pane, data, metadata) {
                 })
             );
 
-        const countTooltipUpdate = _.throttle((tooltip, mouse, text) => {
+        const countTooltipUpdate = throttle((tooltip, mouse, text) => {
             tooltip.attr('x', mouse[0] + 10)
             tooltip.attr('y', mouse[1] - 10);
 
             tooltip.text(text)
         }, 50);
 
-        const dispatchHighlightCustomEvent = _.throttle((ids) => {
+        const dispatchHighlightCustomEvent = throttle((ids) => {
             document.dispatchEvent(new CustomEvent("pcp-hl", { detail: { ids }, }))
         }, 50);
 
