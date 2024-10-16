@@ -1,0 +1,44 @@
+{
+  "finalConclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= <http://www.ifomis.org/bfo/1.1#Entity>",
+  "inferences" : [ {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#PhysicalObject> <= <http://www.ifomis.org/snap#IndependentContinuant>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "TOP <= (A<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.BOTTOM u <http://www.ifomis.org/bfo/1.1#Entity>)",
+    "ruleName" : "eliminate Continuant",
+    "premises" : [ "TOP <= (A<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.BOTTOM u <http://www.ifomis.org/snap#Continuant>)", "<http://www.ifomis.org/snap#Continuant> <= <http://www.ifomis.org/bfo/1.1#Entity>" ]
+  }, {
+    "conclusion" : "TOP <= (A<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.BOTTOM u <http://www.ifomis.org/snap#Continuant>)",
+    "ruleName" : "eliminate IndependentContinuant",
+    "premises" : [ "<http://www.ifomis.org/snap#IndependentContinuant> <= <http://www.ifomis.org/snap#Continuant>", "TOP <= (<http://www.ifomis.org/snap#IndependentContinuant> u A<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.BOTTOM)" ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= <http://www.ifomis.org/bfo/1.1#Entity>",
+    "ruleName" : "eliminate PilosebaceousUnit, has_determinate_part, direct",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#PilosebaceousUnit>", "TOP <= (A<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.BOTTOM u <http://www.ifomis.org/bfo/1.1#Entity>)" ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.TOP",
+    "ruleName" : "eliminate PhysicalObject, IndependentContinuant, Continuant, PilosebaceousUnit",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#PilosebaceousUnit>" ]
+  }, {
+    "conclusion" : "TOP <= (<http://www.ifomis.org/snap#IndependentContinuant> u A<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.BOTTOM)",
+    "ruleName" : "eliminate PhysicalObject",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#PhysicalObject> <= <http://www.ifomis.org/snap#IndependentContinuant>", "domain(<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>) = <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#PhysicalObject>" ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#PilosebaceousUnit>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.ifomis.org/snap#Continuant> <= <http://www.ifomis.org/bfo/1.1#Entity>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.ifomis.org/snap#IndependentContinuant> <= <http://www.ifomis.org/snap#Continuant>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "domain(<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#has_determinate_part>) = <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#PhysicalObject>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  } ]
+}

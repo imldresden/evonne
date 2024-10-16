@@ -1,0 +1,3 @@
+http://purl.org/imbi/dco/dco#PathologicalProcessOfUrinaryTract
+http://purl.org/biotop/biotop.owl#PathologicalProcess
+http://purl.org/biotop/btl2.owl#Process

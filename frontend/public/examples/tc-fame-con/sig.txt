@@ -1,0 +1,2 @@
+http://www.bootstrep.eu/ontology/GRO#TranscriptionRegulator
+http://www.bootstrep.eu/ontology/GRO#MolecularEntity

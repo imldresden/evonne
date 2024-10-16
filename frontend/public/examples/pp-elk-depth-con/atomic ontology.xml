@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <graph id="G" edgedefault="directed">
+<key id="label" for="node" attr.name="label" attr.type="string">
+</key>
+ <node id="1">
+   <data key="signature">PathologicalProcessOfUrinaryTract</data>
+   <data key="axioms">PathologicalProcessOfUrinaryTract ⊑ ∃hasLocus.UrinaryTract
+PathologicalProcessOfUrinaryTract ⊑ PathologicalProcessOfGenitoUrinarySystem</data>
+</node>
+ <node id="2">
+   <data key="signature">PathologicalProcessOfGenitoUrinarySystem</data>
+   <data key="axioms">PathologicalProcessOfGenitoUrinarySystem ≡ (PathologicalProcessOfBodySite ⊓ ∃hasLocus.UrinaryTract)</data>
+</node>
+<edge id="3" source="1" target="2"/>
+ <node id="4">
+   <data key="signature">UrinarySystem</data>
+   <data key="axioms">UrinarySystem ⊑ OrganSystem</data>
+</node>
+ <node id="5">
+   <data key="signature">OrganSystem</data>
+   <data key="axioms">OrganSystem ⊑ BodySystem</data>
+</node>
+<edge id="6" source="4" target="5"/>
+ <node id="7">
+   <data key="signature">UrinaryTract</data>
+   <data key="axioms">UrinaryTract ⊑ UrinarySystemPart</data>
+</node>
+ <node id="8">
+   <data key="signature">physicalPartOf
+UrinarySystemPart</data>
+   <data key="axioms">UrinarySystemPart ⊑ OrganSystemPart
+UrinarySystemPart ⊑ ∃physicalPartOf.UrinarySystem</data>
+</node>
+<edge id="9" source="7" target="8"/>
+<edge id="10" source="2" target="7"/>
+ <node id="11">
+   <data key="signature">PathologicalProcessOfBodySite</data>
+   <data key="axioms">PathologicalProcessOfBodySite ≡ (∃hasLocus.OrganismPart ⊓ AcquiredPathologicalStateProcess)
+PathologicalProcessOfBodySite ⊑ AcquiredPathologicalStateProcess</data>
+</node>
+<edge id="12" source="2" target="11"/>
+ <node id="13">
+   <data key="signature"> </data>
+   <data key="axioms">disjoint(Cell, OrganismPart)</data>
+</node>
+<edge id="14" source="2" target="13"/>
+ <node id="15">
+   <data key="signature">IntraCellularProcess
+Cell</data>
+   <data key="axioms">IntraCellularProcess ≡ (BiologicalProcessualEntity ⊓ ∃isIncludedIn.Cell)
+Cell ⊑ StructuredBiologicalEntity</data>
+</node>
+ <node id="16">
+   <data key="signature">BiologicalProcessualEntity
+Organism
+StructuredBiologicalEntity
+BiologicalFunction</data>
+   <data key="axioms">BiologicalProcessualEntity ≡ (Process ⊓ ∃hasParticipant.StructuredBiologicalEntity ⊓ ∃isIncludedIn.StructuredBiologicalEntity)
+Organism ⊑ StructuredBiologicalEntity
+StructuredBiologicalEntity ⊑ ∃atSomeTime.∃isPartOf.Organism
+BiologicalFunction ≡ (Function ⊓ ∃inheresIn.StructuredBiologicalEntity)
+StructuredBiologicalEntity ⊑ ∃isBearerOf.TaxonQuality
+StructuredBiologicalEntity ⊑ PolyMolecularCompositeEntity</data>
+</node>
+<edge id="17" source="15" target="16"/>
+ <node id="18">
+   <data key="signature">atSomeTime</data>
+   <data key="axioms">MaterialObject ⊑ ∀atSomeTime.MaterialObject
+InformationObject ⊑ ∀atSomeTime.InformationObject
+Disposition ⊑ ∀atSomeTime.Disposition
+ObjectQuality ⊑ ∀atSomeTime.ObjectQuality
+Role ⊑ ∀atSomeTime.Role
+ImmaterialObject ⊑ ∀atSomeTime.ImmaterialObject
+Function ⊑ ∀atSomeTime.Function</data>
+</node>
+ <node id="19">
+   <data key="signature">SubAtomicParticle
+PhysicalVolume
+CompoundOfCollectiveMaterialEntities
+PhysicalForce
+isBearerOf
+isIncludedIn
+OneDimensionalPhysicalEntity
+Thing
+Condition
+Particular
+Wave
+InformationObject
+ObjectQuality
+projectsOnto
+Life
+isParticipantIn
+isLifeOf
+ProcessQuality
+PhysicalLength
+InstantaneousProcess
+Atom
+hasPart
+hasGranularPart
+ValueRegion
+inheresIn
+ImmaterialThreeDimensionalPhysicalEntity
+Quality
+isReferredToAtTime
+PhysicalMass
+MaterialObject
+PointInTime
+Compound
+hasLife
+CollectiveMaterialEntity
+Universe
+Canonicity
+hasComponentPart
+TaxonQuality
+Process
+includes
+Function
+Disposition
+PolyMolecularCompositeEntity
+isPartOf
+TwoDimensionalPhysicalEntity
+TemporalRegion
+MonoMolecularEntity
+CanonicityValueRegion
+Nothing
+Role
+hasParticipant
+TaxonValueRegion
+ImmaterialObject</data>
+   <data key="axioms">Function ⊑ ∃inheresIn.(ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+MaterialObject ⊑ ∀hasPart.(ImmaterialObject ⊔ MaterialObject)
+ImmaterialObject ⊑ ∀hasLife.Life
+Particular ⊑ (Process ⊔ Quality ⊔ ImmaterialObject ⊔ TemporalRegion ⊔ ValueRegion ⊔ Role ⊔ MaterialObject ⊔ InformationObject ⊔ Function ⊔ Disposition)
+ValueRegion ⊑ Particular
+MaterialObject ⊑ ∃hasPart.MaterialObject
+TwoDimensionalPhysicalEntity ⊑ ImmaterialObject
+MonoMolecularEntity ⊑ Compound
+Function ⊑ ∀hasPart.Function
+Quality ⊑ Particular
+ImmaterialThreeDimensionalPhysicalEntity ⊑ ImmaterialObject
+TaxonQuality ⊑ ObjectQuality
+MaterialObject ⊑ ∃hasLife.Life
+disjoint(Compound, SubAtomicParticle)
+PolyMolecularCompositeEntity ⊑ Compound
+Process ⊑ ∃projectsOnto.TemporalRegion
+Quality ⊑ ∀hasPart.Quality
+InformationObject ⊑ ∃inheresIn.MaterialObject
+∃hasParticipant.⊤ ⊑ Process
+ImmaterialObject ⊑ Particular
+InformationObject ⊑ ¬∃isBearerOf.PhysicalMass
+MonoMolecularEntity ⊑ ∃hasPart.Atom
+Quality ⊑ ∃inheresIn.(Process ⊔ ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+MaterialObject ⊑ ∀isParticipantIn.Process
+MaterialObject ⊑ ∃hasPart.SubAtomicParticle
+Process ⊑ ∀projectsOnto.TemporalRegion
+Quality ⊑ ∀projectsOnto.ValueRegion
+disjoint(Role, Process, ValueRegion, Disposition, InformationObject, Quality, ImmaterialObject, TemporalRegion, MaterialObject)
+Condition ≡ (Process ⊔ MaterialObject ⊔ Function ⊔ Disposition)
+ObjectQuality ⊑ ∀inheresIn.(ImmaterialObject ⊔ MaterialObject ⊔ InformationObject ⊔ Function)
+Quality ⊑ ∀isPartOf.Quality
+InformationObject ⊑ Particular
+Process ⊑ ∀hasParticipant.(ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+MaterialObject ⊑ ∃projectsOnto.ImmaterialThreeDimensionalPhysicalEntity
+InformationObject ⊑ (ObjectQuality ⊔ Role ⊔ InformationObject ⊔ Function ⊔ Disposition)
+Condition ⊑ Particular
+PhysicalForce ⊑ ProcessQuality
+Quality ⊑ ∀isIncludedIn.(Process ⊔ Quality ⊔ ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+∃isBearerOf.⊤ ⊑ (Process ⊔ ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+Wave ⊑ MaterialObject
+Role ⊑ ∀isIncludedIn.(Process ⊔ ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+InformationObject ⊑ ∀isIncludedIn.(MaterialObject ⊔ InformationObject)
+CompoundOfCollectiveMaterialEntities ≡ (Compound ⊓ ∀hasComponentPart.CollectiveMaterialEntity)
+Process ⊑ ∀hasPart.Process
+Function ⊑ ∀isPartOf.Function
+ValueRegion ⊑ ∀includes.Quality
+ImmaterialObject ⊑ ∀isBearerOf.(ObjectQuality ⊔ Role ⊔ Function ⊔ Disposition)
+CompoundOfCollectiveMaterialEntities ⊑ Compound
+PhysicalMass ⊑ ObjectQuality
+CollectiveMaterialEntity ⊑ ∃hasGranularPart.MaterialObject
+disjoint(CanonicityValueRegion, TaxonValueRegion)
+Particular ⊑ ∃isReferredToAtTime.TemporalRegion
+(PolyMolecularCompositeEntity ⊓ ∃isPartOf.(Atom ⊔ SubAtomicParticle ⊔ MonoMolecularEntity)) ⊑ ⊥
+MaterialObject ⊑ ∀hasGranularPart.MaterialObject
+MaterialObject ⊑ Particular
+ProcessQuality ⊑ ∀inheresIn.Process
+TemporalRegion ⊑ ∀hasPart.TemporalRegion
+∃inheresIn.⊤ ⊑ (Quality ⊔ Role ⊔ InformationObject ⊔ Function ⊔ Disposition)
+InformationObject ⊑ ∀isParticipantIn.Process
+Process ⊑ ∀isBearerOf.ProcessQuality
+Process ⊑ ∀isPartOf.Process
+Function ⊑ Particular
+∃isParticipantIn.Process ⊑ (ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+ImmaterialObject ⊑ ∃isPartOf.Universe
+MaterialObject ⊑ ∃isBearerOf.PhysicalVolume
+PointInTime ⊑ TemporalRegion
+PhysicalVolume ⊑ ObjectQuality
+ImmaterialThreeDimensionalPhysicalEntity ⊑ ∀projectsOnto.ImmaterialThreeDimensionalPhysicalEntity
+Disposition ⊑ ∃inheresIn.(ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+ImmaterialObject ⊑ ¬∃isBearerOf.PhysicalMass
+ImmaterialObject ⊑ ∀isParticipantIn.Process
+InformationObject ⊑ ∀hasLife.Life
+Life ⊑ ∃isLifeOf.Particular
+PhysicalMass ⊑ ∀inheresIn.MaterialObject
+Role ⊑ ∀isPartOf.Role
+ObjectQuality ⊑ Quality
+Process ⊑ Particular
+Life ⊑ Process
+ImmaterialObject ⊑ ∃isBearerOf.PhysicalVolume
+disjoint(Role, Process, ValueRegion, Function, InformationObject, Quality, ImmaterialObject, TemporalRegion, MaterialObject)
+Canonicity ⊑ ∀projectsOnto.CanonicityValueRegion
+Canonicity ⊑ ∀isIncludedIn.(Process ⊔ ImmaterialObject ⊔ MaterialObject ⊔ Function)
+ProcessQuality ⊑ ∃inheresIn.Process
+Life ⊑ ∀isLifeOf.(ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+ImmaterialObject ⊑ ∃hasLife.Life
+Compound ⊑ MaterialObject
+Particular ⊑ ∀isReferredToAtTime.TemporalRegion
+disjoint(PhysicalVolume, Canonicity, PhysicalForce, PhysicalLength, TaxonQuality, PhysicalMass)
+Disposition ⊑ ∀hasPart.Disposition
+disjoint(MonoMolecularEntity, Atom, PolyMolecularCompositeEntity)
+MaterialObject ⊑ ∀projectsOnto.ImmaterialThreeDimensionalPhysicalEntity
+TemporalRegion ⊑ ∀isPartOf.TemporalRegion
+Role ⊑ ∀hasPart.Role
+TemporalRegion ⊑ Particular
+TaxonQuality ⊑ ∀projectsOnto.TaxonValueRegion
+SubAtomicParticle ⊑ (∀hasPart.SubAtomicParticle ⊓ MaterialObject)
+Canonicity ⊑ Quality
+InformationObject ⊑ ∀hasPart.InformationObject
+TaxonValueRegion ⊑ ValueRegion
+MaterialObject ⊑ ∃isBearerOf.PhysicalMass
+ProcessQuality ⊑ Quality
+CollectiveMaterialEntity ⊑ MaterialObject
+Disposition ⊑ ∀isIncludedIn.(ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+InformationObject ⊑ ∃hasLife.Life
+ImmaterialObject ⊑ ∀hasPart.ImmaterialObject
+disjoint(SubAtomicParticle, Universe, Wave)
+OneDimensionalPhysicalEntity ⊑ ImmaterialObject
+Compound ⊑ ∃hasPart.SubAtomicParticle
+Process ⊑ ∀includes.(Process ⊔ ProcessQuality)
+Disposition ⊑ Particular
+CanonicityValueRegion ⊑ ValueRegion
+disjoint(ProcessQuality, ObjectQuality)
+Role ⊑ ∃inheresIn.(Process ⊔ ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+PhysicalLength ⊑ ObjectQuality
+MaterialObject ⊑ ∀isBearerOf.(ObjectQuality ⊔ Role ⊔ InformationObject ⊔ Function ⊔ Disposition)
+disjoint(OneDimensionalPhysicalEntity, Wave, ImmaterialThreeDimensionalPhysicalEntity, TwoDimensionalPhysicalEntity)
+Atom ⊑ Compound
+InformationObject ⊑ ¬∃isBearerOf.PhysicalVolume
+Role ⊑ Particular
+ImmaterialObject ⊑ ∀isPartOf.(ImmaterialObject ⊔ MaterialObject)
+InformationObject ⊑ ∀isPartOf.InformationObject
+disjoint(Atom, InformationObject)
+ObjectQuality ⊑ (Quality ⊓ ∃inheresIn.(ImmaterialObject ⊔ MaterialObject))
+Universe ⊑ PolyMolecularCompositeEntity
+InstantaneousProcess ≡ (Process ⊓ ∀projectsOnto.PointInTime)
+Function ⊑ ∀isIncludedIn.(ImmaterialObject ⊔ MaterialObject ⊔ InformationObject)
+Quality ⊑ ∃projectsOnto.ValueRegion
+MaterialObject ⊑ ∀hasLife.Life
+Disposition ⊑ ∀isPartOf.Disposition</data>
+</node>
+<edge id="20" source="18" target="19"/>
+ <node id="21">
+   <data key="signature">AcquiredPathologicalStateProcess</data>
+   <data key="axioms">AcquiredPathologicalStateProcess ⊑ PathologicalProcess</data>
+</node>
+<edge id="22" source="11" target="21"/>
+ <node id="23">
+   <data key="signature">TissueProcess
+Tissue
+hasLocus
+OrganismPart</data>
+   <data key="axioms">OrganismPart ≡ (∃hasProperPhysicalPart.Tissue ⊓ ∃originatesFrom.MulticellularOrganism)
+TissueProcess ≡ (∃hasParticipant.Tissue ⊓ BiologicalProcessualEntity)
+Tissue ⊑ ∃hasLocus.OrganismPart
+Tissue ⊑ ∃hasComponentPart.∃hasGranularPart.Cell
+OrganismPart ⊑ StructuredBiologicalEntity
+Tissue ⊑ PortionOfHeterogenousSolid
+Tissue ⊑ ∃hasComponentPart.∃hasGranularPart.EntireMolecularEntity
+Tissue ⊑ ∃originatesFrom.MulticellularOrganism</data>
+</node>
+<edge id="24" source="11" target="23"/>
+ <node id="25">
+   <data key="signature">DevelopmentalQuality</data>
+   <data key="axioms">DevelopmentalQuality ⊑ ∀projectsOnto.DevelopmentalValueRegion
+DevelopmentalQuality ⊑ ∃projectsOnto.DevelopmentalValueRegion
+DevelopmentalQuality ⊑ ObjectQuality</data>
+</node>
+ <node id="26">
+   <data key="signature">DevelopmentalValueRegion</data>
+   <data key="axioms">DevelopmentalValueRegion ⊑ ValueRegion</data>
+</node>
+<edge id="27" source="25" target="26"/>
+ <node id="28">
+   <data key="signature">OrganismPart</data>
+   <data key="axioms">OrganismPart ⊑ StructuredBiologicalEntity</data>
+</node>
+<edge id="29" source="13" target="28"/>
+<edge id="30" source="13" target="15"/>
+ <node id="31">
+   <data key="signature">SolidValueRegion
+PortionOfHeterogenousSolid</data>
+   <data key="axioms">SolidValueRegion ⊑ StateOfMatterValueRegion
+PortionOfHeterogenousSolid ≡ (∃isBearerOf.∃projectsOnto.SolidValueRegion ⊓ CompoundOfCollectiveMaterialEntities)</data>
+</node>
+ <node id="32">
+   <data key="signature">StateOfMatter
+StateOfMatterValueRegion</data>
+   <data key="axioms">StateOfMatterValueRegion ⊑ ValueRegion
+StateOfMatterValueRegion ⊑ ∃isProjectionOf.StateOfMatter
+StateOfMatter ⊑ ∃projectsOnto.StateOfMatterValueRegion
+StateOfMatter ⊑ ∀projectsOnto.StateOfMatterValueRegion
+StateOfMatter ⊑ ObjectQuality</data>
+</node>
+<edge id="33" source="31" target="32"/>
+ <node id="34">
+   <data key="signature">originatesFrom</data>
+   <data key="axioms">range(originatesFrom) = MaterialObject
+domain(originatesFrom) = MaterialObject</data>
+</node>
+<edge id="35" source="34" target="19"/>
+<edge id="36" source="28" target="16"/>
+ <node id="37">
+   <data key="signature">isProjectionOf</data>
+   <data key="axioms">CanonicityValueRegion ⊑ ∀isProjectionOf.Canonicity
+ValueRegion ⊑ ∀isProjectionOf.Quality
+∃isProjectionOf.⊤ ⊑ (ImmaterialObject ⊔ TemporalRegion ⊔ ValueRegion)
+TaxonValueRegion ⊑ ∀isProjectionOf.TaxonQuality
+ImmaterialThreeDimensionalPhysicalEntity ⊑ ∀isProjectionOf.(ImmaterialThreeDimensionalPhysicalEntity ⊔ MaterialObject)
+TemporalRegion ⊑ ∀isProjectionOf.(Process ⊔ TemporalRegion)</data>
+</node>
+<edge id="38" source="32" target="37"/>
+ <node id="39">
+   <data key="signature">BodySystem</data>
+   <data key="axioms">BodySystem ⊑ OrganismPart</data>
+</node>
+<edge id="40" source="39" target="28"/>
+ <node id="41">
+   <data key="signature">EntireMolecularEntity</data>
+   <data key="axioms">EntireMolecularEntity ⊑ MonoMolecularEntity</data>
+</node>
+<edge id="42" source="41" target="19"/>
+<edge id="43" source="23" target="31"/>
+ <node id="44">
+   <data key="signature">Biomolecule</data>
+   <data key="axioms">Biomolecule ≡ (∃originatesFrom.LivingOrganism ⊓ MonoMolecularEntity)</data>
+</node>
+<edge id="45" source="23" target="44"/>
+ <node id="46">
+   <data key="signature">MulticellularOrganism</data>
+   <data key="axioms">MulticellularOrganism ≡ (∃hasProperPhysicalPart.Cell ⊓ LivingOrganism ⊓ ∃isBearerOf.DevelopmentalQuality)</data>
+</node>
+<edge id="47" source="23" target="46"/>
+<edge id="48" source="23" target="41"/>
+ <node id="49">
+   <data key="signature">hasProperPhysicalPart</data>
+   <data key="axioms">range(hasProperPhysicalPart) = (ImmaterialObject ⊔ MaterialObject)
+domain(hasProperPhysicalPart) = (ImmaterialObject ⊔ MaterialObject)</data>
+</node>
+<edge id="50" source="49" target="19"/>
+<edge id="51" source="8" target="4"/>
+ <node id="52">
+   <data key="signature">OrganSystemPart</data>
+   <data key="axioms">OrganSystemPart ⊑ BodySystem</data>
+</node>
+<edge id="53" source="8" target="52"/>
+<edge id="54" source="16" target="18"/>
+<edge id="55" source="52" target="39"/>
+ <node id="56">
+   <data key="signature">PathologicalStructure
+PathologicalDisposition
+PathologicalCondition
+PathologicalProcess
+NoncanonicalProcessualEntity
+NoncanonicalValueRegion</data>
+   <data key="axioms">PathologicalDisposition ≡ (∃inheresIn.∃isBearerOf.(Canonicity ⊓ ∃projectsOnto.NoncanonicalValueRegion) ⊓ Disposition)
+NoncanonicalProcessualEntity ≡ (Process ⊓ ∃isBearerOf.(Canonicity ⊓ ∃projectsOnto.NoncanonicalValueRegion))
+PathologicalStructure ≡ (StructuredBiologicalEntity ⊓ ∃isBearerOf.(Canonicity ⊓ ∃projectsOnto.NoncanonicalValueRegion))
+NoncanonicalValueRegion ⊑ CanonicityValueRegion
+PathologicalCondition ⊑ Condition
+PathologicalProcess ≡ (BiologicalProcessualEntity ⊓ ∃isBearerOf.(Canonicity ⊓ ∃projectsOnto.NoncanonicalValueRegion))
+PathologicalCondition ≡ (PathologicalDisposition ⊔ PathologicalProcess ⊔ PathologicalStructure)</data>
+</node>
+<edge id="57" source="21" target="56"/>
+ <node id="58">
+   <data key="signature">OrganismProcess
+BiologicalLife
+LivingOrganism</data>
+   <data key="axioms">BiologicalLife ⊑ OrganismProcess
+LivingOrganism ⊑ Organism
+OrganismProcess ≡ (BiologicalProcessualEntity ⊓ ∃hasParticipant.LivingOrganism)
+LivingOrganism ⊑ ∃isParticipantIn.BiologicalLife</data>
+</node>
+<edge id="59" source="46" target="58"/>
+<edge id="60" source="46" target="49"/>
+<edge id="61" source="46" target="25"/>
+<edge id="62" source="46" target="15"/>
+<edge id="63" source="37" target="19"/>
+<edge id="64" source="44" target="58"/>
+<edge id="65" source="44" target="34"/>
+ <node id="66">
+   <data key="signature">properPhysicalPartOf</data>
+   <data key="axioms">range(properPhysicalPartOf) = (ImmaterialObject ⊔ MaterialObject)
+domain(properPhysicalPartOf) = (ImmaterialObject ⊔ MaterialObject)</data>
+</node>
+<edge id="67" source="66" target="19"/>
+<edge id="68" source="5" target="39"/>
+<edge id="69" source="56" target="16"/>
+<edge id="70" source="58" target="16"/>
+<edge id="71" source="26" target="19"/>
+
+
+  </graph>
+</graphml>

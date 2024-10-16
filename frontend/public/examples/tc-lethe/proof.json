@@ -1,0 +1,60 @@
+{
+  "finalConclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> <= <http://www.bootstrep.eu/ontology/GRO#Continuant>",
+  "inferences" : [ {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactor> <= <http://www.bootstrep.eu/ontology/GRO#Protein>",
+    "ruleName" : "eliminate TranscriptionRegulator",
+    "premises" : [ "<http://www.bootstrep.eu/ontology/GRO#TranscriptionRegulator> = (<http://www.bootstrep.eu/ontology/GRO#Protein> n E<http://www.bootstrep.eu/ontology/GRO#hasFunction>.<http://www.bootstrep.eu/ontology/GRO#TranscriptionRegulatorActivity>)", "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactor> = (<http://www.bootstrep.eu/ontology/GRO#TranscriptionRegulator> n E<http://www.bootstrep.eu/ontology/GRO#hasFunction>.<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactorActivity>)" ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> <= (<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactor> n <http://www.bootstrep.eu/ontology/GRO#TranscriptionRepressor>)",
+    "ruleName" : "eliminate TranscriptionRegulator",
+    "premises" : [ "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> = (<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactor> n <http://www.bootstrep.eu/ontology/GRO#TranscriptionRepressor>)" ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> <= <http://www.bootstrep.eu/ontology/GRO#InformationBiopolymer>",
+    "ruleName" : "eliminate PhysicalContinuant, MolecularEntity, Protein",
+    "premises" : [ "<http://www.bootstrep.eu/ontology/GRO#Protein> <= <http://www.bootstrep.eu/ontology/GRO#InformationBiopolymer>", "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> <= <http://www.bootstrep.eu/ontology/GRO#Protein>" ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#InformationBiopolymer> <= <http://www.bootstrep.eu/ontology/GRO#MolecularEntity>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#MolecularEntity> <= <http://www.bootstrep.eu/ontology/GRO#PhysicalContinuant>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> <= <http://www.bootstrep.eu/ontology/GRO#Protein>",
+    "ruleName" : "eliminate TranscriptionCofactor",
+    "premises" : [ "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> <= (<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactor> n <http://www.bootstrep.eu/ontology/GRO#TranscriptionRepressor>)", "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactor> <= <http://www.bootstrep.eu/ontology/GRO#Protein>" ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> <= <http://www.bootstrep.eu/ontology/GRO#Continuant>",
+    "ruleName" : "eliminate InformationBiopolymer",
+    "premises" : [ "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> <= <http://www.bootstrep.eu/ontology/GRO#InformationBiopolymer>", "<http://www.bootstrep.eu/ontology/GRO#InformationBiopolymer> <= <http://www.bootstrep.eu/ontology/GRO#Continuant>" ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#MolecularEntity> <= <http://www.bootstrep.eu/ontology/GRO#Continuant>",
+    "ruleName" : "eliminate TranscriptionRegulator, TranscriptionCofactor, PhysicalContinuant",
+    "premises" : [ "<http://www.bootstrep.eu/ontology/GRO#MolecularEntity> <= <http://www.bootstrep.eu/ontology/GRO#PhysicalContinuant>", "<http://www.bootstrep.eu/ontology/GRO#PhysicalContinuant> <= <http://www.bootstrep.eu/ontology/GRO#Continuant>" ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#Protein> <= <http://www.bootstrep.eu/ontology/GRO#InformationBiopolymer>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCorepressor> = (<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactor> n <http://www.bootstrep.eu/ontology/GRO#TranscriptionRepressor>)",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionRegulator> = (<http://www.bootstrep.eu/ontology/GRO#Protein> n E<http://www.bootstrep.eu/ontology/GRO#hasFunction>.<http://www.bootstrep.eu/ontology/GRO#TranscriptionRegulatorActivity>)",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#PhysicalContinuant> <= <http://www.bootstrep.eu/ontology/GRO#Continuant>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactor> = (<http://www.bootstrep.eu/ontology/GRO#TranscriptionRegulator> n E<http://www.bootstrep.eu/ontology/GRO#hasFunction>.<http://www.bootstrep.eu/ontology/GRO#TranscriptionCofactorActivity>)",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.bootstrep.eu/ontology/GRO#InformationBiopolymer> <= <http://www.bootstrep.eu/ontology/GRO#Continuant>",
+    "ruleName" : "eliminate MolecularEntity",
+    "premises" : [ "<http://www.bootstrep.eu/ontology/GRO#MolecularEntity> <= <http://www.bootstrep.eu/ontology/GRO#Continuant>", "<http://www.bootstrep.eu/ontology/GRO#InformationBiopolymer> <= <http://www.bootstrep.eu/ontology/GRO#MolecularEntity>" ]
+  } ]
+}

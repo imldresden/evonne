@@ -1,0 +1,23 @@
+Axiom,Reason,Depth,Width,Groups of Diagnosis,Size
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#Translation> <http://www.bootstrep.eu/ontology/GRO#Process>),S,-1,-1,-1,22
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#Translation> <http://www.bootstrep.eu/ontology/GRO#Occurrent>),"W,S",-1,6,-1,26
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#TranscriptionOfOperon> <http://www.bootstrep.eu/ontology/GRO#Process>),S,-1,-1,-1,26
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#TranscriptionOfOperon> <http://www.bootstrep.eu/ontology/GRO#Occurrent>),S,-1,-1,-1,30
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#DosageCompensation> <http://www.bootstrep.eu/ontology/GRO#RegulationOfProcess>),"W,S",-1,8,-1,30
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfDNABindingDomainOfProteinToDNA> <http://www.bootstrep.eu/ontology/GRO#MolecularProcess>),"W,S",-1,6,-1,36
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfDNABindingDomainOfProteinToDNA> <http://www.bootstrep.eu/ontology/GRO#BindingToMolecularEntity>),"W,S",-1,6,-1,26
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfDNABindingDomainOfProteinToDNA> <http://www.bootstrep.eu/ontology/GRO#BindingOfMolecularEntity>),S,-1,-1,-1,28
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfDNABindingDomainOfProteinToDNA> <http://www.bootstrep.eu/ontology/GRO#MolecularInteraction>),"D,W,S",6,7,-1,48
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfDNABindingDomainOfProteinToDNA> <http://www.bootstrep.eu/ontology/GRO#MolecularBinding>),S,-1,-1,-1,34
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingToProtein> <http://www.bootstrep.eu/ontology/GRO#BindingToMolecularEntity>),S,-1,-1,-1,20
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingToProtein> <http://www.bootstrep.eu/ontology/GRO#MolecularBinding>),S,-1,-1,-1,26
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#ComplexRegulationOfTranscription> <http://www.bootstrep.eu/ontology/GRO#RegulationOfPathway>),"W,S",-1,6,-1,32
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#ComplexRegulationOfTranscription> <http://www.bootstrep.eu/ontology/GRO#RegulationOfProcess>),"W,S",-1,8,-1,42
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#TranscriptionDuringRNA-mediatedTransposition> <http://www.bootstrep.eu/ontology/GRO#Process>),S,-1,-1,-1,30
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#TranscriptionDuringRNA-mediatedTransposition> <http://www.bootstrep.eu/ontology/GRO#Occurrent>),"W,S",-1,6,-1,34
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfTFToTFBindingSiteOfDNA> <http://www.bootstrep.eu/ontology/GRO#BindingToMolecularEntity>),"D,S",6,-1,-1,36
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfTFToTFBindingSiteOfDNA> <http://www.bootstrep.eu/ontology/GRO#BindingOfProtein>),"W,S",-1,6,-1,22
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfTFToTFBindingSiteOfDNA> <http://www.bootstrep.eu/ontology/GRO#MolecularInteraction>),"D,W,S",7,11,-1,64
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfTFToTFBindingSiteOfDNA> <http://www.bootstrep.eu/ontology/GRO#BindingOfTranscriptionFactorToDNA>),S,-1,-1,-1,24
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfTFToTFBindingSiteOfDNA> <http://www.bootstrep.eu/ontology/GRO#MolecularProcess>),"W,S",-1,8,-1,38
+SubClassOf(<http://www.bootstrep.eu/ontology/GRO#BindingOfTFToTFBindingSiteOfDNA> <http://www.bootstrep.eu/ontology/GRO#BindingOfProteinToProteinBindingSiteOfDNA>),"W,S",-1,7,-1,30

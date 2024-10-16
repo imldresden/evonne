@@ -1,0 +1,7 @@
+========================
+Gene Regulation Ontology
+========================
+
+"BindingOfTFToTFBindingSiteOfProtein is "MolecularInteraction" (ALC)
+"BindingOfTFToTFBindingSiteOfProtein is "MolecularProcess" (ALC)
+"TranscriptionCorepressor" is "Continuant" 

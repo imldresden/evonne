@@ -1,0 +1,23 @@
+{
+  "<http://subPizza#FruitTopping>" : "FruitTopping",
+  "owl:Nothing" : "⊥",
+  "<http://subPizza#Pizza>" : "Pizza",
+  "<http://subPizza#Food>" : "Food",
+  "<http://subPizza#SpicyPizzaTopping>" : "SpicyPizzaTopping",
+  "<http://subPizza#CheesyVegetableTopping>" : "CheesyVegetableTopping",
+  "<http://subPizza#IceCream>" : "IceCream",
+  "<http://subPizza#SpicyIceCream>" : "SpicyIceCream",
+  "<http://subPizza#Medium>" : "Medium",
+  "<http://subPizza#Mild>" : "Mild",
+  "<http://subPizza#Hot>" : "Hot",
+  "<http://subPizza#ValuePartition>" : "ValuePartition",
+  "<http://subPizza#MeatTopping>" : "MeatTopping",
+  "<http://subPizza#Spiciness>" : "Spiciness",
+  "<http://subPizza#VegetarianTopping>" : "VegetarianTopping",
+  "owl:Thing" : "⊤",
+  "<http://subPizza#CheeseTopping>" : "CheeseTopping",
+  "<http://subPizza#PizzaBase>" : "PizzaBase",
+  "<http://subPizza#VegetableTopping>" : "VegetableTopping",
+  "<http://subPizza#PizzaTopping>" : "PizzaTopping",
+  "<http://subPizza#DomainThing>" : "DomainThing"
+}

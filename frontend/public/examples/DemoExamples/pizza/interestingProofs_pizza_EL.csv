@@ -1,0 +1,19 @@
+Axiom,Reason,Depth,Width,Groups of Diagnosis,Size
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#SlicedTomatoTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetarianTopping>),S,-1,-1,-1,25
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot> <http://www.co-ode.org/ontologies/pizza/pizza.owl#DomainConcept>),G,-1,-1,5,-1
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot> <http://www.co-ode.org/ontologies/pizza/pizza.owl#MeatyPizza>),S,-1,-1,-1,22
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot> <http://www.co-ode.org/ontologies/pizza/pizza.owl#SpicyPizzaEquivalent>),"D,S",7,-1,-1,34
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot> <http://www.co-ode.org/ontologies/pizza/pizza.owl#SpicyPizza>),"D,S",8,-1,-1,40
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot> <http://www.co-ode.org/ontologies/pizza/pizza.owl#CheeseyPizza>),S,-1,-1,-1,22
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot> <http://www.co-ode.org/ontologies/pizza/pizza.owl#Food>),G,-1,-1,4,-1
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#HotGreenPepperTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#DomainConcept>),S,-1,-1,-1,22
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#HotGreenPepperTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetarianTopping>),S,-1,-1,-1,31
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#HotGreenPepperTopping> <http://www.co-ode.org/ontologies/pizza/pizza.owl#SpicyTopping>),S,-1,-1,-1,24
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#American> <http://www.co-ode.org/ontologies/pizza/pizza.owl#DomainConcept>),G,-1,-1,5,-1
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#American> <http://www.co-ode.org/ontologies/pizza/pizza.owl#MeatyPizza>),S,-1,-1,-1,22
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#American> <http://www.co-ode.org/ontologies/pizza/pizza.owl#CheeseyPizza>),S,-1,-1,-1,22
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#American> <http://www.co-ode.org/ontologies/pizza/pizza.owl#Food>),G,-1,-1,4,-1
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#Capricciosa> <http://www.co-ode.org/ontologies/pizza/pizza.owl#DomainConcept>),G,-1,-1,5,-1
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#Capricciosa> <http://www.co-ode.org/ontologies/pizza/pizza.owl#MeatyPizza>),S,-1,-1,-1,22
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#Capricciosa> <http://www.co-ode.org/ontologies/pizza/pizza.owl#CheeseyPizza>),S,-1,-1,-1,22
+SubClassOf(<http://www.co-ode.org/ontologies/pizza/pizza.owl#Capricciosa> <http://www.co-ode.org/ontologies/pizza/pizza.owl#Food>),G,-1,-1,4,-1

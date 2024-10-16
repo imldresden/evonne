@@ -1,0 +1,6 @@
+========================
+Skin Physiology Ontology
+========================
+
+"SebaceousGland" is "HolocrineGland"
+"SebaceousGland" is "Entity"

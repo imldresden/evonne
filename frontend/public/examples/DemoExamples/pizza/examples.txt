@@ -1,0 +1,9 @@
+=========
+Pizza.owl
+=========
+
+"Icecream" is "Fishtopping"
+"SloppyGuiseppe" is "SpicyPizza"
+"SloppyGuiseppe" is "SpicyPizza" + toppingsSig.txt
+
+"Siciliana" is "NonVegetarianPizza" (ALC)

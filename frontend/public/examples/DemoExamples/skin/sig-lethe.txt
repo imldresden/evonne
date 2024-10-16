@@ -1,0 +1,6 @@
+http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis
+http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart
+http://www.obofoundry.org/ro/ro.owl#agent_in
+http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis
+http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland
+http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess

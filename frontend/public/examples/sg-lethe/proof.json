@@ -1,0 +1,80 @@
+{
+  "finalConclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+  "inferences" : [ {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland> = (E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure>)",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion> <= <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess>",
+    "ruleName" : "eliminate Gland, AnatomicalStructure, CardinalTissuePart, SubdivisionOfEpidermis, GlandOfEpidermis, SecretionByLysis",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis> = (E<http://www.obofoundry.org/ro/ro.owl#has_part>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#Lysis> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess>)", "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion> <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>" ]
+  }, {
+    "conclusion" : "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SubdivisionOfEpidermis> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+    "ruleName" : "eliminate CardinalTissuePart",
+    "premises" : [ "(<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>", "<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SubdivisionOfEpidermis> <= <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart>" ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess>",
+    "ruleName" : "eliminate SebumSecretion",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion>", "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion> <= <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess>" ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis> = (E<http://www.obofoundry.org/ro/ro.owl#has_part>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#Lysis> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess>)",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion> <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis> <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SubdivisionOfEpidermis>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland> = (<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>)",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+    "ruleName" : "eliminate SecretionByLysis",
+    "premises" : [ "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>", "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion> <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>" ]
+  }, {
+    "conclusion" : "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+    "ruleName" : "eliminate Gland",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland> = (E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure>)", "<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland> = (<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>)" ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart> <= <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SubdivisionOfEpidermis> <= <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart>",
+    "ruleName" : "asserted",
+    "premises" : [ ]
+  }, {
+    "conclusion" : "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+    "ruleName" : "eliminate SecretionProcess",
+    "premises" : [ "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>", "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess>" ]
+  }, {
+    "conclusion" : "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+    "ruleName" : "eliminate SubdivisionOfEpidermis",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis> <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SubdivisionOfEpidermis>", "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SubdivisionOfEpidermis> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>" ]
+  }, {
+    "conclusion" : "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+    "ruleName" : "eliminate SebumSecretion",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion>", "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>" ]
+  }, {
+    "conclusion" : "(<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+    "ruleName" : "eliminate AnatomicalStructure",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart> <= <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure>", "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>" ]
+  }, {
+    "conclusion" : "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>",
+    "ruleName" : "eliminate GlandOfEpidermis",
+    "premises" : [ "<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland> <= <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis>", "(E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess> n E<http://www.obofoundry.org/ro/ro.owl#agent_in>.<http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#SecretionByLysis> n <http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis>) <= <http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl#HolocrineGland>" ]
+  } ]
+}

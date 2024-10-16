@@ -1,0 +1,3 @@
+Axiom,Reason,Depth,Width,Groups of Diagnosis,Size
+SubClassOf(<http://owl.man.ac.uk/2006/07/sssw/people#dog_owner> <http://owl.man.ac.uk/2006/07/sssw/people#pet_owner>),"D,S",6,-1,-1,34
+SubClassOf(<http://owl.man.ac.uk/2006/07/sssw/people#dog_owner> <http://owl.man.ac.uk/2006/07/sssw/people#dog_liker>),S,-1,-1,-1,28

@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <graph id="G" edgedefault="directed">
+<key id="label" for="node" attr.name="label" attr.type="string">
+</key>
+ <node id="1">
+   <data key="signature"> </data>
+   <data key="axioms">AdiposeTissue ⊑ ∃has_ingredient.(∀has_grain.Adipocyte ⊓ Collective)</data>
+</node>
+ <node id="2">
+   <data key="signature">LooseConnectiveTissue
+IrregularConnectiveTissue</data>
+   <data key="axioms">LooseConnectiveTissue ⊑ IrregularConnectiveTissue</data>
+</node>
+<edge id="3" source="1" target="2"/>
+ <node id="4">
+   <data key="signature">PortionOfTissue
+AmountOfMatter</data>
+   <data key="axioms">PortionOfTissue ⊑ AmountOfMatter</data>
+</node>
+<edge id="5" source="1" target="4"/>
+ <node id="6">
+   <data key="signature">ConnectiveTissue
+IrregularConnectiveTissue</data>
+   <data key="axioms">IrregularConnectiveTissue ⊑ ConnectiveTissue</data>
+</node>
+<edge id="7" source="1" target="6"/>
+ <node id="8">
+   <data key="signature">Adipocyte
+Cell</data>
+   <data key="axioms">Adipocyte ⊑ Cell</data>
+</node>
+<edge id="9" source="1" target="8"/>
+ <node id="10">
+   <data key="signature">has_ingredient
+AmountOfMatter</data>
+   <data key="axioms">range(has_ingredient) = AmountOfMatter
+domain(has_ingredient) = AmountOfMatter</data>
+</node>
+<edge id="11" source="1" target="10"/>
+ <node id="12">
+   <data key="signature">CollectiveOfErythrocytes
+AmountOfMatter
+Collective</data>
+   <data key="axioms">Collective ≡ (∃has_grain.PhysicalObject ⊓ AmountOfMatter)
+CollectiveOfErythrocytes ≡ (Collective ⊓ ∀has_grain.Erythrocyte)</data>
+</node>
+<edge id="13" source="1" target="12"/>
+ <node id="14">
+   <data key="signature">LooseConnectiveTissue
+AdiposeTissue</data>
+   <data key="axioms">AdiposeTissue ⊑ LooseConnectiveTissue</data>
+</node>
+<edge id="15" source="1" target="14"/>
+ <node id="16">
+   <data key="signature">PortionOfTissue
+ConnectiveTissue</data>
+   <data key="axioms">ConnectiveTissue ⊑ PortionOfTissue</data>
+</node>
+<edge id="17" source="1" target="16"/>
+ <node id="18">
+   <data key="signature">Cell_adhesion
+CellularProcess</data>
+   <data key="axioms">Cell_adhesion ⊑ CellularProcess</data>
+</node>
+ <node id="19">
+   <data key="signature">Entity
+Occurrent</data>
+   <data key="axioms">Occurrent ⊑ Entity</data>
+</node>
+ <node id="20">
+   <data key="signature">has_function</data>
+   <data key="axioms">range(has_function) = DependentContinuant</data>
+</node>
+ <node id="21">
+   <data key="signature">DependentContinuant
+bearer_of</data>
+   <data key="axioms">range(bearer_of) = DependentContinuant</data>
+</node>
+<edge id="22" source="20" target="21"/>
+ <node id="23">
+   <data key="signature">AnatomicalStructure
+Cell</data>
+   <data key="axioms">Cell ⊑ AnatomicalStructure</data>
+</node>
+ <node id="24">
+   <data key="signature">has_determinate_part
+PhysicalObject</data>
+   <data key="axioms">domain(has_determinate_part) = PhysicalObject
+range(has_determinate_part) = PhysicalObject</data>
+</node>
+ <node id="25">
+   <data key="signature">TranscytosisFunction
+CellularProcessFunction</data>
+   <data key="axioms">TranscytosisFunction ⊑ CellularProcessFunction</data>
+</node>
+ <node id="26">
+   <data key="signature"> </data>
+   <data key="axioms">Exocytosis ⊑ CellularProcess</data>
+</node>
+ <node id="27">
+   <data key="signature">StageOfExocytosis
+CellularProcess</data>
+   <data key="axioms">StageOfExocytosis ⊑ CellularProcess</data>
+</node>
+<edge id="28" source="26" target="27"/>
+ <node id="29">
+   <data key="signature">StageOfExocytosis
+Exocytosis
+has_part</data>
+   <data key="axioms">Exocytosis ⊑ ∃has_part.StageOfExocytosis</data>
+</node>
+<edge id="30" source="26" target="29"/>
+ <node id="31">
+   <data key="signature">Type_V_Collagen
+Collagen</data>
+   <data key="axioms">Type_V_Collagen ⊑ Collagen</data>
+</node>
+ <node id="32">
+   <data key="signature">ElasticFibre
+ProteinFibre</data>
+   <data key="axioms">ElasticFibre ⊑ ProteinFibre</data>
+</node>
+ <node id="33">
+   <data key="signature">has_grain
+Hemoglobin
+Erythrocyte</data>
+   <data key="axioms">Erythrocyte ⊑ ∃has_grain.Hemoglobin</data>
+</node>
+ <node id="34">
+   <data key="signature">AnatomicalStructure
+PhysicalObject</data>
+   <data key="axioms">AnatomicalStructure ⊑ PhysicalObject</data>
+</node>
+ <node id="35">
+   <data key="signature">CellToCellAdhesionFunction
+TranscytosisFunction
+has_function</data>
+   <data key="axioms">TightJunction ⊑ ∃has_function.CellToCellAdhesionFunction
+EndothelialCell ⊑ ∃has_function.TranscytosisFunction
+Desmosome ⊑ ∃has_function.CellToCellAdhesionFunction</data>
+</node>
+ <node id="36">
+   <data key="signature">location_of
+located_in
+agent_in
+Capillary
+TightJunction
+CapillaryBed
+Hypodermis
+has_agent
+Transcytosis
+LayerOfEpidermis
+CellToCellAdhesion
+is_gross_part_of
+has_gross_part
+Desmocollin
+Desmosome
+Epidermis
+part_of
+EndothelialCell
+Desmoglein
+Endothelium
+SubdivisionOfEpidermis</data>
+   <data key="axioms">Epidermis ⊑ ∃has_grain.Desmosome
+Desmosome ⊑ CellJunction
+Epidermis ⊑ ∃has_determinate_part.LayerOfEpidermis
+Endothelium ≡ (∃has_grain.EndothelialCell ⊓ Epithelium)
+Capillary ⊑ ∃is_grain_of.CapillaryBed
+CellToCellAdhesion ⊑ ∃has_agent.TightJunction
+Desmocollin ⊑ ∃is_grain_of.Desmosome
+Transcytosis ⊑ ∃has_agent.EndothelialCell
+SubdivisionOfEpidermis ⊑ ∃is_determinate_part_of.Epidermis
+Epidermis ⊑ Epithelium
+Endothelium ⊑ ∃has_grain.TightJunction
+Hypodermis ⊑ CardinalTissuePart
+Desmosome ⊑ ∃agent_in.CellToCellAdhesion
+Hypodermis ⊑ ∃location_of.Capillary
+CellToCellAdhesion ⊑ Cell_adhesion
+TightJunction ⊑ ∃is_grain_of.Endothelium
+Desmoglein ⊑ Cadherin
+EndothelialCell ⊑ ∃agent_in.Transcytosis
+LayerOfEpidermis ⊑ SubdivisionOfEpidermis
+Hypodermis ⊑ ∃has_ingredient.AdiposeTissue
+CapillaryBed ⊑ ∃has_grain.Capillary
+Capillary ⊑ ∃located_in.Hypodermis
+Desmosome ⊑ ∃has_part.Plaque
+CellToCellAdhesion ⊑ ∃has_agent.Desmosome
+Capillary ⊑ CardinalOrganPart
+EndothelialCell ≡ (Cell ⊓ ∃is_grain_of.Endothelium)
+Desmosome ⊑ ∃is_grain_of.Epidermis
+Desmosome ⊑ ∃has_grain.Desmocollin
+Hypodermis ⊑ ∃has_ingredient.AreolarConnectiveTissue
+Transcytosis ⊑ CellularProcess
+Capillary ⊑ ∃has_part.Endothelium
+SubdivisionOfEpidermis ⊑ CardinalTissuePart
+Capillary ⊑ ∃located_in.Dermis
+CapillaryBed ⊑ CardinalOrganPart
+Desmosome ⊑ ∃has_grain.Desmoglein
+Endothelium ⊑ ∃part_of.Capillary
+TightJunction ⊑ ∃agent_in.CellToCellAdhesion
+Desmocollin ⊑ Cadherin
+Transcytosis ≡ (∃has_part.Exocytosis ⊓ CellularProcess ⊓ ∃has_part.Endocytosis)
+Desmoglein ⊑ ∃is_grain_of.Desmosome
+TightJunction ⊑ CellJunction</data>
+</node>
+<edge id="37" source="35" target="36"/>
+ <node id="38">
+   <data key="signature">CellAdhesionMolecule
+Cadherin</data>
+   <data key="axioms">Cadherin ⊑ CellAdhesionMolecule</data>
+</node>
+ <node id="39">
+   <data key="signature">Hair
+SmoothMuscleTissue
+PilosebaceousUnit
+SebaceousGland
+ArrectorPiliMuscle</data>
+   <data key="axioms">SmoothMuscleTissue ⊑ ∃Constitutes.ArrectorPiliMuscle
+SebaceousGland ⊑ ∃has_function.SebumSecretionFunction
+SebaceousGland ⊑ ∃agent_in.SebumSecretion
+SebaceousGland ⊑ GlandOfEpidermis
+Hair ⊑ ∃is_determinate_part_of.PilosebaceousUnit
+PilosebaceousUnit ⊑ ∃has_determinate_part.ArrectorPiliMuscle
+ArrectorPiliMuscle ⊑ ∃is_constituted_by.SmoothMuscleTissue
+ArrectorPiliMuscle ⊑ ∃is_determinate_part_of.PilosebaceousUnit
+PilosebaceousUnit ⊑ ∃has_determinate_part.SebaceousGland
+PilosebaceousUnit ⊑ ∃has_determinate_part.Hair
+SmoothMuscleTissue ⊑ PortionOfTissue
+Hair ⊑ SkinAppendage
+PilosebaceousUnit ⊑ ∃has_determinate_part.HairFollicle
+ArrectorPiliMuscle ⊑ CardinalTissuePart
+SebaceousGland ⊑ ∃has_determinate_part.PilosebaceousUnit
+PilosebaceousUnit ⊑ CardinalOrganPart</data>
+</node>
+ <node id="40">
+   <data key="signature">HairGrowthCycleFunction</data>
+   <data key="axioms">HairFollicle ⊑ ∃has_function.HairGrowthCycleFunction</data>
+</node>
+<edge id="41" source="39" target="40"/>
+ <node id="42">
+   <data key="signature">is_constituted_by
+PhysicalObject</data>
+   <data key="axioms">domain(is_constituted_by) = PhysicalObject</data>
+</node>
+<edge id="43" source="39" target="42"/>
+ <node id="44">
+   <data key="signature">GlandOfEpidermis</data>
+   <data key="axioms">GlandOfEpidermis ⊑ SubdivisionOfEpidermis</data>
+</node>
+<edge id="45" source="39" target="44"/>
+ <node id="46">
+   <data key="signature">CellularProcess
+CellDeath</data>
+   <data key="axioms">CellDeath ⊑ CellularProcess</data>
+</node>
+<edge id="47" source="39" target="46"/>
+ <node id="48">
+   <data key="signature">Constitutes
+AmountOfMatter</data>
+   <data key="axioms">domain(Constitutes) = AmountOfMatter</data>
+</node>
+<edge id="49" source="39" target="48"/>
+ <node id="50">
+   <data key="signature">MerocrineGland</data>
+   <data key="axioms">MerocrineGland ⊑ ∃has_function.SecretionByExocytosisFunction
+MerocrineGland ≡ (Gland ⊓ ∃agent_in.SecretionByExocytosis)</data>
+</node>
+<edge id="51" source="39" target="50"/>
+ <node id="52">
+   <data key="signature">SecretionProcess
+CellularProcess</data>
+   <data key="axioms">SecretionProcess ⊑ CellularProcess</data>
+</node>
+<edge id="53" source="39" target="52"/>
+ <node id="54">
+   <data key="signature">SecretionByLysisFunction
+SebumSecretionFunction</data>
+   <data key="axioms">SebumSecretionFunction ⊑ SecretionByLysisFunction</data>
+</node>
+<edge id="55" source="39" target="54"/>
+ <node id="56">
+   <data key="signature">HolocrineGland</data>
+   <data key="axioms">HolocrineGland ≡ (∃agent_in.SecretionByLysis ⊓ Gland)
+HolocrineGland ⊑ ∃has_function.SecretionByLysisFunction</data>
+</node>
+<edge id="57" source="39" target="56"/>
+ <node id="58">
+   <data key="signature">is_constituted_by
+AmountOfMatter</data>
+   <data key="axioms">range(is_constituted_by) = AmountOfMatter</data>
+</node>
+<edge id="59" source="39" target="58"/>
+ <node id="60">
+   <data key="signature">SkinAppendage</data>
+   <data key="axioms">SkinAppendage ⊑ SubdivisionOfEpidermis</data>
+</node>
+<edge id="61" source="39" target="60"/>
+ <node id="62">
+   <data key="signature">PhysicalObject
+Constitutes</data>
+   <data key="axioms">range(Constitutes) = PhysicalObject</data>
+</node>
+<edge id="63" source="39" target="62"/>
+ <node id="64">
+   <data key="signature">CellDeath</data>
+   <data key="axioms">Lysis ⊑ CellDeath</data>
+</node>
+<edge id="65" source="39" target="64"/>
+ <node id="66">
+   <data key="signature">SebumSecretion</data>
+   <data key="axioms">SebumSecretion ⊑ SecretionByLysis</data>
+</node>
+<edge id="67" source="39" target="66"/>
+ <node id="68">
+   <data key="signature">is_determinate_part_of
+PhysicalObject</data>
+   <data key="axioms">range(is_determinate_part_of) = PhysicalObject
+domain(is_determinate_part_of) = PhysicalObject</data>
+</node>
+ <node id="69">
+   <data key="signature">PhysiologicalProcess
+CellularProcess</data>
+   <data key="axioms">CellularProcess ⊑ PhysiologicalProcess</data>
+</node>
+ <node id="70">
+   <data key="signature">Occurrent
+participates_in</data>
+   <data key="axioms">range(participates_in) = Occurrent</data>
+</node>
+ <node id="71">
+   <data key="signature">StageOfEndocytosis
+CellularProcess</data>
+   <data key="axioms">StageOfEndocytosis ⊑ CellularProcess</data>
+</node>
+ <node id="72">
+   <data key="signature">PhysiologicalProcess
+Occurrent</data>
+   <data key="axioms">PhysiologicalProcess ⊑ Occurrent</data>
+</node>
+ <node id="73">
+   <data key="signature">is_ingredient_of
+AmountOfMatter</data>
+   <data key="axioms">domain(is_ingredient_of) = AmountOfMatter
+range(is_ingredient_of) = AmountOfMatter</data>
+</node>
+ <node id="74">
+   <data key="signature">has_grain
+Type_IV_Collagen
+Type_V_Collagen
+Laminin
+Type_VI_Collagen</data>
+   <data key="axioms">LaminaDensa ⊑ ∃has_grain.Type_IV_Collagen
+BasalLamina ⊑ ∃has_grain.Laminin
+LaminaLucida ⊑ ∃has_grain.Type_VI_Collagen
+LaminaLucida ⊑ ∃has_grain.Type_V_Collagen
+LaminaDensa ⊑ ∃has_grain.Type_VI_Collagen</data>
+</node>
+ <node id="75">
+   <data key="signature">LaminaLucida
+is_determinate_part_of
+has_determinate_part
+BasementMembrane
+LaminaDensa
+BasalLamina
+ReticularLamina</data>
+   <data key="axioms">BasalLamina ⊑ ∃has_determinate_part.LaminaDensa
+BasalLamina ⊑ ∃is_determinate_part_of.BasementMembrane
+ReticularLamina ⊑ ∃is_determinate_part_of.BasementMembrane
+BasalLamina ⊑ ∃has_determinate_part.LaminaLucida
+BasementMembrane ⊑ ∃has_determinate_part.ReticularLamina
+BasementMembrane ⊑ ∃has_determinate_part.BasalLamina
+LaminaLucida ⊑ ∃is_determinate_part_of.BasalLamina
+LaminaDensa ⊑ ∃is_determinate_part_of.BasalLamina</data>
+</node>
+<edge id="76" source="74" target="75"/>
+ <node id="77">
+   <data key="signature">agent_in</data>
+   <data key="axioms">domain(agent_in) = Continuant</data>
+</node>
+ <node id="78">
+   <data key="signature">Continuant
+participates_in</data>
+   <data key="axioms">domain(participates_in) = Continuant</data>
+</node>
+<edge id="79" source="77" target="78"/>
+ <node id="80">
+   <data key="signature">SecretionProcessFunction
+SecretionByExocytosisFunction</data>
+   <data key="axioms">SecretionByExocytosisFunction ⊑ SecretionProcessFunction</data>
+</node>
+<edge id="81" source="44" target="36"/>
+ <node id="82">
+   <data key="signature">DenseIrregularConnectiveTissue
+Dermis</data>
+   <data key="axioms">Dermis ⊑ DenseIrregularConnectiveTissue</data>
+</node>
+ <node id="83">
+   <data key="signature">Continuant
+IndependentContinuant</data>
+   <data key="axioms">IndependentContinuant ⊑ Continuant</data>
+</node>
+ <node id="84">
+   <data key="signature">AcellularMembrane</data>
+   <data key="axioms">ReticularLamina ⊑ AcellularMembrane
+LaminaLucida ⊑ AcellularMembrane
+BasalLamina ⊑ AcellularMembrane
+BasementMembrane ⊑ AcellularMembrane
+LaminaDensa ⊑ AcellularMembrane</data>
+</node>
+<edge id="85" source="84" target="75"/>
+ <node id="86">
+   <data key="signature">DenseIrregularConnectiveTissue
+IrregularConnectiveTissue</data>
+   <data key="axioms">DenseIrregularConnectiveTissue ⊑ IrregularConnectiveTissue</data>
+</node>
+<edge id="87" source="36" target="86"/>
+ <node id="88">
+   <data key="signature">CardinalCellPart
+AnatomicalStructure</data>
+   <data key="axioms">CardinalCellPart ⊑ AnatomicalStructure</data>
+</node>
+<edge id="89" source="36" target="88"/>
+ <node id="90">
+   <data key="signature">CardinalTissuePart
+AnatomicalStructure</data>
+   <data key="axioms">CardinalTissuePart ⊑ AnatomicalStructure</data>
+</node>
+<edge id="91" source="36" target="90"/>
+ <node id="92">
+   <data key="signature">Plaque
+Plakoglobin
+has_grain
+Desmoplakin</data>
+   <data key="axioms">Plaque ⊑ ∃has_grain.Plakoglobin
+Plaque ⊑ ∃has_grain.Desmoplakin</data>
+</node>
+<edge id="93" source="36" target="92"/>
+ <node id="94">
+   <data key="signature"> </data>
+   <data key="axioms">AreolarConnectiveTissue ⊑ ∃has_grain.Fibroblast
+AreolarConnectiveTissue ⊑ ∃has_grain.Thrombocyte
+AreolarConnectiveTissue ⊑ ∃has_grain.Leukocyte
+AreolarConnectiveTissue ⊑ ∃has_grain.Erythrocyte</data>
+</node>
+<edge id="95" source="36" target="94"/>
+ <node id="96">
+   <data key="signature">is_grain_of
+EpithelialCell</data>
+   <data key="axioms">EpithelialCell ≡ (Cell ⊓ ∃is_grain_of.Epithelium)</data>
+</node>
+<edge id="97" source="36" target="96"/>
+<edge id="98" source="36" target="26"/>
+<edge id="99" source="36" target="1"/>
+ <node id="100">
+   <data key="signature">Protein
+Plakoglobin</data>
+   <data key="axioms">Plakoglobin ⊑ Protein</data>
+</node>
+<edge id="101" source="36" target="100"/>
+ <node id="102">
+   <data key="signature"> </data>
+   <data key="axioms">Endocytosis ⊑ CellularProcess</data>
+</node>
+<edge id="103" source="36" target="102"/>
+<edge id="104" source="36" target="82"/>
+<edge id="105" source="36" target="38"/>
+ <node id="106">
+   <data key="signature">AnatomicalStructure
+CardinalOrganPart</data>
+   <data key="axioms">CardinalOrganPart ⊑ AnatomicalStructure</data>
+</node>
+<edge id="107" source="36" target="106"/>
+ <node id="108">
+   <data key="signature">Protein
+Desmoplakin</data>
+   <data key="axioms">Desmoplakin ⊑ Protein</data>
+</node>
+<edge id="109" source="36" target="108"/>
+ <node id="110">
+   <data key="signature">Plaque
+CardinalCellPart</data>
+   <data key="axioms">Plaque ⊑ CardinalCellPart</data>
+</node>
+<edge id="111" source="36" target="110"/>
+<edge id="112" source="36" target="18"/>
+ <node id="113">
+   <data key="signature">CellAdhesionMolecule
+BiologicalMacromolecule</data>
+   <data key="axioms">CellAdhesionMolecule ⊑ BiologicalMacromolecule</data>
+</node>
+<edge id="114" source="36" target="113"/>
+ <node id="115">
+   <data key="signature">AnatomicalStructure
+CellJunction</data>
+   <data key="axioms">CellJunction ⊑ AnatomicalStructure</data>
+</node>
+<edge id="116" source="36" target="115"/>
+ <node id="117">
+   <data key="signature">ReticularFibre
+ProteinFibre</data>
+   <data key="axioms">ReticularFibre ⊑ ProteinFibre</data>
+</node>
+ <node id="118">
+   <data key="signature">IndependentContinuant
+AmountOfMatter</data>
+   <data key="axioms">AmountOfMatter ⊑ IndependentContinuant</data>
+</node>
+ <node id="119">
+   <data key="signature">AcellularMembrane
+AcellularAnatomicalStructure</data>
+   <data key="axioms">AcellularMembrane ⊑ AcellularAnatomicalStructure</data>
+</node>
+ <node id="120">
+   <data key="signature">StageOfEndocytosis
+Endocytosis
+has_part</data>
+   <data key="axioms">Endocytosis ⊑ ∃has_part.StageOfEndocytosis</data>
+</node>
+<edge id="121" source="102" target="120"/>
+<edge id="122" source="102" target="71"/>
+ <node id="123">
+   <data key="signature">has_grain
+CollagenFibre
+Collagen</data>
+   <data key="axioms">CollagenFibre ⊑ ∃has_grain.Collagen
+CollagenFibre ⊑ ∀has_grain.Collagen</data>
+</node>
+ <node id="124">
+   <data key="signature">PortionOfGroundSubstance
+has_ingredient
+ProteinFibre</data>
+   <data key="axioms">PortionOfGroundSubstance ≡ (∃has_ingredient.ProteinFibre ⊓ ∃has_ingredient.PortionOfExtracellularMatrix ⊓ PortionOfBodySubstance)</data>
+</node>
+ <node id="125">
+   <data key="signature">PortionOfBodySubstance
+PortionOfExtracellularMatrix</data>
+   <data key="axioms">PortionOfExtracellularMatrix ⊑ PortionOfBodySubstance</data>
+</node>
+<edge id="126" source="124" target="125"/>
+ <node id="127">
+   <data key="signature">FibrousProtein
+Collagen</data>
+   <data key="axioms">Collagen ⊑ FibrousProtein</data>
+</node>
+ <node id="128">
+   <data key="signature">IndependentContinuant
+PhysicalObject</data>
+   <data key="axioms">PhysicalObject ⊑ IndependentContinuant</data>
+</node>
+ <node id="129">
+   <data key="signature">Cell_adhesionFunction
+CellularProcessFunction</data>
+   <data key="axioms">Cell_adhesionFunction ⊑ CellularProcessFunction</data>
+</node>
+ <node id="130">
+   <data key="signature">Protein
+BiologicalMacromolecule</data>
+   <data key="axioms">Protein ⊑ BiologicalMacromolecule</data>
+</node>
+ <node id="131">
+   <data key="signature">HairFollicle
+HairGrowthCycle</data>
+   <data key="axioms">HairFollicle ⊑ SubdivisionOfEpidermis
+HairFollicle ⊑ ∃agent_in.HairGrowthCycle</data>
+</node>
+<edge id="132" source="131" target="36"/>
+ <node id="133">
+   <data key="signature">SecretionByLysisFunction
+SecretionProcessFunction</data>
+   <data key="axioms">SecretionByLysisFunction ⊑ SecretionProcessFunction</data>
+</node>
+ <node id="134">
+   <data key="signature">AnatomicalStructure
+BiologicalMacromolecule</data>
+   <data key="axioms">BiologicalMacromolecule ⊑ AnatomicalStructure</data>
+</node>
+ <node id="135">
+   <data key="signature">Lysis
+SecretionByLysis
+SecretionProcess
+part_of
+has_part</data>
+   <data key="axioms">Lysis ⊑ ∃part_of.SecretionByLysis
+SecretionByLysis ≡ (SecretionProcess ⊓ ∃has_part.Lysis)</data>
+</node>
+<edge id="136" source="64" target="135"/>
+<edge id="137" source="60" target="36"/>
+ <node id="138">
+   <data key="signature">has_agent</data>
+   <data key="axioms">domain(has_agent) = Occurrent</data>
+</node>
+ <node id="139">
+   <data key="signature">Occurrent
+has_participant</data>
+   <data key="axioms">domain(has_participant) = Occurrent</data>
+</node>
+<edge id="140" source="138" target="139"/>
+ <node id="141">
+   <data key="signature">SecretionProcessFunction
+AnatomicalStructure
+SecretionProcess
+agent_in
+Gland
+has_function</data>
+   <data key="axioms">Gland ≡ (AnatomicalStructure ⊓ ∃has_function.SecretionProcessFunction)
+Gland ≡ (AnatomicalStructure ⊓ ∃agent_in.SecretionProcess)</data>
+</node>
+ <node id="142">
+   <data key="signature">Cell
+Thrombocyte</data>
+   <data key="axioms">Thrombocyte ⊑ Cell</data>
+</node>
+ <node id="143">
+   <data key="signature">Cell
+Erythrocyte</data>
+   <data key="axioms">Erythrocyte ⊑ Cell</data>
+</node>
+ <node id="144">
+   <data key="signature">has_grain
+ReticularFibre
+Type_III_Collagen</data>
+   <data key="axioms">ReticularFibre ⊑ ∀has_grain.Type_III_Collagen
+ReticularFibre ⊑ ∃has_grain.Type_III_Collagen</data>
+</node>
+<edge id="145" source="50" target="141"/>
+ <node id="146">
+   <data key="signature">SecretionByExocytosis
+SecretionProcess</data>
+   <data key="axioms">SecretionByExocytosis ≡ (SecretionProcess ⊓ ∃has_part.Exocytosis)</data>
+</node>
+<edge id="147" source="50" target="146"/>
+<edge id="148" source="50" target="80"/>
+ <node id="149">
+   <data key="signature">PortionOfBodySubstance
+AmountOfMatter</data>
+   <data key="axioms">PortionOfBodySubstance ⊑ AmountOfMatter</data>
+</node>
+ <node id="150">
+   <data key="signature">PhysiologicalFunction
+CellularProcessFunction</data>
+   <data key="axioms">CellularProcessFunction ⊑ PhysiologicalFunction</data>
+</node>
+<edge id="151" source="66" target="135"/>
+ <node id="152">
+   <data key="signature">Collagen
+Type_III_Collagen</data>
+   <data key="axioms">Type_III_Collagen ⊑ Collagen</data>
+</node>
+ <node id="153">
+   <data key="signature"> </data>
+   <data key="axioms">Epithelium ⊑ PortionOfTissue</data>
+</node>
+<edge id="154" source="96" target="153"/>
+<edge id="155" source="96" target="4"/>
+ <node id="156">
+   <data key="signature">Collagen
+Type_VI_Collagen</data>
+   <data key="axioms">Type_VI_Collagen ⊑ Collagen</data>
+</node>
+<edge id="157" source="96" target="156"/>
+<edge id="158" source="96" target="130"/>
+<edge id="159" source="96" target="12"/>
+ <node id="160">
+   <data key="signature">AnatomicalStructure
+AcellularAnatomicalStructure</data>
+   <data key="axioms">AcellularAnatomicalStructure ⊑ AnatomicalStructure</data>
+</node>
+<edge id="161" source="96" target="160"/>
+<edge id="162" source="96" target="119"/>
+<edge id="163" source="96" target="84"/>
+ <node id="164">
+   <data key="signature">Protein
+FibrousProtein</data>
+   <data key="axioms">FibrousProtein ⊑ Protein</data>
+</node>
+<edge id="165" source="96" target="164"/>
+ <node id="166">
+   <data key="signature">Protein
+Laminin</data>
+   <data key="axioms">Laminin ⊑ Protein</data>
+</node>
+<edge id="167" source="96" target="166"/>
+ <node id="168">
+   <data key="signature">Type_IV_Collagen
+Collagen</data>
+   <data key="axioms">Type_IV_Collagen ⊑ Collagen</data>
+</node>
+<edge id="169" source="96" target="168"/>
+<edge id="170" source="96" target="74"/>
+<edge id="171" source="96" target="68"/>
+<edge id="172" source="96" target="24"/>
+<edge id="173" source="96" target="127"/>
+<edge id="174" source="96" target="31"/>
+ <node id="175">
+   <data key="signature">ProteinFibre
+AcellularAnatomicalStructure</data>
+   <data key="axioms">ProteinFibre ⊑ AcellularAnatomicalStructure</data>
+</node>
+<edge id="176" source="94" target="175"/>
+<edge id="177" source="94" target="4"/>
+ <node id="178">
+   <data key="signature">FibrousProtein
+Elastin</data>
+   <data key="axioms">Elastin ⊑ FibrousProtein</data>
+</node>
+<edge id="179" source="94" target="178"/>
+<edge id="180" source="94" target="152"/>
+<edge id="181" source="94" target="142"/>
+<edge id="182" source="94" target="130"/>
+<edge id="183" source="94" target="6"/>
+<edge id="184" source="94" target="12"/>
+ <node id="185">
+   <data key="signature">Cell
+Fibroblast</data>
+   <data key="axioms">Fibroblast ⊑ Cell</data>
+</node>
+<edge id="186" source="94" target="185"/>
+<edge id="187" source="94" target="160"/>
+<edge id="188" source="94" target="149"/>
+<edge id="189" source="94" target="123"/>
+<edge id="190" source="94" target="73"/>
+<edge id="191" source="94" target="16"/>
+<edge id="192" source="94" target="164"/>
+<edge id="193" source="94" target="2"/>
+ <node id="194">
+   <data key="signature">ElasticFibre
+has_grain
+Elastin</data>
+   <data key="axioms">ElasticFibre ⊑ ∀has_grain.Elastin
+ElasticFibre ⊑ ∃has_grain.Elastin</data>
+</node>
+<edge id="195" source="94" target="194"/>
+ <node id="196">
+   <data key="signature">Cell
+Leukocyte</data>
+   <data key="axioms">Leukocyte ⊑ Cell</data>
+</node>
+<edge id="197" source="94" target="196"/>
+ <node id="198">
+   <data key="signature">LooseConnectiveTissue</data>
+   <data key="axioms">AreolarConnectiveTissue ⊑ LooseConnectiveTissue</data>
+</node>
+<edge id="199" source="94" target="198"/>
+<edge id="200" source="94" target="10"/>
+<edge id="201" source="94" target="144"/>
+<edge id="202" source="94" target="127"/>
+ <node id="203">
+   <data key="signature">is_ingredient_of
+Intercellular_matrix_of_areolar_connective_tissue
+AreolarConnectiveTissue
+PortionOfGroundSubstanceOfAreolarConnectiveTissue</data>
+   <data key="axioms">Intercellular_matrix_of_areolar_connective_tissue ⊑ ∃is_ingredient_of.AreolarConnectiveTissue
+AreolarConnectiveTissue ⊑ ∃has_ingredient.PortionOfGroundSubstanceOfAreolarConnectiveTissue
+PortionOfGroundSubstanceOfAreolarConnectiveTissue ⊑ PortionOfGroundSubstance
+PortionOfGroundSubstanceOfAreolarConnectiveTissue ⊑ ∃has_ingredient.Intercellular_matrix_of_areolar_connective_tissue
+PortionOfGroundSubstanceOfAreolarConnectiveTissue ⊑ ∃has_ingredient.ElasticFibre
+PortionOfGroundSubstanceOfAreolarConnectiveTissue ⊑ ∃has_ingredient.CollagenFibre
+PortionOfGroundSubstanceOfAreolarConnectiveTissue ⊑ ∃has_ingredient.ReticularFibre
+Intercellular_matrix_of_areolar_connective_tissue ⊑ PortionOfExtracellularMatrix</data>
+</node>
+<edge id="204" source="198" target="203"/>
+ <node id="205">
+   <data key="signature">Continuant
+Entity</data>
+   <data key="axioms">Continuant ⊑ Entity</data>
+</node>
+<edge id="206" source="146" target="29"/>
+ <node id="207">
+   <data key="signature">HairGrowthCycleFunction
+PhysiologicalFunction</data>
+   <data key="axioms">HairGrowthCycleFunction ⊑ PhysiologicalFunction</data>
+</node>
+ <node id="208">
+   <data key="signature">Continuant
+DependentContinuant</data>
+   <data key="axioms">DependentContinuant ⊑ Continuant</data>
+</node>
+ <node id="209">
+   <data key="signature">SecretionProcessFunction
+CellularProcessFunction</data>
+   <data key="axioms">SecretionProcessFunction ⊑ CellularProcessFunction</data>
+</node>
+ <node id="210">
+   <data key="signature">CollagenFibre
+ProteinFibre</data>
+   <data key="axioms">CollagenFibre ⊑ ProteinFibre</data>
+</node>
+ <node id="211">
+   <data key="signature">Continuant
+has_participant</data>
+   <data key="axioms">range(has_participant) = Continuant</data>
+</node>
+<edge id="212" source="203" target="124"/>
+<edge id="213" source="203" target="117"/>
+<edge id="214" source="203" target="210"/>
+<edge id="215" source="203" target="32"/>
+ <node id="216">
+   <data key="signature">agent_in</data>
+   <data key="axioms">range(agent_in) = Occurrent</data>
+</node>
+<edge id="217" source="216" target="70"/>
+<edge id="218" source="40" target="131"/>
+<edge id="219" source="40" target="35"/>
+ <node id="220">
+   <data key="signature">ConnectiveTissue
+Epithelium
+adjacent_to</data>
+   <data key="axioms">Epithelium ⊑ ∃adjacent_to.BasementMembrane
+Epithelium ⊑ ∃adjacent_to.ConnectiveTissue</data>
+</node>
+<edge id="221" source="220" target="75"/>
+ <node id="222">
+   <data key="signature">IndependentContinuant
+bearer_of</data>
+   <data key="axioms">domain(bearer_of) = IndependentContinuant</data>
+</node>
+ <node id="223">
+   <data key="signature">has_agent</data>
+   <data key="axioms">range(has_agent) = Continuant</data>
+</node>
+<edge id="224" source="223" target="211"/>
+ <node id="225">
+   <data key="signature">DependentContinuant
+inheres_in</data>
+   <data key="axioms">domain(inheres_in) = DependentContinuant</data>
+</node>
+ <node id="226">
+   <data key="signature">has_function</data>
+   <data key="axioms">domain(has_function) = IndependentContinuant</data>
+</node>
+<edge id="227" source="226" target="222"/>
+ <node id="228">
+   <data key="signature">DependentContinuant
+PhysiologicalFunction</data>
+   <data key="axioms">PhysiologicalFunction ⊑ DependentContinuant</data>
+</node>
+<edge id="229" source="153" target="220"/>
+<edge id="230" source="153" target="16"/>
+<edge id="231" source="12" target="143"/>
+<edge id="232" source="12" target="33"/>
+<edge id="233" source="12" target="34"/>
+ <node id="234">
+   <data key="signature">Hemoglobin
+BiologicalMacromolecule</data>
+   <data key="axioms">Hemoglobin ⊑ BiologicalMacromolecule</data>
+</node>
+<edge id="235" source="12" target="234"/>
+<edge id="236" source="12" target="134"/>
+<edge id="237" source="12" target="23"/>
+<edge id="238" source="56" target="135"/>
+<edge id="239" source="56" target="141"/>
+<edge id="240" source="56" target="133"/>
+ <node id="241">
+   <data key="signature">IndependentContinuant
+inheres_in</data>
+   <data key="axioms">range(inheres_in) = IndependentContinuant</data>
+</node>
+ <node id="242">
+   <data key="signature">PhysiologicalProcess
+HairGrowthCycle</data>
+   <data key="axioms">HairGrowthCycle ⊑ PhysiologicalProcess</data>
+</node>
+ <node id="243">
+   <data key="signature">Cell_adhesionFunction
+CellToCellAdhesionFunction</data>
+   <data key="axioms">CellToCellAdhesionFunction ⊑ Cell_adhesionFunction</data>
+</node>
+
+
+  </graph>
+</graphml>

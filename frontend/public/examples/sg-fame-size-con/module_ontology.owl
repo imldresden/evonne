@@ -1,0 +1,1817 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://www.semanticweb.org/ontologies/2008/8/SPO_lightweight_merged.owl">
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Declaration>
+        <Class IRI="http://www.ifomis.org/bfo/1.1#Entity"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.ifomis.org/snap#Continuant"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.ifomis.org/snap#DependentContinuant"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.ifomis.org/snap#IndependentContinuant"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.ifomis.org/span#Occurrent"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularAnatomicalStructure"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularMembrane"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Adipocyte"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AdiposeTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ArrectorPiliMuscle"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BasementMembrane"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BiologicalMacromolecule"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cadherin"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CapillaryBed"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellJunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellToCellAdhesion"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell_adhesion"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Collagen"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CollagenFibre"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ConnectiveTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#DenseIrregularConnectiveTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Dermis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmocollin"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmoglein"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmoplakin"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ElasticFibre"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Elastin"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endocytosis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#EndothelialCell"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endothelium"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epidermis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epithelium"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Erythrocyte"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Exocytosis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Fibroblast"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#FibrousProtein"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hair"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#HairGrowthCycle"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hemoglobin"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hypodermis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Intercellular_matrix_of_areolar_connective_tissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#IrregularConnectiveTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Laminin"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#LayerOfEpidermis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Leukocyte"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#LooseConnectiveTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PhysiologicalProcess"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Plakoglobin"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Plaque"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfBodySubstance"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfExtracellularMatrix"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Protein"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ProteinFibre"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ReticularFibre"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#StageOfExocytosis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Thrombocyte"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#TightJunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Transcytosis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#AmountOfMatter"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#BasalLamina"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CardinalCellPart"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CardinalOrganPart"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CellAdhesionMolecule"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CellDeath"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CellToCellAdhesionFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Cell_adhesionFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CellularProcess"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CellularProcessFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Collective"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CollectiveOfErythrocytes"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#EpithelialCell"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#HairFollicle"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#HairGrowthCycleFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#HolocrineGland"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LaminaDensa"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LaminaLucida"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Lysis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#MerocrineGland"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PhysicalObject"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PhysiologicalFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PilosebaceousUnit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PortionOfGroundSubstance"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PortionOfGroundSubstanceOfAreolarConnectiveTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ReticularLamina"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SebumSecretionFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SecretionByExocytosis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SecretionByExocytosisFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SecretionByLysis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SecretionByLysisFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SecretionProcessFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SkinAppendage"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SmoothMuscleTissue"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#StageOfEndocytosis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SubdivisionOfEpidermis"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#TranscytosisFunction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Type_III_Collagen"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Type_IV_Collagen"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Type_VI_Collagen"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Type_V_Collagen"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#bearer_of"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#function_of"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#inheres_in"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#adjacent_to"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_agent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_participant"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#located_in"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#location_of"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#participates_in"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#Constitutes"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_determinate_part"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_gross_part"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_ingredient"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#is_constituted_by"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#is_determinate_part_of"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#is_gross_part_of"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#is_ingredient_of"/>
+    </Declaration>
+    <EquivalentClasses>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#EndothelialCell"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endothelium"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endothelium"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epithelium"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#EndothelialCell"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+                <Class IRI="#SecretionProcessFunction"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Transcytosis"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#CellularProcess"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endocytosis"/>
+            </ObjectSomeValuesFrom>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Exocytosis"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Collective"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#AmountOfMatter"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+                <Class IRI="#PhysicalObject"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#CollectiveOfErythrocytes"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Collective"/>
+            <ObjectAllValuesFrom>
+                <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Erythrocyte"/>
+            </ObjectAllValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#EpithelialCell"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epithelium"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#HolocrineGland"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+                <Class IRI="#SecretionByLysis"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#MerocrineGland"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Gland"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+                <Class IRI="#SecretionByExocytosis"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#PortionOfGroundSubstance"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfBodySubstance"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="#has_ingredient"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfExtracellularMatrix"/>
+            </ObjectSomeValuesFrom>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="#has_ingredient"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ProteinFibre"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#SecretionByExocytosis"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+                <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Exocytosis"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#SecretionByLysis"/>
+        <ObjectIntersectionOf>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess"/>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+                <Class IRI="#Lysis"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <SubClassOf>
+        <Class IRI="http://www.ifomis.org/snap#Continuant"/>
+        <Class IRI="http://www.ifomis.org/bfo/1.1#Entity"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.ifomis.org/snap#DependentContinuant"/>
+        <Class IRI="http://www.ifomis.org/snap#Continuant"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.ifomis.org/snap#IndependentContinuant"/>
+        <Class IRI="http://www.ifomis.org/snap#Continuant"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.ifomis.org/span#Occurrent"/>
+        <Class IRI="http://www.ifomis.org/bfo/1.1#Entity"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularAnatomicalStructure"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularMembrane"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularAnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Adipocyte"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AdiposeTissue"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#LooseConnectiveTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AdiposeTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_ingredient"/>
+            <ObjectIntersectionOf>
+                <Class IRI="#Collective"/>
+                <ObjectAllValuesFrom>
+                    <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+                    <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Adipocyte"/>
+                </ObjectAllValuesFrom>
+            </ObjectIntersectionOf>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+        <Class IRI="#PhysicalObject"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#LooseConnectiveTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Erythrocyte"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Fibroblast"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Leukocyte"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Thrombocyte"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_ingredient"/>
+            <Class IRI="#PortionOfGroundSubstanceOfAreolarConnectiveTissue"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ArrectorPiliMuscle"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ArrectorPiliMuscle"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_constituted_by"/>
+            <Class IRI="#SmoothMuscleTissue"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ArrectorPiliMuscle"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_determinate_part_of"/>
+            <Class IRI="#PilosebaceousUnit"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BasementMembrane"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularMembrane"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BasementMembrane"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="#BasalLamina"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BasementMembrane"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="#ReticularLamina"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BiologicalMacromolecule"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cadherin"/>
+        <Class IRI="#CellAdhesionMolecule"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+        <Class IRI="#CardinalOrganPart"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CapillaryBed"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endothelium"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#located_in"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Dermis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#located_in"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hypodermis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CapillaryBed"/>
+        <Class IRI="#CardinalOrganPart"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CapillaryBed"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellJunction"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellToCellAdhesion"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell_adhesion"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellToCellAdhesion"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_agent"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellToCellAdhesion"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_agent"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#TightJunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell_adhesion"/>
+        <Class IRI="#CellularProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Collagen"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#FibrousProtein"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CollagenFibre"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ProteinFibre"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CollagenFibre"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Collagen"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CollagenFibre"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Collagen"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ConnectiveTissue"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#DenseIrregularConnectiveTissue"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#IrregularConnectiveTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Dermis"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#DenseIrregularConnectiveTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmocollin"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cadherin"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmocollin"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmoglein"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cadherin"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmoglein"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmoplakin"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Protein"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellJunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+            <Class IRI="#CellToCellAdhesionFunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmocollin"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmoglein"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epidermis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellToCellAdhesion"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Plaque"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ElasticFibre"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ProteinFibre"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ElasticFibre"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Elastin"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ElasticFibre"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Elastin"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Elastin"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#FibrousProtein"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endocytosis"/>
+        <Class IRI="#CellularProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endocytosis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+            <Class IRI="#StageOfEndocytosis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#EndothelialCell"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+            <Class IRI="#TranscytosisFunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#EndothelialCell"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Transcytosis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endothelium"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#TightJunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endothelium"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epidermis"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epithelium"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epidermis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmosome"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epidermis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#LayerOfEpidermis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epithelium"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epithelium"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#adjacent_to"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BasementMembrane"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epithelium"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#adjacent_to"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ConnectiveTissue"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Erythrocyte"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Erythrocyte"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hemoglobin"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Exocytosis"/>
+        <Class IRI="#CellularProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Exocytosis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#StageOfExocytosis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Fibroblast"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#FibrousProtein"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Protein"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis"/>
+        <Class IRI="#SubdivisionOfEpidermis"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hair"/>
+        <Class IRI="#SkinAppendage"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hair"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_determinate_part_of"/>
+            <Class IRI="#PilosebaceousUnit"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#HairGrowthCycle"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PhysiologicalProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hemoglobin"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BiologicalMacromolecule"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hypodermis"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hypodermis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#location_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Capillary"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hypodermis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_ingredient"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AdiposeTissue"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hypodermis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_ingredient"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Intercellular_matrix_of_areolar_connective_tissue"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfExtracellularMatrix"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Intercellular_matrix_of_areolar_connective_tissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_ingredient_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AreolarConnectiveTissue"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#IrregularConnectiveTissue"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ConnectiveTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Laminin"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Protein"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#LayerOfEpidermis"/>
+        <Class IRI="#SubdivisionOfEpidermis"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Leukocyte"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#LooseConnectiveTissue"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#IrregularConnectiveTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PhysiologicalProcess"/>
+        <Class IRI="http://www.ifomis.org/span#Occurrent"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Plakoglobin"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Protein"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Plaque"/>
+        <Class IRI="#CardinalCellPart"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Plaque"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Desmoplakin"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Plaque"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Plakoglobin"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfBodySubstance"/>
+        <Class IRI="#AmountOfMatter"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfExtracellularMatrix"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfBodySubstance"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfTissue"/>
+        <Class IRI="#AmountOfMatter"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Protein"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BiologicalMacromolecule"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ProteinFibre"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularAnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ReticularFibre"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ProteinFibre"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ReticularFibre"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="#Type_III_Collagen"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ReticularFibre"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="#Type_III_Collagen"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#GlandOfEpidermis"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+            <Class IRI="#SebumSecretionFunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="#PilosebaceousUnit"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebumSecretion"/>
+        <Class IRI="#SecretionByLysis"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SecretionProcess"/>
+        <Class IRI="#CellularProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#StageOfExocytosis"/>
+        <Class IRI="#CellularProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Thrombocyte"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Cell"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#TightJunction"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellJunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#TightJunction"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+            <Class IRI="#CellToCellAdhesionFunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#TightJunction"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Endothelium"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#TightJunction"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CellToCellAdhesion"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Transcytosis"/>
+        <Class IRI="#CellularProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Transcytosis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_agent"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#EndothelialCell"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#AmountOfMatter"/>
+        <Class IRI="http://www.ifomis.org/snap#IndependentContinuant"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#BasalLamina"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularMembrane"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#BasalLamina"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Laminin"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#BasalLamina"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="#LaminaDensa"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#BasalLamina"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="#LaminaLucida"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#BasalLamina"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_determinate_part_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BasementMembrane"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CardinalCellPart"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CardinalOrganPart"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AnatomicalStructure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellAdhesionMolecule"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BiologicalMacromolecule"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellDeath"/>
+        <Class IRI="#CellularProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellToCellAdhesionFunction"/>
+        <Class IRI="#Cell_adhesionFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Cell_adhesionFunction"/>
+        <Class IRI="#CellularProcessFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellularProcess"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PhysiologicalProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellularProcessFunction"/>
+        <Class IRI="#PhysiologicalFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#HairFollicle"/>
+        <Class IRI="#SubdivisionOfEpidermis"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#HairFollicle"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+            <Class IRI="#HairGrowthCycleFunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#HairFollicle"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#HairGrowthCycle"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#HairGrowthCycleFunction"/>
+        <Class IRI="#PhysiologicalFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#HolocrineGland"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+            <Class IRI="#SecretionByLysisFunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LaminaDensa"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularMembrane"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LaminaDensa"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="#Type_IV_Collagen"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LaminaDensa"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="#Type_VI_Collagen"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LaminaDensa"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_determinate_part_of"/>
+            <Class IRI="#BasalLamina"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LaminaLucida"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularMembrane"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LaminaLucida"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="#Type_VI_Collagen"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LaminaLucida"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <Class IRI="#Type_V_Collagen"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LaminaLucida"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_determinate_part_of"/>
+            <Class IRI="#BasalLamina"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Lysis"/>
+        <Class IRI="#CellDeath"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Lysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+            <Class IRI="#SecretionByLysis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#MerocrineGland"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+            <Class IRI="#SecretionByExocytosisFunction"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PhysicalObject"/>
+        <Class IRI="http://www.ifomis.org/snap#IndependentContinuant"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PhysiologicalFunction"/>
+        <Class IRI="http://www.ifomis.org/snap#DependentContinuant"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PilosebaceousUnit"/>
+        <Class IRI="#CardinalOrganPart"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PilosebaceousUnit"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ArrectorPiliMuscle"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PilosebaceousUnit"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Hair"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PilosebaceousUnit"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#SebaceousGland"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PilosebaceousUnit"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_determinate_part"/>
+            <Class IRI="#HairFollicle"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PortionOfGroundSubstanceOfAreolarConnectiveTissue"/>
+        <Class IRI="#PortionOfGroundSubstance"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PortionOfGroundSubstanceOfAreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_ingredient"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CollagenFibre"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PortionOfGroundSubstanceOfAreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_ingredient"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ElasticFibre"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PortionOfGroundSubstanceOfAreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_ingredient"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Intercellular_matrix_of_areolar_connective_tissue"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PortionOfGroundSubstanceOfAreolarConnectiveTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#has_ingredient"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ReticularFibre"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ReticularLamina"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#AcellularMembrane"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ReticularLamina"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_determinate_part_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#BasementMembrane"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SebumSecretionFunction"/>
+        <Class IRI="#SecretionByLysisFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SecretionByExocytosisFunction"/>
+        <Class IRI="#SecretionProcessFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SecretionByLysisFunction"/>
+        <Class IRI="#SecretionProcessFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SecretionProcessFunction"/>
+        <Class IRI="#CellularProcessFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SkinAppendage"/>
+        <Class IRI="#SubdivisionOfEpidermis"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SmoothMuscleTissue"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#PortionOfTissue"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SmoothMuscleTissue"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#Constitutes"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#ArrectorPiliMuscle"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#StageOfEndocytosis"/>
+        <Class IRI="#CellularProcess"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SubdivisionOfEpidermis"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#CardinalTissuePart"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SubdivisionOfEpidermis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#is_determinate_part_of"/>
+            <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Epidermis"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#TranscytosisFunction"/>
+        <Class IRI="#CellularProcessFunction"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Type_III_Collagen"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Collagen"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Type_IV_Collagen"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Collagen"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Type_VI_Collagen"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Collagen"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Type_V_Collagen"/>
+        <Class IRI="http://www.semanticweb.org/ontologies/2008/8/MultiscaleSkinPhysiologyOntology.owl#Collagen"/>
+    </SubClassOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#function_of"/>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#inheres_in"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#bearer_of"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#participates_in"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_agent"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_participant"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#location_of"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#located_in"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#Constitutes"/>
+        <ObjectProperty IRI="#is_gross_part_of"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#has_determinate_part"/>
+        <ObjectProperty IRI="#has_gross_part"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#has_gross_part"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#has_ingredient"/>
+        <ObjectProperty IRI="#has_gross_part"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#is_constituted_by"/>
+        <ObjectProperty IRI="#has_gross_part"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#is_determinate_part_of"/>
+        <ObjectProperty IRI="#is_gross_part_of"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#is_gross_part_of"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#is_ingredient_of"/>
+        <ObjectProperty IRI="#is_gross_part_of"/>
+    </SubObjectPropertyOf>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#bearer_of"/>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#inheres_in"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#function_of"/>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_agent"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_participant"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#participates_in"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#located_in"/>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#location_of"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#has_determinate_part"/>
+        <ObjectProperty IRI="#is_determinate_part_of"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#has_gross_part"/>
+        <ObjectProperty IRI="#is_gross_part_of"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#has_ingredient"/>
+        <ObjectProperty IRI="#is_ingredient_of"/>
+    </InverseObjectProperties>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#inheres_in"/>
+    </FunctionalObjectProperty>
+    <AsymmetricObjectProperty>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+    </AsymmetricObjectProperty>
+    <AsymmetricObjectProperty>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+    </AsymmetricObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#located_in"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#location_of"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="#has_determinate_part"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="#has_gross_part"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="#has_ingredient"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="#is_determinate_part_of"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="#is_gross_part_of"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="#is_ingredient_of"/>
+    </TransitiveObjectProperty>
+    <IrreflexiveObjectProperty>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+    </IrreflexiveObjectProperty>
+    <IrreflexiveObjectProperty>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+    </IrreflexiveObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#bearer_of"/>
+        <Class IRI="http://www.ifomis.org/snap#IndependentContinuant"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+        <Class IRI="http://www.ifomis.org/snap#IndependentContinuant"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#inheres_in"/>
+        <Class IRI="http://www.ifomis.org/snap#DependentContinuant"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+        <Class IRI="http://www.ifomis.org/snap#Continuant"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_agent"/>
+        <Class IRI="http://www.ifomis.org/span#Occurrent"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_participant"/>
+        <Class IRI="http://www.ifomis.org/span#Occurrent"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#participates_in"/>
+        <Class IRI="http://www.ifomis.org/snap#Continuant"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#Constitutes"/>
+        <Class IRI="#AmountOfMatter"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_determinate_part"/>
+        <Class IRI="#PhysicalObject"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_ingredient"/>
+        <Class IRI="#AmountOfMatter"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#is_constituted_by"/>
+        <Class IRI="#PhysicalObject"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#is_determinate_part_of"/>
+        <Class IRI="#PhysicalObject"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#is_ingredient_of"/>
+        <Class IRI="#AmountOfMatter"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#bearer_of"/>
+        <Class IRI="http://www.ifomis.org/snap#DependentContinuant"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_function"/>
+        <Class IRI="http://www.ifomis.org/snap#DependentContinuant"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="http://purl.org/obo/owl/ro#inheres_in"/>
+        <Class IRI="http://www.ifomis.org/snap#IndependentContinuant"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#agent_in"/>
+        <Class IRI="http://www.ifomis.org/span#Occurrent"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_agent"/>
+        <Class IRI="http://www.ifomis.org/snap#Continuant"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_participant"/>
+        <Class IRI="http://www.ifomis.org/snap#Continuant"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#participates_in"/>
+        <Class IRI="http://www.ifomis.org/span#Occurrent"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#Constitutes"/>
+        <Class IRI="#PhysicalObject"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_determinate_part"/>
+        <Class IRI="#PhysicalObject"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_ingredient"/>
+        <Class IRI="#AmountOfMatter"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#is_constituted_by"/>
+        <Class IRI="#AmountOfMatter"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#is_determinate_part_of"/>
+        <Class IRI="#PhysicalObject"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#is_ingredient_of"/>
+        <Class IRI="#AmountOfMatter"/>
+    </ObjectPropertyRange>
+    <SubObjectPropertyOf>
+        <ObjectPropertyChain>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#has_grain"/>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+        </ObjectPropertyChain>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectPropertyChain>
+            <ObjectProperty IRI="http://purl.org/obo/owl/ro#is_grain_of"/>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+        </ObjectPropertyChain>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectPropertyChain>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#has_part"/>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#location_of"/>
+        </ObjectPropertyChain>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#location_of"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectPropertyChain>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#part_of"/>
+            <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#located_in"/>
+        </ObjectPropertyChain>
+        <ObjectProperty IRI="http://www.obofoundry.org/ro/ro.owl#located_in"/>
+    </SubObjectPropertyOf>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 5.1.7) https://github.com/owlcs/owlapi/ -->
+
+
