@@ -119,6 +119,11 @@ function init_proof({
   //Set a ruleNameMap to be used to replace the labels of rule nodes
   ruleNamesMap && conf.ruleNameMapHelper.setRuleNamesMaps(ruleNamesMap)
 
+  //By default, hide the ontology view
+  document.querySelectorAll('.resizer').forEach(function (element) {
+    element.previousElementSibling.style.width = '99%'
+  });
+
   if (external) {
     d3.select(`#${proof.div}`).selectAll("*").remove();
     setFromExternal(external);
