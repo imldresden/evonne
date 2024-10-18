@@ -124,12 +124,24 @@ function createVisContainer(params, where, extra = 0) {
         <div id='cd-right'></div> 
     `);
 
+    where.append("div")
+        .attr("class", "explanation-probe")
+        .attr("id", "explanation-probe")
+        .html(`
+            <div class="input-field" style="display:flex">
+                <input id="var-input" type="number" step="0.01">
+                <label for="var-input" class="active" id="var-input-desc"></label>
+                <button class="btn-small btn-primary" id="play-with-var" title="See animation"><i class="material-icons">play_arrow</i></button>
+            </div>
+        `);
+
     //Add visualization
     where.append("div")
         .attr("class", "explanation-container")
         .attr("id", "explanation-container")
         .style("height", params.large ? `${params.p.height - (150 + extra)}px` : "350px")
         .style("width", "100%")
+
 
     return { input: d3.select('#cd-left'), output: d3.select('#cd-right'), };
 }
