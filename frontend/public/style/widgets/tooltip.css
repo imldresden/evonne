@@ -138,3 +138,9 @@
 #tooltip-handle-bar {
     cursor: pointer;
 }
+
+.explanation-probe {
+    width: 600px;
+    padding: 10px 15px 0 15px;
+    display: none;
+}

@@ -139,7 +139,7 @@ export class DifferenceCD {
                         .attr("class", "text-eq premise")
                         .on('mouseover', ()=> dispatchHighlightCustomEvent(cid))
                         .on('mouseout', ()=> dispatchHighlightCustomEvent(cid))
-                        .on('click', ()=> animateNegativeCycle(cy, cid));
+                        .on('click', ()=> animateNegativeCycle(cy, { sid: cid }));
                     printTerms(pr.constraint.lhs, constraint);
                     constraint.append("span").attr("class", "text-black").text(" " + types[pr.constraint.type] + " ");
                     printTerms(pr.constraint.rhs, constraint);
@@ -171,13 +171,13 @@ export class DifferenceCD {
                     neg.append("span").text("Negated:");
 
                     op.conclusion.negs.forEach((c, i) => {
-                        const nid = `eq-${op.conclusion.id}-n${i}`;
+                        const ncid = `eq-${op.conclusion.id}-n${i}`;
                         const cons = neg.append("span")
-                            .attr("id", nid)
+                            .attr("id", ncid)
                             .attr("class", "text-eq conclusion")
-                            .on('mouseover', () => dispatchHighlightCustomEvent(nid))
-                            .on('mouseout', () => dispatchUndoHighlightCustomEvent(nid))
-                            .on('click', ()=> animateNegativeCycle(cy, nid));
+                            .on('mouseover', () => dispatchHighlightCustomEvent(ncid))
+                            .on('mouseout', () => dispatchUndoHighlightCustomEvent(ncid))
+                            .on('click', ()=> animateNegativeCycle(cy, { sid: ncid }));
                         cons.append("br");
                         cons.append("span").attr("class", "tab");
                         printTerms(c.lhs, cons);
@@ -361,6 +361,7 @@ export class DifferenceCD {
                     data: {
                         id: nodes[n],
                         v: n,
+                        og: n, 
                         w: n.length * 4.5
                     }
                 }
@@ -368,21 +369,28 @@ export class DifferenceCD {
             return { nodes: cynodes, edges };
         }
 
-        function animateNegativeCycle(cy, sid) {
+        function animateNegativeCycle(cy, startId = {}) {
             clearTimeout(timeout);
             cy.elements().removeClass("highlighted");
             d3.select("#cycle-val").text("0");
 
             const l = cy.elements("node").length;
 
-            function sortCycleEdges(edges, sid) {
+            function sortCycleEdges(edges, startId) {
                 let s = edges[0]; 
-                if (sid) {
-                    const sp = edges.filter(n => n.data().eid === sid); 
+                if (startId.sid) {
+                    const sp = edges.filter(e => e.data().eid === startId.sid); 
                     if (sp.length === 1) { 
                         s = sp[0];
                     }
                 }  
+
+                if (startId.nid) {
+                    const sp = edges.filter(e => e.data().source === startId.nid); 
+                    if (sp.length === 1) { 
+                        s = sp[0];
+                    }
+                }
                 
                 const r = [s];
                 while (edges.length !== r.length) {
@@ -394,7 +402,12 @@ export class DifferenceCD {
             }
 
             if (l > 0) {
-                const start = cy.elements("node")[Math.floor(Math.random() * (l))]; // starts at random node 
+                let start;
+                if (startId.nid) {
+                    start = cy.nodes(`#${startId.nid}`)
+                } else {
+                    start = cy.nodes()[Math.floor(Math.random() * (l))]; // starts at random node 
+                }
                 
                 let negs = 0;
                 const elementsWithJustOneNegated = cy.elements().filter(e => {
@@ -409,25 +422,28 @@ export class DifferenceCD {
                     directed: true,
                     findNegativeWeightCycles: true,
                     weight: (edge) => edge.data().weight
-                }, elementsWithJustOneNegated); /**/
-
-                /* const bf = elementsWithJustOneNegated.bellmanFord({ 
-                    root: `#${start.data().id}`, 
-                    directed: true,
-                    findNegativeWeightCycles: true, 
-                    weight: (edge) => edge.data().weight
-                }); /**/
+                }, elementsWithJustOneNegated); 
 
                 if (bf.hasNegativeWeightCycle) {
                     const ncycle = sortCycleEdges(
-                        bf.negativeWeightCycles[0].filter(el => el.group() === "edges"), sid
+                        bf.negativeWeightCycles[0].filter(el => el.group() === "edges"), startId
                     );
 
                     let i = 0, ep = 0, cycleValue = 0, current;
+
                     const highlightNextEle = function () {
                         current = ncycle[i];
                         current.addClass("highlighted");
                         const label = `${current.data().label}`;
+                        
+                        if (startId.nid) {
+                            const n = cy.nodes(`#${current.data().source}`)
+                            
+                            n.data({
+                                og: n.data().v,
+                                v: `${n.data().v} = ${params.manual.value + cycleValue}${EPSILONS(ep)}`
+                            })
+                        }
 
                         if (label.includes(EPSILON)) {
                             cycleValue += eval(current.data().label.split(EPSILON)[0]);
@@ -436,10 +452,21 @@ export class DifferenceCD {
                             cycleValue += eval(current.data().label);
                         }
 
+                        
+
                         d3.select("#cycle-val").text(`${cycleValue !== 0 ? cycleValue : ""}${EPSILONS(ep)}`);
                         i += 1;
                         if (i < ncycle.length) {
                             timeout = setTimeout(highlightNextEle, 1000);
+                        } else {
+                            setTimeout(() => {
+                                if (startId.nid) {
+                                    const n = cy.nodes(`#${startId.nid}`)
+                                    n.data({
+                                        v: `${n.data().v} = ${params.manual.value + cycleValue}${EPSILONS(ep)}`
+                                    })
+                                }
+                            }, 1000);
                         }
                     };
                     timeout = setTimeout(highlightNextEle, 1000);
@@ -470,7 +497,7 @@ export class DifferenceCD {
                 elements: graph,
             });
 
-            cy.elements().filter(e => e.group() === "edges")
+            cy.edges()
                 .on("tapdragover", e => {
                     dispatchHighlightCustomEvent(e.target.data().eid, e.target)
                 })
@@ -478,9 +505,27 @@ export class DifferenceCD {
                     dispatchUndoHighlightCustomEvent(e.target.data().eid);
                 })     
                 .filter(e => e.data().negated).addClass("negated");
+            cy.nodes()
+                .on("dbltap", e => {
+                    const variable = e.target.data();
+                    console.log(variable.id)
+                    params.manual = setManualValue(params, variable);
+                    document.getElementById("explanation-probe").style.display = "flex";
+                    document.getElementById("var-input-desc").innerHTML = `Set a value for "${variable.og}" and see it propagate in the graph!` 
+                });
             
             cy.fit();
             return cy;
+        }
+
+        function setManualValue(params, variable) {
+            params.manual = {
+                variable: variable.v,
+                value: 0,
+                id: variable.id
+            }
+
+            return params.manual;
         }
 
         const ruleName = getRuleName(data.ops[data.current].name);
@@ -508,5 +553,17 @@ export class DifferenceCD {
         document.addEventListener('undo-ineq-graph-hl', undoGraphHighlight)
         document.removeEventListener('ineq-graph-hl', ineqGraphHighlight)
         document.addEventListener('ineq-graph-hl', ineqGraphHighlight)
+
+        function playWithVar(_) {
+            params.manual.value = +varInput.value;
+            cy.nodes().forEach(d => {
+                d.data({v: d.data().og})
+            })
+            animateNegativeCycle(cy, { nid: params.manual.id})
+        }
+        const varInput = document.getElementById('var-input')
+        varInput.value = "";
+        varInput.addEventListener('change', playWithVar)
+        document.getElementById('play-with-var').addEventListener('click', playWithVar)
     }
 }
