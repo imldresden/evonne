@@ -460,6 +460,7 @@ function init_ontology({
         socket.emit('get repairs', {
           id: data.id,
           axiom: data.axiom,
+          readableAxiom: data.readableAxiom,
           ontologyFile: ontologyFile.name,
           reasoner: document.getElementById('diagnosesReasoner').value
         });

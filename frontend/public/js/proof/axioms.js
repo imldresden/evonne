@@ -556,6 +556,7 @@ export class AxiomsHelper {
 	showRepairs(axiom) {
 		this._socket.emit("get ontology", {
 			axiom: axiom.element,
+			readableAxiom: axiom.labels.preferred,
 			id: getSessionId()
 		});
 	}
