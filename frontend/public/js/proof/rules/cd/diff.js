@@ -473,6 +473,7 @@ export class DifferenceCD {
                                             strip(params.manual.value + cycleValue)
                                         }${EPSILONS(ep)}`
                                     })
+                                    n.addClass("highlighted")
                                 }
                             }, 1000);
                         }
@@ -516,10 +517,11 @@ export class DifferenceCD {
             cy.nodes()
                 .on("dbltap", e => {
                     const variable = e.target.data();
-                    console.log(variable.id)
-                    params.manual = setManualValue(params, variable);
-                    document.getElementById("explanation-probe").style.display = "flex";
-                    document.getElementById("var-input-desc").innerHTML = `Set a value for "${variable.og}" and see it propagate in the graph!` 
+                    if (variable.v !== "(0)") {
+                        params.manual = setManualValue(params, variable);
+                        document.getElementById("explanation-probe").style.display = "flex";
+                        document.getElementById("var-input-desc").innerHTML = `Set a value for "${variable.og}" and see it propagate in the graph!` 
+                    }
                 });
             
             cy.fit();
