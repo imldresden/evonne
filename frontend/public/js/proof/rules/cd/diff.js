@@ -369,6 +369,11 @@ export class DifferenceCD {
             return { nodes: cynodes, edges };
         }
 
+        function strip(number) {
+            // absolutely unbelievable
+            return parseFloat(number).toPrecision(12)/1;
+        }
+
         function animateNegativeCycle(cy, startId = {}) {
             clearTimeout(timeout);
             cy.elements().removeClass("highlighted");
@@ -438,10 +443,12 @@ export class DifferenceCD {
                         
                         if (startId.nid) {
                             const n = cy.nodes(`#${current.data().source}`)
-                            
+                            console.log(cycleValue)
                             n.data({
                                 og: n.data().v,
-                                v: `${n.data().v} = ${params.manual.value + cycleValue}${EPSILONS(ep)}`
+                                v: `${n.data().v} = ${
+                                    strip(params.manual.value + cycleValue)
+                                }${EPSILONS(ep)}`
                             })
                         }
 
@@ -451,8 +458,7 @@ export class DifferenceCD {
                         } else {
                             cycleValue += eval(current.data().label);
                         }
-
-                        
+                        strip(cycleValue)
 
                         d3.select("#cycle-val").text(`${cycleValue !== 0 ? cycleValue : ""}${EPSILONS(ep)}`);
                         i += 1;
@@ -463,7 +469,9 @@ export class DifferenceCD {
                                 if (startId.nid) {
                                     const n = cy.nodes(`#${startId.nid}`)
                                     n.data({
-                                        v: `${n.data().v} = ${params.manual.value + cycleValue}${EPSILONS(ep)}`
+                                        v: `${n.data().v} = ${
+                                            strip(params.manual.value + cycleValue)
+                                        }${EPSILONS(ep)}`
                                     })
                                 }
                             }, 1000);
