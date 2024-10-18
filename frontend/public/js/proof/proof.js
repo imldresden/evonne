@@ -119,19 +119,32 @@ function init_proof({
   //Set a ruleNameMap to be used to replace the labels of rule nodes
   ruleNamesMap && conf.ruleNameMapHelper.setRuleNamesMaps(ruleNamesMap)
 
+  d3.select(`#${proof.div}`).selectAll("*").remove();
   if (external) {
-    d3.select(`#${proof.div}`).selectAll("*").remove();
     setFromExternal(external);
   }
+
+
 
   if (proof.svgRootLayer) {
     proof.svgRootLayer.selectAll("*").remove();
   }
 
   // Configure SVG
+  d3.select(`#${proof.div}`).html(`
+    <div class="minimap-view-container opacity-0">
+      <svg class="minimap scope-container">
+        <g>
+          <rect class="scope" x="199.99999857761642" y="157.9999943659637" width="41.10526272763356" height="37.59999960472709"></rect>
+        </g>
+      </svg>
+      <embed type="image/svg+xml" class="minimap minimap-view">
+    </div>
+  `)
+
   d3.select(`#${proof.div}`).insert("svg", ":first-child").attr("id", "proof-view"); 
   proof.svg = d3.select("#proof-view");
-
+  
   const svgNode = proof.svg.node();
   if (!proof.isZoomPan) {
     svgNode.parentElement.style.overflow= "auto";
