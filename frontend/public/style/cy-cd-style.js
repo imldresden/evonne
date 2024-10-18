@@ -73,6 +73,12 @@ const stylesheet = [
       'line-color': colors.edgeColor,
       'target-arrow-color': colors.edgeColor,
     }
+  },
+  {
+    "selector": "node.highlighted",
+    "style": {
+      'color': colors.edgeWeightTextColor,
+    }
   }
 ];
 
