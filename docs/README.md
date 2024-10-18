@@ -62,7 +62,7 @@ the Project menu.
 To upload your own proofs (e.g., for debugging purposes), you can use the <img src="resources/upload.png"  style="width:16px"/> button under the Proof and Ontology menus. 
 Both of these can be specified in GraphML format, with some slight particularities. For example, custom labels and parseable axioms need to be considered. 
 To see examples of these formats, you can look at the files generated from Evonne for any of the example projects, in the `See examples` menu from the welcome screen. 
-These files are stored in `frontend/public/examples`, and the created projects under `frontend/public/data`. 
+If you installed evonne locally, you can access the examples files from the `frontend/public/examples`, and the files for active projects under `frontend/public/data`. 
 
 ---
 
@@ -213,8 +213,6 @@ When a **Compute Diagnoses** button is clicked, the *diagnoses menu* in the onto
 The list of diagnoses can be filtered by *locking* nodes (right click) in the ontology graph. Locking means that all axioms of a node must not be changed, hence removing all diagnoses that affect these axioms.
 
 Note: by default, the computation of diagnoses depends on the reasoner that was selected when the project was first created. However, this can be changed from the diagnoses subsection in the ontology section of the *settings menu*.
-
-
 
 ---
 
