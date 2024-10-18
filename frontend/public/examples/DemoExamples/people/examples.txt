@@ -1,6 +1,0 @@
-==========
-People.owl
-==========
-
-"old_lady" is "woman"
-"van_driver" is "grownup"
