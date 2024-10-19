@@ -2,12 +2,11 @@ import { utils } from "../rules.js";
 import { controls, createVisContainer } from "./cd-rules.js";
 import { stylesheet } from "../../../../style/cy-cd-style.js";
 import { params as cola } from "../../../layouts/cola.js";
-import { bellmanFord } from "./bellman-ford.js";
+import { hamiltonianCycle } from "./hamiltonian-cycle.js";
 import { throttle } from "../../../utils/throttle.js";
 
 const EPSILON = " - Є";
 const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? ` -Є` : ` -${n}Є`);
-const epsilon_value = 0.000000000000001;
 
 let timeout;
 
@@ -316,7 +315,7 @@ export class DifferenceCD {
                         const edge = {
                             id: `e-${i++}`, eid: p.eid,
                             label: `${c}${_epsilon}`,
-                            weight: c - (_epsilon !== "" ? epsilon_value : 0),
+                            weight: c,
                             negated
                         }
 
@@ -343,7 +342,7 @@ export class DifferenceCD {
                                 id: `e-${i++}`, eid: p.eid, negated,
                                 source: nodes[y], target: nodes[x],
                                 label: `${c}${_epsilon}`,
-                                weight: c - (_epsilon !== "" ? epsilon_value : 0),
+                                weight: c,
                             } // x−y <= c  ... (y, x) c
                         });
                     } else {
@@ -414,74 +413,72 @@ export class DifferenceCD {
                     start = cy.nodes()[Math.floor(Math.random() * (l))]; // starts at random node 
                 }
                 
-                let negs = 0;
-                const elementsWithJustOneNegated = cy.elements().filter(e => {
-                    if (e.data().negated) {
-                        negs++;
-                    }
-                    return negs < 2;
-                });
-
-                const bf = bellmanFord({
+                const hC = hamiltonianCycle({
                     root: `#${start.data().id}`,
                     directed: true,
-                    findNegativeWeightCycles: true,
-                    weight: (edge) => edge.data().weight
-                }, elementsWithJustOneNegated); 
+                    weight: (edge) => edge.data().weight,
+                }, cy.elements());
 
-                if (bf.hasNegativeWeightCycle) {
-                    const ncycle = sortCycleEdges(
-                        bf.negativeWeightCycles[0].filter(el => el.group() === "edges"), startId
-                    );
-
-                    let i = 0, ep = 0, cycleValue = 0, current;
-
-                    const highlightNextEle = function () {
-                        current = ncycle[i];
-                        current.addClass("highlighted");
-                        const label = `${current.data().label}`;
-                        
-                        if (startId.nid) {
-                            const n = cy.nodes(`#${current.data().source}`)
-                            console.log(cycleValue)
-                            n.data({
-                                og: n.data().v,
-                                v: `${n.data().v} = ${
-                                    strip(params.manual.value + cycleValue)
-                                }${EPSILONS(ep)}`
-                            })
-                        }
-
-                        if (label.includes(EPSILON)) {
-                            cycleValue += eval(current.data().label.split(EPSILON)[0]);
-                            ep = 1;
-                        } else {
-                            cycleValue += eval(current.data().label);
-                        }
-                        strip(cycleValue)
-
-                        d3.select("#cycle-val").text(`${cycleValue !== 0 ? cycleValue : ""}${EPSILONS(ep)}`);
-                        i += 1;
-                        if (i < ncycle.length) {
-                            timeout = setTimeout(highlightNextEle, 1000);
-                        } else {
-                            setTimeout(() => {
-                                if (startId.nid) {
-                                    const n = cy.nodes(`#${startId.nid}`)
-                                    n.data({
-                                        v: `${n.data().v} = ${
-                                            strip(params.manual.value + cycleValue)
-                                        }${EPSILONS(ep)}`
-                                    })
-                                    n.addClass("highlighted")
-                                }
-                            }, 1000);
-                        }
-                    };
-                    timeout = setTimeout(highlightNextEle, 1000);
-                } else {
-                    console.error("negative weight cycle could not be detected");
+                let cycle = hC.cycle; 
+                let cWeight = strip(hC.weight)
+                if (cWeight > 0) {
+                    console.error("hamiltonian cycle not negative")
+                } else if (cWeight === 0) {
+                    
+                    const epsilonCheck = cycle.filter(e => (""+e.data().label).includes(EPSILON))
+                    if (!epsilonCheck) {
+                        console.error("hamiltonian cycle not negative")
+                    }
                 }
+
+                const ncycle = sortCycleEdges(cycle, startId);
+
+                let i = 0, ep = 0, cycleValue = 0, current;
+
+                const highlightNextEle = function () {
+                    current = ncycle[i];
+                    current.addClass("highlighted");
+                    const label = `${current.data().label}`;
+                    
+                    if (startId.nid) {
+                        const n = cy.nodes(`#${current.data().source}`)
+                        console.log(cycleValue)
+                        n.data({
+                            og: n.data().v,
+                            v: `${n.data().v} = ${
+                                strip(params.manual.value + cycleValue)
+                            }${EPSILONS(ep)}`
+                        })
+                    }
+
+                    if (label.includes(EPSILON)) {
+                        cycleValue += eval(current.data().label.split(EPSILON)[0]);
+                        ep = 1;
+                    } else {
+                        cycleValue += eval(current.data().label);
+                    }
+                    strip(cycleValue)
+
+                    d3.select("#cycle-val").text(`${cycleValue !== 0 ? cycleValue : ""}${EPSILONS(ep)}`);
+                    i += 1;
+                    if (i < ncycle.length) {
+                        timeout = setTimeout(highlightNextEle, 1000);
+                    } else {
+                        setTimeout(() => {
+                            if (startId.nid) {
+                                const n = cy.nodes(`#${startId.nid}`)
+                                n.data({
+                                    v: `${n.data().v} = ${
+                                        strip(params.manual.value + cycleValue)
+                                    }${EPSILONS(ep)}`
+                                })
+                                n.addClass("highlighted")
+                            }
+                        }, 1000);
+                    }
+                };
+                timeout = setTimeout(highlightNextEle, 1000);
+                
             }
         }
 

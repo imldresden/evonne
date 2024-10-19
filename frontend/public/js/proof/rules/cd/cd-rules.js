@@ -128,9 +128,10 @@ function createVisContainer(params, where, extra = 0) {
         .attr("class", "explanation-probe")
         .attr("id", "explanation-probe")
         .html(`
-            <div class="input-field" style="display:flex">
+            <div class="input-field flexy">
                 <input id="var-input" type="number" step="0.01">
                 <label for="var-input" class="active" id="var-input-desc"></label>
+                &nbsp;
                 <button class="btn-small btn-primary" id="play-with-var" title="See animation"><i class="material-icons">play_arrow</i></button>
             </div>
         `);
