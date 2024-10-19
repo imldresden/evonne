@@ -60,7 +60,9 @@ async function createContent(data) {
   if (!document.getElementById("ontology-view")) {
     const svg = document.createElement("svg");
     svg.id = "ontology-view"
-    document.getElementById(div).append(svg)  
+    const c = document.getElementById(div)
+    c.innerHTML = `<div class="minimap-view-container opacity-0" id="ontology-minimap-container"></div>`;
+    c.append(svg);
   }
   
   const container = document.getElementById("ontology-view");
@@ -460,6 +462,7 @@ function init_ontology({
         socket.emit('get repairs', {
           id: data.id,
           axiom: data.axiom,
+          readableAxiom: data.readableAxiom,
           ontologyFile: ontologyFile.name,
           reasoner: document.getElementById('diagnosesReasoner').value
         });

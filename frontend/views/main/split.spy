@@ -21,13 +21,13 @@
   <main>
     <div class="container container-split container-flex">
       <div class="container-left" id="proof-container">
-        << menus/thumbnail >>
+        <!-- everything gets added via js -->
       </div>
 
       <div class="resizer" data-direction="horizontal"></div>
       
       <div class="container-right" id="ontology-container">
-        << menus/minimap >>
+        <!-- everything gets added via js -->
       </div>
     </div>
     

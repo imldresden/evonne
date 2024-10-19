@@ -129,6 +129,17 @@ function init_proof({
   }
 
   // Configure SVG
+  d3.select(`#${proof.div}`).html(`
+    <div class="minimap-view-container opacity-0">
+      <svg class="minimap scope-container">
+        <g>
+          <rect class="scope" x="199.99999857761642" y="157.9999943659637" width="41.10526272763356" height="37.59999960472709"></rect>
+        </g>
+      </svg>
+      <embed type="image/svg+xml" class="minimap minimap-view">
+    </div>
+  `)
+
   d3.select(`#${proof.div}`).insert("svg", ":first-child").attr("id", "proof-view"); 
   proof.svg = d3.select("#proof-view");
 
