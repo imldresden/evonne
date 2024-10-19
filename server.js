@@ -68,7 +68,7 @@ app.get('/', (req, res) => {
     res.render('main/split.spy', {
       title,
       uuid: id,
-      settings_specific: '<< proof/settings >> << ontology/settings >>',
+      settings_specific: '<< proof/settings >> << ontology/settings >> << counterexample/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
       menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << proof/menu >> << ontology/menu >>`,
@@ -150,6 +150,7 @@ app.get('/project', (req, res) => {
     names: {},
     proofs: [],
     reasoner:'',
+    counterShow:'',
   };
 
   const files = readdirSync(target);
@@ -191,13 +192,25 @@ app.get('/project', (req, res) => {
     const concepts = JSON.parse(readFileSync(namesPath));
     const hierarchy = JSON.parse(readFileSync(hierarchyPath));
 
+    // Collect all hierarchy values
+    const allHierarchyValues = new Set();
+    Object.values(hierarchy).forEach(values => {
+      values.forEach(value => {
+        allHierarchyValues.add(value);
+      });
+    });
+    
     Object.keys(concepts).forEach(key => {
+      const rhs = hierarchy[key] || [];
+      const rhh = Array.from(allHierarchyValues).filter(value => !rhs.includes(value));
+  
       status.names[key] = {
         conceptNameShort: concepts[key],
-        rhs: hierarchy[key]
-      };
-    });
-  }
+        rhs: rhs,
+        rhh: rhh
+        };
+      });
+    }
 
   const pending = !flags.proofs || !flags.ad;
   if (flags.proofs && flags.ad) {

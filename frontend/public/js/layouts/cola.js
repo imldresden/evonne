@@ -27,4 +27,31 @@ const params = {
   nodeDimensionsIncludeLabels: true,
 };
 
-export { params };
+const counter = {
+  name: 'cola',
+  animate: true,
+  animationDuration: 500,
+  fit: true,
+  idealEdgeLength: 500,
+  randomize: false,  
+  nodeSpacing: 50,
+  centerGraph: true,
+  maxSimulationTime: 2000,
+
+  flow: {
+    axis: 'x',
+    minSeparation: 60,
+  },
+
+  /*
+  edgeLength: undefined,
+  edgeSymDiffLength: undefined,
+  edgeJaccardLength: undefined,
+  */
+
+  padding: 30,
+  nodeDimensionsIncludeLabels: true,
+
+};
+
+export { params, counter };

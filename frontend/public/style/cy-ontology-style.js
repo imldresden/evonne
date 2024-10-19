@@ -72,6 +72,7 @@ const stylesheet = [
   }, {
     "selector": "edge",
     "style": {
+      'label': 'data(label)',
       'font-size': 8,
       'curve-style': 'bezier', //taxi
       'width': 1.5,
