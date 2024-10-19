@@ -1,10 +1,7 @@
 const colors = {
   SELECTED_BORDER: "#4887b9",
   SELECTED_NODE_COLOR: "#4887b9",
-
-  // taken from style/widgets/general
   nodeText: '#000',
-
   edgeWeightTextColor: '#b34343',
   edgeColor: '#db9e9e',
 
@@ -18,7 +15,6 @@ const edge = {
   'curve-style': 'bezier', //taxi
   'width': .5,
   'line-color': '#ccc',
-  'line-outline-width': 0,
   'target-arrow-color': '#ccc',
   'target-arrow-shape': 'triangle',
   'arrow-scale': .5,

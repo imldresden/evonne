@@ -79,7 +79,6 @@ const stylesheet = [
       'target-arrow-shape': 'triangle',
       'target-arrow-color': '#ccc',
       'line-color': '#ccc',
-      'line-outline-width': 0,
     }
   }
 ];

@@ -1,4 +1,4 @@
-import { readFiles } from "./fileReader.js";
+// import swal from 'sweetalert2';
 import { globals } from "../shared-data.js";
 import { stylesheet } from "../../../style/counter-cy-style.js";
 import { counter } from "../layouts/cola.js";
@@ -6,22 +6,15 @@ import { counter } from "../layouts/cola.js";
 let cy;
 const ontologyNodeId = "oN";
 let originalEdgeData = [];
-let div = "counter-example-container";
+const swalGenerals = {
+  backdrop: true,
+  heightAuto: false,
+  showClass: { popup: `` },
+  hideClass: { popup: `` }
+}
 
-
-await readFiles();
-
-async function createContent(mapper, model) {
-  const existingSVG = document.getElementById('counter-view');
-  if (existingSVG) {
-    existingSVG.remove();
-  }
-
-  const svg = document.createElement('svg');
-  svg.id = 'counter-view';
-  document.getElementById(div).append(svg);
-
-  const container = document.getElementById("counter-view");
+async function createContent(div, mapper, model) {
+  const container = document.getElementById(div);
   container.innerHTML = "";
 
   const elements = processData(mapper, model);
@@ -31,7 +24,7 @@ async function createContent(mapper, model) {
     layout: counter,
     wheelSensitivity: 0.3,
     ready: function () {
-      var api = this.expandCollapse({
+      const api = this.expandCollapse({
         fisheye: true,
         animate: true,
         undoable: false,
@@ -86,9 +79,7 @@ async function createContent(mapper, model) {
   };
 
   cy.on('layoutstart', handleLayoutEvent(false));
-  setTimeout(function () {
-    cy.on('layoutstop', handleLayoutEvent(true));
-  }, 100);
+  cy.on('layoutstop', handleLayoutEvent(true));
 
   document.getElementById('lasso_selection').addEventListener('click', function () {
     cy.lassoSelectionEnabled(true);
@@ -97,6 +88,7 @@ async function createContent(mapper, model) {
   document.getElementById('clear_selection').addEventListener('click', function () {
     cy.nodes().unselect();
   });
+
   const shortened_rangeInput = document.getElementById('shortening_mode_value');
   const shortened_badge = document.getElementById('shortened-value');
   document.getElementById('shortening_mode_value').addEventListener('input', function () {
@@ -162,7 +154,7 @@ async function createContent(mapper, model) {
   document.getElementById('show_hidden_nodes').addEventListener('click', showAllHiddenNodes);
 
   // Contect Menu Options lists
-  var contextMenu = cy.contextMenus({
+  const contextMenu = cy.contextMenus({
     menuItems: [
 
       {
@@ -192,16 +184,19 @@ async function createContent(mapper, model) {
           };
 
           if (uniqueParentNodes.size > 1 || (uniqueParentNodes.size === 1 && selectedElems.not(':parent').length > 0)) {
-            swal({
+            Swal.fire({
               text: 'Enter group name:',
-              content: "input",
-              buttons: ["Cancel", "OK"]
-            })
-              .then(groupName => {
+              input: "text",
+              showCancelButton: true,
+              confirmButtonText: "Ok",
+              ...swalGenerals,
+              preConfirm: groupName => {
+                console.log(groupName)
                 if (groupName !== null) {
                   createGroup(groupName || "Group");
                 }
-              });
+              },
+            });
           } else {
             const groupNode = selectedElems.filter(':parent');
             const nonGroupNodes = selectedElems.not(':parent');
@@ -212,12 +207,13 @@ async function createContent(mapper, model) {
               nonGroupNodes.move({ parent: groupId });
             } else {
               const parent = selectedElems[0].parent().id();
-              swal({
+              Swal.fire({
                 text: 'Enter group name:',
-                content: "input",
-                buttons: ["Cancel", "OK"]
-              })
-                .then(groupName => {
+                input: "text",
+                showCancelButton: true,
+                confirmButtonText: "Ok",
+                ...swalGenerals,
+                preConfirm: groupName => {
                   if (groupName !== null) {
                     const id = new Date().getTime();
                     const groupId = addParentNode(id, parent, groupName || "Group");
@@ -225,7 +221,8 @@ async function createContent(mapper, model) {
                       elem.move({ parent: groupId });
                     });
                   }
-                });
+                }
+              })
             }
           }
         }
@@ -249,7 +246,7 @@ async function createContent(mapper, model) {
 
             // Recalculate dimensions if necessary
             const labelHeight = 30; // Space for the label at the top
-            const boxH = calcGroupHeight(newName) + labelHeight;
+            const boxH = calcGroupHeight(newName);
             const boxW = calcBoxWidth(newName.length);
 
             // Update node dimensions and styles
@@ -492,7 +489,8 @@ async function createContent(mapper, model) {
             updateIndicators(); // Ensure all indicators are updated
           });
 
-          document.getElementById('counter-view').appendChild(indicator);
+          // TODO: add as cytoscape style, not svg
+          // document.getElementById('counter-view').appendChild(indicator);
         } else {
           // Ensure correct class is set based on the state
           if (node.connectedEdges(':hidden').length > 0) {
@@ -523,11 +521,41 @@ async function createContent(mapper, model) {
 
   updateIndicators();
 
-
   cy.on('position', 'node', () => {
     updateIndicators();
   });
   // Hide node functionality ends
+
+  // Event listener for double click on a node
+  cy.on('dblclick', 'node', (event) => {
+    const node = event.target;
+    const labelStructure = node.data('labelStructure');
+    const importantLabel = node.data('importantLabel');
+
+    // Get connected nodes with importantLabel where the edge is directed from the current node
+    const connectedImportantNodes = node.outgoers('node').filter(n => n.data('importantLabel') && n.data('importantLabel') !== null);
+
+    let content = `<h6>${labelStructure || ''}</h6>`;
+
+    if (importantLabel === null || connectedImportantNodes.length === 0) {
+      content += `<p>No structure could be found for this node.</p>`;
+    } else {
+      content += `<div id="subgraph" style="width: 100%; height: 300px;"></div>`;
+    }
+
+    Swal.fire({
+      title: 'Important Structure',
+      html: content,
+      confirmButtonText: "Ok",
+      width: 800,
+      ...swalGenerals
+    });
+
+    // Ensure the content is injected
+    if (importantLabel !== null && connectedImportantNodes.length > 0) {
+      renderSubgraph(node, connectedImportantNodes);
+    }
+  });
 
   // For again adding html to hidden nodes
   function initHTMLForNodes(nodes) {
@@ -571,14 +599,12 @@ async function createContent(mapper, model) {
       ]);
     });
   }
+
   cy.counter = structuredClone(counter);
-  console.log(elements)
   cy.stylesheet = stylesheet;
   cy.add(elements);
   await initHTML();
-  // bindListeners();
   cy.layout(cy.counter).run();
-  // console.log(cy);
   return cy;
 }
 
@@ -604,7 +630,7 @@ function initializeEdgeLabels() {
   cy.edges().forEach(edge => {
     const fullLabel = edge.data('label');
     const truncatedLabel = truncateLabel(fullLabel);
-    edge.data('truncatedLabel', truncatedLabel);
+    edge.data('truncateLabel', truncatedLabel);
     edge.style({
       'label': truncatedLabel
     });
@@ -714,7 +740,7 @@ async function initHTML() {
   ]);
 
   // Adding a tooltip on the edge & edge hover effects
-  var edgeTooltip = tippy(document.createElement('div'), {
+  const edgeTooltip = tippy(document.createElement('div'), {
     placement: 'top-start',
     animation: 'shift-away',
     delay: [0, 500],
@@ -725,14 +751,14 @@ async function initHTML() {
   });
 
   // Define a CSS class for the red color
-  var redEdgeClass = 'red-edge';
+  const redEdgeClass = 'red-edge';
 
   // Apply red color on hover
   cy.on('mouseover', 'edge', function (event) {
-    var edge = event.target;
-    var label = edge.data('label');
-    var formattedLabel = '';
-    const showLabels = document.getElementById('edge_labels').checked;
+    const edge = event.target;
+    const label = edge.data('label');
+    let formattedLabel = '';
+    // const showLabels = document.getElementById('edge_labels').checked;
     if (typeof label === 'string') {
       formattedLabel = label.split(',').join('<br>');
     } else if (Array.isArray(label)) {
@@ -752,7 +778,7 @@ async function initHTML() {
 
   // Remove red color when mouseout
   cy.on('mouseout', 'edge', function (event) {
-    var edge = event.target;
+    const edge = event.target;
 
     // Hide the tooltip on mouseout
     edgeTooltip.hide();
@@ -765,7 +791,7 @@ async function initHTML() {
       edge.style('label', edge.data('truncatedLabel'));
     }
   });
-  var isChecked = document.getElementById('edge_bundle').checked;
+  const isChecked = document.getElementById('edge_bundle').checked;
   if (isChecked) {
     initializeEdgeLabels();
   }
@@ -783,6 +809,7 @@ function calcBoxHeight(stringList) {
     return (stringList.length * 20 + 35) + "px";
   }
 }
+
 function calcGroupHeight(stringList) {
   return (35) + "px";
 }
@@ -896,12 +923,14 @@ function checkIfImportantLabelMatchesWholeLabel(labels, importantLabel) {
   }
   return undefined;
 }
+
 function checkIfImportantLabelContainsLabel(labels, importantLabel) {
   for (let label of labels) {
     if (importantLabel.includes(label)) return label;
   }
   return undefined;
 }
+
 function bundleEdges(edgeData) {
   let isChecked = document.getElementById('edge_bundle').checked;
   if (isChecked) {
@@ -910,6 +939,7 @@ function bundleEdges(edgeData) {
     return originalEdgeData;
   }
 }
+
 function mergeLabels(edges) {
   const uniqueEdges = {};
 
@@ -934,7 +964,6 @@ function mergeLabels(edges) {
   const mergedEdges = Object.values(uniqueEdges);
   return mergedEdges;
 }
-
 
 function UpdateNodeslabel(layout = true) {
   cy.startBatch();
@@ -999,20 +1028,10 @@ function createParentNode(id, groupName, boxH, boxW, parent = undefined) {
 
 function addParentNode(idSuffix, parent = undefined, groupName = "Group") {
   const id = 'gr' + idSuffix;
-  const labelHeight = 30; // Space for the label at the top
-  const boxH = calcGroupHeight(groupName) + labelHeight;
+  const boxH = calcGroupHeight(groupName);
   const boxW = calcBoxWidth(groupName.length);
 
   return createParentNode(id, groupName, boxH, boxW, parent);
-}
-
-
-function checkAndRemoveEmptyGroups() {
-  cy.nodes(':parent').forEach(group => {
-    if (group.children().length === 0) {
-      cy.remove(group);
-    }
-  });
 }
 
 // For Sidebar Controls
@@ -1046,10 +1065,6 @@ function toggleSidebar() {
     slideIn();
   }
   btnToggleSideBar.classList.toggle("active");
-
-  setTimeout(() => {
-    document.dispatchEvent(new CustomEvent("reinit-minimap"));
-  }, 250); // wait for animation to finish
 }
 
 function setTabFromDirectControl(srcID, toggleIfOpen = true) {
@@ -1061,7 +1076,6 @@ function setTabFromDirectControl(srcID, toggleIfOpen = true) {
     !btnToggleSideBar.classList.contains("active") && toggleSidebar();
   }
 }
-
 
 function showSettingsTab(toggleIfOpen = true) {
   setTabFromDirectControl("sidebarSettings", toggleIfOpen);
@@ -1247,12 +1261,14 @@ function getRandomColor() {
   }
   return color;
 }
+
 function getTagColor(label) {
   if (!labelColorMap[label]) {
     labelColorMap[label] = getRandomColor();
   }
   return labelColorMap[label];
 }
+
 function applyColorToLabelInGraph(label, color) {
   // Apply color to edges in Cytoscape based on label
   cy.edges().forEach(edge => {
@@ -1323,101 +1339,79 @@ function renderSubgraph(currentNode, connectedNodes) {
       };
     })
   ];
+
+  const styleN = {
+    'label': 'data(label)',
+    'text-valign': 'center',
+    'text-halign': 'center',
+    'shape': 'round-rectangle',
+    'background-color': 'hsl(31, 87%, 94%)',
+    'border-style': 'solid',
+    'border-width': '1px',
+    'border-color': 'hsl(30, 89%, 68%)',
+    'height': 'data(boxH)',
+    'width': 'data(boxW)',
+  }
+
+  const styleE = {
+    'label': 'data(label)',
+    'width': 1.5,
+    'line-color': '#ccc',
+    'target-arrow-shape': 'triangle',
+    'target-arrow-color': '#ccc',
+    'source-arrow-color': '#ccc',
+    'source-arrow-shape': 'none',
+    'curve-style': 'bezier'
+  }
+
   const subgraph = cytoscape({
     container: document.getElementById('subgraph'),
     elements: elements,
     style: [
       {
+        "selector": ":active",
+        "style": {
+          "overlay-padding": 0,
+          "overlay-opacity": 0
+        }
+      }, {
         selector: 'node',
+        style: styleN,
+      }, {
+        selector: 'node:selected',
         style: {
-          'label': 'data(label)',
-          'text-valign': 'center',
-          'text-halign': 'center',
-          'shape': 'round-rectangle',
-          'background-color': 'hsl(31, 87%, 94%)',
-          'border-style': 'solid',
-          'border-width': '1px',
-          'border-color': 'hsl(30, 89%, 68%)',
-          'height': 'data(boxH)',
-          'width': 'data(boxW)',
-        }
-      },
-      {
-        selector: 'edge',
-        style: {
-          'label': 'data(label)',
-          'width': 1.5,
-          'line-color': '#ccc',
-          'target-arrow-shape': 'triangle',
-          'source-arrow-color': '#ccc',
-          'source-arrow-shape': 'none',
-          'curve-style': 'bezier'
-        }
+          'border-width': '3px' 
+        },
+      }, {
+        selector: 'edge, edge:selected',
+        style: styleE
       }
     ],
     layout: counter
   });
 }
 
-// Event listener for double click on a node
-cy.on('dblclick', 'node', (event) => {
-  const node = event.target;
-  const labelStructure = node.data('labelStructure');
-  const importantLabel = node.data('importantLabel');
 
-  // Get connected nodes with importantLabel where the edge is directed from the current node
-  const connectedImportantNodes = node.outgoers('node').filter(n => n.data('importantLabel') && n.data('importantLabel') !== null);
-
-  let content = `<h6>${labelStructure || ''}</h6>`;
-
-  if (importantLabel === null || connectedImportantNodes.length === 0) {
-    content += `<p>No structure could be found for this node.</p>`;
-  } else {
-    content += `<div id="subgraph" style="width: 100%; height: 300px;"></div>`;
-  }
-
-  // SweetAlert popup
-  swal({
-    title: 'Important Structure',
-    text: ' ',
-    className: 'importantStructure',
-    content: {
-      element: "div",
-      attributes: {
-        innerHTML: content
-      }
-    },
-    buttons: {
-      confirm: {
-        text: 'OK',
-        value: true,
-        visible: true,
-        className: '',
-        closeModal: true
-      }
-    },
-    closeOnClickOutside: false,
-    width: 800
-  });
-
-  // Ensure the content is injected
-  setTimeout(() => {
-    if (importantLabel !== null && connectedImportantNodes.length > 0) {
-      renderSubgraph(node, connectedImportantNodes);
-    }
-  }, 100);
-});
-
-
-function init_counter({
-  ad,
-  container = "proof-container",
-}) {
-  div = container;
-
-  let mappers = readJson("js/counterexample/example/mapper.json");
-  let model = readXML("js/counterexample/example/result.model.xml");
-  createContent(mappers, model);
+async function readJson(url) {
+  const response = await fetch(url);
+  return response.json();
 }
+
+async function readXML(url) {
+  const response = await fetch(url);
+  let text = response.text();
+  return new window.DOMParser().parseFromString(await text, "text/xml");
+}
+
+async function init_counter({
+  div = "counter-example-container",
+} = {}) {
+
+  let mappers = await readJson("examples/counterexample/mapper.json");
+  let model = await readXML("examples/counterexample/result.model.xml");
+  createContent(div, mappers, model);
+}
+
+await init_counter();
 
 export { createContent, cy, calcGroupHeight, calcBoxWidth, init_counter }

@@ -31,7 +31,6 @@
         "socket.io": "^4.7.2",
         "sprightly": "^1.0.3",
         "svg-pan-zoom": "^3.6.1",
-        "sweetalert": "^2.1.2",
         "sweetalert2": "11.4.8",
         "underscore": "^1.13.6",
         "uuid": "^8.3.2",

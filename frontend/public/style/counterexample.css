@@ -126,16 +126,7 @@ input#group_name::placeholder {
 #subgraph canvas {
   left:0;
 }
-.importantStructure {
-  width: 700px;
-}
-.importantStructure .swal-title {
-  padding-bottom: 0;
-  margin-bottom: 0;
-}
-.importantStructure .swal-content {
-  margin-top: 0;
-}
+
 #counter-container {
  display: none;
 }
