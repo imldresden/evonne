@@ -1,8 +1,6 @@
 ----
 
 #### Table of contents
-- [Description](#description)
-- [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Proof View](#proof-view)
 - [Ontology View](#ontology-view)
@@ -12,6 +10,7 @@
 ### Description
 
 **Evonne** is a web-application for explaining Description Logic reasoning and ontology debugging.
+
 ---
 
 ### Getting Started
@@ -48,7 +47,7 @@ Note: concepts and proof generation methods that are available in this menu depe
 	</kbd>
 </p>
 
-In the top right corner, the *menu bar* is located. The buttons, from left to right are for the Input, Proof, Ontology, Diagnoses and Settings Menus:
+In the top right corner, the *menu bar* is located. The buttons, from left to right are for the Project, Proof, Ontology, Diagnoses and Settings Menus:
 
 <p align="center">
 	<kbd align="center">
@@ -57,7 +56,13 @@ In the top right corner, the *menu bar* is located. The buttons, from left to ri
 </p>
 
 By default, the *proof* and *ontology* views are displayed side-by-side in the same tab (as shown in the overview screenshot).
-Opening a linked *proof* or *ontology* view on a separate tab can be achieved by clicking <img src="resources/export_graph.png" style="width:16px"/> which are located in the *ontology* and *proof* menus respectively. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:16px"/>.
+Opening a linked *proof* or *ontology* view on a separate tab can be achieved by clicking <img src="resources/export_graph.png" style="width:16px"/> which are located in the *ontology* and *proof* menus respectively. Each of the views is equipped with a *mini-map* that can be activated / deactivated from the corresponding menu by clicking <img src="resources/minimap_view.png"  style="width:16px"/>. You can also open the split view from either of the single views by clicking the <img src="resources/split.png"  style="width:16px"/> button, under 
+the Project menu. 
+
+To upload your own proofs (e.g., for debugging purposes), you can use the <img src="resources/upload.png"  style="width:16px"/> button under the Proof and Ontology menus. 
+Both of these can be specified in GraphML format, with some slight particularities. For example, custom labels and parseable axioms need to be considered. 
+To see examples of these formats, you can look at the files generated from Evonne for any of the example projects, in the `See examples` menu from the welcome screen. 
+If you installed evonne locally, you can access the examples files from the `frontend/public/examples` directory where they are copied after `npm start`. Similarly, the files for your active projects are stored under `frontend/public/data`. 
 
 ---
 
@@ -85,9 +90,9 @@ Every axiom node in a proof is equipped with its own buttons and are the followi
 
 * *Navigation Buttons* (Buttons 3, 4 and 5) which manipulate the structure of a proof (available on *hover*)
 	
-	* **Show Previous** (Button 3): clicking this button hides all inferences in the corresponding subtree except the immediate inference.
-	* **Show All Previous** (Button 4): clicking this button shows all inferences in the corresponding subtree.
-	* **Hide All Previous** (Button 5): clicking this button hides all inferences in the corresponding subtree.
+	* **Show Step** (Button 3): clicking this button hides all inferences in the corresponding subtree except the immediate inference.
+	* **Expand** (Button 4): clicking this button shows the nodes leading to the selected node.
+	* **Collapse** (Button 5): clicking this button hides the nodes leading to the selected node, and thus the corresponding subtrees.
 
 * *Communication Buttons* (Buttons 1 and 2) which trigger functionalities displayed in the *ontology* view (available on *double click*)
 

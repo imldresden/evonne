@@ -1,5 +1,5 @@
 import { loadOntology, loadLayout, loadAtomicDecomposition } from '../ontology/ontology.js';
-import { loadProof, loadSignature } from '../proof/proof.js';
+import { loadProof, loadSignature } from '../main/main.js';
 
 const listenerFunctions = [loadProof, loadOntology, loadLayout];
 const fileUploadInput = document.getElementById('browseButton');
@@ -72,10 +72,11 @@ uploadSignatureTrigger && uploadSignatureTrigger.addEventListener("click", () =>
   uploadSignatureTrigger.addEventListener("change", loadSignature);
 });
 
-export function upload(file, fn) {
+export function upload(file, fn, type = '') {
   const formData = new FormData();
   formData.append('id', getSessionId());
   formData.append('file', file);
+  formData.append('type', type);
 
   fetch('/upload', {
     method: 'POST',

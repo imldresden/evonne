@@ -1,14 +1,8 @@
 import { proof } from "../proof.js";
-import { nodeVisualsDefaults } from "../node-visuals.js";
 import { computeTreeLayout } from "../data/process-data.js";
 import { utils as ruleUtils } from "../rules/rules.js";
 
 export class TreeNavigation {
-
-    constructor() {
-        this._entireProofHierarchy = undefined;
-    }
-
     hierarchy = undefined;
     nodes = undefined;
     links = undefined;
@@ -17,38 +11,46 @@ export class TreeNavigation {
     rules = undefined;
     labels = undefined;
     root = undefined;
-    edgeData = undefined;
-    restOfProofNode = { id: "r0", element: "", type: "rest" }
+    cuts = [];
 
-    init(processedData) {
-        let nodeData = processedData.nodes;
-        let edgeData = processedData.edges;
+    subProofBoxCounter = 0;
+    subproofEdgeCounter = 0;
+
+    // read-only variables 
+    _edges = undefined;
+    _entire = undefined;
+    _restOfProofNode = { id: "r0", element: "", type: "rest" }
+    
+    init(data) {
+        this._edges = data.edges;
 
         // add a custom link from the root node, needed for the stratify function
-        edgeData.push({
+        this._edges.push({
             id: "L-1",
-            source: nodeData.filter((x) => x.isRoot)[0],
+            source: data.nodes.filter((x) => x.isRoot)[0],
             target: "",
         });
 
-        //Store original data
-        this.edgeData = edgeData;
+        this._entire = this.createHierarchy(this._edges);
 
         this.restart();
         this.update();
     }
 
-    restart() { // this.edgeData must have been set 
+    restart() { // this._edges must have been set 
         proof.svgRootLayer.selectAll("*").remove();
+        const edges = this.hideEdges(this._edges);
 
         if (proof.isMagic) { // rules always shown in magic
             this.hierarchy = this.createHierarchy(
-                proof.magic.getInitialMagicalHierarchy(this.edgeData)
+                proof.magic.getInitialMagicalHierarchy(edges)
             );
         } else {
-            this.hierarchy = this.createHierarchy(this.processRules());
+            this.hierarchy = this.createHierarchy(edges);
         }
 
+        this.cuts = []; 
+        
         this.links = proof.svgRootLayer
             .append("g")
             .attr("id", "links")
@@ -62,10 +64,22 @@ export class TreeNavigation {
         this.labels = proof.svg.selectAll("#nodes");
     }
 
-    processRules() {
-        const data = structuredClone(this.edgeData);
+    hideEdges(edges) {
+        let data = structuredClone(edges);
+        
+        if (!proof.showSubProofs) {
+            data = this.hideSubProofs(data); 
+        }
+
+        if (!proof.showRules) {
+            data = this.hideRules(data); 
+        }
+        return data;
+    }
+
+    hideRules(edges) {
         const rules = {}, rts = {}, targets = [];
-        data.forEach(e => {
+        edges.forEach(e => {
             if (ruleUtils.isRule(e.source.type)) {
                 rules[e.source.id] = e;
                 rts[e.target.id] = e;
@@ -74,34 +88,124 @@ export class TreeNavigation {
             }
         });
 
-        if (!proof.showRules) {
-            targets.forEach(t => {
-                t.source.rule = rts[t.source.id].source; // copies the rule into the nodes that are made from it
-                t.source.subProof = t.source.rule.subProof;
-                if (t.target !== "" && rules[t.target.id]) {
-                    t.target = rules[t.target.id].target; // replaces rule with rule target
-                }
-            });
-            return targets;
-        }
+        targets.forEach(t => {
+            t.source.rule = rts[t.source.id].source; // copies the rule into the nodes that are made from it
+            t.source.subProof = t.source.rule.subProof;
+            if (t.target !== "" && rules[t.target.id]) {
+                t.target = rules[t.target.id].target; // replaces rule with rule target
+            }
+        });
 
-        return data;
+        return targets;
+    }
+
+    //Create a new edge with a fresh ID
+	getNewEdge(source, target) {
+		return {
+			id: "SPE" + this.subproofEdgeCounter++,
+			source,
+			target,
+		};
+	}
+
+	//Create a new magic rule with a fresh ID
+	getNewSubProofBox(name, type) {
+		return {
+			id: "SP" + this.subProofBoxCounter++,
+			element: name,
+			type,
+            subProof: name,
+            premises: {}, 
+            conclusion: undefined
+		}
+	}
+
+    hideSubProofs(edges) {
+        const subproofs = {}, result = [], clean = [];
+        
+        edges.forEach(e => {
+            const s = e.source.subProof && e.source.subProof !== '';
+            const t = e.target.subProof && e.target.subProof !== '';
+
+            if (s) {
+                if (!subproofs[e.source.subProof]) {
+                    subproofs[e.source.subProof] = this.getNewSubProofBox(e.source.subProof, e.source.type);
+                }
+
+                if (!t) { // s and !t: edge from subproof to conclusion
+                    subproofs[e.source.subProof].conclusion = e.target;
+                    //result.push(this.getNewEdge(subproofs[e.source.subProof], e.target));
+                } 
+                // ignore s & t 
+            } else if (t) { // t and !s: edge from premise to subproof
+                if (!subproofs[e.target.subProof]) {
+                    subproofs[e.target.subProof] = this.getNewSubProofBox(e.target.subProof, e.target.type);
+                }
+
+                if (subproofs[e.target.subProof].premises[e.source.element]) {
+                    clean.push(e)
+                } else {
+                    subproofs[e.target.subProof].premises[e.source.element] = e.source;
+                    // change e.source.element to e.source.id to keep duplicates
+                }
+                
+                //result.push(this.getNewEdge(e.source, subproofs[e.target.subProof]));
+            } else {
+                result.push(e);
+            }
+        });
+
+        Object.keys(subproofs).forEach(sp => {
+            const premises = subproofs[sp].premises;
+            const conclusion = subproofs[sp].conclusion;
+
+            delete subproofs[sp].premises;
+            delete subproofs[sp].conclusion;
+
+            Object.values(premises).forEach(p => {
+                result.push(this.getNewEdge(p, subproofs[sp]));
+            });
+
+            result.push(this.getNewEdge(subproofs[sp], conclusion));
+        })
+        
+        // there can be duplicate branches after hiding subproofs...
+        clean.forEach(c => {
+            let current = c.source.id;
+            while (current !== undefined) {
+                const idx = result.findIndex(r => r.target.id === current);
+                
+                if (idx === -1) {
+                    current = undefined;
+                } else {
+                    current = result.find(r => r.target.id === current).source.id
+                    result.splice(idx,1);                    
+                }
+            }
+        })
+
+        return result;
     }
 
     update(reset = false) {
         if (reset) {
             this.restart();
         }
-
-        const drawTime = proof.drawTime;
-        proof.nodeVisuals.setNodeWidthsAndMax(this.hierarchy);
+        
+        proof.rules.destroyExplanation();
+        proof.nodeVisuals.totalHeight = 0;
+        proof.nodeVisuals.setNodeDimsAndMax(this.hierarchy);
         this.root = computeTreeLayout(this.hierarchy);
-        this.drawTree(drawTime);
 
+        if (!proof.isZoomPan) {
+            proof.svg.attr("width", proof.nodeVisuals.maxNodeWidth + 100); 
+            proof.svg.attr("height", Math.max(proof.svg.attr("height"), proof.nodeVisuals.totalHeight + 20)); 
+        }
+
+        this.drawTree(proof.drawTime);
+        
         // add axiom buttons depending on the navigation mode (Normal vs Magic)
         if (proof.isMagic) {
-            let originalHierarchy = this.createHierarchy(this.edgeData);
-            proof.magic.entireProofHierarchy = originalHierarchy;
             proof.magic.addMagicNavButtonsToNodes();
         } else {
             proof.axioms.addFunctionButtonsToNodes();
@@ -157,23 +261,26 @@ export class TreeNavigation {
     }
 
     addFocusFunctionality() {
-        this.nodes.selectAll("g").on('mouseover', function (d) {
+        this.nodes.selectAll("g").on('mouseover', function (_, d) {
             const nodes = proof.svg.selectAll(".node");
             nodes.sort((a, b) => (a.id === d.id) ? 1 : (b.id === d.id) ? -1 : 0);
         });
     }
 
     showSubTree(root) {
+        if (proof.isDrawing || root.data.id === "rest") {
+			return;
+		}
         //extract the current data
-        let originalEdgeData = this.extractOriginalData(root);
+        let originalData = this.extractOriginalData(root);
         //reset all children to show the entire subtree, defined in axiomFunctions.js
         proof.axioms.resetAllChildren(root);
         //extract the data of the subtree
-        let newEdgesData = this.extractData(root);
+        let newData = this.extractData(root);
         //create a new hierarchy
-        let newHierarchy = this.createHierarchy(newEdgesData);
+        let newHierarchy = this.createHierarchy(newData);
         //preserve previous sub-structure
-        let previousHierarchy = this.createHierarchy(originalEdgeData);
+        let previousHierarchy = this.createHierarchy(originalData);
         let found;
         newHierarchy.children[0].descendants().forEach(x => {
             found = previousHierarchy.descendants().find(y => y.data.source.id === x.data.source.id);
@@ -182,10 +289,19 @@ export class TreeNavigation {
             }
         });
 
-        //update the graph
+        this.cuts.push(this.hierarchy);
         this.hierarchy = newHierarchy;
-        proof.nodeVisuals.initVarsAxiomFunctions();
         this.update();
+    }
+
+    restoreFromSubProof() {
+        if (proof.isDrawing) {
+			return;
+		}
+        if (this.cuts.length > 0) {
+            this.hierarchy = this.cuts.pop();
+            this.update();
+        }
     }
 
     extractOriginalData(root) {
@@ -205,13 +321,13 @@ export class TreeNavigation {
         const data = [
             {
                 id: "L-1",
-                source: this.restOfProofNode,
+                source: this._restOfProofNode,
                 target: ""
             },
             {
                 id: "rest",
                 source: root.data.source,
-                target: this.restOfProofNode
+                target: this._restOfProofNode
             }
         ];
         root.links().forEach(entry => data.push(entry.target.data));
@@ -219,12 +335,21 @@ export class TreeNavigation {
     }
 
     lineAttributes(input) {
+        if (proof.isCompact && proof.showRules) {
+            input
+                .attr("marker-end", "")
+                .attr("class", d => `link cuttable dim ${(d.source.data.source.type === "rest" ? "torest" : "")
+                } ${(d.source.data.target === "" || ruleUtils.isRule(d.source.data.target.type) ? " hidden " : "")
+                }`)
+        } else {
+            input
+                .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
+                .attr("class", d => `link ${(d.source.data.source.type === "rest" ? "torest" : "")
+                } ${(d.source.data.target.type === "axiom" && !proof.isMagic ? "cuttable" : "")
+                }`)
+        }
+        
         return input
-            .attr("marker-end", d => d.source.data.source.type === "rest" ? "" : "url(#arrowhead)")
-            .attr("class", d =>
-                (d.source.data.source.type === "rest" ? "link torest" : "link") +
-                (d.source.data.target.type === "axiom" && !proof.isMagic ? " from-axiom " : "")
-            )
             .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
             .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
             .on("click", (_, d) => {
@@ -316,12 +441,12 @@ export class TreeNavigation {
                         // move to destinations (expand, pull)
                         .transition(t)
                         .attr("x1", d => d.target.x)
-                        .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                        .attr("y1", d => proof.height - d.target.y + d.target.height + 1)
                         .attr("x2", d => d.source.x)
                         .attr("y2", d => proof.height - d.source.y),
                     update => update.transition(t)
                         .attr("x1", d => d.target.x)
-                        .attr("y1", d => proof.height - d.target.y + nodeVisualsDefaults.BOX_HEIGHT + 1)
+                        .attr("y1", d => proof.height - d.target.y + d.target.height + 1)
                         .attr("x2", d => d.source.x)
                         .attr("y2", d => proof.height - d.source.y),
                     exit => {
@@ -339,7 +464,7 @@ export class TreeNavigation {
             proof.linear.drawLinks(t, sn);
         }
 
-        this.edgeData.forEach(link => {
+        this._edges.forEach(link => {
             if (link.source.element === "Asserted Conclusion") {
                 d3.select("#N" + link.target.id).attr("class", "node axiom asserted");
             }

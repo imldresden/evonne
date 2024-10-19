@@ -1,6 +1,5 @@
 .container-split {
     border: 1px solid #cbd5e0;
-    height: 100%;
 }
 
 .resizer[data-direction='horizontal'] {

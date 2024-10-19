@@ -222,19 +222,27 @@ input:checked + .slider:before {
 	user-select: none;
 }
 
-.node:has(.node-eye) #frontRect {
+.node #frontRect {
     display: flex;
 	align-items: center;
 }
 
-.cy-html img {
-	opacity: 0;
-	transition: opacity 0.3s ease-in-out;
-	position: relative;
-	z-index: 2;
-  }
+img.eye-on {
+	opacity: 1;
+	transition: opacity 200ms ease-in-out, transform 50ms ease-in-out;
+}
 
-#ontology-view:not(.complete-ontology) .node:has(.node-eye) #frontRect .node-title {
-	 transform:translate(-6px, 0); 
-     transition:0.3s;
+img.eye-off {
+	opacity: 0;
+	transition: opacity 200ms ease-in-out;
+}
+
+.node-title.eye-on-text {
+	transform:translate(1px, 0); 
+    transition:0.3s;
+}
+
+.node-title.eye-off-text {
+	transform:translate(-6px, 0); 
+    transition:0.3s;
 }

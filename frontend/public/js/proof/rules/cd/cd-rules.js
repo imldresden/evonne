@@ -4,7 +4,7 @@ import { proof } from "../../../proof/proof.js";
 
 function getIndexedData(data) {
     const indexed_data = {};
-    let current = -1;
+    let current = 0;
     data.ops.forEach((op,i) => {
         if (op.id === data.current) {
             current = i
@@ -28,6 +28,7 @@ function combineSteps(data, name) {
         const d = { id: "combined", premises: [], name: `Subproof: ${name}` };
         const s = new Set();
         keys.forEach(id => {
+            d.domain = data.ops[id].domain;
             data.ops[id].premises.forEach(p => {
                 if (!s.has(p.id) && p.constraint._asserted) {
                     d.premises.push(p);
@@ -51,15 +52,28 @@ function controls({ data }, where, params) {
     //const centered = buttons.append("a").attr("class", "bar-center");
     const righted = buttons.append("a").attr("class", "bar-right");
 
-    const complete = righted.append("a")
-        .attr("class", "bar-button tooltipped")
-        .attr("id", "entire-subproof")
-        .attr("title", params.isSubProof?"Show Single Inference":"Show Entire Numerical Subproof");
-    complete.append("i")
-        .attr("class", "material-icons")
-        .text(params.isSubProof?"unfold_less":"unfold_more")
-        .style("font-size", "23px");
-
+    if (proof.showSubProofs) {
+        const complete = righted.append("a")
+            .attr("class", "bar-button tooltipped")
+            .attr("id", "entire-subproof")
+            .attr("title", params.isSubProof?"Show Single Inference":"Show Entire Numerical Subproof");
+        complete.append("i")
+            .attr("class", "material-icons")
+            .text(params.isSubProof?"unfold_less":"unfold_more")
+            .style("font-size", "23px");
+        
+        complete.on("click", (e, d) => {
+            if (params.isSubProof) {
+                params.isSubProof = false;
+                params.nodes = [data.ops[data.current].node];
+            } else {
+                params.isSubProof = true;
+                params.nodes = Object.values(data.ops).map(d => d.node);
+            }
+            proof.rules.openExplanation(params, params.nodes)
+        });
+    }
+    
     const replay = righted.append("a")
         .attr("class", "bar-button")
         .attr("title", "Replay animation");
@@ -96,18 +110,10 @@ function controls({ data }, where, params) {
     }
 
     replay.on("click", (e, d) => {
-        proof.rules.openExplanation(params, [data.ops[data.current].node])
+        proof.rules.openExplanation(params, params.nodes)
     });
     
-    complete.on("click", (e, d) => {
-        if (params.isSubProof) {
-            params.isSubProof = false;
-        } else {
-            params.isSubProof = true;
-        }
-        proof.rules.openExplanation(params, [data.ops[data.current].node])
-        proof.rules.highlightNodes(Object.values(data.ops).map(d => d.node));
-    });
+    
 }
 
 function createVisContainer(params, where, extra = 0) {
@@ -118,12 +124,24 @@ function createVisContainer(params, where, extra = 0) {
         <div id='cd-right'></div> 
     `);
 
+    where.append("div")
+        .attr("class", "explanation-probe")
+        .attr("id", "explanation-probe")
+        .html(`
+            <div class="input-field" style="display:flex">
+                <input id="var-input" type="number" step="0.01">
+                <label for="var-input" class="active" id="var-input-desc"></label>
+                <button class="btn-small btn-primary" id="play-with-var" title="See animation"><i class="material-icons">play_arrow</i></button>
+            </div>
+        `);
+
     //Add visualization
     where.append("div")
         .attr("class", "explanation-container")
         .attr("id", "explanation-container")
-        .style("height", params.large ? `${params.p.height - (150 + extra)}px` : "200px")
+        .style("height", params.large ? `${params.p.height - (150 + extra)}px` : "350px")
         .style("width", "100%")
+
 
     return { input: d3.select('#cd-left'), output: d3.select('#cd-right'), };
 }
@@ -136,15 +154,14 @@ class CDRules {
     draw({ div, data, params }) {
 
         let _data = getIndexedData(data);
-        const ruleName = params.ruleName;
+
         if (params.isSubProof) {
             _data = combineSteps(_data, params.subProof.name);
         }
 
-        if (this.diff.isDifference(ruleName)) { 
-            //TODO: come up with a better way to distinguish domains... 
-            // this is only checked once using the const, the name changes!
-            // cannot identify if its a subproof!
+        console.log(_data)
+
+        if (this.diff.isDifference(_data)) { 
             this.diff.draw(_data, params, div);
         } else if (data) {
             this.linear.draw(_data, params, div);

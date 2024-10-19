@@ -5,7 +5,8 @@ import { BasicShorteningFunctions } from "../shortening/basic.js";
 import { colors, stylesheet } from "../../style/cy-ontology-style.js";
 import { params } from "../layouts/cola.js";
 import { showRepairsTab } from "../utils/controls.js";
-import {owlFunctions} from "../utils/myOWL.js";
+import { owlFunctions } from "../utils/myOWL.js";
+import { throttle } from "../utils/throttle.js";
 
 const socket = io();
 
@@ -33,6 +34,8 @@ const saveLayoutButton = document.getElementById("saveLayoutButton");
 const showRepairsMenuButton = document.getElementById("showRepairsMenuButton");
 const shortenAllInOntologyBtn = document.getElementById("shortenAllInOntologyBtn");
 const openProof = document.getElementById('openProofInNew');
+const resetStickyPositionsBtn = document.getElementById('resetStickyPositions');
+const rerunSimulationBtn = document.getElementById('rerunSimulation');
 
 const thingsWithListeners = [
   { type: 'click', thing: btnShowSignature, fn: btnShowSignatureFunction },
@@ -43,19 +46,25 @@ const thingsWithListeners = [
   { type: 'click', thing: flowStrengthReset, fn: flowStrengthResetFunction },
   { type: 'click', thing: openProof, fn: openProofFunction },
   { type: 'click', thing: shortenAllInOntologyBtn, fn: shortenAllInOntology },
-  { type: 'input', thing: lineLengthInput, fn: labelNodes },
+  { type: 'click', thing: resetStickyPositionsBtn, fn: resetStickyPositions },
+  { type: 'click', thing: rerunSimulationBtn, fn: rerunSimulation },
+  { type: 'input', thing: lineLengthInput, fn: throttle(labelNodes, 500) },
   { type: 'input', thing: maxLengthInput, fn: maxLengthInputFunction },
-  { type: 'input', thing: flowStrength, fn: rerunLayout },
-  { type: 'change', thing: flowDirection, fn: rerunLayout },
+  { type: 'input', thing: flowStrength, fn: throttle(rerunLayout, 500) },
+  { type: 'change', thing: flowDirection, fn: throttle(rerunLayout, 500) },
   { type: 'view_resize', thing: window, fn: () => cy.resize() },
 ];
 
 // creates the content of the view based on the chosen/read data
 async function createContent(data) {
-  const svg = document.createElement("svg");
-  svg.id = "ontology-view"
-  document.getElementById(div).append(svg)
-
+  if (!document.getElementById("ontology-view")) {
+    const svg = document.createElement("svg");
+    svg.id = "ontology-view"
+    const c = document.getElementById(div)
+    c.innerHTML = `<div class="minimap-view-container opacity-0" id="ontology-minimap-container"></div>`;
+    c.append(svg);
+  }
+  
   const container = document.getElementById("ontology-view");
   container.innerHTML = "";
 
@@ -90,13 +99,37 @@ async function createContent(data) {
 
   cy.on('tap', 'node', function (event) {
     const clickedElement = event.originalEvent.target;
-    const node = event.target.isNode() ? event.target : event.target.isEdge() ? event.target.source() : null;
-    if (clickedElement && (clickedElement.classList.contains('node-eye')) && node) {
-      const data = node.data();
-      enable_eye(data, node);
+
+    if (clickedElement && (clickedElement.classList.contains('eye-button'))) {
+      const data = event.target.data();
+
+      if (!data.revealed) {
+        data.revealed = true;
+      } else {
+        data.revealed = false;
+      }
     }
   });
   
+  const timeoutMap = {};
+  cy.on('mouseover', 'node', function (event) {
+    if (!showOriginal) {
+      const n = event.target.isNode() ? event.target : null
+      n.data("hovered", true)
+      clearTimeout(timeoutMap[n.data().id]) 
+    }
+  });
+
+  cy.on('mouseout', 'node', function (event) {
+    if (!showOriginal) {
+      const n = event.target.isNode() ? event.target : null
+      n.data("hovered", true)
+      timeoutMap[n.data().id] = setTimeout(() => {
+        n.data("hovered", false)  
+      }, 500);
+    }
+  });
+
   cy.params = structuredClone(params);
   cy.stylesheet = stylesheet;
   cy.add(elements);
@@ -107,88 +140,24 @@ async function createContent(data) {
   return cy;
 }
 
-function enable_eye(data, node) {
-  if (!showOriginal) {
-    const nodeHtmlElement = document.getElementById(ontologyNodeId + data.id);
-    if (nodeHtmlElement && nodeHtmlElement.parentNode) {
-      nodeHtmlElement.parentNode.remove();
-    }
-    if (data.revealed === undefined || data.revealed === false) {
-      data.revealed = true;
-    } else {
-      data.revealed = false;
-    }
-    const eyeIconClass = data.revealed ? 'eye-crossed' : 'eye-on';
-    const eyeIconSrc = data.revealed ? '../icons/eye-crossed.svg' : '../icons/eye.svg';
-
-    let html = `<div class='${eyeIconClass}'><img src='${eyeIconSrc}' class='node-eye' width='14' height='14'></div><div class='node-title'>`;
-    const text = getNodeText(data);
-
-    for (let i = 0; i < text.length; i++) {
-      let color = 'black';
-      if (cy.justification && cy.justification.has(text[i])) {
-        color = colors.justNodeStroke;
-      }
-      if (cy.diagnoses && cy.diagnoses.has(text[i])) {
-        color = colors.diagNodeStroke;
-      }
-      html += `
-      <p style="color:${color};margin:0;padding:0">
-          ${text[i]}
-      </p>`;
-    }
-    html += `</div>`;
-    let longestn = 1;
-    text.forEach(l => {
-      if (l.length > longestn) {
-        longestn = l.length;
-      }
-    });
-    data.boxH = calcBoxHeight(text);
-    data.boxW = calcBoxWidth(longestn);
-
-    node.style({
-      'width': data.boxW + 'px',
-      'height': data.boxH + 'px'
-    });
-    const template = `
-    <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
-      <div id="frontRect" style="padding: 5px; white-space:nowrap;">
-        ${html}
-      </div>
-    </div>
-  `;
-    // Replace the node's label with the new HTML template using cy.nodeHtmlLabel()
-    cy.nodeHtmlLabel([
-      {
-        query: '#' + node.id(),
-        valign: "center",
-        halign: "center",
-        tpl: function (data) {
-          return template;
-        }
-      }
-    ]);
-    // cy.layout(cy.params).run();
-  }
+function resetStickyPositions() {
+  Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+    const node = cy.$id(nodeId);
+    node.unlock();
+    delete lastDraggedPositions[nodeId];
+  });
+  
+  labelNodes();
 }
 
-function getNodeText(data) {
-  const tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
-  const text = data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
-  return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
+
+function rerunSimulation() {
+  labelNodes();
 }
 
 function getNodeTextList(data) {
   let tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
-  let text = [];
-
-  if (showOriginal) {
-    text = [...tmpText];
-  } else {
-    tmpText.forEach(x => text.push(globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod)));
-  }
-
+  const text = showOriginal || data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
   return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
 }
 
@@ -204,9 +173,20 @@ async function initHTML() {
     {
       query: 'node',
       tpl: function (data) {
+        //const text = getNodeText(data);
         const text = getNodeTextList(data);
-        let html = !showOriginal && text.filter(element => element.trim() !== '').length > 0 ? "<div class='eye-on'><img src='../icons/eye.svg' class='node-eye' width='14' height='14'></div><div class='node-title'>" : '';
+        
+        let html = `
+          <div>
+            <img src=${
+              (data.revealed ? '../icons/eye-crossed.svg' : '../icons/eye.svg')} 
+              class="eye-button ${
+              (data.hovered ? "eye-on" : "eye-off") 
+              }" width='14' height='14'>
+          </div>
+          <div class='node-title ${data.hovered ? "eye-on-text" : "eye-off-text"}'>`;
 
+        let longestn = 1;
         for (let i = 0; i < text.length; i++) {
           let color = 'black';
           if (cy.justification && cy.justification.has(text[i])) {
@@ -216,12 +196,17 @@ async function initHTML() {
             color = colors.diagNodeStroke;
           }
 
-          html += `
-            <p style="color:${color};margin:0;padding:0">
-                ${text[i]}
-            </p>`;
+          html += `<p style="color:${color};margin:0;padding:0"> ${text[i]} </p>`;
+
+          if (text[i].length > longestn) {
+            longestn = text[i].length;
+          }
         }
+        
         html += `</div>`;
+        data.boxH = calcBoxHeight(text);
+        data.boxW = calcBoxWidth(longestn);
+
         const template = `
           <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
             <div id="frontRect" style="padding: 5px; white-space:nowrap;">
@@ -236,38 +221,6 @@ async function initHTML() {
   ]);
 }
 
-setInterval(function () {
-  document.addEventListener('mouseover', function (event) {
-    var node = event.target.closest('.cy-html');
-    if (node) {
-      var domElem = node;
-      if (!showOriginal) {
-        var container = findContainerWithClass(domElem, 'node');
-        if (container && container.contains(domElem)) {
-          var imageElement = container.querySelector('img');
-          var nodeText = container.querySelector('.node-title');
-          if (imageElement) {
-            imageElement.style.transition = 'opacity 200ms ease-in-out, transform 50ms ease-in-out';
-            imageElement.style.opacity = 1;
-            nodeText.style.transform = 'translate(1px, 0)';
-          }
-        }
-      }
-    }
-  });
-
-  function findContainerWithClass(element, className) {
-    while (element && element !== document) {
-      if (element.classList && element.classList.contains(className)) {
-        return element;
-      }
-      element = element.parentNode;
-    }
-    return null;
-  }
-
-}, 500);
-
 function calcBoxWidth(longestString) {
   return (longestString * globals.fontCharacterWidth + 25) + "px";
 }
@@ -278,7 +231,7 @@ function calcBoxHeight(stringList) {
 
 function processData(data) {
   // Compute edges
-  const edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
+  const edges = [].map.call(data.querySelectorAll("edge"), (d) => {
     const id = d.getAttribute("id");
     const source = d.getAttribute("source");
     const target = d.getAttribute("target");
@@ -286,7 +239,7 @@ function processData(data) {
     return { data: { id, source, target } };
   });
 
-  const nodeData = [].map.call(data.querySelectorAll("node"), (d) => {
+  const nodes = [].map.call(data.querySelectorAll("node"), (d) => {
     let dataNodes, signature, axioms, axiomsMap, id;
 
     id = d.getAttribute("id");
@@ -304,7 +257,7 @@ function processData(data) {
       }
     });
 
-    const edgeFromParent = edgeData.find((edge) => edge.source === id);
+    const edgeFromParent = edges.find((edge) => edge.source === id);
     const parentId = edgeFromParent == null ? "" : edgeFromParent.target;
 
     const text = getNodeTextList({ signature, axioms });
@@ -329,8 +282,8 @@ function processData(data) {
   });
 
   return {
-    nodes: nodeData,
-    edges: edgeData,
+    nodes,
+    edges,
   };
 }
 
@@ -366,7 +319,7 @@ function bindListeners() {
   });
 }
 
-function labelNodes(layout = true) {
+async function labelNodes(layout = true) {
   cy.startBatch();
   const nodesHTML = [...document.getElementsByClassName(`cy-html`)];
   nodesHTML.forEach(node => {
@@ -386,10 +339,9 @@ function labelNodes(layout = true) {
     });
     d.boxH = calcBoxHeight(text);
     d.boxW = calcBoxWidth(longest);
-    // Resetting data nodes to false for eye functionality removes all previous saved values and starts fresh.
     d.revealed = false;
   });
-  initHTML();
+  await initHTML();
   cy.style().update();
   cy.endBatch();
   if (layout) {
@@ -421,8 +373,7 @@ function loadOntology(e) {
         console.error('Error:', error);
       });
     document.getElementById("reasoner-choice-upload").style.display = "none";
-  });
-
+  }, 'ontology' );
 }
 
 function loadAtomicDecomposition(e) {
@@ -472,7 +423,7 @@ function loadLayout(e) {
     showOriginal = result.flags.original;
     showSignature = result.flags.signature;
     wrapLines = result.flags.wrap;
-    labelNodes(false);
+    await labelNodes(false);
     cy.json(result.cyExport);
   }
 
@@ -511,6 +462,7 @@ function init_ontology({
         socket.emit('get repairs', {
           id: data.id,
           axiom: data.axiom,
+          readableAxiom: data.readableAxiom,
           ontologyFile: ontologyFile.name,
           reasoner: document.getElementById('diagnosesReasoner').value
         });
@@ -629,7 +581,7 @@ function keepNodes() {
       cy.params.animationDuration = undefined,
       cy.params.animationThreshold = 1,
       cy.params.fit = false;
-    cy.params.centerGrsaph = false;
+    cy.params.centerGraph = false;
   }
   else {
     cy.params.animate = true,

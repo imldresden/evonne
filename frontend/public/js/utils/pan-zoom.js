@@ -58,6 +58,8 @@ const thumbnailViewer = function (options) {
         const main = svgPanZoom("#" + options.mainViewId, {
             zoomEnabled: true,
             controlIconsEnabled: true,
+            beforePan: () => options.isZoomPan,
+            beforeZoom: () => options.isZoomPan,
             fit: false,
             center: true,
             minZoom: 0.1,

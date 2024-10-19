@@ -1,5 +1,6 @@
 import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
+import { upload } from '../utils/upload-file.js';
 
 let status = {};
 let interval = undefined;
@@ -9,6 +10,7 @@ const signaturePathFile = document.getElementById("uploadSignatureTrigger");
 const browseFilePathText = document.getElementById("browseFilePath");
 const clearSigFilePath = document.getElementById("clearSignatureFile");
 const computeAxiomsBtn = document.getElementById('computeAxiomPairBtn');
+const openSplit = document.getElementById('openSplitInNew');
 
 window.onload = function () {
   //Mapping elements with events to their functions
@@ -16,6 +18,7 @@ window.onload = function () {
   const thingsWithListeners = [
     { type: 'click', thing: clearSigFilePath, fn: clearSigFilePathFunction },
     { type: 'click', thing: computeAxiomsBtn, fn: computeAxiomsBtnFunction },
+    { type: 'click', thing: openSplit, fn: openSplitFunction },
   ];
 
   // Remove listeners
@@ -57,6 +60,14 @@ window.onload = function () {
     browseFilePathText.value = "";
     browseFilePathText.classList.remove("valid");
     proof.proofFile = undefined;
+  }
+
+  if (clearSigFilePath) {
+    clearSigFilePath.addEventListener("click", clearSigFilePathFunction);
+  }
+  
+  if (openSplit) {
+    openSplit.addEventListener("click", openSplitFunction)
   }
 
   init_views();
@@ -138,7 +149,6 @@ function init_views(loop = false) {
 
       if (res.status === 'busy') {
         console.log('project is busy...')
-        return;
       } else if (res.status === 'pending') {
         if (res.axioms && res.axioms.length === 1) {
           console.error('atomic decomposition missing');
@@ -152,7 +162,7 @@ function init_views(loop = false) {
         modal.close();
 
         if (document.getElementById('proof-container')) {
-          init_proof({ file: res.proofs[0] });
+          init_proof({ file: res.proofs[0], ruleNamesMap:res.ruleNamesMap });
         }
         // if (document.getElementById('proof-container')) {
         //   init_counter({ ad: res.ad });
@@ -172,12 +182,8 @@ function init_views(loop = false) {
 }
 
 // for progress.spy
-export function progress(message) {
+function progress(message) {
   document.getElementById('custom-messages').innerHTML += "<br>" + message;
-}
-
-if (clearSigFilePath) {
-  clearSigFilePath.addEventListener("click", clearSigFilePathFunction);
 }
 
 function sortNames(c1, c2) {
@@ -199,6 +205,7 @@ function clearSigFilePathFunction() {
   signaturePathText.classList.remove("valid");
   proof.signatureFile = undefined;
 }
+
 
 function computeAxiomsBtnFunction() {
 
@@ -235,6 +242,10 @@ function computeAxiomsBtnFunction() {
     });
 }
 
+function openSplitFunction() {
+  window.open('/?id=' + getSessionId())
+}
+
 function blockProofMethods(reasoner) {
   const options = document.getElementById("methodsList").getElementsByTagName("option");
   let valuesToBlock;
@@ -256,3 +267,15 @@ function blockProofMethods(reasoner) {
     options[i].disabled = valuesToBlock.includes((i + 1).toString());
   }
 }
+
+function loadProof(event) {
+  proof.proofFile = event.target.files[0];
+  upload(proof.proofFile, _ => init_proof());
+}
+
+function loadSignature(event) {
+  proof.signatureFile = event.target.files[0];
+  upload(proof.signatureFile);
+}
+
+export { progress, loadProof, loadSignature }

@@ -51,6 +51,7 @@ function readRepairs({ axiom, file, cy } = {}) {
       }
     });
     showRepairs(repairs, cy);
+    console.log(axiom)
     document.getElementById("diagnoses-axiom").innerHTML = axiom;
     document.getElementById("diagnoses-title").innerHTML = "Diagnoses for";
   });
@@ -226,6 +227,7 @@ function highlightOntology(data, cy) {
     
     cy.nodes().forEach((n) => {
       const node = n.data();
+
       if (!node || node.axiomsMap[trimmedAxiom] === undefined) {
         return;
       }

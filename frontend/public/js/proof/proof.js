@@ -1,6 +1,5 @@
 import thumbnailViewer from "../utils/pan-zoom.js";
 import { getTreeFromXML, getTreeFromJSON } from "./data/process-data.js";
-import { upload } from '../utils/upload-file.js';
 
 import { AxiomsHelper } from "./axioms.js";
 import { RulesHelper } from "./rules/rules.js";
@@ -13,9 +12,11 @@ import { MagicNavigation } from "./trees/magic.js";
 import { controls, init as initControls } from "./controls.js";
 import { proof } from "./proof.js";
 import { globals } from "../shared-data.js";
+import {RuleNameMapHelper} from "./ruleNamesMapHelper.js";
 
 const conf = {
   div: "proof-container",
+  isZoomPan: true,
   shortenAll: false,
   allowOverlap: false,
   showRules: true,
@@ -23,7 +24,14 @@ const conf = {
   isMagic: false,
   isRuleShort: false,
   isLinear: false,
+  bottomRoot: false,
+
+  isCompact: false, 
+  compactInteraction: false, 
+  
   drawTime: 750,
+  trays: {upper: false, lower: true},
+  stepNavigator: true, 
 
   proofFile: undefined,
   signatureFile: undefined,
@@ -51,6 +59,8 @@ const conf = {
   rules: new RulesHelper(),
   axioms: new AxiomsHelper(),
 
+  ruleNameMapHelper : new RuleNameMapHelper(),
+
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
 
@@ -69,28 +79,49 @@ const conf = {
     }
   },
 
-  update: function (reset) {
+  update: function ({ reset=false, ext=undefined } = {}) {
+    ext && setFromExternal(ext);
     proof.tree.update(reset);
   }
 }
 
+function setFromExternal(external) {
+  proof.div = external.div || proof.div,
+  proof.isZoomPan = external.isZoomPan === undefined ? proof.isZoomPan : external.isZoomPan;
+
+  proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
+  
+  proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
+  proof.linear.isBreadthFirst = external.isBreadthFirst === undefined ? proof.linear.isBreadthFirst : external.isBreadthFirst;
+  proof.linear.bottomRoot = external.bottomRoot === undefined ? proof.linear.bottomRoot : external.bottomRoot;
+  
+  proof.isCompact = external.isCompact === undefined ? proof.isCompact : external.isCompact; 
+  proof.compactInteraction = external.compactInteraction === undefined ? proof.compactInteraction : external.compactInteraction;
+
+  proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
+  proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
+
+  globals.shorteningMethod = external.shorteningMethod || globals.shorteningMethod;
+  proof.shortenAll = external.shortenAll === undefined ? proof.shortenAll : external.shortenAll; 
+  proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
+  proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
+  proof.trays = external.trays === undefined ? proof.trays : external.trays;
+  proof.stepNavigator = external.stepNavigator === undefined ? proof.stepNavigator : external.stepNavigator;
+  
+  proof.drawTime = external.drawTime === undefined ? proof.drawTime : external.drawTime; 
+}
+
 function init_proof({
   file,
+  ruleNamesMap,
   external,
 } = {}) {
-  if (external) {
-    proof.div = external.div || proof.div,
-    proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
-    proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
-    proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
-    proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
+  //Set a ruleNameMap to be used to replace the labels of rule nodes
+  ruleNamesMap && conf.ruleNameMapHelper.setRuleNamesMaps(ruleNamesMap)
 
-    globals.shorteningMethod = external.shorteningMethod || globals.shorteningMethod;
-    proof.shortenAll = external.shortenAll === undefined ? proof.shortenAll : external.shortenAll; 
-    proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
-    proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
-    
-    proof.drawTime = external.drawTime || proof.drawTime; 
+  if (external) {
+    d3.select(`#${proof.div}`).selectAll("*").remove();
+    setFromExternal(external);
   }
 
   if (proof.svgRootLayer) {
@@ -98,16 +129,39 @@ function init_proof({
   }
 
   // Configure SVG
-  if (!proof.svg) {
-    d3.select(`#${proof.div}`).insert("svg", ":first-child").attr("id", "proof-view"); 
-    proof.svg = d3.select("#proof-view");
+  d3.select(`#${proof.div}`).html(`
+    <div class="minimap-view-container opacity-0">
+      <svg class="minimap scope-container">
+        <g>
+          <rect class="scope" x="199.99999857761642" y="157.9999943659637" width="41.10526272763356" height="37.59999960472709"></rect>
+        </g>
+      </svg>
+      <embed type="image/svg+xml" class="minimap minimap-view">
+    </div>
+  `)
 
-    proof.BBox = proof.svg.node().getBoundingClientRect();
-    proof.SVGwidth = proof.BBox.width;
-    proof.SVGheight = proof.BBox.height;
-    proof.margin = { top: 50, right: 50, bottom: 100, left: 50 };
-    proof.width = proof.SVGwidth - proof.margin.left - proof.margin.right;
-    proof.height = proof.SVGheight - proof.margin.top - proof.margin.bottom;
+  d3.select(`#${proof.div}`).insert("svg", ":first-child").attr("id", "proof-view"); 
+  proof.svg = d3.select("#proof-view");
+
+  const svgNode = proof.svg.node();
+  if (!proof.isZoomPan) {
+    svgNode.parentElement.style.overflow= "auto";
+    svgNode.parentElement.style.display= "block";
+  } else {
+    svgNode.style.flex = 1;
+    svgNode.parentElement.style.display= "flex";
+    svgNode.parentElement.style.overflow= "hidden";
+  }
+
+  proof.BBox = svgNode.getBoundingClientRect();
+  proof.SVGwidth = proof.BBox.width;
+  proof.SVGheight = proof.BBox.height;
+  proof.margin = { top: 50, right: 50, bottom: 100, left: 50 };
+
+  proof.width = proof.SVGwidth - proof.margin.left - proof.margin.right;
+  proof.height = proof.SVGheight - proof.margin.top - proof.margin.bottom;
+
+  if (proof.isZoomPan) {
     proof.svg
       .attr("viewBox", [
         -proof.margin.left,
@@ -115,9 +169,9 @@ function init_proof({
         proof.SVGwidth,
         proof.SVGheight,
       ])
-      .style("user-select", "none");
-    proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport");
-  }
+  } 
+  proof.svg.style("user-select", "none");
+  proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport");
 
   if (file) {
     proof.proofFile = { name: file };
@@ -133,8 +187,10 @@ function init_proof({
   proof.axioms.socket = socket;
   proof.magic.currentMagicAction = "";
 
-  initControls();
-
+  if (!external || (external && external.controls)) {
+    initControls();
+  }
+  
   proof.svg
     .append("defs")
     .append("marker")
@@ -155,8 +211,7 @@ function init_proof({
   } else {
     proof.load();
   }
-  
-  proof.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: `#${proof.div}` });
+  proof.minimap = thumbnailViewer({ mainViewId: "proof-view", containerSelector: `#${proof.div}`, isZoomPan : proof.isZoomPan });
 }
 
 function getFileName() {
@@ -164,26 +219,10 @@ function getFileName() {
   if (proof.proofFile) {
     fileName = proof.proofFile.name;
   } else {
-    proof.proofFile = {
-      name: fileName
-    };
+    proof.proofFile = { name: fileName };
   }
 
   return fileName;
 }
 
-function loadProof(event) {
-  proof.proofFile = event.target.files[0];
-  proof.nodeVisuals.initVarsAxiomFunctions();
-
-  upload(proof.proofFile, _ => {
-    init_proof();//proof.load();
-  });
-}
-
-function loadSignature(event) {
-  proof.signatureFile = event.target.files[0];
-  upload(proof.signatureFile);
-}
-
-export { init_proof, loadProof, loadSignature, conf as proof }
+export { init_proof, conf as proof }

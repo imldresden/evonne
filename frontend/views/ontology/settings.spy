@@ -53,13 +53,23 @@
         </label>
       </div>
     </div>
+
     <button class="btn-small btn-primary" id="shortenAllInOntologyBtn" title="Shorten all text in the ontology">
       Shorten All Nodes
     </button>
+
+    <button class="btn-small btn-primary" id="resetStickyPositions" title="Releases Nodes from Custom Positions">
+      Free Nodes
+    </button>    
   </fieldset>
 
   <fieldset>
     <h4>Layout Simulation Settings</h4>
+    
+    <button class="btn-small btn-primary" id="rerunSimulation" title="Executes the Layout Simulation with current parameters">
+      Re-run Simulation
+    </button>
+
     <div class="modal-option">
       <label>Animation</label>
       <div class="switch">

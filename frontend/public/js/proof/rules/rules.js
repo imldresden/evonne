@@ -145,7 +145,9 @@ class RulesHelper {
         }
 
         if (data.source.type === "rule" || data.source.type === "DLRule") {
-            rule_sets.dl.draw({ div, premises, conclusion, params });
+            const alternativeRuleName = params.ruleName;
+            const originalRuleName = proof.ruleNameMapHelper.getOriginalName(alternativeRuleName);
+            rule_sets.dl.draw({ div, premises, conclusion, alternativeRuleName, originalRuleName });
         } else if (data.source.type === "CDRule") {
             rule_sets.cd.draw({ div, data: sp, params });
         } else if (data.source.type === "mrule" || data.source.type === "krule") {
@@ -195,43 +197,32 @@ class RulesHelper {
     }
 
     #getSubProof(node) {
-        const subproof = proof.tree.hierarchy.find(p => {
+        const spID = node.source.subProof;
+        
+        const subproof = proof.tree._entire.find(p => {
             const sp = p.data.source.subProof;
-            return sp && sp !== "" && sp === node.source.subProof;
+            return sp && sp !== "" && sp === spID;
         });
 
         if (subproof) {
-            let steps;
-            if (proof.showRules) {
-                steps = subproof.descendants()
-                    .filter(d => d.data.source.type === node.source.type
-                        && d.data.source.subProof === node.source.subProof
-                    ).map(cd => {
-                        const op = cd.data.source.data.op
-                        op.name = cd.data.source.element;
-                        op.node = cd;
-                        return op;
-                    }); // `cd.data.source.id` matches `cd.data.source.data.op.id`
-            } else {
-                steps = subproof.descendants()
-                    .filter(d => d.data.source.rule.type === node.source.type
-                        && d.data.source.rule.subProof === node.source.subProof
-                    ).map(cd => {
-                        const op = cd.data.source.rule.data.op;
-                        op.name = cd.data.source.rule.element;
-                        op.node = cd;
-                        return op;
-                    });
-            }
+            let steps = subproof.descendants()
+                .filter(d => utils.isRule(d.data.source.type)
+                    && d.data.source.subProof === spID
+                ).map(cd => {
+                    const source = cd.data.source;
+                    const op = source.data.op;
+                    op.name = source.element;
+                    op.node = cd;
+                    
+                    return op;
+                }); // `cd.data.source.id` matches `cd.data.source.data.op.id`
             steps = steps.flat(1).reverse();
 
             return {
-                name: node.source.subProof,
+                name: spID,
                 current: node.source.id,
                 ops: steps,
             };
-        } else {
-            console.warn("no subproof identified");
         }
     }
 
@@ -246,41 +237,24 @@ class RulesHelper {
                     proof.rules.openExplanation({ event }, [node]);
                     proof.rules.#lastToolTipTriggerID = node.data.source.id;
                 } else {
-                    proof.rules.destroyExplanation();
+                    proof.rules.destroyExplanation({ event, node });
                 }
             });
         });
-    }
-
-    destroyExplanation() {
-        if (tooltip) { tooltip.remove(); }
-
-        proof.rules.#lastToolTipTriggerID = null;
-        proof.nodeVisuals.setFullOpacityToAll();
-        d3.selectAll("#H1 text").text("help_outline");
     }
 
     highlightNodes(nodes) {
         let premises = [];
         let iDsToHighlight = [];
         let data, conclusion, cnode = nodes[nodes.length - 1];
-        if (proof.showRules) {
-            data = cnode.data;
-        } else {
-            data = { source: cnode.data.source.rule };
-        }
-
+        data = cnode.data;
+        
         nodes.forEach(node => {
-            if (proof.showRules) {
-                conclusion = proof.nodeVisuals.getLabel(node.parent.data.source);
-                iDsToHighlight.push(node.parent.data.source.id, node.data.source.id); // axiom, rule
-            } else {
-                conclusion = proof.nodeVisuals.getLabel(node.data.source);
-                iDsToHighlight.push(node.data.source.id); // axiom
-            }
-
-            if (node.children) {
-                node.children.forEach(child => {
+            conclusion = proof.nodeVisuals.getLabel(node.parent.data.source);
+            iDsToHighlight.push(node.parent.data.source.id, node.data.source.id); // axiom, rule
+            
+            if (node._children) { // _children queries the tree regardless of collapsing or expanding
+                node._children.forEach(child => {
                     premises.push(proof.nodeVisuals.getLabel(child.data.source));
                     iDsToHighlight.push(child.data.source.id);
                 });
@@ -293,6 +267,14 @@ class RulesHelper {
     }
 
     openExplanation(_params, nodes) {
+        if (_params.event.ctrlKey && proof.compactInteraction) {
+			nodes[0].children = nodes[0]._children; // expand rule
+            nodes[0].children?.forEach(c => {
+                c.children = null; // collapse children of rule
+            });
+            proof.update();
+		}
+
         const { data, premises, conclusion } = this.highlightNodes(nodes);
         const ruleName = proof.nodeVisuals.getLabel(data.source);
         const subProof = proof.rules.#getSubProof(data);
@@ -302,13 +284,31 @@ class RulesHelper {
             premises,
             conclusion,
             data: _params?.data ? _params.data : data,
+            nodes: _params?.nodes ? _params.nodes : nodes,
             subProof,
-            isSubProof: _params?.isSubProof || false,
+            isSubProof: _params?.isSubProof || !proof.showSubProofs,
             large: _params?.large || false,
             ruleName // source of explanation trigger
         };
 
         this.#renderExplanation();
+    }
+
+    destroyExplanation({ event={ctrlKey:false}, node } = {}) {
+        if (event.ctrlKey && proof.compactInteraction) {
+			node.children = node._children; // expand rule
+            node.children?.forEach(c => {
+                c.children = c._children; // expand children of rule
+            });
+            proof.update();
+		}
+
+        if (tooltip) { tooltip.remove(); }
+
+        proof.rules.#lastToolTipTriggerID = null;
+        proof.nodeVisuals.setFullOpacityToAll();
+        d3.selectAll("#H1 text").text("help_outline");
+        
     }
 
     enlargeExplanation() {

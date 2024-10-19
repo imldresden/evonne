@@ -10,31 +10,74 @@
     <link rel="stylesheet" href="https://unpkg.com/hack-font@3.3.0/build/web/hack.css">
     <link rel="stylesheet" href="https://unpkg.com/material-icons@1.13.9/iconfont/material-icons.css">
 
-    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.4/frontend/public//style/widgets/general.css">
-    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.4/frontend/public//style/widgets/parallel-coords.css">
-    <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.4/frontend/public//style/proof.css">
+    <!-- <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.6/frontend/public/style/widgets/general.css"> --> 
+    <link rel="stylesheet" href="http://localhost:3000/style/widgets/general.css">
+    <!-- <link rel="stylesheet" href="https://unpkg.com/evonne@0.0.6/frontend/public/style/proof.css"> --> 
+    <link rel="stylesheet" href="http://localhost:3000/style/proof.css">
+    
 </head>
 
 <body>
-    <main id="my-reasoning-tree"></main>
     
+    <button id="change"> Switch Layout </button>
+    <main id="my-reasoning-tree"></main>
     <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
     <script src="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/js/materialize.min.js"></script>
     <script src="https://unpkg.com/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
-    <script src="https://unpkg.com/underscore@1.13.6/underscore-min.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
     
     <script type="module">
-        import { init_proof } from "https://unpkg.com/evonne@0.0.4/frontend/public/js/proof/proof.js";
+        //import { init_proof, proof } from "https://unpkg.com/evonne@0.0.6/frontend/public/js/proof/proof.js";
+        import { init_proof, proof } from "http://localhost:3000/js/proof/proof.js";
+        
+        const compact = {
+            isLinear: true,
+                bottomRoot: false,
 
-        init_proof({ 
-            external: {
-                div: "my-reasoning-tree",
-                path: "../data/test/normal.t.xml",
-                drawTime: 500,
-                isLinear: true,
-            } 
-        });
+            isCompact: true,
+                isZoomPan: false, 
+                compactInteraction: true,
+        } 
+
+        const normal = {
+            isLinear: false,
+                bottomRoot: true,
+            
+            isMagic: false,
+            isCompact: false,
+                isZoomPan: true, 
+                compactInteraction: false,
+        } 
+
+        const external = {
+            div: "my-reasoning-tree",
+            path: "../data/test/4th-trace.xml",
+            //path: "../data/test/test.t.xml",
+            drawTime: 0,
+            showRules: true,
+            trays: { upper:false, lower:false },
+            stepNavigator: false, 
+        }
+
+        init_proof({ external });
+
+        let compactOrNormal = true;
+        const switchBtn = document.getElementById("change")
+        switchBtn.addEventListener("click", () => {
+            
+            const layout = compactOrNormal ? compact : normal;
+
+            init_proof({ external: {
+                ...external,
+                ...layout
+            }}); 
+
+            if (compactOrNormal) {
+                compactOrNormal = false;
+            } else {
+                compactOrNormal = true;
+            }
+        })
     </script>
 </body>
 

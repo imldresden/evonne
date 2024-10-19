@@ -89,6 +89,7 @@ function getConstraint(id, data) {
 function buildCDRule({ d, data }) {
     const op = {
         id: d.id,
+        domain: 'diff', // TODO: get something from data that says which domain it is
         premises: [],
         conclusion: undefined
     }
@@ -110,7 +111,7 @@ function buildCDRule({ d, data }) {
     return { op };
 }
 
-function getNodes(data, edgeData) {
+function getNodes(data, edges) {
     // Compute nodes
     return [].map.call(data.querySelectorAll("node"), (d) => {
 
@@ -144,29 +145,26 @@ function getNodes(data, edgeData) {
             node.data = buildCDRule({ d, data });
         }
 
-        const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
-        node.isRoot = outGoingEdges.length === 0;
+        const outgoingEdges = edges.filter((edge) => edge.source === d.id);
+        node.isRoot = outgoingEdges.length === 0;
 
         return node;
     });
 }
 
-function addNodesToEdges(nodeData, edgeData) {
-    // add the nodeData to the edgeData
-    edgeData.forEach((d) => {
-        d.source = nodeData.find((b) => b.id === d.source);
-        d.target = nodeData.find((b) => b.id === d.target);
+function addNodesToEdges(nodes, edges) {
+    // add the node data to the edge data
+    edges.forEach((d) => {
+        d.source = nodes.find((b) => b.id === d.source);
+        d.target = nodes.find((b) => b.id === d.target);
     });
 
-    return {
-        nodes: nodeData,
-        edges: edgeData,
-    };
+    return { nodes, edges };
 }
 
 function getTreeFromXML(data) {
     // read edges 
-    let edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
+    let edges = [].map.call(data.querySelectorAll("edge"), (d) => {
         let edgeId = d.getAttribute("id");
         let edgeSource = d.getAttribute("source");
         let edgeTarget = d.getAttribute("target");
@@ -175,20 +173,20 @@ function getTreeFromXML(data) {
     });
 
     // read nodes
-    let nodeData = getNodes(data, edgeData);
+    let nodes = getNodes(data, edges);
 
-    return addNodesToEdges(nodeData, edgeData);
+    return addNodesToEdges(nodes, edges);
 }
 
 function getTreeFromJSON(data) { // { edges, nodes }
-    let edgeData = data.edges; // { id, source, target }
-    let nodeData = data.nodes.map(d => {
-        const outGoingEdges = edgeData.filter((edge) => edge.source === d.id);
-        node.isRoot = outGoingEdges.length === 0;
-        return node;
+    let edges = data.edges; // { id, source, target }
+    let nodes = data.nodes.map(d => {
+        const outgoingEdges = edges.filter((edge) => edge.source === d.id);
+        d.isRoot = outgoingEdges.length === 0;
+        return d;
     }); // { id, type, element, labels:{}, data (eg numerical)} 
     
-    return addNodesToEdges(nodeData, edgeData);
+    return addNodesToEdges(nodes, edges);
 }
 
 function computeTreeLayout(hierarchy) {
@@ -197,9 +195,6 @@ function computeTreeLayout(hierarchy) {
         return ((a.width + b.width) / 2) / proof.nodeVisuals.maxNodeWidth + 0.03;
     }
 
-    // Layout and draw the tree
-    hierarchy.dx = 50;
-    hierarchy.dy = proof.width / (hierarchy.height + 1);
     let tree_layout;
 
     if (proof.allowOverlap) {
@@ -210,7 +205,10 @@ function computeTreeLayout(hierarchy) {
             (hierarchy);
     } else {
         tree_layout = d3.tree()
-            .nodeSize([proof.nodeVisuals.maxNodeWidth, proof.nodeVisuals.maxNodeHeight * 1.2])
+            .nodeSize([
+                proof.nodeVisuals.maxNodeWidth, 
+                proof.nodeVisuals.maxNodeHeight * (proof.isCompact ? 2 : 2.5)
+            ])
             .separation((a, b) => separation(a, b))
             (hierarchy);
         
@@ -220,7 +218,7 @@ function computeTreeLayout(hierarchy) {
     }
     
     if (proof.isLinear) {
-        return proof.linear.computeLinearLayout(tree_layout, proof.allowOverlap);
+        return proof.linear.computeLinearLayout(tree_layout);
     }
     
     return tree_layout;

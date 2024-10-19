@@ -18,6 +18,7 @@ const edge = {
   'curve-style': 'bezier', //taxi
   'width': .5,
   'line-color': '#ccc',
+  'line-outline-width': 0,
   'target-arrow-color': '#ccc',
   'target-arrow-shape': 'triangle',
   'arrow-scale': .5,
@@ -38,11 +39,10 @@ const node = {
 
 const stylesheet = [
   {
-    "selector": "core",
+    "selector": ":active",
     "style": {
-      "selection-box-color": colors.SELECTED_NODE_COLOR,
-      "selection-box-border-color": "#fafafa",
-      "selection-box-opacity": "0",
+      "overlay-padding": 0,
+      "overlay-opacity": 0
     }
   }, {
     "selector": "node",
@@ -72,6 +72,12 @@ const stylesheet = [
       'color': colors.edgeWeightTextColor,
       'line-color': colors.edgeColor,
       'target-arrow-color': colors.edgeColor,
+    }
+  },
+  {
+    "selector": "node.highlighted",
+    "style": {
+      'color': colors.edgeWeightTextColor,
     }
   }
 ];

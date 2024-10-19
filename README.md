@@ -2,7 +2,8 @@
 
 ## Using Docker:
 * Install docker, run `docker build . -t <your username>/evonne`. 
-* Run `docker run -dp 7007:3000 <your username>/evonne:latest` then open `http://localhost:7007`.
+* Run `docker run -dp <port>:3000 <your username>/evonne:latest` then open `http://localhost:<port>`.
+* Note that the host port (3000) should match between the `DockerFile` and  `.env` files!
 
 ## Local Installation: 
 ### Requirements:
@@ -14,6 +15,7 @@
 * Run `npm install`
 * Running `npm start` will download the necessary files and start the app at: `https://localhost:3030`. 
 * If you want to skip the downloads and only run, use `npm run dev` instead.
+* If you want to modify the port, edit the `.env`
 
 ## Deployment: 
 * An example of continuous integration for gitlab, using docker: `evonne.gitlab-ci.yml`.

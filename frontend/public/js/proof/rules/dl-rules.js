@@ -34,15 +34,12 @@ export class DLRules {
         "Top Superclass" : (_, c) => this.topSuperClass(c),  
     }
 
-    draw({ div, premises, conclusion, params }) {
+    draw({ div, premises, conclusion, alternativeRuleName, originalRuleName }) {
         this.displayObject = div;
-        const ruleName = params.ruleName;
         
-        if (this.rules[ruleName]) {
-            utils.addTitle(ruleName);
-            this.rules[ruleName](premises, conclusion);
-        } else {
-            console.error("unknown dl rule");
+        if (this.rules[originalRuleName]) {
+            utils.addTitle(alternativeRuleName);
+            this.rules[originalRuleName](premises, conclusion);
         }
     }
 
@@ -255,14 +252,9 @@ export class DLRules {
     intersectionDecomposition(conclusion) {
         let lHS, rHS, lHSConjuncts, indexOfMatch;
 
-        // console.log(conclusion.replace(regPar, ""));
-        if (conclusion[0] === "(" && conclusion[conclusion.length-1] === ")")
-            // conclusion = conclusion.replace(regPar, "");
+        if (conclusion[0] === "(" && conclusion[conclusion.length-1] === ")") {
             conclusion = conclusion.substring(1,conclusion[conclusion.length-1])
-
-        console.log("conclusion after removing outer = " + conclusion)
-
-        //let lHSRaw =  conclusion.split(subsumes)[0].trim();
+        }
         
         lHS = conclusion.substring(1, conclusion.indexOf(")")).split(subsumes)[0].trim();
         rHS = conclusion.split(subsumes)[1].trim();

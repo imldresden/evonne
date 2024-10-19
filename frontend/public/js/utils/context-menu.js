@@ -1,26 +1,27 @@
 export class ContextMenu {
     once = false;
     menuFactory(x, y, menuItems, data, svgId) {
+        menuItems = menuItems.filter(d => d);
         const svg = document.querySelector(svgId);
         const svgBBox = svg.getBoundingClientRect();
 
         d3.select(`.contextMenu`).remove();
-
+        
         // Draw the menu
-        d3.select(svgId)
+        const entries = d3.select(svgId)
             .append('g').attr('class', 'contextMenu')
             .selectAll('tmp')
             .data(menuItems).enter()
             .append('g').attr('class', d => `menuEntry ${d.type}`)
-            .style({ 'cursor': 'pointer' });
-
-            
         let orient = [true, true];
-        const maxWidth = menuItems.reduce((a, b) => {
-            const c = a.title ? a.title.length : a;
-            const d = b.title ? b.title.length : b;
-            return (c > d ? c : d)
-        }) * 9;
+        
+        let maxWidth = 0;
+        menuItems.forEach(a => {
+            const l = a.title.length * 12;
+            if (l > maxWidth) {
+                maxWidth = l;
+            } 
+        })
         
         if (x + maxWidth + 30 > svgBBox.width) {
             orient[0] = false;
@@ -28,7 +29,7 @@ export class ContextMenu {
 
         const buttonHeight = 25;
         const sectionHeight = 2;
-        const heightF = d => d.type === 'button' ? buttonHeight : sectionHeight;
+        const heightF = d => d && d.type === 'button' ? buttonHeight : sectionHeight;
         const calcHeight = (items) => {
             let height = 0;
             items.forEach(e => height += heightF(e));
@@ -43,7 +44,11 @@ export class ContextMenu {
         const xF = () => { return x - (orient[0] ? 0 : maxWidth) };
         const yF = (d, i) => y + calcHeight(menuItems.filter((e, ie) => ie < i)) - (orient[1] ? 0 : totalHeight);
         
-        d3.selectAll(`.menuEntry`)
+  
+          
+        entries.style({ 'cursor': 'pointer' });
+
+        entries
             .append('rect')
             .attr('x', xF)
             .attr('y', yF)
@@ -51,7 +56,7 @@ export class ContextMenu {
             .attr('height', heightF)
             .on('click', (_, d) => { d.action(_, data) });
 
-        d3.selectAll(`.menuEntry`)
+        entries
             .append('text')
             .text((d) => { return d.type === 'button' ? d.title : ''; })
             .attr('x', xF)
@@ -63,13 +68,16 @@ export class ContextMenu {
         if (!this.once) {
             d3.select('body').on('click', () => {
                 d3.select(`.contextMenu`).remove();
+            }).on('ctxmenu', () => {
+                d3.select(`.contextMenu`).remove();
             });
             this.once = true;
         }
     }
 
     create(event, data, menuItems, svgId) {
-        this.menuFactory(event.pageX, event.pageY - 40, menuItems, data, svgId);
-        event.preventDefault();
+        if (menuItems.length > 0) {
+            this.menuFactory(event.pageX, event.pageY - 40, menuItems, data, svgId);
+        }
     }
 }

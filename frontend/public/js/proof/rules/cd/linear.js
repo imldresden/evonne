@@ -190,6 +190,7 @@ export class LinearCD {
         });
 
         const showObvious = this.showObvious; 
+        console.log(data.ops)
         if (data.ops[data.current] && pcp_data[data.current]) {
             controls({ data, }, where, params);
             displayRowOperation(data.ops[data.current]);
