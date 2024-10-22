@@ -375,12 +375,13 @@ app.post('/axiom', (req, res) => {
     console.log("done computing proofs.");
     console.log('extracting module...');
 
-    const moduleName = 'module_'+ path.parse(ontology).name;
+    const outputLabel = path.parse(ontology).name;
     const module = spawn('java',  [
       '-jar', 'externalTools/explain.jar',
       '-o', ontPath,
       '-a', axiom,
-      '-mod', moduleName,
+      '-ad',
+      '-ol', outputLabel,
       '-od', projPath,
     ], { encoding: 'utf-8' });
 
@@ -391,7 +392,7 @@ app.post('/axiom', (req, res) => {
       console.log('computing atomic decomposition...');
       const ad = spawn('java',  [
         '-cp', 'externalTools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
-        path.join(projPath, moduleName) + '.owl', // module input 
+        path.join(projPath, outputLabel) + '.owl', // module input
         projPath, //outDir
         'atomic ' + path.parse(ontology).name //outFileName
       ], { encoding: 'utf-8' });
@@ -616,21 +617,21 @@ function getProofType(genMethod, sigPath) {
   let minWTreeOpts = ["3","7","12"];
   let minDepthOpts = ["2","5","10"];
 
-  let proofType = 'MinTreeSize';
+  let proofType = 'MinimalTreeSize';
   // CONDENSED MINIMAL PROOF
   if (sigPath!=="NoSignature"){
-    proofType = 'ConMinTreeSize';
+    proofType = 'CondensedMinimalTreeSize';
     if (minDepthOpts.includes(genMethod))
-      proofType = 'ConMinDepth';
+      proofType = 'CondensedMinimalDepth';
     else if (minWTreeOpts.includes(genMethod))
-      proofType = 'ConMinWTreeSize';
+      proofType = 'CondensedMinimalWeightedTreeSize';
   }
   // MINIMAL PROOF
   else {
     if (minDepthOpts.includes(genMethod))
-      proofType = 'MinDepth';
+      proofType = 'MinimalDepth';
     else if (minWTreeOpts.includes(genMethod))
-      proofType = 'MinWTreeSize';
+      proofType = 'MinimalWeightedTreeSize';
   }
   return proofType;
 }
@@ -666,7 +667,7 @@ function generateProofs(ontPath,axiom, projPath,sigPath,genMethod,translate2NL) 
       '--ontology-path', ontPath,
       '--conclusion-axiom', axiom,
       '--output-type', 'graph',
-      '--output-name', 'proof',
+      '--output-label', 'proof',
       '--output-directory', projPath,
       '--proof-type', proofType,
       '--signature-file-path', sigPath,
