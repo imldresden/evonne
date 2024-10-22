@@ -68,7 +68,7 @@ app.get('/', (req, res) => {
     res.render('main/split.spy', {
       title,
       uuid: id,
-      settings_specific: '<< proof/settings >> << ontology/settings >>',
+      settings_specific: '<< proof/settings >> << ontology/settings >> << counterexample/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
       menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << proof/menu >> << ontology/menu >>`,
@@ -150,6 +150,7 @@ app.get('/project', (req, res) => {
     names: {},
     proofs: [],
     reasoner:'',
+    counterShow:'',
   };
 
   const files = readdirSync(target);
@@ -191,13 +192,25 @@ app.get('/project', (req, res) => {
     const concepts = JSON.parse(readFileSync(namesPath));
     const hierarchy = JSON.parse(readFileSync(hierarchyPath));
 
+    // Collect all hierarchy values
+    const allHierarchyValues = new Set();
+    Object.values(hierarchy).forEach(values => {
+      values.forEach(value => {
+        allHierarchyValues.add(value);
+      });
+    });
+    
     Object.keys(concepts).forEach(key => {
+      const rhs = hierarchy[key] || [];
+      const rhh = Array.from(allHierarchyValues).filter(value => !rhs.includes(value));
+  
       status.names[key] = {
         conceptNameShort: concepts[key],
-        rhs: hierarchy[key]
-      };
-    });
-  }
+        rhs: rhs,
+        rhh: rhh
+        };
+      });
+    }
 
   const pending = !flags.proofs || !flags.ad;
   if (flags.proofs && flags.ad) {
@@ -362,12 +375,13 @@ app.post('/axiom', (req, res) => {
     console.log("done computing proofs.");
     console.log('extracting module...');
 
-    const moduleName = 'module_'+ path.parse(ontology).name;
+    const outputLabel = path.parse(ontology).name;
     const module = spawn('java',  [
       '-jar', 'externalTools/explain.jar',
       '-o', ontPath,
       '-a', axiom,
-      '-mod', moduleName,
+      '-ad',
+      '-ol', outputLabel,
       '-od', projPath,
     ], { encoding: 'utf-8' });
 
@@ -378,7 +392,7 @@ app.post('/axiom', (req, res) => {
       console.log('computing atomic decomposition...');
       const ad = spawn('java',  [
         '-cp', 'externalTools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
-        path.join(projPath, moduleName) + '.owl', // module input 
+        path.join(projPath, outputLabel) + '.owl', // module input
         projPath, //outDir
         'atomic ' + path.parse(ontology).name //outFileName
       ], { encoding: 'utf-8' });
@@ -603,21 +617,21 @@ function getProofType(genMethod, sigPath) {
   let minWTreeOpts = ["3","7","12"];
   let minDepthOpts = ["2","5","10"];
 
-  let proofType = 'MinTreeSize';
+  let proofType = 'MinimalTreeSize';
   // CONDENSED MINIMAL PROOF
   if (sigPath!=="NoSignature"){
-    proofType = 'ConMinTreeSize';
+    proofType = 'CondensedMinimalTreeSize';
     if (minDepthOpts.includes(genMethod))
-      proofType = 'ConMinDepth';
+      proofType = 'CondensedMinimalDepth';
     else if (minWTreeOpts.includes(genMethod))
-      proofType = 'ConMinWTreeSize';
+      proofType = 'CondensedMinimalWeightedTreeSize';
   }
   // MINIMAL PROOF
   else {
     if (minDepthOpts.includes(genMethod))
-      proofType = 'MinDepth';
+      proofType = 'MinimalDepth';
     else if (minWTreeOpts.includes(genMethod))
-      proofType = 'MinWTreeSize';
+      proofType = 'MinimalWeightedTreeSize';
   }
   return proofType;
 }
@@ -653,7 +667,7 @@ function generateProofs(ontPath,axiom, projPath,sigPath,genMethod,translate2NL) 
       '--ontology-path', ontPath,
       '--conclusion-axiom', axiom,
       '--output-type', 'graph',
-      '--output-name', 'proof',
+      '--output-label', 'proof',
       '--output-directory', projPath,
       '--proof-type', proofType,
       '--signature-file-path', sigPath,
