@@ -1407,8 +1407,8 @@ async function init_counter({
   div = "counter-example-container",
 } = {}) {
 
-  let mappers = await readJson("examples/counterexample/mapper.json");
-  let model = await readXML("examples/counterexample/result.model.xml");
+  let mappers = await readJson("data/counterexample/mapper.json");
+  let model = await readXML("data/counterexample/result.model.xml");
   createContent(div, mappers, model);
 }
 

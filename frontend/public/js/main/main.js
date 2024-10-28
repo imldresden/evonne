@@ -65,7 +65,7 @@ window.onload = function () {
   if (clearSigFilePath) {
     clearSigFilePath.addEventListener("click", clearSigFilePathFunction);
   }
-  
+
   if (openSplit) {
     openSplit.addEventListener("click", openSplitFunction)
   }
@@ -77,41 +77,74 @@ function createConceptDropdowns(concepts) {
   const lhs = document.getElementById('lhsConcepts');
   lhs.innerHTML = '';
 
-  Object.entries(concepts).sort(([, s1], [, s2]) => sortNames(s1.conceptNameShort, s2.conceptNameShort)).forEach(
-    entry => {
-      if (entry[0] !== "owl:Nothing" && entry[1].rhs && entry[1].rhs.length > 0) {
+  
+  function sortNames(c1, c2) {
+    let arg1 = c1.substring(c1.indexOf("#") + 1).toLowerCase();
+    let arg2 = c2.substring(c2.indexOf("#") + 1).toLowerCase();
+
+    if (arg1 < arg2) {
+      return -1;
+    }
+    if (arg1 > arg2) {
+      return 1;
+    }
+    return 0;
+  }
+
+  const lhsOptions = { truthy: [], falsey: [] }
+  
+  Object.keys(concepts)
+    .sort(sortNames)
+    .forEach(k => {
+      if (k !== "owl:Nothing") {
         const concept = document.createElement('option');
-        concept.value = entry[0];
-        concept.innerHTML = entry[1].conceptNameShort;
-        lhs.appendChild(concept);
+        concept.value = k;
+        concept.innerHTML = concepts[k].conceptNameShort;
+        if (concepts[k].rhs && concepts[k].rhs.length > 0) {
+          concept.classList.add('option-rhs-true');
+          lhsOptions.truthy.push(concept);
+        } else {
+          concept.classList.add('option-rhs-false'); 
+          lhsOptions.falsey.push(concept);
+        }
       }
     });
 
-    const updateRHS = function () {
-      const rhs = document.getElementById('rhsConcepts');
-      rhs.innerHTML = '';
+  [ ...lhsOptions.truthy, 
+    ...lhsOptions.falsey
+  ].forEach(concept => {
+    lhs.appendChild(concept);
+  });
   
-      const key = lhs.options[lhs.selectedIndex].value;
-      const currentConcept = concepts[key];
-  
-      // Add RHS options with one color
-      currentConcept.rhs.forEach(rhsKey => {
-        const rhsC = document.createElement('option');
-        rhsC.value = rhsKey;
-        rhsC.innerHTML = concepts[rhsKey].conceptNameShort;
-        rhsC.classList.add('option-rhs');
-        rhs.appendChild(rhsC);
-      });
-  
-      // Add RHH options with another color
-      currentConcept.rhh.forEach(rhhKey => {
-        const rhhC = document.createElement('option');
-        rhhC.value = rhhKey;
-        rhhC.innerHTML = concepts[rhhKey].conceptNameShort;
-        rhhC.classList.add('option-rhh');
-        rhs.appendChild(rhhC);
-      });
-    };
+  const updateRHS = function () {
+    const rhs = document.getElementById('rhsConcepts');
+    rhs.innerHTML = '';
+
+    const key = lhs.options[lhs.selectedIndex].value;
+    const currentConcept = concepts[key];
+    const ccs = new Set(currentConcept.rhs);
+
+    const rhsOptions = { truthy: [], falsey: [] }
+
+    Object.keys(concepts).forEach(rhsKey => {
+      const rhsC = document.createElement('option');
+      rhsC.value = rhsKey;
+      rhsC.innerHTML = concepts[rhsKey].conceptNameShort;
+      if (ccs.has(rhsKey)) {
+        rhsC.classList.add('option-rhs-true');
+        rhsOptions.truthy.push(rhsC);
+      } else {
+        rhsC.classList.add('option-rhs-false');
+        rhsOptions.falsey.push(rhsC);
+      }
+    });
+
+    [ ...rhsOptions.truthy, 
+      ...rhsOptions.falsey
+    ].forEach(concept => {
+      rhs.appendChild(concept);
+    });
+  };
   updateRHS();
 
   lhs.removeEventListener('change', updateRHS);
@@ -131,7 +164,7 @@ function init_views(loop = false) {
     .then(res => {
       status = res;
       console.log(res);
-      
+
       if (res.status === 'custom' || res.reasoner === 'n/a') { // blank project
         clearInterval(interval);
         return;
@@ -162,7 +195,7 @@ function init_views(loop = false) {
         modal.close();
 
         if (document.getElementById('proof-container')) {
-          init_proof({ file: res.proofs[0], ruleNamesMap:res.ruleNamesMap });
+          init_proof({ file: res.proofs[0], ruleNamesMap: res.ruleNamesMap });
         }
         // if (document.getElementById('proof-container')) {
         //   init_counter({ ad: res.ad });
@@ -186,18 +219,6 @@ function progress(message) {
   document.getElementById('custom-messages').innerHTML += "<br>" + message;
 }
 
-function sortNames(c1, c2) {
-  let arg1 = c1.substring(c1.indexOf("#") + 1).toLowerCase();
-  let arg2 = c2.substring(c2.indexOf("#") + 1).toLowerCase();
-
-  if (arg1 < arg2) {
-    return -1;
-  }
-  if (arg1 > arg2) {
-    return 1;
-  }
-  return 0;
-}
 
 function clearSigFilePathFunction() {
   signaturePathText.value = "";
