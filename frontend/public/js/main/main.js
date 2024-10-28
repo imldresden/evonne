@@ -77,57 +77,42 @@ function createConceptDropdowns(concepts) {
   const lhs = document.getElementById('lhsConcepts');
   lhs.innerHTML = '';
 
-  
-  function sortNames(c1, c2) {
-    let arg1 = c1.substring(c1.indexOf("#") + 1).toLowerCase();
-    let arg2 = c2.substring(c2.indexOf("#") + 1).toLowerCase();
-
-    if (arg1 < arg2) {
-      return -1;
-    }
-    if (arg1 > arg2) {
-      return 1;
-    }
-    return 0;
-  }
-
   const lhsOptions = { truthy: [], falsey: [] }
-  
-  Object.keys(concepts)
-    .sort(sortNames)
-    .forEach(k => {
-      if (k !== "owl:Nothing") {
-        const concept = document.createElement('option');
-        concept.value = k;
-        concept.innerHTML = concepts[k].short;
-        if (concepts[k].rhs && concepts[k].rhs.length > 0) {
-          concept.classList.add('option-rhs-true');
-          lhsOptions.truthy.push(concept);
-        } else {
-          concept.classList.add('option-rhs-false'); 
-          lhsOptions.falsey.push(concept);
-        }
-      }
-    });
+  const cl = Object.keys(concepts); // sorted in server.js
 
-  [ ...lhsOptions.truthy, 
-    ...lhsOptions.falsey
+  cl.forEach(k => {
+    if (k !== "owl:Nothing") {
+      const concept = document.createElement('option');
+      concept.value = k;
+      concept.innerHTML = concepts[k].short;
+      if (concepts[k].rhs && concepts[k].rhs.length > 0) {
+        concept.classList.add('option-rhs-true');
+        lhsOptions.truthy.push(concept);
+      } else {
+        concept.classList.add('option-rhs-false');
+        lhsOptions.falsey.push(concept);
+      }
+    }
+  });
+
+  [...lhsOptions.truthy,
+  ...lhsOptions.falsey
   ].forEach(concept => {
     lhs.appendChild(concept);
   });
-  
+
   const updateRHS = function () {
     const rhs = document.getElementById('rhsConcepts');
     rhs.innerHTML = '';
 
     const key = lhs.options[lhs.selectedIndex].value;
     const currentConcept = concepts[key];
-    const conceptList = Object.keys(concepts);
+
     // decodes the encoding done on server.js to send less data
-    const ccs = new Set(currentConcept.rhs.map(ek => conceptList[ek-100]));
+    const ccs = new Set(currentConcept.rhs.map(ek => cl[ek - 100]));
     const rhsOptions = { truthy: [], falsey: [] };
-    
-    conceptList.forEach(rhsKey => {
+
+    cl.forEach(rhsKey => {
       const rhsC = document.createElement('option');
       rhsC.value = rhsKey;
       rhsC.innerHTML = concepts[rhsKey].short;
@@ -140,8 +125,8 @@ function createConceptDropdowns(concepts) {
       }
     });
 
-    [ ...rhsOptions.truthy, 
-      ...rhsOptions.falsey
+    [...rhsOptions.truthy,
+    ...rhsOptions.falsey
     ].forEach(concept => {
       rhs.appendChild(concept);
     });

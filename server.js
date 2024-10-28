@@ -186,20 +186,34 @@ app.get('/project', (req, res) => {
 
   const namesPath = path.join(target, 'cnsOriginal.json');
   const hierarchyPath = path.join(target, 'cnsHierarchy.json');
+
   if (existsSync(namesPath) && existsSync(hierarchyPath)) {
     flags.names = true;
-
     const concepts = JSON.parse(readFileSync(namesPath));
     const hierarchy = JSON.parse(readFileSync(hierarchyPath));
+    const encoded = {}
+    const sc = Object.keys(concepts).sort(sortNames);
 
-    const encoded = {} 
-    Object.keys(concepts).forEach( (k, i) => {
+    function sortNames(c1, c2) {
+      let arg1 = concepts[c1];
+      let arg2 = concepts[c2];
+
+      if (arg1 < arg2) {
+        return -1;
+      }
+      if (arg1 > arg2) {
+        return 1;
+      }
+      return 0;
+    }
+
+    sc.forEach((k, i) => {
       // send less data
-      encoded[k] = i+100; 
+      encoded[k] = i + 100;
     });
 
-    Object.keys(concepts).forEach( (k, i) => {
-      const ec = hierarchy[k].map(d => encoded[d]);
+    sc.forEach((k, i) => {
+      const ec = hierarchy[k]?.map(d => encoded[d]) || [];
       status.names[k] = {
         short: concepts[k],
         rhs: ec,
