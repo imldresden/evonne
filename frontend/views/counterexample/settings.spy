@@ -1,7 +1,7 @@
 <div style="background-color:#a9a9a9; height:0.5px;"></div>
 <br>
 <header class="modal-section-header toggles-content" target="counterexample-settings">
-  <h3 class="modal-section-heading">Counter Settings</h3> <i class="material-icons">arrow_drop_down</i>
+  <h3 class="modal-section-heading">Counterex. Settings</h3> <i class="material-icons">arrow_drop_down</i>
 </header>
 
 <div class="slidering closed" id="counterexample-settings">

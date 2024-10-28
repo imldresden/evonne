@@ -192,10 +192,17 @@ app.get('/project', (req, res) => {
     const concepts = JSON.parse(readFileSync(namesPath));
     const hierarchy = JSON.parse(readFileSync(hierarchyPath));
 
-    Object.keys(concepts).forEach(key => {
-      status.names[key] = {
-        conceptNameShort: concepts[key],
-        rhs: hierarchy[key],
+    const encoded = {} 
+    Object.keys(concepts).forEach( (k, i) => {
+      // send less data
+      encoded[k] = i+100; 
+    });
+
+    Object.keys(concepts).forEach( (k, i) => {
+      const ec = hierarchy[k].map(d => encoded[d]);
+      status.names[k] = {
+        short: concepts[k],
+        rhs: ec,
       };
     });
   }

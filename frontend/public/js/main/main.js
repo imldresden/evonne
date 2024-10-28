@@ -99,7 +99,7 @@ function createConceptDropdowns(concepts) {
       if (k !== "owl:Nothing") {
         const concept = document.createElement('option');
         concept.value = k;
-        concept.innerHTML = concepts[k].conceptNameShort;
+        concept.innerHTML = concepts[k].short;
         if (concepts[k].rhs && concepts[k].rhs.length > 0) {
           concept.classList.add('option-rhs-true');
           lhsOptions.truthy.push(concept);
@@ -122,14 +122,15 @@ function createConceptDropdowns(concepts) {
 
     const key = lhs.options[lhs.selectedIndex].value;
     const currentConcept = concepts[key];
-    const ccs = new Set(currentConcept.rhs);
-
-    const rhsOptions = { truthy: [], falsey: [] }
-
-    Object.keys(concepts).forEach(rhsKey => {
+    const conceptList = Object.keys(concepts);
+    // decodes the encoding done on server.js to send less data
+    const ccs = new Set(currentConcept.rhs.map(ek => conceptList[ek-100]));
+    const rhsOptions = { truthy: [], falsey: [] };
+    
+    conceptList.forEach(rhsKey => {
       const rhsC = document.createElement('option');
       rhsC.value = rhsKey;
-      rhsC.innerHTML = concepts[rhsKey].conceptNameShort;
+      rhsC.innerHTML = concepts[rhsKey].short;
       if (ccs.has(rhsKey)) {
         rhsC.classList.add('option-rhs-true');
         rhsOptions.truthy.push(rhsC);

@@ -46,7 +46,7 @@ nav a.sidenav-trigger {
 }
 
 #project-id-div {
-  width:350px;
+  width:20%;
   margin-left:calc(30% + 80px);
   position:absolute;
 }
