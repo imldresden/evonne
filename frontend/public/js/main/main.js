@@ -1,6 +1,9 @@
 import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
+import { init_counter } from '../counterexample/counterexample.js';
+
 import { upload } from '../utils/upload-file.js';
+import { init as init_controls } from '../utils/controls.js'
 
 let status = {};
 let interval = undefined;
@@ -70,6 +73,7 @@ window.onload = function () {
     openSplit.addEventListener("click", openSplitFunction)
   }
 
+  init_controls();
   init_views();
 }
 
@@ -95,9 +99,7 @@ function createConceptDropdowns(concepts) {
     }
   });
 
-  [...lhsOptions.truthy,
-  ...lhsOptions.falsey
-  ].forEach(concept => {
+  [...lhsOptions.truthy, ...lhsOptions.falsey].forEach(concept => {
     lhs.appendChild(concept);
   });
 
@@ -125,9 +127,7 @@ function createConceptDropdowns(concepts) {
       }
     });
 
-    [...rhsOptions.truthy,
-    ...rhsOptions.falsey
-    ].forEach(concept => {
+    [...rhsOptions.truthy, ...rhsOptions.falsey].forEach(concept => {
       rhs.appendChild(concept);
     });
   };
@@ -180,16 +180,38 @@ function init_views(loop = false) {
         clearInterval(interval);
         modal.close();
 
-        if (document.getElementById('proof-container')) {
-          init_proof({ file: res.proofs[0], ruleNamesMap: res.ruleNamesMap });
-        }
-        // if (document.getElementById('proof-container')) {
-        //   init_counter({ ad: res.ad });
-        // }
-        if (document.getElementById('ontology-container')) {
-          init_ontology({ ad: res.ad, ontology: res.ontology });
-        }
+        const container = document.getElementById('container-main')
+        if (res.explanation.type === 'pr') {
+          const onlyProof = window.location.href.includes('/proof')
+          const onlyAD = window.location.href.includes('/ontology')
+          if (!onlyProof && !onlyAD) {
+            container.innerHTML = `
+              <div class="container container-split container-flex">
+                <div class="container-left" id="proof-container"></div>
+                <div class="resizer" data-direction="horizontal"></div>
+                <div class="container-right" id="ontology-container"></div>
+              </div>`
+              init_proof({ file: res.explanation.proof, ruleNamesMap: res.ruleNamesMap });
+              init_ontology({ ad: res.explanation.ad, ontology: res.ontology });
+          }
 
+          if (onlyProof) {
+            container.innerHTML = `<div class="container container-flex" id="proof-container"></div>`
+            init_proof({ file: res.explanation.proof, ruleNamesMap: res.ruleNamesMap });
+          }
+
+          if (onlyAD) {
+            container.innerHTML = `<div class="container container-flex" id="ontology-container"></div>`
+            init_ontology({ ad: res.explanation.ad, ontology: res.ontology });
+          }
+          
+        } else if (res.explanation.type === 'ce') {
+            container.innerHTML = `<div class="container container-flex" id="ce-container"></div>`;
+            // init_counter({ model: res.explanation.model, mapper: res.explanation.mapper, ontology: res.ontology });
+
+            console.error('under construction!')
+        }
+     
         //Hide computing indicator
         document.getElementById('computingGif').style.display = "none";
       }
@@ -205,7 +227,6 @@ function progress(message) {
   document.getElementById('custom-messages').innerHTML += "<br>" + message;
 }
 
-
 function clearSigFilePathFunction() {
   signaturePathText.value = "";
   signaturePathFile.value = "";
@@ -213,31 +234,33 @@ function clearSigFilePathFunction() {
   proof.signatureFile = undefined;
 }
 
-
 function computeAxiomsBtnFunction() {
-
   //Show computing indicator
   document.getElementById('computingGif').style.display = "inline-block";
-  const rhsElement = document.getElementById('rhsConcepts');
-  const isRhh = rhsElement.options[rhsElement.selectedIndex].classList.contains('option-rhh');
+  
   const body = new FormData();
   body.append('id', getSessionId());
   body.append('ontology', status.ontology);
-  body.append('lhs', document.getElementById('lhsConcepts').value);
-  body.append('rhs', document.getElementById('rhsConcepts').value);
+  const lhs = document.getElementById('lhsConcepts');
+  const rhs = document.getElementById('rhsConcepts');
+
+  body.append('lhs', lhs.value);
+  body.append('rhs', rhs.value);
   body.append('method', document.getElementById('methodsList').value);
+  if (rhs.options[rhs.selectedIndex].classList.contains('option-rhs-true')) {
+    body.append('type', 'pr')
+  } else { // if (rhs.options[rhs.selectedIndex].classList.contains('option-rhs-false')) {
+    body.append('type', 'ce')
+  }
   body.append('signaturePath', proof.signatureFile
     ? "frontend/public/data/" + getSessionId() + "/" + proof.signatureFile.name
     : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 
-  const endpoint = isRhh ? '/counterexample' : '/axiom';
-
-  fetch(endpoint, {
+  fetch('/explain', {
     method: 'POST',
     body,
-  })
-    .then(res => res.json())
+  }).then(res => res.json())
     .then(res => {
       console.log(res)
       interval = setInterval(() => {

@@ -16,11 +16,10 @@
   << modals/file-upload >>
   << modals/axiom >>
 
-  <main>
-    <div class="container container-flex" id="ontology-container">
-      <!-- everything gets added via js -->
-    </div>
+  <main id="container-main">
+    <!-- everything gets added via main.js -->
   </main>
+
   << menus/settings >> 
 
   << scripts >> 

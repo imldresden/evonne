@@ -19,22 +19,11 @@
   << modals/advanced-settings >>
   << modals/axiom >>
 
-  <main>
-    <div class="container container-split container-flex">
-      <div class="container-left" id="proof-container">
-        <!-- everything gets added via js -->
-      </div>
-
-      <div class="resizer" data-direction="horizontal"></div>
-      
-      <div class="container-right" id="ontology-container">
-        <!-- everything gets added via js -->
-      </div>
-    </div>
-    
-    << menus/settings >>
-    
+  <main id="container-main">
+    <!-- everything gets added via main.js -->
   </main>
+
+  << menus/settings >>
   
   << scripts >>
   <script src="/js/ontology/repairsDisplay.js"></script>

@@ -53,7 +53,6 @@ app.get('/test', (req, res) => {
   });
 });
 
-// TODO: this is a workaround to avoid injecting the node_module into the browser 
 app.get('/uuid', (req, res) => {
   res.status(200).send(uuidv4());
 });
@@ -111,16 +110,12 @@ app.get('/proof', (req, res) => {
   }
 });
 
-app.get('/euler', (request, response) => {
+app.get('/euler', (_, response) => {
   response.render('euler/euler.spy')
 });
 
-app.get('/inference', (request, response) => {
+app.get('/inference', (_, response) => {
   response.render('inference/inference.spy');
-});
-
-app.get("/counterexample", (request, response) => {
-  response.render("counterexample/counterexample.spy", { settings_specific: '<< counterexample/settings >>' });
 });
 
 function parseMap(mapStr) {
@@ -148,9 +143,8 @@ app.get('/project', (req, res) => {
     status: undefined,
     ontology: [],
     names: {},
-    proofs: [],
+    explanation: { type: '' },
     reasoner: '',
-    counterShow: '',
   };
 
   const files = readdirSync(target);
@@ -158,19 +152,31 @@ app.get('/project', (req, res) => {
   const flags = {
     ontology: false,
     names: false,
-    proofs: false,
-    ad: false,
+    explanation: false,
   }
+
+  const proof = { file: false, ad: false };
+  const ce = { model: false, mapper: false };
 
   files.forEach(function (file) {
     if (file.endsWith('.t.xml')) {
-      status.proofs.push(file);
-      flags.proofs = true;
+      status.explanation.proof = file;
+      proof.file = true;
     }
 
     if (file.endsWith('.xml') && file.startsWith('atomic ')) {
-      status.ad = file;
-      flags.ad = true;
+      status.explanation.ad = file;
+      proof.ad = true;
+    }
+
+    if (file.endsWith('result.json')) {
+      status.explanation.model = file;
+      ce.result = true;
+    }
+
+    if (file.endsWith('mapper.json')) {
+      status.explanation.mapper = file;
+      ce.mapper = true;
     }
 
     if (
@@ -183,6 +189,16 @@ app.get('/project', (req, res) => {
       flags.ontology = true;
     }
   });
+
+  if (proof.file && proof.ad) {
+    status.explanation.type = 'pr';
+    flags.explanation = true;
+  }
+
+  if (ce.mapper && ce.result) {
+    status.explanation.type = 'ce';
+    flags.explanation = true;
+  }
 
   const namesPath = path.join(target, 'cnsOriginal.json');
   const hierarchyPath = path.join(target, 'cnsHierarchy.json');
@@ -221,8 +237,9 @@ app.get('/project', (req, res) => {
     });
   }
 
-  const pending = !flags.proofs || !flags.ad;
-  if (flags.proofs && flags.ad) {
+  const pending = !flags.explanation;
+
+  if (flags.explanation) {
     status.status = 'ready';
   } else if (pending) {
     status.status = 'pending';
@@ -352,9 +369,8 @@ app.get('/extract-names', (req, res) => {
   });
 });
 
-app.post('/axiom', (req, res) => {
+app.post('/explain', (req, res) => {
   const id = req.body.id;
-  const ontology = req.body.ontology;
 
   if (sessions[id]) {
     return;
@@ -362,75 +378,30 @@ app.post('/axiom', (req, res) => {
     sessions[id] = true;
   }
 
+  const ontology = req.body.ontology;
   const projPath = path.join(dataDir, id);
-  const ontPath = path.join(projPath, ontology);
-  const genMethod = req.body.method;
-  const sigPath = req.body.signaturePath;
   const axiom = req.body.lhs + " SubClassOf: " + req.body.rhs;
-  let translate2NL = req.body.translate2NL === "true" ? "" : "-nt";
+  const ontPath = path.join(projPath, ontology);
 
-  console.log('computing proofs...');
+  const preserve = ['.owl', 'reasoner.txt', 'cnsHierarchy.json', 'cnsOriginal.json'];
 
-  let proofs = generateProofs(ontPath, axiom, projPath, sigPath, genMethod, translate2NL)
-
-  printOutput(proofs);
-  proofs.on("exit", function (exitCode) {
-    if (exitCode === 333) {
-      console.log("Proving the axiom is not supported by the selected method")
-      return;
-      //TODO show the user that proof generation was not possible because
-      // the method they chose can not generate a proof for the type of input axiom
-    }
-    console.log("done computing proofs.");
-    console.log('extracting module...');
-
-    const outputLabel = path.parse(ontology).name;
-    const module = spawn('java', [
-      '-jar', 'externalTools/explain.jar',
-      '-o', ontPath,
-      '-a', axiom,
-      '-ad',
-      '-ol', outputLabel,
-      '-od', projPath,
-    ], { encoding: 'utf-8' });
-
-    printOutput(module);
-
-    module.on("exit", function () {
-      console.log("done extracting module.");
-      console.log('computing atomic decomposition...');
-      const ad = spawn('java', [
-        '-cp', 'externalTools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
-        path.join(projPath, outputLabel) + '.owl', // module input
-        projPath, //outDir
-        'atomic ' + path.parse(ontology).name //outFileName
-      ], { encoding: 'utf-8' });
-
-      printOutput(ad);
-      ad.on("exit", function () {
-        console.log("done computing atomic decomposition.");
-        delete sessions[id];
-      });
-
-      ad.on('close', (code) => {
-        if (code !== 0) {
-          console.log('failed computing atomic decomposition: ' + code);
-        }
-      });
-    });
-
-    module.on('close', (code) => {
-      if (code !== 0) {
-        console.log('failed extracting module: ' + code);
+  readdirSync(projPath).forEach(function (file) {
+    for (const p of preserve) {
+      if (file.endsWith(p)) {
+        return;
       }
-    });
+    }
+    removeFile(path.join(projPath, file));
   });
 
-  proofs.on('close', (code) => {
-    if (code !== 0) {
-      console.log('failed extracting concepts: ' + code);
-    }
-  });
+  const type = req.body.type;
+  if (type === 'pr') { // expects a proof
+    prove({ id, req, axiom, projPath, ontology, ontPath });
+  }
+
+  if (type === 'ce') { // expects a counterexample
+    counter({ axiom, projPath, ontPath });
+  }
 
   res.status(200).send({ msg: 'processing request..' });
 });
@@ -619,32 +590,6 @@ function copyFolderRecursiveSync(source, target) {
   }
 }
 
-function getProofType(genMethod, sigPath) {
-  // For reference
-  // minTreeOpts = ["1","4","6",/*"8",*/,"9","11"];
-
-  let minWTreeOpts = ["3", "7", "12"];
-  let minDepthOpts = ["2", "5", "10"];
-
-  let proofType = 'MinimalTreeSize';
-  // CONDENSED MINIMAL PROOF
-  if (sigPath !== "NoSignature") {
-    proofType = 'CondensedMinimalTreeSize';
-    if (minDepthOpts.includes(genMethod))
-      proofType = 'CondensedMinimalDepth';
-    else if (minWTreeOpts.includes(genMethod))
-      proofType = 'CondensedMinimalWeightedTreeSize';
-  }
-  // MINIMAL PROOF
-  else {
-    if (minDepthOpts.includes(genMethod))
-      proofType = 'MinimalDepth';
-    else if (minWTreeOpts.includes(genMethod))
-      proofType = 'MinimalWeightedTreeSize';
-  }
-  return proofType;
-}
-
 function convertOntology(ontFile, ontDir) {
   const owlFileName = owlFunctions.getOWlFileName(ontFile.name);
   const exitCode = spawn('java', [
@@ -662,113 +607,230 @@ function convertOntology(ontFile, ontDir) {
   }
 }
 
-function generateProofs(ontPath, axiom, projPath, sigPath, genMethod, translate2NL) {
-  console.log("GENERATION METHOD -> " + genMethod);
+function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
+  console.log('computing proofs for ' + axiom);
 
-  const proofType = getProofType(genMethod, sigPath);
-  console.log("proof type = " + proofType)
+  const genMethod = req.body.method;
+  const sigPath = req.body.signaturePath;
+  const translate2NL = req.body.translate2NL === "true" ? "" : "-nt";
+  const proofs = generateProofs({
+    ontPath, axiom, projPath, sigPath, genMethod, translate2NL
+  });
 
-  //ELK PROOF
-  let elkOpts = ["1", "2", "3"];
-  if (elkOpts.includes(genMethod)) {
-    return spawn('java', [
+  printOutput(proofs);
+
+  proofs.on("exit", function (code) {
+    if (code !== 0) {
+      console.error('failed computing proofs: ' + code);
+
+      if (code === 333) {
+        console.error("Proving the axiom is not supported by the selected method.")
+        return;
+      }
+
+      return;
+    }
+
+    console.log("done computing proofs.");
+    console.log('extracting module...');
+
+    const outputLabel = path.parse(ontology).name;
+    const module = spawn('java', [
       '-jar', 'externalTools/explain.jar',
-      '--ontology-path', ontPath,
-      '--conclusion-axiom', axiom,
-      '--output-type', 'graph',
-      '--output-label', 'proof',
-      '--output-directory', projPath,
-      '--proof-type', proofType,
-      '--signature-file-path', sigPath,
-      '-no-image',
-      translate2NL
+      '-o', ontPath,
+      '-a', axiom,
+      '-ad',
+      '-ol', outputLabel,
+      '-od', projPath,
     ], { encoding: 'utf-8' });
+
+    printOutput(module);
+
+    module.on("exit", function (code) {
+      if (code !== 0) {
+        console.error('failed extracting module: ' + code);
+        return;
+      }
+
+      console.log("done extracting module.");
+      console.log('computing atomic decomposition...');
+
+      const ad = spawn('java', [
+        '-cp', 'externalTools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
+        path.join(projPath, outputLabel) + '.owl', // module input
+        projPath, //outDir
+        'atomic ' + path.parse(ontology).name //outFileName
+      ], { encoding: 'utf-8' });
+
+      printOutput(ad);
+
+      ad.on("exit", function () {
+        if (code !== 0) {
+          console.error('failed computing atomic decomposition: ' + code);
+          return;
+        }
+        console.log("done computing atomic decomposition.");
+        delete sessions[id];
+      });
+    });
+  });
+
+  function getProofType(genMethod, sigPath) {
+    // For reference
+    // minTreeOpts = ["1","4","6",/*"8",*/,"9","11"];
+
+    let minWTreeOpts = ["3", "7", "12"];
+    let minDepthOpts = ["2", "5", "10"];
+
+    let proofType = 'MinimalTreeSize';
+    // CONDENSED MINIMAL PROOF
+    if (sigPath !== "NoSignature") {
+      proofType = 'CondensedMinimalTreeSize';
+      if (minDepthOpts.includes(genMethod))
+        proofType = 'CondensedMinimalDepth';
+      else if (minWTreeOpts.includes(genMethod))
+        proofType = 'CondensedMinimalWeightedTreeSize';
+    }
+    // MINIMAL PROOF
+    else {
+      if (minDepthOpts.includes(genMethod))
+        proofType = 'MinimalDepth';
+      else if (minWTreeOpts.includes(genMethod))
+        proofType = 'MinimalWeightedTreeSize';
+    }
+    return proofType;
   }
 
-  //Parsing here is a bit different
-  axiom = axiom.replace('SubClassOf:', '<=');
-  if (axiom.endsWith("owl:Nothing"))
-    axiom = axiom.replace("owl:Nothing", "BOTTOM")
+  function generateProofs(params) {
 
-  //LETHE Forgetting-Based Proof
-  let generator = 'externalTools/evee-elimination-proofs-lethe.jar';
-  let cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedHeuristicProofGenerator';
+    const { ontPath, axiom, projPath, sigPath, genMethod, translate2NL } = params;
 
-  //LETHE Forgetting-Based Symbol Minimal Proof
-  if (genMethod === "5") {
-    cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedSymbolMinimalProofGenerator';
-  }
+    console.log("GENERATION METHOD -> " + genMethod);
 
-  //LETHE Forgetting-Based Size Minimal Proof
-  if (genMethod === "6") {
-    cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedSizeMinimalProofGenerator';
-  }
+    const proofType = getProofType(genMethod, sigPath);
+    console.log("proof type = " + proofType)
 
-  //LETHE Forgetting-Based Weighted Size Minimal Proof
-  if (genMethod === "7") {
-    cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedWeightedSizeMinimalProofGenerator';
-  }
+    //ELK PROOF
+    const elkOpts = ["1", "2", "3"];
+    if (elkOpts.includes(genMethod)) {
+      return spawn('java', [
+        '-jar', 'externalTools/explain.jar',
+        '--ontology-path', ontPath,
+        '--conclusion-axiom', axiom,
+        '--output-type', 'graph',
+        '--output-label', 'proof',
+        '--output-directory', projPath,
+        '--proof-type', proofType,
+        '--signature-file-path', sigPath,
+        '-no-image',
+        translate2NL
+      ], { encoding: 'utf-8' });
+    }
 
-  //LETHE Proof
-  if (genMethod === "8") {
-    generator = 'externalTools/evee-lethe-proof-extractor.jar';
-    cls = 'de.tu_dresden.inf.lat.evee.proofs.lethe.LetheProofGenerator';
-  }
+    //Parsing here is a bit different
+    axiom = axiom.replace('SubClassOf:', '<=');
+    if (axiom.endsWith("owl:Nothing"))
+      axiom = axiom.replace("owl:Nothing", "BOTTOM")
 
-  //FAME Forgetting-Based Proof
-  if (genMethod === "9") {
-    generator = 'externalTools/evee-elimination-proofs-fame.jar';
-    cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedHeuristicProofGenerator';
-  }
+    //LETHE Forgetting-Based Proof
+    let generator = 'externalTools/evee-elimination-proofs-lethe.jar';
+    let cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedHeuristicProofGenerator';
 
-  //FAME Forgetting-Based Symbol Minimal Proof
-  if (genMethod === "10") {
-    generator = 'externalTools/evee-elimination-proofs-fame.jar';
-    cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSymbolMinimalProofGenerator';
-  }
+    //LETHE Forgetting-Based Symbol Minimal Proof
+    if (genMethod === "5") {
+      cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedSymbolMinimalProofGenerator';
+    }
 
-  //FAME Forgetting-Based Size Minimal Proof
-  if (genMethod === "11") {
-    generator = 'externalTools/evee-elimination-proofs-fame.jar';
-    cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSizeMinimalProofGenerator';
-  }
+    //LETHE Forgetting-Based Size Minimal Proof
+    if (genMethod === "6") {
+      cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedSizeMinimalProofGenerator';
+    }
 
-  //FAME Forgetting-Based Weighted Size Minimal Proof
-  if (genMethod === "12") {
-    generator = 'externalTools/evee-elimination-proofs-fame.jar';
-    cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedWeightedSizeMinimalProofGenerator';
-  }
+    //LETHE Forgetting-Based Weighted Size Minimal Proof
+    if (genMethod === "7") {
+      cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedWeightedSizeMinimalProofGenerator';
+    }
 
-  const process = sigPath !== "NoSignature" ? spawn('java', [
-    '-cp', generator, 'de.tu_dresden.inf.lat.evee.proofs.GenerateProof',
-    cls, ontPath, axiom, projPath, 'proof', sigPath
-  ], { encoding: 'utf-8' })
-    : spawn('java', [
+    //LETHE Proof
+    if (genMethod === "8") {
+      generator = 'externalTools/evee-lethe-proof-extractor.jar';
+      cls = 'de.tu_dresden.inf.lat.evee.proofs.lethe.LetheProofGenerator';
+    }
+
+    //FAME Forgetting-Based Proof
+    if (genMethod === "9") {
+      generator = 'externalTools/evee-elimination-proofs-fame.jar';
+      cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedHeuristicProofGenerator';
+    }
+
+    //FAME Forgetting-Based Symbol Minimal Proof
+    if (genMethod === "10") {
+      generator = 'externalTools/evee-elimination-proofs-fame.jar';
+      cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSymbolMinimalProofGenerator';
+    }
+
+    //FAME Forgetting-Based Size Minimal Proof
+    if (genMethod === "11") {
+      generator = 'externalTools/evee-elimination-proofs-fame.jar';
+      cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSizeMinimalProofGenerator';
+    }
+
+    //FAME Forgetting-Based Weighted Size Minimal Proof
+    if (genMethod === "12") {
+      generator = 'externalTools/evee-elimination-proofs-fame.jar';
+      cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedWeightedSizeMinimalProofGenerator';
+    }
+
+    const process = spawn('java', [
       '-cp', generator, 'de.tu_dresden.inf.lat.evee.proofs.GenerateProof',
-      cls, ontPath, axiom, projPath, 'proof'
+      cls, ontPath, axiom, projPath, 'proof', sigPath !== "NoSignature" ? '' : sigPath,
     ], { encoding: 'utf-8' });
 
-  return process.on("exit", function (exitCode) {
-    if (exitCode === 3)
-      return process;
+    return process.on("exit", function (exitCode) {
+      if (exitCode === 3)
+        return process;
 
-    console.log("Done computing JSON Proofs");
-    const draw = spawn('java', ['-cp', 'externalTools/explain.jar',
-      'de.tu_dresden.lat.evonne.EvonneInputGenerator',
-      '--proof-path', projPath + '/proof.json',
-      '--output-directory', projPath,
-      '--output-name', "proof",
-      '--proof-type', proofType,
-      '--signature-file-path', sigPath,
-      '--ontology-path', ontPath,
-      translate2NL
-    ]);
+      console.log("Done computing JSON Proofs");
+      const draw = spawn('java', ['-cp', 'externalTools/explain.jar',
+        'de.tu_dresden.lat.evonne.EvonneInputGenerator',
+        '--proof-path', projPath + '/proof.json',
+        '--output-directory', projPath,
+        '--output-name', "proof",
+        '--proof-type', proofType,
+        '--signature-file-path', sigPath,
+        '--ontology-path', ontPath,
+        translate2NL
+      ]);
 
-    printOutput(draw);
+      printOutput(draw);
 
-    return draw.on("exit", function () {
-      console.log("Done generating GML Proofs");
+      return draw.on("exit", function () {
+        console.log("Done generating GML Proofs");
+      })
     })
-  })
 
+  }
+}
+
+function counter({ id, axiom, projPath, ontPath } = {}) {
+  console.log('producing counterexample for' + axiom)
+
+  const process = spawn('java', [
+    '-jar', 'externalTools/explain.jar',
+    '-o', ontPath,
+    '-a', axiom,
+    '-od', projPath,
+    '-em',
+  ], { encoding: 'utf-8' });
+
+  printOutput(process);
+
+  process.on("exit", function (code) {
+    if (code !== 0) {
+      console.error('failed to create counterexample: ' + code);
+    } else {
+      console.log("done creating counterexample." + code);
+    }
+    delete sessions[id];
+  });
 }

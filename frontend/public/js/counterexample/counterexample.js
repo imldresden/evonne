@@ -816,6 +816,7 @@ function calcGroupHeight(stringList) {
 
 // Creating an edge and node arrays for CY
 function processData(mapper, model) {
+  
   // Compute edges
   // console.log(model);
   const edgeData = [].map.call(model.querySelectorAll("edge"), (d, index) => {
@@ -1033,76 +1034,6 @@ function addParentNode(idSuffix, parent = undefined, groupName = "Group") {
 
   return createParentNode(id, groupName, boxH, boxW, parent);
 }
-
-// For Sidebar Controls
-const sidebarToggles = document.getElementsByClassName("toggles-sidebar");
-const btnToggleSideBar = document.getElementById("btnToggleSideBar");
-
-function slideIn() {
-  const sidebar = document.getElementById("sidebar");
-  sidebar.classList.remove("bar-sliding-out");
-  sidebar.classList.add("bar-sliding-in");
-
-  const icon = document.getElementById("iconToggleSideBar");
-  icon.classList.remove("icon-sliding-out");
-  icon.classList.add("icon-sliding-in");
-}
-
-function slideOut() {
-  const sidebar = document.getElementById("sidebar");
-  sidebar.classList.remove("bar-sliding-in");
-  sidebar.classList.add("bar-sliding-out");
-
-  const icon = document.getElementById("iconToggleSideBar");
-  icon.classList.remove("icon-sliding-in");
-  icon.classList.add("icon-sliding-out");
-}
-
-function toggleSidebar() {
-  if (btnToggleSideBar.classList.contains("active")) {
-    slideOut();
-  } else {
-    slideIn();
-  }
-  btnToggleSideBar.classList.toggle("active");
-}
-
-function setTabFromDirectControl(srcID, toggleIfOpen = true) {
-  if (document.getElementById(srcID).classList.contains("active") && toggleIfOpen) {
-    toggleSidebar();
-  } else {
-    const tabs = document.querySelector(".tabs");
-    M.Tabs.getInstance(tabs).select(srcID);
-    !btnToggleSideBar.classList.contains("active") && toggleSidebar();
-  }
-}
-
-function showSettingsTab(toggleIfOpen = true) {
-  setTabFromDirectControl("sidebarSettings", toggleIfOpen);
-}
-
-for (const c of sidebarToggles) {
-  c.addEventListener("click", toggleSidebar);
-}
-
-const settingsSidebar = document.getElementById("sidebarSettings");
-const settingsButton = document.getElementById("showSettingsMenuButton");
-
-if (settingsButton) {
-  if (settingsSidebar !== null) {
-    settingsButton.addEventListener("click", showSettingsTab);
-  } else {
-    settingsButton.style.display = "none";
-  }
-}
-
-const searchBar = document.getElementById('search-bar');
-const tagsContainer = document.getElementById('tags');
-const labelColorMap = {};
-const highlightedLabels = new Set();
-
-searchBar.addEventListener('input', handleSearch);
-tagsContainer.addEventListener('click', handleTagClick);
 
 function handleSearch(event) {
   const query = event.target.value.toLowerCase();
@@ -1380,7 +1311,7 @@ function renderSubgraph(currentNode, connectedNodes) {
       }, {
         selector: 'node:selected',
         style: {
-          'border-width': '3px' 
+          'border-width': '3px'
         },
       }, {
         selector: 'edge, edge:selected',
@@ -1390,7 +1321,6 @@ function renderSubgraph(currentNode, connectedNodes) {
     layout: counter
   });
 }
-
 
 async function readJson(url) {
   const response = await fetch(url);
@@ -1403,15 +1333,87 @@ async function readXML(url) {
   return new window.DOMParser().parseFromString(await text, "text/xml");
 }
 
-async function init_counter({
-  div = "counter-example-container",
-} = {}) {
+async function init_controls() {
+  // For Sidebar Controls
+  const sidebarToggles = document.getElementsByClassName("toggles-sidebar");
+  const btnToggleSideBar = document.getElementById("btnToggleSideBar");
 
-  let mappers = await readJson("data/counterexample/mapper.json");
-  let model = await readXML("data/counterexample/result.model.xml");
-  createContent(div, mappers, model);
+  function slideIn() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.remove("bar-sliding-out");
+    sidebar.classList.add("bar-sliding-in");
+
+    const icon = document.getElementById("iconToggleSideBar");
+    icon.classList.remove("icon-sliding-out");
+    icon.classList.add("icon-sliding-in");
+  }
+
+  function slideOut() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.remove("bar-sliding-in");
+    sidebar.classList.add("bar-sliding-out");
+
+    const icon = document.getElementById("iconToggleSideBar");
+    icon.classList.remove("icon-sliding-in");
+    icon.classList.add("icon-sliding-out");
+  }
+
+  function toggleSidebar() {
+    if (btnToggleSideBar.classList.contains("active")) {
+      slideOut();
+    } else {
+      slideIn();
+    }
+    btnToggleSideBar.classList.toggle("active");
+  }
+
+  function setTabFromDirectControl(srcID, toggleIfOpen = true) {
+    if (document.getElementById(srcID).classList.contains("active") && toggleIfOpen) {
+      toggleSidebar();
+    } else {
+      const tabs = document.querySelector(".tabs");
+      M.Tabs.getInstance(tabs).select(srcID);
+      !btnToggleSideBar.classList.contains("active") && toggleSidebar();
+    }
+  }
+
+  function showSettingsTab(toggleIfOpen = true) {
+    setTabFromDirectControl("sidebarSettings", toggleIfOpen);
+  }
+
+  for (const c of sidebarToggles) {
+    c.addEventListener("click", toggleSidebar);
+  }
+
+  const settingsSidebar = document.getElementById("sidebarSettings");
+  const settingsButton = document.getElementById("showSettingsMenuButton");
+
+  if (settingsButton) {
+    if (settingsSidebar !== null) {
+      settingsButton.addEventListener("click", showSettingsTab);
+    } else {
+      settingsButton.style.display = "none";
+    }
+  }
+
+  const searchBar = document.getElementById('search-bar');
+  const tagsContainer = document.getElementById('tags');
+
+  searchBar.addEventListener('input', handleSearch);
+  tagsContainer.addEventListener('click', handleTagClick);
 }
 
-await init_counter();
+async function init_counter({
+  div = "ce-container",
+  model, mapper
+} = {}) {
+  await init_controls();
+  let mapperData = await readJson("data/" + getSessionId() + "/" + mapper);
+  let modelData = await readJson("data/" + getSessionId() + "/" + model);
+  createContent(div, mapperData, modelData);
+}
 
-export { createContent, cy, calcGroupHeight, calcBoxWidth, init_counter }
+const labelColorMap = {};
+const highlightedLabels = new Set();
+
+export { createContent, cy, calcGroupHeight, calcBoxWidth, init_counter, init_controls }

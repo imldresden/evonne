@@ -1,18 +1,19 @@
 <div style="background-color:#a9a9a9; height:0.5px;"></div>
 <br>
-<header class="modal-section-header toggles-content" target="counterexample-settings">
-  <h3 class="modal-section-heading">Counterex. Settings</h3> <i class="material-icons">arrow_drop_down</i>
+
+<header class="modal-section-header toggles-content" target="ce-settings">
+  <h3 class="modal-section-heading">CE Settings</h3> <i class="material-icons">arrow_drop_down</i>
 </header>
 
-<div class="slidering closed" id="counterexample-settings">
-    <fieldset style="display:none">
+<div class="slidering" id="ce-settings">
+  <fieldset style="display:none">
     <h4>Selection Mode</h4>
     <div class="counter-modal-option">
       <button id="redo" class="btn btn-small btn-primary">Redo</button>
       <button id="undo" class="btn btn-small btn-primary">Undo</button>
     </div>
   </fieldset>
-  
+
   <fieldset style="display:none;">
     <h4>Group</h4>
     <div class="counter-modal-option">
@@ -33,7 +34,7 @@
       <button id="show_hidden_nodes" class="btn btn-small btn-primary">Show hidden nodes</button>
     </div>
   </fieldset>
-  
+
   <fieldset>
     <h4>Selection Mode</h4>
     <div class="counter-modal-option">
@@ -42,7 +43,7 @@
       <button id="rectangle_selection" class="btn btn-small btn-primary">Rectangle</button>
     </div>
   </fieldset>
-  
+
   <fieldset>
     <h4>Edges</h4>
     <div class="modal-option">
@@ -57,7 +58,7 @@
         </label>
       </div>
           </div>
-           <div class="modal-option">
+          <div class="modal-option">
         <label>
           Edge labels
         </label>
@@ -69,16 +70,16 @@
       </div>
     </div>
   </fieldset>
-  
+
   <fieldset>
     <h4>Shortening mode</h4>
       <button style="display:none" id="toggle_shortening_mode" class="btn btn-small btn-primary">Shortening Mode</button>
       <div class="modal-option">
-         <label>
+        <label>
           Shortening mode
         </label>
         <div class="switch">
-         <label>
+        <label>
           <input id="shortening_mode" type="checkbox">
           <span class="lever"></span>
         </label>

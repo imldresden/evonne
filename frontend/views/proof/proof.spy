@@ -17,8 +17,8 @@
   << modals/advanced-settings >>
   << modals/axiom >>
   
-  <main id="proof-container">
-    <!-- everything gets added via js -->
+  <main id="container-main">
+    <!-- everything gets added via main.js -->
   </main>
 
   << menus/settings >>
