@@ -639,7 +639,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
       '-jar', 'externalTools/explain.jar',
       '-o', ontPath,
       '-a', axiom,
-      '-ad',
+      '-mod',
       '-ol', outputLabel,
       '-od', projPath,
     ], { encoding: 'utf-8' });
