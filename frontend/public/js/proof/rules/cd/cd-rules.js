@@ -44,12 +44,8 @@ function combineSteps(data, name) {
 }
 
 function controls({ data }, where, params) {
-    const buttons = where
-        .append("div")
-        .attr("class", "controls-bar");
-
+    const buttons = where.append("div").attr("class", "controls-bar");
     const lefted = buttons.append("a").attr("class", "bar-left");
-    //const centered = buttons.append("a").attr("class", "bar-center");
     const righted = buttons.append("a").attr("class", "bar-right");
 
     if (proof.showSubProofs) {
@@ -76,12 +72,11 @@ function controls({ data }, where, params) {
     
     const replay = righted.append("a")
         .attr("class", "bar-button")
-        .attr("title", "Replay animation");
+        .attr("title", "Reset Explanation");
     replay.append("i")
         .attr("class", "material-icons")
         .text("replay")
         .style("font-size", "23px");
-    //const centered = buttons.append("a").attr("class", "bar-center");
 
     if (!params.isSubProof) {
         const prev = lefted.append("a")

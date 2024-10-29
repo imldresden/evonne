@@ -1,6 +1,5 @@
 import { controls, createVisContainer } from "./cd-rules.js";
 import { utils } from "../rules.js";
-import { parallelCoords } from "../../../parallel-coords/parallel-coords-svg.js";
 
 export class LinearCD {
 
@@ -117,24 +116,6 @@ export class LinearCD {
             d3.selectAll(`#eq-${Array.from(e.detail.ids).join(', #eq-')}`).classed("hl-text", true)
         }
 
-        function makePCP(data) {
-            d3.select("#pcp").selectAll("*").remove();
-            const dim = d3.select("#explanation-container").node().getBoundingClientRect()
-
-            parallelCoords(
-                { id: "pcp", details: "explanation-container", width: dim.width, height: dim.height },
-                data,
-                {
-                    data_id: 'id',
-                    nominals: [],
-                    booleans: [],
-                    numbers: header,
-                    cols: header,
-                    domains: domains,
-                }
-            );
-        }
-
         utils.addTitle("Numerical Logic: Gaussian Elimination");
 
         const { input } = createVisContainer(params, where);
@@ -194,7 +175,7 @@ export class LinearCD {
         if (data.ops[data.current] && pcp_data[data.current]) {
             controls({ data, }, where, params);
             displayRowOperation(data.ops[data.current]);
-            makePCP(pcp_data[data.current]);
+            
             document.removeEventListener('pcp-hl', highlightText)
             document.addEventListener('pcp-hl', highlightText)
         }

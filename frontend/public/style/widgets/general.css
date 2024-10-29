@@ -46,7 +46,7 @@ nav a.sidenav-trigger {
 }
 
 #project-id-div {
-  width:350px;
+  width:20%;
   margin-left:calc(30% + 80px);
   position:absolute;
 }
@@ -430,4 +430,12 @@ span.badge.new {
 
 .wide-row {
 	width: 55%;
+}
+
+.option-rhs-true {
+	background-color: var(--color-primary-light);
+}
+
+.option-rhs-false {
+	background-color: var(--color-orange-dark);
 }

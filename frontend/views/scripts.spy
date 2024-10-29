@@ -1,24 +1,23 @@
 <!-- cytoscape and layouts -->
 <script src="/libs/cytoscape/dist/cytoscape.min.js"></script>
 <script src="/libs/cytoscape-navigator/cytoscape-navigator.js"></script>
-<script src="/libs/layout-base/layout-base.js"></script>
-<script src="/libs/cytoscape-layout-utilities/cytoscape-layout-utilities.js"></script>
 
 <!-- cola -->
 <script src="/libs/webcola/WebCola/cola.min.js"></script>
 <script src="/libs/cytoscape-cola/cytoscape-cola.js"></script>
 
 <!-- utils -->
-<script src="/libs/cytoscape-undo-redo/cytoscape-undo-redo.js"></script> <!-- undo/redo -->
 <script src="/libs/cytoscape-node-html-label/dist/cytoscape-node-html-label.js"></script> <!-- node html -->
 <script src="/libs/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
 <script src="/libs/cytoscape-lasso/dist/cytoscape-lasso.min.js"></script>
 <script src="/libs/cytoscape-context-menus/cytoscape-context-menus.js"></script>
-<script src="/libs/sweetalert2/dist/sweetalert2.all.min.js"></script>
-<script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/cytoscape-popper/cytoscape-popper.js"></script>
-<script src="https://unpkg.com/tippy.js@6"></script>
 
+<script src="/libs/@popperjs/core/dist/umd/popper-lite.js"></script>
+<script src="/libs/cytoscape-popper/cytoscape-popper.js"></script>
+<script src="/libs/tippy.js/dist/tippy.umd.min.js"></script>
+
+<!-- other libs -->
+<script src="/libs/sweetalert2/dist/sweetalert2.all.min.js"></script>
 <script src="/libs/d3/dist/d3.min.js"></script>
 <script src="/libs/materialize-css/dist/js/materialize.min.js"></script>
 <script src="/libs/svg-pan-zoom/dist/svg-pan-zoom.min.js"></script>
