@@ -25,6 +25,7 @@
         "material-icons": "^1.13.9",
         "materialize-css": "^1.0.0-rc.2",
         "move-file-cli": "^3.0.0",
+        "normalize.css": "^8.0.1",
         "parse-json": "^5.2.0",
         "pure-context-menu": "^1.1.1",
         "recursive-fs": "^2.1.0",
