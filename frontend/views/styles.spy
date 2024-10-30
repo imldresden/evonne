@@ -1,6 +1,5 @@
 <link rel="shortcut icon" type="image/svg" href="/favicon.svg"/>
 
-<link rel="stylesheet" href="/libs/normalize.css/normalize.css">
 <link rel="stylesheet" href="/libs/materialize-css/dist/css/materialize.css">
 <link rel="stylesheet" href="/libs/hack-font/build/web/hack.css">
 <link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">

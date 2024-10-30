@@ -80,9 +80,13 @@ window.onload = function () {
 function createConceptDropdowns(concepts) {
   const lhs = document.getElementById('lhsConcepts');
   lhs.innerHTML = '';
+  const cl = Object.keys(concepts); // sorted in server.js  
 
-  const lhsOptions = { truthy: [], falsey: [] }
-  const cl = Object.keys(concepts); // sorted in server.js
+  const toProof = document.createElement('optgroup')
+  const toCE = document.createElement('optgroup')
+  
+  toProof.label = "Proofs Exist:"
+  toCE.label = "Doesn't Follow From Ontology:";
 
   cl.forEach(k => {
     if (k !== "owl:Nothing") {
@@ -91,17 +95,16 @@ function createConceptDropdowns(concepts) {
       concept.innerHTML = concepts[k].short;
       if (concepts[k].rhs && concepts[k].rhs.length > 0) {
         concept.classList.add('option-rhs-true');
-        lhsOptions.truthy.push(concept);
+        toProof.appendChild(concept);
       } else {
         concept.classList.add('option-rhs-false');
-        lhsOptions.falsey.push(concept);
+        toCE.appendChild(concept);
       }
     }
   });
 
-  [...lhsOptions.truthy, ...lhsOptions.falsey].forEach(concept => {
-    lhs.appendChild(concept);
-  });
+  lhs.appendChild(toProof);
+  lhs.appendChild(toCE);
 
   const updateRHS = function () {
     const rhs = document.getElementById('rhsConcepts');
@@ -112,7 +115,12 @@ function createConceptDropdowns(concepts) {
 
     // decodes the encoding done on server.js to send less data
     const ccs = new Set(currentConcept.rhs.map(ek => cl[ek - 100]));
-    const rhsOptions = { truthy: [], falsey: [] };
+
+    const toProof = document.createElement('optgroup')
+    const toCE = document.createElement('optgroup')
+
+    toProof.label = "Can Be Proved:";
+    toCE.label = "Doesn't Follow From Ontology:";
 
     cl.forEach(rhsKey => {
       const rhsC = document.createElement('option');
@@ -120,16 +128,15 @@ function createConceptDropdowns(concepts) {
       rhsC.innerHTML = concepts[rhsKey].short;
       if (ccs.has(rhsKey)) {
         rhsC.classList.add('option-rhs-true');
-        rhsOptions.truthy.push(rhsC);
+        toProof.appendChild(rhsC);
       } else {
         rhsC.classList.add('option-rhs-false');
-        rhsOptions.falsey.push(rhsC);
+        toCE.appendChild(rhsC);
       }
     });
 
-    [...rhsOptions.truthy, ...rhsOptions.falsey].forEach(concept => {
-      rhs.appendChild(concept);
-    });
+    rhs.appendChild(toProof);
+    rhs.appendChild(toCE);
   };
   updateRHS();
 
@@ -207,9 +214,7 @@ function init_views(loop = false) {
           
         } else if (res.explanation.type === 'ce') {
             container.innerHTML = `<div class="container container-flex" id="ce-container"></div>`;
-            // init_counter({ model: res.explanation.model, mapper: res.explanation.mapper, ontology: res.ontology });
-
-            console.error('under construction!')
+            init_counter({ model: res.explanation.model, mapper: res.explanation.mapper, ontology: res.ontology });
         }
      
         //Hide computing indicator

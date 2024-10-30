@@ -169,7 +169,7 @@ app.get('/project', (req, res) => {
       proof.ad = true;
     }
 
-    if (file.endsWith('result.json')) {
+    if (file.endsWith('result.model.xml')) {
       status.explanation.model = file;
       ce.result = true;
     }
@@ -703,7 +703,8 @@ function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
 
   function generateProofs(params) {
 
-    const { ontPath, axiom, projPath, sigPath, genMethod, translate2NL } = params;
+    const { ontPath, projPath, sigPath, genMethod, translate2NL } = params;
+    let { axiom } = params;
 
     console.log("GENERATION METHOD -> " + genMethod);
 
@@ -821,6 +822,7 @@ function counter({ id, axiom, projPath, ontPath } = {}) {
     '-a', axiom,
     '-od', projPath,
     '-em',
+    '--output-type', 'graph',
   ], { encoding: 'utf-8' });
 
   printOutput(process);

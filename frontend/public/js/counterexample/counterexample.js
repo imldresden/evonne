@@ -1409,7 +1409,7 @@ async function init_counter({
 } = {}) {
   await init_controls();
   let mapperData = await readJson("data/" + getSessionId() + "/" + mapper);
-  let modelData = await readJson("data/" + getSessionId() + "/" + model);
+  let modelData = await readXML("data/" + getSessionId() + "/" + model);
   createContent(div, mapperData, modelData);
 }
 
