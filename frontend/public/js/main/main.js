@@ -79,14 +79,16 @@ window.onload = function () {
 
 function createConceptDropdowns(concepts) {
   const lhs = document.getElementById('lhsConcepts');
+  const rhs = document.getElementById('rhsConcepts');
+
   lhs.innerHTML = '';
   const cl = Object.keys(concepts); // sorted in server.js  
 
   const toProof = document.createElement('optgroup')
   const toCE = document.createElement('optgroup')
   
-  toProof.label = "Proofs Exist:"
-  toCE.label = "Doesn't Follow From Ontology:";
+  toProof.label = "...lead to proofs or counterexamples:"
+  toCE.label = "...only lead to counterexamples:";
 
   cl.forEach(k => {
     if (k !== "owl:Nothing") {
@@ -94,10 +96,8 @@ function createConceptDropdowns(concepts) {
       concept.value = k;
       concept.innerHTML = concepts[k].short;
       if (concepts[k].rhs && concepts[k].rhs.length > 0) {
-        concept.classList.add('option-rhs-true');
         toProof.appendChild(concept);
       } else {
-        concept.classList.add('option-rhs-false');
         toCE.appendChild(concept);
       }
     }
@@ -106,8 +106,7 @@ function createConceptDropdowns(concepts) {
   lhs.appendChild(toProof);
   lhs.appendChild(toCE);
 
-  const updateRHS = function () {
-    const rhs = document.getElementById('rhsConcepts');
+  function updateRHS () {
     rhs.innerHTML = '';
 
     const key = lhs.options[lhs.selectedIndex].value;
@@ -119,29 +118,44 @@ function createConceptDropdowns(concepts) {
     const toProof = document.createElement('optgroup')
     const toCE = document.createElement('optgroup')
 
-    toProof.label = "Can Be Proved:";
-    toCE.label = "Doesn't Follow From Ontology:";
+    toProof.label = "...lead to a proof:";
+    toCE.label = "...lead to a counterexample:";
 
     cl.forEach(rhsKey => {
       const rhsC = document.createElement('option');
       rhsC.value = rhsKey;
       rhsC.innerHTML = concepts[rhsKey].short;
       if (ccs.has(rhsKey)) {
-        rhsC.classList.add('option-rhs-true');
+        rhsC.type = "pr";
         toProof.appendChild(rhsC);
       } else {
-        rhsC.classList.add('option-rhs-false');
+        rhsC.type = "ce";
         toCE.appendChild(rhsC);
       }
     });
 
     rhs.appendChild(toProof);
     rhs.appendChild(toCE);
-  };
+    updateModal();
+  }
+
+  function updateModal() {
+    if (rhs.options[rhs.selectedIndex].type === "pr") {
+      document.getElementById('proof-more-settings').style.display = 'block'
+      document.getElementById('lead-to').innerHTML = "...will lead to a proof."
+    } else {
+      document.getElementById('proof-more-settings').style.display = 'none'
+      document.getElementById('lead-to').innerHTML = "...will lead to a counterexample."
+    };
+  }
+
   updateRHS();
 
   lhs.removeEventListener('change', updateRHS);
   lhs.addEventListener('change', updateRHS);
+
+  rhs.removeEventListener('change', updateModal);
+  rhs.addEventListener('change', updateModal);
 }
 
 function init_views(loop = false) {
