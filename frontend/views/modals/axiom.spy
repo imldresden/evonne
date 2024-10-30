@@ -7,7 +7,9 @@
     </header>
 
     <h4>Select Axiom Concepts</h4>
-    <div class="row" style="display:table">
+    <em>With the selected reasoner, these concepts...</em>
+    <div class="row" style="display:table;margin-bottom:0">
+      
       <div class="col vert-centered">
         <div class="modal-option modal-option-select">
           <select id="lhsConcepts" class="browser-default">
@@ -26,46 +28,47 @@
         </div>
       </div>
     </div>
-
-    <h4>Select Proof Generation Method</h4>
-    <div class="row">
-      <div class="modal-option modal-option-select">
-        <select id="methodsList" class="browser-default">
-          <option value="1">ELK Size Minimal Proof</option>
-          <option value="2">ELK Depth Minimal Proof</option>
-          <option value="3">ELK Weighted Size Minimal Proof</option>
-          <option value="4">LETHE Forgetting-Based Proof</option>
-          <option value="5">LETHE Forgetting-Based Symbol Minimal Proof</option>
-          <option value="6">LETHE Forgetting-Based Size Minimal Proof</option>
-          <option value="7">LETHE Forgetting-Based Weighted Size Minimal Proof</option>
-          <option value="8">Detailed Proof (LETHE)</option>
-          <option value="9">FAME Forgetting-Based Proof</option>
-          <option value="10">FAME Forgetting-Based Symbol Minimal Proof</option>
-          <option value="11">FAME Forgetting-Based Size Minimal Proof</option>
-          <option value="12">FAME Forgetting-Based Weighted Size Minimal Proof</option>
-        </select>
-      </div>
-    </div>
+    <em id="lead-to">...will lead to a</em>
     
-    << main/progress >>
-
-    <h4>Select Signature File (optional)</h4>
-    <div class="container-flex">
-      
-      <div class="col-11 file-field input-field">
-        
-        <div class="btn btn-primary">
-          <i class="material-icons">upload</i>
-          <input id="uploadSignatureTrigger" type="file" accept=".txt">
-        </div>
-        
-        <div class="file-path-wrapper">
-          <input id=signatureFilePath class="file-path validate" type="text" placeholder="Upload a signature...">
+    <div id="proof-more-settings"> 
+      <h4>Select Proof Generation Method</h4>
+      <div class="row">
+        <div class="modal-option modal-option-select">
+          <select id="methodsList" class="browser-default">
+            <option value="1">ELK Size Minimal Proof</option>
+            <option value="2">ELK Depth Minimal Proof</option>
+            <option value="3">ELK Weighted Size Minimal Proof</option>
+            <option value="4">LETHE Forgetting-Based Proof</option>
+            <option value="5">LETHE Forgetting-Based Symbol Minimal Proof</option>
+            <option value="6">LETHE Forgetting-Based Size Minimal Proof</option>
+            <option value="7">LETHE Forgetting-Based Weighted Size Minimal Proof</option>
+            <option value="8">Detailed Proof (LETHE)</option>
+            <option value="9">FAME Forgetting-Based Proof</option>
+            <option value="10">FAME Forgetting-Based Symbol Minimal Proof</option>
+            <option value="11">FAME Forgetting-Based Size Minimal Proof</option>
+            <option value="12">FAME Forgetting-Based Weighted Size Minimal Proof</option>
+          </select>
         </div>
       </div>
-      <i class="col-1 material-icons suffix right" style="margin-top:25px;color:gray" id="clearSignatureFile" title="Clear selection">clear</i>    
+      <h4>Select Signature File (optional)</h4>
+      <div class="container-flex">
+        
+        <div class="col-11 file-field input-field">
+          
+          <div class="btn btn-primary">
+            <i class="material-icons">upload</i>
+            <input id="uploadSignatureTrigger" type="file" accept=".txt">
+          </div>
+          
+          <div class="file-path-wrapper">
+            <input id=signatureFilePath class="file-path validate" type="text" placeholder="Upload a signature...">
+          </div>
+        </div>
+        <i class="col-1 material-icons suffix right" style="margin-top:25px;color:gray" id="clearSignatureFile" title="Clear selection">clear</i>    
+      </div>
     </div>
-
+  
+    << main/progress >>
     <h4>Natural Language Translation</h4>
     <div class="container-flex">
       <label>

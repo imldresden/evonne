@@ -433,9 +433,9 @@ span.badge.new {
 }
 
 .option-rhs-true {
-	background-color: var(--color-primary-light);
+	background-color: var(--color-teal-light);
 }
 
 .option-rhs-false {
-	background-color: var(--color-orange-dark);
+	background-color: var(--color-orange-light);
 }
