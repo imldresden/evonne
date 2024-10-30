@@ -431,3 +431,11 @@ span.badge.new {
 .wide-row {
 	width: 55%;
 }
+
+.option-rhs-true {
+	background-color: var(--color-teal-light);
+}
+
+.option-rhs-false {
+	background-color: var(--color-orange-light);
+}

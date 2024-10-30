@@ -96,8 +96,10 @@ function createConceptDropdowns(concepts) {
       concept.value = k;
       concept.innerHTML = concepts[k].short;
       if (concepts[k].rhs && concepts[k].rhs.length > 0) {
+        concept.classList.add('option-rhs-true');
         toProof.appendChild(concept);
       } else {
+        concept.classList.add('option-rhs-false');
         toCE.appendChild(concept);
       }
     }
@@ -127,9 +129,11 @@ function createConceptDropdowns(concepts) {
       rhsC.innerHTML = concepts[rhsKey].short;
       if (ccs.has(rhsKey)) {
         rhsC.type = "pr";
+        rhsC.classList.add('option-rhs-true');
         toProof.appendChild(rhsC);
       } else {
         rhsC.type = "ce";
+        rhsC.classList.add('option-rhs-false');
         toCE.appendChild(rhsC);
       }
     });
