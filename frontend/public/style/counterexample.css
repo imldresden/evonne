@@ -79,23 +79,17 @@ input#group_name::placeholder {
 .modal-option-range form:has(#shortening_mode_value) {
   width: 100%;
 }
-@keyframes sideBarSlideOut {
-  from {
-      right: 0;
-  }
 
-  to {
-      right: calc(0px - 300px);
-  }
-}
 #search-container {
   position: relative;
 }
+
 #search-bar:focus{
   border-bottom: 1px solid #799c78;
   -webkit-box-shadow: 0 1px 0 0 #799c78;
   box-shadow: 0 1px 0 0 #799c78;
 }
+
 #search-results:not(:empty) {
   position: absolute;
   width: 100%;
@@ -123,15 +117,11 @@ input#group_name::placeholder {
   color: white;
   cursor: pointer;
 }
+
 #subgraph canvas {
   left:0;
 }
 
 #counter-container {
  display: none;
-}
-.swal-button--confirm {
-  background-color: #799c78 !important;
-  color: white !important;           
-  border-radius: 5px !important;     
 }
