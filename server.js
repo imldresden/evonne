@@ -818,11 +818,12 @@ function counter({ id, axiom, projPath, ontPath } = {}) {
 
   const process = spawn('java', [
     '-jar', 'externalTools/explain.jar',
-    '-o', ontPath,
-    '-a', axiom,
-    '-od', projPath,
-    '-em',
-    '--output-type', 'graph',
+    '--ontology-path', ontPath,
+    '--conclusion-axiom', axiom,
+    '--output-directory', projPath,
+    '-output-type', 'graph',
+    '--export-mapper',
+    '--no-image'
   ], { encoding: 'utf-8' });
 
   printOutput(process);
