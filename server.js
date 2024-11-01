@@ -30,7 +30,7 @@ const app = express();
 app.engine('spy', sprightly);
 app.set('views', './frontend/views');
 app.set('view engine', 'spy');
-app.use(express.static('./frontend/public')); // serve the "public" directory
+app.use('/', express.static('./frontend/public'));
 app.use('/libs', express.static('./node_modules'));
 app.use(upload());
 

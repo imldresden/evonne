@@ -1,9 +1,9 @@
-import { utils } from "../rules.js";
-import { controls, createVisContainer } from "./cd-rules.js";
-import { stylesheet } from "../../../../style/cy-cd-style.js";
-import { params as cola } from "../../../layouts/cola.js";
+import { utils } from "../../rules.js";
+import { controls, createVisContainer } from "../cd-rules.js";
+import { stylesheet } from "../../../../../style/cy-cd-style.js";
+import { params as cola } from "../../../../layouts/cola.js";
 import { hamiltonianCycle } from "./hamiltonian-cycle.js";
-import { throttle } from "../../../utils/throttle.js";
+import { throttle } from "../../../../utils/throttle.js";
 
 const EPSILON = " - Є";
 const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? ` -Є` : ` -${n}Є`);

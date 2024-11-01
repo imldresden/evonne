@@ -88,7 +88,7 @@ function getConstraint(id, data) {
 
 function buildCDRule({ d, data }) {
     let domain = '';
-    const CDName = data.querySelector('concreteDomainMap').getAttribute("CDName") 
+    const CDName = data.querySelector('concreteDomainMap').getAttribute("CDName");
 
     if (CDName === 'Linear Constraints') {
         domain = 'linear'
