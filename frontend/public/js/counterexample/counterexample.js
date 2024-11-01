@@ -12,6 +12,7 @@ const swalGenerals = {
   showClass: { popup: `` },
   hideClass: { popup: `` }
 }
+let searchBar, tagsContainer;
 
 async function createContent(div, mapper, model) {
   const container = document.getElementById(div);
@@ -1323,8 +1324,8 @@ async function readXML(url) {
 
 async function init_controls() {
 
-  const searchBar = document.getElementById('search-bar');
-  const tagsContainer = document.getElementById('tags');
+  searchBar = document.getElementById('search-bar');
+  tagsContainer = document.getElementById('tags');
 
   searchBar.addEventListener('input', handleSearch);
   tagsContainer.addEventListener('click', handleTagClick);
