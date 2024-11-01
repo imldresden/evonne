@@ -205,20 +205,27 @@ function init_views(loop = false) {
         modal.close();
 
         function displaySettings({ proof = 'block', ad = 'block', ce='block'}){
-          document.getElementById('proof-settings-with-header').style.display = proof;
-          document.getElementById('proof-menu').style.display = proof;
-          document.getElementById('ontology-settings-with-header').style.display = ad;
-          document.getElementById('ontology-menu').style.display = ad;
-          document.getElementById('repairs-menu').style.display = ad;
-          document.getElementById('ce-settings-with-header').style.display = ce;
-          document.getElementById('general-settings-with-header').style.display = 
-            ce === 'block' ? 
-              'none' : 
-              'block';
-          document.getElementById('split-view-menu').style.display = 
-            ce !== 'block' && (ad === 'none' || proof === 'none') ? 
-              'block' : 
-              'none';
+          const pswh = document.getElementById('proof-settings-with-header');
+          const pm = document.getElementById('proof-menu');          
+          const oswh = document.getElementById('ontology-settings-with-header');
+          const om = document.getElementById('ontology-menu');
+          const rm = document.getElementById('repairs-menu');
+          const cswh = document.getElementById('ce-settings-with-header');
+          const gswh = document.getElementById('general-settings-with-header');
+          const svm = document.getElementById('split-view-menu');
+          
+          if (pswh) { pswh.style.display = proof; }
+          if (pm) { pm.style.display = proof; }
+          if (oswh) { oswh.style.display = ad; }
+          if (om) { om.style.display = ad; }
+          if (rm) { rm.style.display = ad; }
+          if (cswh) { cswh.style.display = ce; }
+          if (gswh) {
+            gswh.style.display = ce === 'block' ?  'none' : 'block';
+          }
+          if (svm) {
+            svm.style.display = ce !== 'block' && (ad === 'none' || proof === 'none') ? 'block' : 'none';
+          }
         }
 
         const container = document.getElementById('container-main')

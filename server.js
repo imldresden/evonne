@@ -67,7 +67,7 @@ app.get('/', (req, res) => {
     res.render('main/split.spy', {
       title,
       uuid: id,
-      settings_specific: '<< proof/settings >> << ontology/settings >> << counterexample/settings >>',
+      settings_specific: '<< proof/settings >> << ontology/settings >> << ce/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
       menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << proof/menu >> << ontology/menu >>`,

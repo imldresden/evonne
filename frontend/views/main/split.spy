@@ -9,7 +9,7 @@
 
   <link rel="stylesheet" href="/style/proof.css">
   <link rel="stylesheet" href="/style/ontology.css">
-  <link rel="stylesheet" href="/style/counterexample.css">
+  <link rel="stylesheet" href="/style/ce.css">
 </head>
 
 <body>
@@ -26,7 +26,7 @@
   << menus/settings >>
   
   << scripts >>
-  <script src="/js/ontology/repairsDisplay.js"></script>
+  <script src="/js/ontology/repairs.js"></script>
   <script src="/js/main/main.js" type="module"></script>
 </body>
 

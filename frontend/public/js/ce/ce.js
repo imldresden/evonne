@@ -1,6 +1,5 @@
-// import swal from 'sweetalert2';
 import { globals } from "../shared-data.js";
-import { stylesheet } from "../../../style/counter-cy-style.js";
+import { stylesheet } from "../../../style/cy-ce-style.js";
 import { counter } from "../layouts/cola.js";
 
 let cy;

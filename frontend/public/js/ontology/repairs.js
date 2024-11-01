@@ -1,21 +1,14 @@
 //The following works under the following assumptions:
-//				- there is a div with "repairsDiv" as an ID and contains
-//					- a label with ID = "closeRepairsMenuButton"
-//					- a div with ID = "notificationDiv" to show diagnosis computation status
-//				- there is a button with "showRepairsMenuButton" as an ID
-//				  to show the hidden repairs menu
+//  - there is a div with id "repairsDiv" and contains
+//	  - a label with id "closeRepairsMenuButton"
+//		- a div with id "notificationDiv" to show diagnosis computation status
+//	- there is a button with id "showRepairsMenuButton" to show the hidden repairs menu
 //
 //Call "readRepairs(axiom,ontology)" to show diagnoses in the repairs menu
 //Call "highlightNodesOf(axioms)" to change the color of the provided axioms
 //Call "computingRepairs()" to show a visual indicator that repairs are beeing computed
 //Call "computingRepairsFailed()" to show an error message if repairs could not be computed
-//
-//=========================================================================================
 
-//TODO: 1- pin repairs to compare them with different colors
-//TODO: 2- allow nodes to be protected, hence filtering the repairs (keep the ones that does not involve the selected nodes)
-
-//Frequently selected objects
 const repairsMenu = d3.select("#repairsDiv");
 const closeButton = d3.select("#closeRepairsMenuButton");
 const notificationDiv = d3.select("#notificationDiv");
