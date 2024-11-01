@@ -5,7 +5,7 @@
     </span>
   </button>
 
-  <ul class="tabs settings-tabs"> <!-- TODO: this is invisible but needed to reuse the sidebar -->
+  <ul class="tabs"> <!-- TODO: this is invisible but needed to reuse the sidebar -->
     <li class="tab col s3"><a id="sidebarTabAppearance" class="active" href="#sidebarSettings">Appearance</a></li>
     <li class="tab col s3"><a id="sidebarTabRepairs" href="#sidebarRepairs">Diagnoses</a></li>
   </ul>

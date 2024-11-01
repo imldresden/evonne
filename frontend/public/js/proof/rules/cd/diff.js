@@ -442,7 +442,6 @@ export class DifferenceCD {
                     
                     if (startId.nid) {
                         const n = cy.nodes(`#${current.data().source}`)
-                        console.log(cycleValue)
                         n.data({
                             og: n.data().v,
                             v: `${n.data().v} = ${

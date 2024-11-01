@@ -173,7 +173,7 @@ function init_views(loop = false) {
     .then(res => res.json())
     .then(res => {
       status = res;
-      console.log(res);
+      console.log(status);
 
       if (res.status === 'custom' || res.reasoner === 'n/a') { // blank project
         clearInterval(interval);
@@ -312,8 +312,7 @@ function computeAxiomsBtnFunction() {
     method: 'POST',
     body,
   }).then(res => res.json())
-    .then(res => {
-      console.log(res)
+    .then(_ => {
       interval = setInterval(() => {
         init_views(true);
       }, 2000)

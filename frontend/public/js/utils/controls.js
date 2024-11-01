@@ -33,7 +33,6 @@ function init() {
   });
 
   for (const toggle of document.getElementsByClassName('toggles-content')) {
-    console.log(toggle)
     toggle.addEventListener('click', () => {
       const toggeable = document.getElementById(toggle.getAttribute('target'));
 

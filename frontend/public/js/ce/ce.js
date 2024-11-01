@@ -186,7 +186,6 @@ async function createContent(div, mapper, model) {
               confirmButtonText: "Ok",
               ...swalGenerals,
               preConfirm: groupName => {
-                console.log(groupName)
                 if (groupName !== null) {
                   createGroup(groupName || "Group");
                 }
@@ -234,8 +233,6 @@ async function createContent(div, mapper, model) {
 
           if (selectedGroup.length === 1) {
             const currentName = selectedGroup.data('labels');
-            console.log('Current group name:', currentName);
-
             const newName = prompt("Enter new group name:", currentName) || currentName;
             selectedGroup.data('labels', newName);
 
@@ -272,7 +269,6 @@ async function createContent(div, mapper, model) {
         coreAsWell: false,
         show: function (ele) {
           const selectedElems = ele ? ele : cy.nodes(':selected');
-          console.log(selectedElems);
           // Check if any of the selected elements are parents (groups) or have parents that are groups
           const hasGroups = selectedElems.some(node => node.isParent() || node.parent().isParent());
 
@@ -804,9 +800,6 @@ function calcGroupHeight(stringList) {
 
 // Creating an edge and node arrays for CY
 function processData(mapper, model) {
-  
-  // Compute edges
-  // console.log(model);
   const edgeData = [].map.call(model.querySelectorAll("edge"), (d, index) => {
     const id = index + 1;
     const source = d.getAttribute("source");
@@ -906,7 +899,6 @@ function processData(mapper, model) {
 }
 
 function checkIfImportantLabelMatchesWholeLabel(labels, importantLabel) {
-  // console.log(importantLabel)
   for (let label of labels) {
     if (label === importantLabel) return label;
   }

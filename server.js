@@ -302,8 +302,7 @@ app.post('/upload', (req, res) => {
         if (owlFileName !== uploadPath)
           fs.unlink(uploadPath, function (err) {
             if (err) {
-              //TODO Please take a look and adapt handling the error if needed
-              throw err;
+              console.error(err); 
             }
             console.log("Original ontology file was deleted successfully");
           });
@@ -347,7 +346,7 @@ app.get('/extract-names', (req, res) => {
   const projPath = path.join(dataDir, id);
   const ontPath = path.join(projPath, req.query.ontology);
 
-  // TODO: progress bar (consider spawnSync)
+  //TODO: progress bar (consider spawnSync)
   const names = spawn('java', [
     '-jar', 'externalTools/extractNames.jar',
     '-o', ontPath,
