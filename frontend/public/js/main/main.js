@@ -1,7 +1,6 @@
 import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
 import { init_counter } from '../counterexample/counterexample.js';
-
 import { upload } from '../utils/upload-file.js';
 import { init as init_controls } from '../utils/controls.js'
 
@@ -205,10 +204,28 @@ function init_views(loop = false) {
         clearInterval(interval);
         modal.close();
 
+        function displaySettings({ proof = 'block', ad = 'block', ce='block'}){
+          document.getElementById('proof-settings-with-header').style.display = proof;
+          document.getElementById('proof-menu').style.display = proof;
+          document.getElementById('ontology-settings-with-header').style.display = ad;
+          document.getElementById('ontology-menu').style.display = ad;
+          document.getElementById('repairs-menu').style.display = ad;
+          document.getElementById('ce-settings-with-header').style.display = ce;
+          document.getElementById('general-settings-with-header').style.display = 
+            ce === 'block' ? 
+              'none' : 
+              'block';
+          document.getElementById('split-view-menu').style.display = 
+            ce !== 'block' && (ad === 'none' || proof === 'none') ? 
+              'block' : 
+              'none';
+        }
+
         const container = document.getElementById('container-main')
         if (res.explanation.type === 'pr') {
           const onlyProof = window.location.href.includes('/proof')
           const onlyAD = window.location.href.includes('/ontology')
+          
           if (!onlyProof && !onlyAD) {
             container.innerHTML = `
               <div class="container container-split container-flex">
@@ -218,21 +235,25 @@ function init_views(loop = false) {
               </div>`
               init_proof({ file: res.explanation.proof, ruleNamesMap: res.ruleNamesMap });
               init_ontology({ ad: res.explanation.ad, ontology: res.ontology });
+              displaySettings({ce:'none'});
           }
 
           if (onlyProof) {
             container.innerHTML = `<div class="container container-flex" id="proof-container"></div>`
             init_proof({ file: res.explanation.proof, ruleNamesMap: res.ruleNamesMap });
+            displaySettings({ad:'none', ce:'none'});
           }
 
           if (onlyAD) {
             container.innerHTML = `<div class="container container-flex" id="ontology-container"></div>`
             init_ontology({ ad: res.explanation.ad, ontology: res.ontology });
+            displaySettings({proof:'none', ce:'none'});
           }
           
         } else if (res.explanation.type === 'ce') {
             container.innerHTML = `<div class="container container-flex" id="ce-container"></div>`;
             init_counter({ model: res.explanation.model, mapper: res.explanation.mapper, ontology: res.ontology });
+            displaySettings({proof:'none', ad:'none'});
         }
      
         //Hide computing indicator

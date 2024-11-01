@@ -14,12 +14,14 @@
 
   <div class="sidebar-content" id="sidebarSettings">  
     
-    <header class="modal-section-header toggles-content" target="general-settings">
-      <h3 class="modal-section-heading">General Settings</h3> <i class="material-icons">arrow_drop_up</i>
-    </header>
+    <div id="general-settings-with-header">
+      <header class="modal-section-header toggles-content" target="general-settings">
+        <h3 class="modal-section-heading">General Settings</h3> <i class="material-icons">arrow_drop_up</i>
+      </header>
 
-    <div class="slidering" id="general-settings">
-      {{ general_settings }}
+      <div class="slidering" id="general-settings">
+        {{ general_settings }}
+      </div>
     </div>
 
     {{ settings_specific }}

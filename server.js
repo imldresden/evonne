@@ -183,7 +183,8 @@ app.get('/project', (req, res) => {
       (file.endsWith('.xml') || file.endsWith('.owl'))
       && !file.startsWith('atomic ')
       && !file.startsWith('proof_')
-      && !file.endsWith('t.xml')
+      && !file.endsWith('.t.xml')
+      && !file.endsWith('.model.xml')
     ) {
       status.ontology = owlFunctions.getOWlFileName(file); // there is more than one
       flags.ontology = true;
@@ -400,7 +401,7 @@ app.post('/explain', (req, res) => {
   }
 
   if (type === 'ce') { // expects a counterexample
-    counter({ axiom, projPath, ontPath });
+    counter({ id, axiom, projPath, ontPath });
   }
 
   res.status(200).send({ msg: 'processing request..' });

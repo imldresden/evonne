@@ -25,27 +25,22 @@ async function createContent(div, mapper, model) {
     wheelSensitivity: 0.3,
     ready: function () {
       const api = this.expandCollapse({
-        fisheye: true,
+        fisheye: false,
         animate: true,
         undoable: false,
         expandCollapseCuePosition: setCuePosition,
         expandCueImage: "../icons/icon-plus.svg",
-        collapseCueImage: "../icons/icon-minus.svg"
-      });
-      cy.nodes().on("expandcollapse.afterexpand", function (e) {
-        api.setOption("expandCollapseCuePosition", setCuePosition);
+        collapseCueImage: "../icons/icon-minus.svg",
+        zIndex: 1
       });
       function setCuePosition(e) {
         const { x1, y1 } = e._private.bodyBounds;
         const margin = 2;
-        const x = x1 + margin;
-        const y = y1 + margin;
-        return { x, y };
+        return { x: x1 + margin, y: y1 + margin };
       }
       api.collapseAll();
     }
   }).on('cxttap', function (event) {
-
     const contextNode = event.target || event.cyTarget;
     const selectedElems = cy.nodes(':selected').union(contextNode);
     let isGroupSelected = false;
@@ -524,7 +519,6 @@ async function createContent(div, mapper, model) {
   cy.on('position', 'node', () => {
     updateIndicators();
   });
-  // Hide node functionality ends
 
   // Event listener for double click on a node
   cy.on('dblclick', 'node', (event) => {
@@ -700,13 +694,10 @@ async function initHTML() {
           let italic;
           data.importantLabel !== null ? italic = 'italic' : '';
           let html = "";
+          
           if (!Array.isArray(text)) {
-            html += `
-          <p style="margin:0;padding:0">
-              ${text}
-          </p>`;
-          }
-          else {
+            html += `<p style="margin:0;padding:0">${text}</p>`;
+          } else {
             for (let i = 0; i < text.length; i++) {
               let color = 'black';
               let bold = '';
@@ -718,21 +709,18 @@ async function initHTML() {
                 bold = "font-weight:bold";
               }
               const fontStyle = i === 0 ? 'font-style:' + italic + ';' : '';
-              html += `
-            <p style="color:${color};${bold};margin:0;padding:0;${fontStyle}">
-                ${text[i]}
-            </p>`;
+              html += `<p style="color:${color};${bold};margin:0;padding:0;${fontStyle}">${text[i]}</p>`;
             }
           }
           // html += `</div>`;
           const template = `
-          <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}" data-value="${data.element}" data-id = "${data.id}"> 
-            <div id="frontRect" style="padding: 5px; white-space:nowrap;">
-              ${html}
+            <div class="cy-html bg-box prevent-select" 
+                 id="${ontologyNodeId + data.id}" 
+                 data-value="${data.element}" 
+                 data-id="${data.id}"> 
+              <div id="frontRect">${html}</div>
             </div>
-          </div>
-        `;
-
+          `;
           return template;
         }
       }
@@ -1334,67 +1322,6 @@ async function readXML(url) {
 }
 
 async function init_controls() {
-  // For Sidebar Controls
-  const sidebarToggles = document.getElementsByClassName("toggles-sidebar");
-  const btnToggleSideBar = document.getElementById("btnToggleSideBar");
-
-  function slideIn() {
-    const sidebar = document.getElementById("sidebar");
-    sidebar.classList.remove("bar-sliding-out");
-    sidebar.classList.add("bar-sliding-in");
-
-    const icon = document.getElementById("iconToggleSideBar");
-    icon.classList.remove("icon-sliding-out");
-    icon.classList.add("icon-sliding-in");
-  }
-
-  function slideOut() {
-    const sidebar = document.getElementById("sidebar");
-    sidebar.classList.remove("bar-sliding-in");
-    sidebar.classList.add("bar-sliding-out");
-
-    const icon = document.getElementById("iconToggleSideBar");
-    icon.classList.remove("icon-sliding-in");
-    icon.classList.add("icon-sliding-out");
-  }
-
-  function toggleSidebar() {
-    if (btnToggleSideBar.classList.contains("active")) {
-      slideOut();
-    } else {
-      slideIn();
-    }
-    btnToggleSideBar.classList.toggle("active");
-  }
-
-  function setTabFromDirectControl(srcID, toggleIfOpen = true) {
-    if (document.getElementById(srcID).classList.contains("active") && toggleIfOpen) {
-      toggleSidebar();
-    } else {
-      const tabs = document.querySelector(".tabs");
-      M.Tabs.getInstance(tabs).select(srcID);
-      !btnToggleSideBar.classList.contains("active") && toggleSidebar();
-    }
-  }
-
-  function showSettingsTab(toggleIfOpen = true) {
-    setTabFromDirectControl("sidebarSettings", toggleIfOpen);
-  }
-
-  for (const c of sidebarToggles) {
-    c.addEventListener("click", toggleSidebar);
-  }
-
-  const settingsSidebar = document.getElementById("sidebarSettings");
-  const settingsButton = document.getElementById("showSettingsMenuButton");
-
-  if (settingsButton) {
-    if (settingsSidebar !== null) {
-      settingsButton.addEventListener("click", showSettingsTab);
-    } else {
-      settingsButton.style.display = "none";
-    }
-  }
 
   const searchBar = document.getElementById('search-bar');
   const tagsContainer = document.getElementById('tags');
@@ -1407,10 +1334,11 @@ async function init_counter({
   div = "ce-container",
   model, mapper
 } = {}) {
-  await init_controls();
+  
   let mapperData = await readJson("data/" + getSessionId() + "/" + mapper);
   let modelData = await readXML("data/" + getSessionId() + "/" + model);
   createContent(div, mapperData, modelData);
+  await init_controls();
 }
 
 const labelColorMap = {};
