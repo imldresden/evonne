@@ -1,6 +1,6 @@
 import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
-import { init_counter } from '../counterexample/counterexample.js';
+import { init_counter } from '../ce/ce.js';
 import { upload } from '../utils/upload-file.js';
 import { init as init_controls } from '../utils/controls.js'
 
