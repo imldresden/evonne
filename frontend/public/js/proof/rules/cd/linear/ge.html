@@ -1,74 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Linear Equation Visualizer</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-    <link rel="stylesheet" href="./ge.css">  
-  
+
     <script type="module" src="https://cdn.jsdelivr.net/npm/function-plot/dist/function-plot.min.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-    <script src="./ge.js" defer></script>
+    <script type="module" src="./ge.js" defer></script>
 </head>
-  
+
 <body>
     <h1>Linear Equation Visualizer</h1>
     <div>
         <button id="exampleUnique">Load Example with Unique Solution</button>
         <button id="exampleInfinite">Load Example with Infinite Solutions</button>
         <button id="exampleNoSolution">Load Example with No Solution</button>
-        <button id="resetForm">Reset Form</button>
     </div>
 
-    <div id="equationInputContainers" style="display: none;">
-        <div>
-            <h3 id="systemTitle">PREVIEW of: System of Linear Equations</h3>
-            <div id="matrixContainer"></div>
-            <div id="equationPreview" class="equation-preview"></div>
-        </div>
-        <div>
-            <h3 id="singleTitle">PREVIEW of: Single Equation</h3>
-            <div id="singleMatrixContainer"></div>
-            <div id="singleEquationPreview" class="equation-preview"></div>
-      </div>
-      <button id="submitData">Visualize</button>  
-    </div>
-    <div id="dependentVariablesUniqueSol" style="display: none;">
-    <label for="var1">Dependent variable (y):</label>
-    <select id="var1"></select>
-    <label for="var2">Independent variable (x):</label>
-    <select id="var2"></select>
-    <button id="updatePlotButton">Update Plot</button>
-    </div>
-    <div id="plot"></div> <!-- This will be the container for your plot -->
-    <div id="slidersContainer" class="sliders-section" style="display: none;">
-      <h3>Adjust Parameters:</h3>
-      <!-- Sliders will be dynamically inserted here -->
-    </div>  
-    <div id="previewContainer" style="display: none;">
-        <div id="solutionPreview" class="preview"></div>
-        <div id="systemPreview" class="preview"></div>
+    <div id="plot">
+        <!-- This will be the container for your plot -->
+    </div> 
+
+    <div id="linear-vis-controls" style="display: none;">
+        <label for="var1">Dependent variable (y):</label>
+        <select id="var1"></select>
+        <label for="var2">Independent variable (x):</label>
+        <select id="var2"></select>
+        <button id="updatePlotButton">Update Plot</button>
     </div>
 
-    <div id="previewsContainer" style="display: none;">
-        <h3 style="text-align:center">Solutions Preview</h3>
-        <div id="solutionsPreview"></div>
-        <h3 style="text-align:center">Solutions Replaced Preview</h3>
-        <div id="solutionsReplacedPreview"></div>
-        <h3 style="text-align:center">Single Equation Preview</h3>
-        <div id="singlePreview"></div>
-        <h3 style="text-align:center">Single Equation Replaced Preview</h3>
-        <div id="singleReplacedPreview"></div>
+    <div id="slidersContainer" style="display: none;">
+        <!-- Sliders will be dynamically inserted here -->
+    </div>
+
+    <div id="previewContainer">
+        
     </div>
 
     <div id="noSolutionPreviewContainer" style="display: none;">
-        <h2 style="text-align:center">The System Has No Solution</h2>
-        <h3 style="text-align:center">Augmented Matrix:</h3>
+        <h2>The System Has No Solution</h2>
+        <h3>Augmented Matrix:</h3>
         <div id="initialStatePreview" class="preview"></div>
-        <h3 style="text-align:center">Final State of the Augmented Matrix after Gaussian Elimination:</h3>
+        <h3>Final State of the Augmented Matrix after Gaussian Elimination:</h3>
         <div id="finalStatePreview" class="preview"></div>
     </div>
 
-
 </body>
+
 </html>
