@@ -1,5 +1,5 @@
-import { LinearCD } from "./linear.js";
-import { DifferenceCD } from "./diff.js";
+import { LinearCD } from "./linear/linear.js";
+import { DifferenceCD } from "./diff/diff.js";
 import { proof } from "../../../proof/proof.js";
 
 function getIndexedData(data) {

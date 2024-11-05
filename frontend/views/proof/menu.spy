@@ -1,4 +1,4 @@
-<li>
+<li id="proof-menu">
   <a class="dropdown dropdown-trigger tooltipped" data-target="submenu-proof" data-tooltip="Proof">
     <i class="material-icons">filter_list</i>
   </a>

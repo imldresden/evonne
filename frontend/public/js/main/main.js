@@ -1,7 +1,6 @@
 import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
-import { init_counter } from '../counterexample/counterexample.js';
-
+import { init_counter } from '../ce/ce.js';
 import { upload } from '../utils/upload-file.js';
 import { init as init_controls } from '../utils/controls.js'
 
@@ -174,7 +173,7 @@ function init_views(loop = false) {
     .then(res => res.json())
     .then(res => {
       status = res;
-      console.log(res);
+      console.log(status);
 
       if (res.status === 'custom' || res.reasoner === 'n/a') { // blank project
         clearInterval(interval);
@@ -205,10 +204,35 @@ function init_views(loop = false) {
         clearInterval(interval);
         modal.close();
 
+        function displaySettings({ proof = 'block', ad = 'block', ce='block'}){
+          const pswh = document.getElementById('proof-settings-with-header');
+          const pm = document.getElementById('proof-menu');          
+          const oswh = document.getElementById('ontology-settings-with-header');
+          const om = document.getElementById('ontology-menu');
+          const rm = document.getElementById('repairs-menu');
+          const cswh = document.getElementById('ce-settings-with-header');
+          const gswh = document.getElementById('general-settings-with-header');
+          const svm = document.getElementById('split-view-menu');
+          
+          if (pswh) { pswh.style.display = proof; }
+          if (pm) { pm.style.display = proof; }
+          if (oswh) { oswh.style.display = ad; }
+          if (om) { om.style.display = ad; }
+          if (rm) { rm.style.display = ad; }
+          if (cswh) { cswh.style.display = ce; }
+          if (gswh) {
+            gswh.style.display = ce === 'block' ?  'none' : 'block';
+          }
+          if (svm) {
+            svm.style.display = ce !== 'block' && (ad === 'none' || proof === 'none') ? 'block' : 'none';
+          }
+        }
+
         const container = document.getElementById('container-main')
         if (res.explanation.type === 'pr') {
           const onlyProof = window.location.href.includes('/proof')
           const onlyAD = window.location.href.includes('/ontology')
+          
           if (!onlyProof && !onlyAD) {
             container.innerHTML = `
               <div class="container container-split container-flex">
@@ -218,21 +242,25 @@ function init_views(loop = false) {
               </div>`
               init_proof({ file: res.explanation.proof, ruleNamesMap: res.ruleNamesMap });
               init_ontology({ ad: res.explanation.ad, ontology: res.ontology });
+              displaySettings({ce:'none'});
           }
 
           if (onlyProof) {
             container.innerHTML = `<div class="container container-flex" id="proof-container"></div>`
             init_proof({ file: res.explanation.proof, ruleNamesMap: res.ruleNamesMap });
+            displaySettings({ad:'none', ce:'none'});
           }
 
           if (onlyAD) {
             container.innerHTML = `<div class="container container-flex" id="ontology-container"></div>`
             init_ontology({ ad: res.explanation.ad, ontology: res.ontology });
+            displaySettings({proof:'none', ce:'none'});
           }
           
         } else if (res.explanation.type === 'ce') {
             container.innerHTML = `<div class="container container-flex" id="ce-container"></div>`;
             init_counter({ model: res.explanation.model, mapper: res.explanation.mapper, ontology: res.ontology });
+            displaySettings({proof:'none', ad:'none'});
         }
      
         //Hide computing indicator
@@ -284,8 +312,7 @@ function computeAxiomsBtnFunction() {
     method: 'POST',
     body,
   }).then(res => res.json())
-    .then(res => {
-      console.log(res)
+    .then(_ => {
       interval = setInterval(() => {
         init_views(true);
       }, 2000)

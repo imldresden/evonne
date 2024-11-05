@@ -12,7 +12,7 @@
       </a>
     </div>
   </li>
-  <li>
+  <li id="split-view-menu">
     <div type="button" class="menu-entry tooltipped" data-tooltip="Open Split View (Proof | Ontology)">
       <a id="openSplitInNew">
         <i class="material-icons">flip</i>

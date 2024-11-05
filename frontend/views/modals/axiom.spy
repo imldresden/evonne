@@ -66,16 +66,18 @@
         </div>
         <i class="col-1 material-icons suffix right" style="margin-top:25px;color:gray" id="clearSignatureFile" title="Clear selection">clear</i>    
       </div>
+      
+      <h4>Natural Language Translation</h4>
+      <div class="container-flex">
+        <label>
+          <input id="checkboxT2NL" type="checkbox" class="filled-in" checked="checked" />
+          <span>Translate proof axioms to natural language</span>
+        </label>
+      </div>
     </div>
   
     << main/progress >>
-    <h4>Natural Language Translation</h4>
-    <div class="container-flex">
-      <label>
-        <input id="checkboxT2NL" type="checkbox" class="filled-in" checked="checked" />
-        <span>Translate proof axioms to natural language</span>
-      </label>
-    </div>
+    
   </div>
 
   <div>

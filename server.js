@@ -30,7 +30,7 @@ const app = express();
 app.engine('spy', sprightly);
 app.set('views', './frontend/views');
 app.set('view engine', 'spy');
-app.use(express.static('./frontend/public')); // serve the "public" directory
+app.use('/', express.static('./frontend/public'));
 app.use('/libs', express.static('./node_modules'));
 app.use(upload());
 
@@ -67,7 +67,7 @@ app.get('/', (req, res) => {
     res.render('main/split.spy', {
       title,
       uuid: id,
-      settings_specific: '<< proof/settings >> << ontology/settings >> << counterexample/settings >>',
+      settings_specific: '<< proof/settings >> << ontology/settings >> << ce/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
       menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << proof/menu >> << ontology/menu >>`,
@@ -183,7 +183,8 @@ app.get('/project', (req, res) => {
       (file.endsWith('.xml') || file.endsWith('.owl'))
       && !file.startsWith('atomic ')
       && !file.startsWith('proof_')
-      && !file.endsWith('t.xml')
+      && !file.endsWith('.t.xml')
+      && !file.endsWith('.model.xml')
     ) {
       status.ontology = owlFunctions.getOWlFileName(file); // there is more than one
       flags.ontology = true;
@@ -301,8 +302,7 @@ app.post('/upload', (req, res) => {
         if (owlFileName !== uploadPath)
           fs.unlink(uploadPath, function (err) {
             if (err) {
-              //TODO Please take a look and adapt handling the error if needed
-              throw err;
+              console.error(err); 
             }
             console.log("Original ontology file was deleted successfully");
           });
@@ -346,7 +346,7 @@ app.get('/extract-names', (req, res) => {
   const projPath = path.join(dataDir, id);
   const ontPath = path.join(projPath, req.query.ontology);
 
-  // TODO: progress bar (consider spawnSync)
+  //TODO: progress bar (consider spawnSync)
   const names = spawn('java', [
     '-jar', 'externalTools/extractNames.jar',
     '-o', ontPath,
@@ -400,7 +400,7 @@ app.post('/explain', (req, res) => {
   }
 
   if (type === 'ce') { // expects a counterexample
-    counter({ axiom, projPath, ontPath });
+    counter({ id, axiom, projPath, ontPath });
   }
 
   res.status(200).send({ msg: 'processing request..' });

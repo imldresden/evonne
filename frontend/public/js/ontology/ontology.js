@@ -352,8 +352,7 @@ async function labelNodes(layout = true) {
 function loadOntology(e) {
   const ontology = e.target.files[0];
   progress('Uploading...');
-  upload(ontology, uploaded => {
-    console.log('Uploaded: ', uploaded);
+  upload(ontology, _ => {
     progress('Ontology uploaded.');
     progress('Extracting concept names...');
 
@@ -378,10 +377,9 @@ function loadOntology(e) {
 
 function loadAtomicDecomposition(e) {
   adOntologyFile = e.target.files[0];
-  upload(adOntologyFile, result => {
-    console.log('Success:', result);
+  upload(adOntologyFile, _ => {
     d3.xml("../data/" + getSessionId() + "/" + adOntologyFile.name).then((xml) => {
-      createContent(xml,);
+      createContent(xml);
     });
   });
 }
