@@ -634,7 +634,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
     console.log("done computing proofs.");
     console.log('extracting module...');
 
-    const outputLabel = path.parse(ontology).name;
+    const outputLabel = "module_" + path.parse(ontology).name;
     const module = spawn('java', [
       '-jar', 'externalTools/explain.jar',
       '-o', ontPath,
@@ -657,9 +657,9 @@ function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
 
       const ad = spawn('java', [
         '-cp', 'externalTools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
-        path.join(projPath, outputLabel) + '.owl', // module input
+        path.join(projPath, outputLabel),
         projPath, //outDir
-        'atomic ' + path.parse(ontology).name //outFileName
+        'atomic ' + outputLabel
       ], { encoding: 'utf-8' });
 
       printOutput(ad);
