@@ -52,11 +52,6 @@ function init() {
     });
   }
 
-  // Query all resizers
-  document.querySelectorAll('.resizer').forEach(function (ele) {
-    resizable(ele);
-  });
-
   for (const c of document.getElementsByClassName("toggles-sidebar")) {
     c.addEventListener("click", toggleSidebar);
   }
@@ -136,103 +131,110 @@ function finishRedrawCSS() {
   dispatchEvent(new CustomEvent("view_resize", {}));
 }
 
-function resizable(resizer) {
-  const direction = resizer.getAttribute('data-direction') || 'horizontal';
-  const prevSibling = resizer.previousElementSibling;
-  const nextSibling = resizer.nextElementSibling;
+function init_resizer() {
+  // Query all resizers
+  document.querySelectorAll('.resizer').forEach(function (ele) {
+    resizable(ele);
 
-  // The current position of mouse
-  let x = 0;
-  let y = 0;
-  let prevSiblingHeight = 0;
-  let prevSiblingWidth = 0;
+    function resizable(resizer) {
+      const direction = resizer.getAttribute('data-direction') || 'horizontal';
+      const prevSibling = resizer.previousElementSibling;
+      const nextSibling = resizer.nextElementSibling;
 
-  // Handle the mousedown event
-  // that's triggered when user drags the resizer
-  const mouseDownHandler = function (e) {
-    // Get the current mouse position
-    x = e.clientX;
-    y = e.clientY;
-    const rect = prevSibling.getBoundingClientRect();
-    prevSiblingHeight = rect.height;
-    prevSiblingWidth = rect.width;
+      // The current position of mouse
+      let x = 0;
+      let y = 0;
+      let prevSiblingHeight = 0;
+      let prevSiblingWidth = 0;
 
-    // Attach the listeners to `document`
-    document.addEventListener('mousemove', mouseMoveHandler);
-    document.addEventListener('mouseup', mouseUpHandler);
-  };
+      // Handle the mousedown event
+      // that's triggered when user drags the resizer
+      const mouseDownHandler = function (e) {
+        // Get the current mouse position
+        x = e.clientX;
+        y = e.clientY;
+        const rect = prevSibling.getBoundingClientRect();
+        prevSiblingHeight = rect.height;
+        prevSiblingWidth = rect.width;
 
-  const mouseMoveHandler = function (e) {
-    // How far the mouse has been moved
-    const dx = e.clientX - x;
-    const dy = e.clientY - y;
+        // Attach the listeners to `document`
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+      };
 
-    switch (direction) {
-      case 'vertical':
-        const h =
-          ((prevSiblingHeight + dy) * 100) /
-          resizer.parentNode.getBoundingClientRect().height;
-        prevSibling.style.height = `${h}%`;
-        break;
-      case 'horizontal':
-      default:
-        const w =
-          ((prevSiblingWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
-        prevSibling.style.width = `${w}%`;
-        break;
-    }
+      const mouseMoveHandler = function (e) {
+        // How far the mouse has been moved
+        const dx = e.clientX - x;
+        const dy = e.clientY - y;
 
-    const cursor = direction === 'horizontal' ? 'col-resize' : 'row-resize';
-    resizer.style.cursor = cursor;
-    document.body.style.cursor = cursor;
+        switch (direction) {
+          case 'vertical':
+            const h =
+              ((prevSiblingHeight + dy) * 100) /
+              resizer.parentNode.getBoundingClientRect().height;
+            prevSibling.style.height = `${h}%`;
+            break;
+          case 'horizontal':
+          default:
+            const w =
+              ((prevSiblingWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
+            prevSibling.style.width = `${w}%`;
+            break;
+        }
 
-    prevSibling.style.userSelect = 'none';
-    prevSibling.style.pointerEvents = 'none';
+        const cursor = direction === 'horizontal' ? 'col-resize' : 'row-resize';
+        resizer.style.cursor = cursor;
+        document.body.style.cursor = cursor;
 
-    nextSibling.style.userSelect = 'none';
-    nextSibling.style.pointerEvents = 'none';
-    startRedrawCSS();
-  };
+        prevSibling.style.userSelect = 'none';
+        prevSibling.style.pointerEvents = 'none';
 
-  const mouseUpHandler = function () {
-    resizer.style.removeProperty('cursor');
-    document.body.style.removeProperty('cursor');
+        nextSibling.style.userSelect = 'none';
+        nextSibling.style.pointerEvents = 'none';
+        startRedrawCSS();
+      };
 
-    prevSibling.style.removeProperty('user-select');
-    prevSibling.style.removeProperty('pointer-events');
+      const mouseUpHandler = function () {
+        resizer.style.removeProperty('cursor');
+        document.body.style.removeProperty('cursor');
 
-    nextSibling.style.removeProperty('user-select');
-    nextSibling.style.removeProperty('pointer-events');
+        prevSibling.style.removeProperty('user-select');
+        prevSibling.style.removeProperty('pointer-events');
 
-    // Remove the handlers of `mousemove` and `mouseup`
-    document.removeEventListener('mousemove', mouseMoveHandler);
-    document.removeEventListener('mouseup', mouseUpHandler);
-    finishRedrawCSS();
-  };
+        nextSibling.style.removeProperty('user-select');
+        nextSibling.style.removeProperty('pointer-events');
 
-  document.onkeydown = function (e) {
-    if (e.altKey) { // option for mac, must be disabled on windows
-      e.preventDefault();
-    }
+        // Remove the handlers of `mousemove` and `mouseup`
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+        finishRedrawCSS();
+      };
 
-    if (e.key === "Escape" || e.key === "Esc") {
-      document.dispatchEvent(new CustomEvent("destroy_explanation", {}));
-    }
-  }
+      document.onkeydown = function (e) {
+        if (e.altKey) { // option for mac, must be disabled on windows
+          e.preventDefault();
+        }
 
-  document.onkeyup = function (e) {
-    startRedrawCSS();
-    const which = e.which || e.buttons;
-    if ((e.ctrlKey || e.altKey) && which == 39) {
-      prevSibling.style.width = '100%';
-    } else if ((e.ctrlKey || e.altKey) && which == 37) {
-      prevSibling.style.width = '0%';
-    }
-    finishRedrawCSS();
-  };
+        if (e.key === "Escape" || e.key === "Esc") {
+          document.dispatchEvent(new CustomEvent("destroy_explanation", {}));
+        }
+      }
 
-  // Attach the handler
-  resizer.addEventListener('mousedown', mouseDownHandler);
-};
+      document.onkeyup = function (e) {
+        startRedrawCSS();
+        const which = e.which || e.buttons;
+        if ((e.ctrlKey || e.altKey) && which == 39) {
+          prevSibling.style.width = '100%';
+        } else if ((e.ctrlKey || e.altKey) && which == 37) {
+          prevSibling.style.width = '0%';
+        }
+        finishRedrawCSS();
+      };
 
-export { showRepairsTab, init }
+      // Attach the handler
+      resizer.addEventListener('mousedown', mouseDownHandler);
+    };
+  });
+}
+
+export { showRepairsTab, init, init_resizer }
