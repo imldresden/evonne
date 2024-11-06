@@ -306,7 +306,7 @@ function computeAxiomsBtnFunction() {
     body.append('type', 'ce')
   }
   body.append('signaturePath', proof.signatureFile
-    ? "frontend/public/data/" + getSessionId() + "/" + proof.signatureFile.name
+    ? "frontend/public/data/" + getSessionId() + "/sig.txt"
     : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 
@@ -357,7 +357,7 @@ function loadProof(event) {
 
 function loadSignature(event) {
   proof.signatureFile = event.target.files[0];
-  upload(proof.signatureFile);
+  upload(proof.signatureFile, undefined, 'signature');
 }
 
 export { progress, loadProof, loadSignature }
