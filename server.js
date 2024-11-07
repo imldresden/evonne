@@ -42,6 +42,9 @@ const dataDir = './frontend/public/data/';
 const examplesDir = './frontend/public/examples/';
 const fs = require('fs');
 
+const proofFileName = 'proof';
+const externalProofFileName = proofFileName+'.json';
+
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
 }
@@ -383,7 +386,8 @@ app.post('/explain', (req, res) => {
   const axiom = req.body.lhs + " SubClassOf: " + req.body.rhs;
   const ontPath = path.join(projPath, ontology);
 
-  const preserve = ['.owl', 'reasoner.txt', 'cnsHierarchy.json', 'cnsOriginal.json'];
+
+  const preserve = ['.owl', 'reasoner.txt', 'cnsHierarchy.json', 'cnsOriginal.json', 'sig.txt', externalProofFileName];
 
   readdirSync(projPath).forEach(function (file) {
     for (const p of preserve) {
@@ -703,8 +707,8 @@ function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
 
   function generateProofs(params) {
 
-    const { ontPath, projPath, sigPath, genMethod, translate2NL } = params;
-    let { axiom } = params;
+    const { ontPath, projPath, genMethod, translate2NL } = params;
+    let { axiom, sigPath } = params;
 
     console.log("GENERATION METHOD -> " + genMethod);
 
@@ -719,7 +723,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
         '--ontology-path', ontPath,
         '--conclusion-axiom', axiom,
         '--output-type', 'graph',
-        '--output-label', 'proof',
+        '--output-label', proofFileName,
         '--output-directory', projPath,
         '--proof-type', proofType,
         '--signature-file-path', sigPath,
@@ -782,34 +786,36 @@ function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedWeightedSizeMinimalProofGenerator';
     }
 
-    const process = spawn('java', [
-      '-cp', generator, 'de.tu_dresden.inf.lat.evee.proofs.GenerateProof',
-      cls, ontPath, axiom, projPath, 'proof', sigPath !== "NoSignature" ? '' : sigPath,
-    ], { encoding: 'utf-8' });
+    let processParams = ['-cp', generator, 'de.tu_dresden.inf.lat.evee.proofs.GenerateProof',
+      cls, ontPath, axiom, projPath, proofFileName, sigPath];
+
+    processParams = sigPath !== "NoSignature" ? processParams : processParams.slice(0,processParams.length-1);
+
+    const process = spawn('java', processParams);
 
     return process.on("exit", function (exitCode) {
       if (exitCode === 3)
         return process;
 
-      console.log("Done computing JSON Proofs");
-      const draw = spawn('java', ['-cp', 'externalTools/explain.jar',
-        'de.tu_dresden.lat.evonne.EvonneInputGenerator',
-        '--proof-path', projPath + '/proof.json',
-        '--output-directory', projPath,
-        '--output-name', "proof",
-        '--proof-type', proofType,
-        '--signature-file-path', sigPath,
-        '--ontology-path', ontPath,
-        translate2NL
-      ]);
+      if(exitCode === 0){
+        const draw = spawn('java', ['-cp', 'externalTools/explain.jar',
+          'de.tu_dresden.lat.evonne.EvonneInputGenerator',
+          '--proof-path', path.join(projPath, externalProofFileName),
+          '--output-directory', projPath,
+          '--output-label', proofFileName,
+          '--proof-type', proofType,
+          '--signature-file-path', sigPath,
+          '--ontology-path', ontPath,
+          translate2NL
+        ]);
 
-      printOutput(draw);
+        printOutput(draw);
 
-      return draw.on("exit", function () {
-        console.log("Done generating GML Proofs");
-      })
+        return draw.on("exit", function () {
+          console.log("Done generating GML Proofs");
+        })
+      }
     })
-
   }
 }
 
