@@ -10,7 +10,8 @@ import {
   lstatSync,
   copyFileSync,
   readdirSync,
-  readFileSync
+  readFileSync,
+  renameSync,
 } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from "module";
@@ -293,6 +294,10 @@ app.post('/upload', (req, res) => {
       return res.status(500).send(err);
     }
 
+    if (req.body.type === 'signature') {
+      renameSync(uploadPath, path.join(uploadsDir, 'sig.txt'));
+    }
+
     if (req.body.type === 'ontology') {
       //Try to translate the ontology file to OWL XML format.
       const owlFileName = convertOntology(file, uploadsDir)
@@ -386,8 +391,7 @@ app.post('/explain', (req, res) => {
   const axiom = req.body.lhs + " SubClassOf: " + req.body.rhs;
   const ontPath = path.join(projPath, ontology);
 
-
-  const preserve = ['.owl', 'reasoner.txt', 'cnsHierarchy.json', 'cnsOriginal.json', 'sig.txt', externalProofFileName];
+  const preserve = ['.owl', 'sig.txt', 'reasoner.txt', 'cnsHierarchy.json', 'cnsOriginal.json', externalProofFileName];
 
   readdirSync(projPath).forEach(function (file) {
     for (const p of preserve) {
