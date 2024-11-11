@@ -144,3 +144,11 @@
     padding: 10px 15px 0 15px;
     display: none;
 }
+
+#cd-linear-plot .annotations path {
+    stroke: var(--color-purple-dark) !important; /* Use !important to override any existing inline styles or other CSS */
+}
+
+#cd-linear-plot .top-right-legend {
+    display: none;
+}

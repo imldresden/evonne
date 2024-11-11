@@ -6,3 +6,7 @@
 <link rel="stylesheet" href="/style/widgets/general.css">
 <link rel="stylesheet" href="/style/widgets/parallel-coords.css">
 <link rel="stylesheet" href="/libs/cytoscape-context-menus/cytoscape-context-menus.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/function-plot/dist/function-plot.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
