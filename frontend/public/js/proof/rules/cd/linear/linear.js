@@ -109,7 +109,7 @@ export class LinearCD {
 
             let maxLength = 0;
             variables.forEach((v, i) => {
-                const l = printValue(values[i], v, output.append("span").attr("id", `#${plot}-sol-${v}`).attr("class", "text-eq premise"));
+                const l = printValue(values[i], v, output.append("span").attr("id", `${plot}-sol-${v}`).attr("class", "text-eq premise"));
                 if (l > maxLength) {
                     maxLength = l;
                 }
