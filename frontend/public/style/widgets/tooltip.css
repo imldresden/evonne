@@ -145,10 +145,10 @@
     display: none;
 }
 
-#cd-linear-plot .annotations path {
+.annotations path {
     stroke: var(--color-purple-dark) !important; /* Use !important to override any existing inline styles or other CSS */
 }
 
-#cd-linear-plot .top-right-legend {
+.top-right-legend {
     display: none;
 }
