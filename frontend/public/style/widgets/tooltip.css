@@ -145,10 +145,6 @@
     display: none;
 }
 
-.annotations path {
-    stroke: var(--color-purple-dark) !important; /* Use !important to override any existing inline styles or other CSS */
-}
-
 .top-right-legend {
     display: none;
 }

@@ -1,8 +1,8 @@
 import { controls, createVisContainer } from "../cd-rules.js";
 import { utils } from "../../rules.js";
 
-const regex_terms = /[\+\-]?[\d\.]+x\d+/g;
-const regex_term = /([\+\-]?[\d+\.\d+])(x\d+)/;
+const regex_terms = /[\+\-]?[\d\.]+x\d+/g; // Extract terms like '1.00x1'
+const regex_term = /(\d+(?:\.\d+)?)(x\d+)/; // Separates term into [match, '1.00', 'x1']
 
 function strip(number) {
     return parseFloat(number).toPrecision(12) / 1;
@@ -91,8 +91,8 @@ export class LinearCD {
 
             });
 
-            utils.addMidRule([maxLength], input)
-            printEquation(op.conclusion.constraint, input.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-eq conclusion"))
+            utils.addMidRule([maxLength], input);
+            printEquation(op.conclusion.constraint, input.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-eq conclusion"));
         }
 
         function displaySolution(plot, values, variables) {
@@ -128,28 +128,29 @@ export class LinearCD {
         const variables = getVariables(data);
         const showObvious = this.showObvious;
 
-
         if (data.ops[data.current]) {
             controls({ data, }, where, params);
             displayEquationSystem(data.ops[data.current], variables);
 
             const solutions = this.solve(data.ops[data.current], variables);
+            console.log(solutions)
 
             if (solutions.type === 'unique solution') {
                 solutions.solutions = solutions.solutions.map(strip);
             }
 
-            
             const container = document.getElementById('explanation-container');
             container.style.minHeight = '475px';
             container.style.display = 'flex';
             container.innerHTML = '';
 
-            const plots = ['cd-linear-plot'];
-            plots.forEach(plot => {
+            const plots = { 'cd-linear-plot': undefined };
+            Object.keys(plots).forEach(plot => {
                 displaySolution(plot, solutions.solutions, variables);
-                this.vis(plot, solutions, variables);
+                plots[plot] = this.vis(plot, solutions, variables);
             });
+
+            console.log(plots)
 
             document.removeEventListener('cd-l-hl', highlightText);
             document.addEventListener('cd-l-hl', highlightText);
@@ -345,41 +346,35 @@ export class LinearCD {
             
         switch (solution.type) {
             case 'unique solution':
-                visualizeUniqueSolution(solution, variables);
-                break;
+                return visualizeUniqueSolution(solution, variables);
             case 'infinite solutions':
-                visualizeInfiniteSolutions(solution, variables);
-                break;
+                return visualizeInfiniteSolutions(solution, variables);
             case 'no solution':
-                visualizeNoSolutions(solution, variables);
-                break;
+                return visualizeNoSolutions(solution, variables);
         }
-
-        const highlighter = {};
 
         function visualizeUniqueSolution(data, vars) {
             generateVariableSelectors(data, vars);
-            updateUnique(data.matrix, vars, data.solutions);
+            return updateUnique(data, vars);
         }
 
-        function generateVariableSelectors(data, varNames) {
-            if (varNames.length > 2) {
+        function generateVariableSelectors(data, vars) {
+            if (vars.length > 2) {
                 const controls = document.querySelector(`#${plot}-linear-vis-controls`);
                 controls.style.display = 'inline-block';
                 const select1 = document.querySelector(`#${plot}-var1`);
                 const select2 = document.querySelector(`#${plot}-var2`);
                 select1.innerHTML = '';
                 select2.innerHTML = '';
-                varNames.forEach(varName => {
+                vars.forEach(varName => {
                     select1.add(new Option(varName, varName));
                     select2.add(new Option(varName, varName));
                 });
-                select1.value = varNames[0];
-                select2.value = varNames[1];
+                select1.value = vars[0];
+                select2.value = vars[1];
 
                 function update(d) {
                     const other = d.target.id === `#${plot}-var1` ? `#${plot}-var2 option` : `#${plot}-var1 option`;
-                    //document.getElementById(`l-${d.target.id}`).textContent = `${d.target.value}-axis`;
                     document.querySelectorAll(other).forEach(opt => {
                         if (opt.value == d.target.value) {
                             opt.disabled = true;
@@ -387,7 +382,7 @@ export class LinearCD {
                             opt.disabled = false;
                         }
                     });
-                    updateUnique(data.matrix, varNames, data.solutions)
+                    updateUnique(data, vars);
                 }
 
                 update({ target: select1 });
@@ -400,18 +395,22 @@ export class LinearCD {
             }
         }
 
-        function updateUnique(matrix, varNames, solutions) {
-            if (!varNames || varNames.length === 0) {
+        function updateUnique(_data, vars) {
+            const matrix = _data.matrix;
+            const solutions = _data.solutions; 
+
+            if (!vars || vars.length === 0) {
                 console.error('Variable names are undefined or empty');
                 return; // Stop execution if varNames is not defined
             }
 
+            const highlighter = {};
             const select1 = document.getElementById(`${plot}-var1`).value;
             const select2 = document.getElementById(`${plot}-var2`).value;
 
             // Determine which variable is independent (lowest index) and which is dependent (highest index)
-            const index1 = varNames.indexOf(select1);
-            const index2 = varNames.indexOf(select2);
+            const index1 = vars.indexOf(select1);
+            const index2 = vars.indexOf(select2);
             const dependentIndex = index1;
             const independentIndex = index2;
             const annotations = [
@@ -461,7 +460,7 @@ export class LinearCD {
 
             let text = solutions.filter(s => !isNaN(s)).map((_, i) => {
                 if (i !== independentIndex && i !== dependentIndex && solutions[i] !== null) {
-                    return `${varNames[i]} = ${strip(solutions[i])}`; 
+                    return `${vars[i]} = ${strip(solutions[i])}`; 
                 }
             }).filter(e => e).join(', ');
 
@@ -473,7 +472,7 @@ export class LinearCD {
             });
         
             // Use function-plot to draw the plot
-            functionPlot({
+            const p = functionPlot({
                 target: `#${plot}`,
                 width: 400,
                 height: 400,
@@ -483,6 +482,8 @@ export class LinearCD {
                 data,
                 annotations
             });
+
+            return { plot: p, hl: highlighter };
         }
 
         function visualizeInfiniteSolutions(data, vars) {
@@ -495,12 +496,12 @@ export class LinearCD {
 
             // First pass to identify dependent variables
             data.solutions.forEach((solution) => {
-                const parts = solution.match(regex_terms); // Extract terms like '1.00x1'
+                const parts = solution.match(regex_terms); 
                 let lowestIndex = Infinity;
                 let lowestVar = '';
 
                 parts.forEach(part => {
-                    const [_, coef, varName] = part.match(regex_term);
+                    const [_, __, varName] = part.match(regex_term);
                     const varIndex = parseInt(varName.substring(1));
                     if (varIndex < lowestIndex) {
                         lowestIndex = varIndex;
@@ -515,7 +516,7 @@ export class LinearCD {
             data.solutions.forEach((solution) => {
                 const parts = solution.match(regex_terms);
                 parts.forEach(part => {
-                    const [_, coef, varName] = part.match(regex_term);
+                    const [_, __, varName] = part.match(regex_term);
                     if (!dependentVars.includes(varName)) { // Check if varName is not a dependent variable
                         if (!sliders[varName]) { // Create a slider if it hasn't been created yet
                             const slider = document.createElement('input');
@@ -555,13 +556,13 @@ export class LinearCD {
             });
 
             // Initial plot with default values
-            updateInfinite(data, dependentVars, sliders, vars);
+            return updateInfinite(data, dependentVars, sliders, vars);
         }
 
-        function updateInfinite(data, dependentVars, sliders, vars) {
+        function updateInfinite(_data, dependentVars, sliders, vars) {
             document.getElementById(plot).innerHTML = '';
-            const solutions = data.solutions;
-            const matrix = data.matrix;
+            const solutions = _data.solutions;
+            const matrix = _data.matrix;
 
             let solutionsPreview = [];
             let solutionsReplacedPreview = [];
@@ -569,6 +570,7 @@ export class LinearCD {
             let singleReplacedPreview = [];
             let dependentValues = {}; // Store computed values for dependent variables
 
+            const highlighter = {};
             const fixed = {};
             // Iterate over solutions in reverse to handle dependencies correctly
             for (let i = solutions.length - 1; i >= 0; i--) {
@@ -580,7 +582,7 @@ export class LinearCD {
                 let equationPreviewParts = [];
                 let dependentCoef;
                 terms.forEach(term => {
-                    const [match, coef, varName] = term.match(regex_term);
+                    const [_, coef, varName] = term.match(regex_term);
 
                     if (varName === dependentVar) {
                         dependentCoef = parseFloat(coef); // Coefficient of the dependent variable
@@ -622,7 +624,7 @@ export class LinearCD {
                 // var = const - (rest of eq) / coef
                 const solutionPreview = `${varName} = ${solved}`;
 
-                let computedSolution = eval(fn);
+                const computedSolution = eval(fn);
                 document.getElementById(`${plot}-sol-${varName}`).innerHTML = `${solutionPreview} = ${computedSolution}`;
                 dependentValues[dependentVar] = computedSolution; // Store the calculated value
 
@@ -638,17 +640,17 @@ export class LinearCD {
                 solutionsReplacedPreview.push(computedSolutionPrev);
             }
 
-            let annotations = [];
-
             const x = fixed[Object.keys(fixed)[1]]; // 1 first because fixed was created in reverse
             const y = fixed[Object.keys(fixed)[0]];
             const ex = eval(x.fn);
             const ey = eval(y.fn);
 
-            annotations.push({ x: ex, text: `${x.varName} = ${strip(ex)}` });
-            annotations.push({ y: ey, text: `${y.varName} = ${strip(ey)}` });
+            const annotations = [
+                { x: ex, text: `${x.varName} = ${strip(ex)}` }, 
+                { y: ey, text: `${y.varName} = ${strip(ey)}` }
+            ];
 
-            let data_plot = [];
+            let data = [];
             let simplified = false; // plot 2D solution + true: all equations, false: only conclusion
 
             for (let i = 0; i < matrix.length; i++) {
@@ -692,7 +694,15 @@ export class LinearCD {
                 let equation = `(${constantTerm} ${nonDependentTerms.length > 0 ? ` - (${nonDependentTerms})` : ''} )/ ${dependentCoef}`;
                 let replacedSolutionPrev = `${highestDependentVar} = ${equation}`;
 
-                data_plot.push({
+                if (dependentCoef === 0) { // can't be expressed as f(x), must use annotation
+                    console.log('check this!!')
+                    const v = `${constantTerm} / ${nonDependentTerms}`;
+                    annotations.push({ x: strip(eval(v)) });
+
+                    // TODO to highlight: document.querySelectorAll(`${plot} .annotations')[2].style.strokeWidth = '5px' 
+                }
+
+                data.push({
                     fn: equation,
                     updateOnMouseMove: true
                 });
@@ -702,16 +712,18 @@ export class LinearCD {
             }
 
             // Use function-plot to draw the plot
-            functionPlot({
+            const p = functionPlot({
                 target: `#${plot}`,
                 width: 400,
                 height: 400,
                 xAxis: { label: `${x.varName}-axis`, domain: [ex - 10, ex + 10] }, // center plot on the intersection point
                 yAxis: { label: `${y.varName}-axis`, domain: [ey - 10, ey + 10] },
                 grid: false,
-                data: data_plot,
+                data,
                 annotations
             });
+
+            return { plot: p, hl: highlighter };
         }
 
         function visualizeNoSolutions(data, vars) {
@@ -740,6 +752,8 @@ export class LinearCD {
 
             // Show the preview container
             noSolutionPreviewContainer.style.display = 'block';
+
+            return { };
         }
     }
 }

@@ -22,5 +22,8 @@
 <script src="/libs/materialize-css/dist/js/materialize.min.js"></script>
 <script src="/libs/svg-pan-zoom/dist/svg-pan-zoom.min.js"></script>
 
+<script src="/libs/fraction.js/dist/fraction.min.js"></script>
+<script type="module" src="/libs/function-plot/dist/function-plot.js"></script>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/utils/session-id.js"></script>
