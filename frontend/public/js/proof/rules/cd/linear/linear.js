@@ -9,6 +9,10 @@ function strip(number) {
     //return Fraction(number)
 }
 
+function f(number) {
+    return Fraction(number).toFraction();
+}
+
 export class LinearCD {
     showObvious = false;
 
@@ -140,10 +144,6 @@ export class LinearCD {
             container.innerHTML = '';
 
             const solutions = this.solve(data.ops[data.current], variables);
-            solutions.matrix.forEach(row => {
-                console.log(row.map(e=>Fraction(e).toString()).join(" "));
-            })
-
             console.log(solutions.solutions)
 
             const plots = { 'cd-linear-plot': undefined };
@@ -160,29 +160,30 @@ export class LinearCD {
     };
 
     solve(data, variables) {
+
         function solveEquations(systemInput, singleInput) {
 
             function extractSolutions(matrix, tolerance, solutionType) {
-                if (solutionType !== 'infinite solutions') {
+                if (solutionType === 'unique solution') {
                     let solutions = [];
                     const numRows = matrix.length;
                     const numCols = matrix[0].length;
 
                     // Solve for unique solutions
                     for (let i = numRows - 1; i >= 0; i--) {
-                        let sum = Fraction(0);
+                        let sum = 0;
                         for (let j = i + 1; j < numCols - 1; j++) {
-                            sum = sum.add(Fraction(matrix[i][j]).mul(Fraction(solutions[j])));
+                            sum = Fraction(sum).add(Fraction(matrix[i][j]).mul(Fraction(solutions[j])));
                         }
                         solutions[i] = Fraction(matrix[i][numCols - 1]).sub(Fraction(sum)).div(Fraction(matrix[i][i]));
 
-                        if (Fraction(solutions[i]).abs() < tolerance) {
+                        if (Fraction(solutions[i]).abs().lt(tolerance)) {
                             solutions[i] = Fraction(0);
                         }
                     }
-                    
+
                     return solutions;
-                } else {
+                } else if (solutionType === 'infinite solutions') {
                     // Handle infinite solutions
                     const numCols = matrix[0].length - 1; // excluding the constant column
                     let solutions = [];
@@ -190,18 +191,20 @@ export class LinearCD {
                     matrix.forEach(row => {
                         let equationParts = [];
                         for (let j = 0; j < numCols; j++) {
-                            if (Fraction(row[j]).abs() > tolerance) {
-                                equationParts.push(`(${Fraction(row[j]).toFraction()})${variables[j]}`);
+                            if (Fraction(row[j]).abs().gt(tolerance)) {
+                                equationParts.push(`(${f(row[j])})${variables[j]}`);
                             }
                         }
                         if (equationParts.length > 0) {
                             // Join all parts and append the equals sign with the last constant value
-                            let equation = equationParts.join(' + ') + ` = ${Fraction(row[numCols]).toFraction()}`;
+                            let equation = equationParts.join(' + ') + ` = ${f(row[numCols])}`;
                             solutions.push(equation);
                         }
                     });
 
                     return solutions;
+                } else {
+                    return [];
                 }
             }
 
@@ -215,13 +218,13 @@ export class LinearCD {
                 matrix.forEach((row) => {
                     let nonZeroFound = false;
                     for (let j = 0; j < numCols; j++) {
-                        if (Fraction(row[j]).abs() > 0) {
+                        if (Fraction(row[j]).abs().gt(0)) {
                             freeVariables--;
                             nonZeroFound = true;
                             break;
                         }
                     }
-                    if (!nonZeroFound && Fraction(row[numCols]).abs() > 0) {
+                    if (!nonZeroFound && Fraction(row[numCols]).abs().gt(0)) {
                         hasSolution = false; // No solution if a row has all zeros and a non-zero constant
                     }
                 });
@@ -236,7 +239,7 @@ export class LinearCD {
             }
 
             try {
-                const tolerance = 1e-10;
+                const tolerance = 0;
                 const augMatrix = structuredClone(systemInput).concat([singleInput[0]]);
                 let system = structuredClone(systemInput); // the system that will be reduced, without the conclusion
                 let numRows = system.length;
@@ -270,7 +273,7 @@ export class LinearCD {
                     matrix: augMatrix, // augmented matrix with premises + conclusion
                     echelon: system, // the reduced premise-only system
                     solutions: solutions,
-                    free: analysis.freeVariables // Include free variable count for 'infinite solutions'
+                    free: analysis.freeVariables // free variable count for 'infinite solutions'
                 };
             } catch (error) {
                 console.error('Error processing equations:', error);
@@ -292,7 +295,7 @@ export class LinearCD {
                     eq.push(Fraction(0));
                 }
             });
-            systemData.push(eq)
+            systemData.push(eq);
         });
 
         if (data.conclusion.constraint) {
@@ -345,7 +348,7 @@ export class LinearCD {
                 <div id="${plot}-finalStatePreview" class="preview"></div>
                 </div>
             </div>`;
-            
+
         switch (solution.type) {
             case 'unique solution':
                 return visualizeUniqueSolution(solution, variables);
@@ -399,7 +402,7 @@ export class LinearCD {
 
         function updateUnique(_data, vars) {
             const matrix = _data.matrix;
-            const solutions = _data.solutions; 
+            const solutions = _data.solutions;
 
             if (!vars || vars.length === 0) {
                 console.error('Variable names are undefined or empty');
@@ -410,19 +413,19 @@ export class LinearCD {
             const select1 = document.getElementById(`${plot}-var1`).value;
             const select2 = document.getElementById(`${plot}-var2`).value;
 
-            // Determine which variable is independent (lowest index) and which is dependent (highest index)
+            // set dependent and independent variables
             const index1 = vars.indexOf(select1);
             const index2 = vars.indexOf(select2);
             const dependentIndex = index1;
             const independentIndex = index2;
             const annotations = [
-                { x: solutions[independentIndex], text: `${select1} = ${Fraction(solutions[independentIndex])}` },
-                { y: solutions[dependentIndex], text: `${select2} = ${Fraction(solutions[dependentIndex])}` }
+                { x: solutions[independentIndex], text: `${select1} = ${Fraction(solutions[independentIndex]).toFraction()}` },
+                { y: solutions[dependentIndex], text: `${select2} = ${Fraction(solutions[dependentIndex]).toFraction()}` }
             ];
 
-            let data = matrix.map(row => {
+            const data = matrix.map(row => {
                 // Replace all other variables with their solutions except for the selected free variables
-                let adjustedRow = row.slice(0, -1).map((coef, i) => {
+                const adjustedRow = row.slice(0, -1).map((coef, i) => {
                     if (i !== independentIndex && i !== dependentIndex) {
                         return Fraction(coef).mul(Fraction(solutions[i])); // Use the solved value
                     }
@@ -432,31 +435,32 @@ export class LinearCD {
                 // Rearrange the equation to solve for the dependent variable
                 const dependentCoefficient = adjustedRow[dependentIndex];
                 const independentTerm = adjustedRow.reduce((acc, coef, i) => {
-                    return i !== dependentIndex ? Fraction(acc).add(Fraction(coef).mul(i === independentIndex ? Fraction(1) : Fraction(0))) : Fraction(acc);
+                    return i !== dependentIndex ? Fraction(acc).add(Fraction(coef).mul(i === independentIndex ? 1 : 0)) : Fraction(acc);
                 }, 0);
                 const constantTerm = adjustedRow.reduce((acc, coef, i) => {
                     return i !== dependentIndex && i !== independentIndex ? Fraction(acc).add(Fraction(coef)) : Fraction(acc);
                 }, 0);
 
                 // Construct the function string for function-plot
-                let fn = `(${Fraction(row[row.length - 1]).sub(Fraction(constantTerm))} - (${Fraction(independentTerm)})x) / (${Fraction(dependentCoefficient)})`;
+                const fn = `(${Fraction(row[row.length - 1]).sub(Fraction(constantTerm))} - (${Fraction(independentTerm)})x) / (${Fraction(dependentCoefficient)})`;
 
                 if (Fraction(dependentCoefficient).equals(0)) { // can't be expressed as f(x), must use annotation
                     if (!Fraction(independentTerm).equals(0)) {
-                        const v = `${row[row.length - 1] - constantTerm} / ${independentTerm}`;
-                        annotations.push({ x: strip(eval(v)) });
+                        const v = Fraction(row[row.length - 1]).sub(Fraction(constantTerm)).div(Fraction(independentTerm));
+                        // f(v) === f(solutions[independentIndex]), could use either
+                        annotations.push({ x: eval(f(v)) });
                     } else {
-                        console.log('check this!!!')
+                        console.error('both of the selected variables canceled')
                     }
 
                     // TODO to highlight: document.querySelectorAll(`${plot} .annotations')[2].style.strokeWidth = '5px' 
                 }
-                
-                return { fn, updateOnMouseMove: true };
+
+                return { fn, updateOnMouseMove: false };
             });
 
             // Make emphazis on the intersection point
-            let points = {
+            const points = {
                 points: [
                     [solutions[independentIndex], solutions[dependentIndex]]
                 ],
@@ -465,11 +469,14 @@ export class LinearCD {
             };
             data.push(points);
 
-            let text = solutions.filter(s => !isNaN(s)).map((_, i) => {
-                if (i !== independentIndex && i !== dependentIndex && solutions[i] !== null) {
-                    return `${vars[i]} = ${strip(solutions[i])}`; 
-                }
-            }).filter(e => e).join(', ');
+            const text = solutions
+                .filter(s => !isNaN(s))
+                .map((_, i) => {
+                    if (i !== independentIndex && i !== dependentIndex && solutions[i] !== null) {
+                        return `${vars[i]} = ${f(solutions[i])}`;
+                    }
+                })
+                .filter(e => e).join(', ');
 
             data.push({
                 graphType: 'text',
@@ -477,7 +484,7 @@ export class LinearCD {
                 text,
                 color: 'black'
             });
-        
+
             // Use function-plot to draw the plot
             const p = functionPlot({
                 target: `#${plot}`,
@@ -490,6 +497,7 @@ export class LinearCD {
                 annotations
             });
 
+            //document.querySelectorAll(`#${plot} .annotations path`)[2].style.stroke = 'black';
             return { plot: p, hl: highlighter };
         }
 
@@ -498,12 +506,12 @@ export class LinearCD {
             slidersContainer.innerHTML = '';
             slidersContainer.style.display = 'block';
 
-            let dependentVars = [];
-            let sliders = {};
+            const dependentVars = [];
+            const sliders = {};
 
             // First pass to identify dependent variables
             data.solutions.forEach((solution) => {
-                const parts = solution.match(regex_terms); 
+                const parts = solution.match(regex_terms);
                 let lowestIndex = Infinity;
                 let lowestVar = '';
 
@@ -522,7 +530,7 @@ export class LinearCD {
             // Second pass to set up sliders for all independent variables
             data.solutions.forEach((solution) => {
                 const parts = solution.match(regex_terms);
-                
+
                 parts.forEach(part => {
                     const [_, __, varName] = part.match(regex_term);
 
@@ -535,7 +543,7 @@ export class LinearCD {
                             slider.value = '0'; // Default value
                             slider.step = '0.1';
                             slider.id = `slider-${varName}`;
-                            
+
                             const label = document.createElement('label');
                             label.id = `${plot}-label-${varName}`;
                             label.htmlFor = slider.id;
@@ -571,15 +579,9 @@ export class LinearCD {
             document.getElementById(plot).innerHTML = '';
             const solutions = _data.solutions;
             const matrix = _data.matrix;
-
-            let solutionsPreview = [];
-            let solutionsReplacedPreview = [];
-            let singlePreview = [];
-            let singleReplacedPreview = [];
-            let dependentValues = {}; // Store computed values for dependent variables
-
+            const dependentValues = {}; // Store computed values for dependent variables
             const highlighter = {};
-            const fixed = {};
+
             // Iterate over solutions in reverse to handle dependencies correctly
             for (let i = solutions.length - 1; i >= 0; i--) {
                 const sol = solutions[i];
@@ -616,128 +618,88 @@ export class LinearCD {
                 } else {
                     solved = ` - (${solved})`;
                 }
-                
+
                 if (constantTerm !== 0) {
-                    solved = `${Fraction(constantTerm).toFraction()}${solved}`;
+                    solved = `${f(constantTerm)}${solved}`;
                 }
 
                 if (dependentCoef !== 1) {
-                    solved = `(${solved}) / (${Fraction(dependentCoef).toFraction()})`;
+                    solved = `(${solved}) / (${f(dependentCoef)})`;
                 }
 
                 // var = const - (rest of eq) / coef
                 const solutionPreview = `${varName} = ${solved}`;
-
-                // Solve equation for dependent variable
-                // Build the function string for plotting
-                
-                let independentTerms = equationParts.reduce((acc, part) => Fraction(acc).add(Fraction(part)), 0);
+                const independentTerms = equationParts.reduce((acc, part) => Fraction(acc).add(Fraction(part)), 0);
 
                 if (!Fraction(dependentCoef).equals(0)) {
                     const it = Fraction(independentTerms)
                     const s = Fraction(constantTerm).sub(Fraction(it));
-                    const fn = `${Fraction(s).div(Fraction(dependentCoef)).toFraction()}`;
+                    const fn = `${f(Fraction(s).div(f(dependentCoef)))}`;
                     document.getElementById(`${plot}-sol-${varName}`).innerHTML = `${solutionPreview} = ${fn}`;
-                    dependentValues[dependentVar] = Fraction(fn).toFraction(); // Store the calculated value
-    
-                    // Add the function to the plot data
-                    fixed[varName] = { fn, varName };
-                    
-                    let replacedSolutionPrev = `${dependentVar} = ${fn}`;
-                    let computedSolutionPrev = `${dependentVar} = ${fn}`;
-
-                    // Add the function to the preview
-                    solutionsPreview.push(solutionPreview);
-                    solutionsReplacedPreview.push(replacedSolutionPrev);
-                    solutionsReplacedPreview.push(computedSolutionPrev);
-                }   
+                    dependentValues[dependentVar] = f(fn); // Store the calculated value
+                }
             }
 
-            const x = fixed[vars[0]];
-            const y = fixed[vars[1]];
-            const ex = eval(Fraction(x.fn).toFraction());
-            const ey = eval(Fraction(y.fn).toFraction());
+            const x = { varName: vars[0], fn: dependentValues[vars[0]] };
+            const y = { varName: vars[1], fn: dependentValues[vars[1]] };
+            const ex = f(x.fn);
+            const ey = f(y.fn);
 
             const annotations = [
-                { x: ex, text: `${x.varName} = ${ex}` }, 
-                { y: ey, text: `${y.varName} = ${ey}` }
+                { x: eval(f(x.fn)), text: `${x.varName} = ${f(x.fn)}` },
+                { y: eval(f(y.fn)), text: `${y.varName} = ${f(y.fn)}` }
             ];
 
-            let data = [];
+            const data = [];
             let simplified = false; // plot 2D solution + true: all equations, false: only conclusion
 
             for (let i = 0; i < matrix.length; i++) {
-                if (simplified && i !== matrix.length - 1) { 
+                if (simplified && i !== matrix.length - 1) {
                     continue; // only plots 2D solution + conclusion equation
                 }
 
-                let row = matrix[i];
-                let dependentCoef = row[vars.indexOf(y.varName)];
-                let constantTerm = row[row.length - 1];
-                let incognitaCoef = row[vars.indexOf(x.varName)];
+                const row = matrix[i];
+                const dependentCoef = row[vars.indexOf(y.varName)];
+                const independentCoef = row[vars.indexOf(x.varName)];
+                const constantTerm = row[row.length - 1];
+                let replacedSum = 0;
 
-                let equationPreviewParts = [];
-                let replacedConstants = Fraction(0);
-
-                // Construct the equation for the dependent variable with the highest index
+                // Construct the equation for the dependent variable (y)
                 row.slice(0, -1).forEach((coef, idx) => {
                     if (!Fraction(coef).equals(0)) {
                         let currentVar = vars[idx];
                         let value = undefined;
-                        
+
                         if (currentVar !== x.varName && currentVar !== y.varName) { // already in incognitaCoef and dependentCoef, respectively 
                             if (sliders[currentVar] !== undefined || dependentValues[currentVar]) {
                                 value = sliders[currentVar] !== undefined ? sliders[currentVar] : dependentValues[currentVar];
-                                replacedConstants = Fraction(replacedConstants).add(Fraction(coef).mul(Fraction(value)).toFraction());
-                                equationPreviewParts.push(`(${coef} * ${currentVar})`); 
+                                replacedSum = Fraction(replacedSum).add(Fraction(coef).mul(Fraction(value)));
                             } else {
-                                console.error('this can\'t happen')   
+                                console.error('this can\'t happen -- variables should be in either the sliders or dependentValues map')
                             }
-                        } 
+                        }
                     }
                 });
-                
-                // Build the function string for preview
-                let solutionPreview = `
-                    ${y.varName} = (${
-                        Fraction(constantTerm).toFraction()
-                    } - (${
-                        Fraction(incognitaCoef).toFraction()
-                    }x + ${
-                        Fraction(replacedConstants).toFraction()
-                    }) / ${
-                        Fraction(dependentCoef).toFraction()
-                    }`;
-                    
-                // Format the final equation: isolate the dependent variable
-                let equation = `(${Fraction(constantTerm).toFraction()} ${nonDependentTerms.length > 0 ? ` - (${nonDependentTerms})` : ''} )/ ${Fraction(dependentCoef).toFraction()}`;
-                let replacedSolutionPrev = `${y.varName} = ${equation}`;
+
+                // Build the function string for ploter: f(x) = c - (Ax + sum) / B 
+                const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / ${f(dependentCoef)}`;
 
                 if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
-                    console.log('check this!!')
-                    // if (!Fraction(nonDependentTerms).equals(0)) {
-                        
-                    //     const v = `${Fraction(constantTerm).div(Fraction(nonDependentTerms))}`;
-                    //     annotations.push({ x: eval(v) });
-                        
-                    // } else {
-                    //     console.log('check this!!')
-                    //     console.log(equation)
-                    // }
-                    
-                    //
-                    //
+                    if (!Fraction(independentCoef).equals(0)) {
+                        // solve for x because y is canceled (0f(x)): x = (sum - c)/A 
+                        const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
+                        annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}` },);
+                    } else {
+                        console.error('both of the selected variables canceled');
+                    }
 
                     // TODO to highlight: document.querySelectorAll(`${plot} .annotations')[2].style.strokeWidth = '5px' 
                 }
 
                 data.push({
                     fn: equation,
-                    updateOnMouseMove: true
+                    updateOnMouseMove: false
                 });
-
-                singlePreview.push(solutionPreview);
-                singleReplacedPreview.push(replacedSolutionPrev);
             }
 
             // Use function-plot to draw the plot
@@ -745,8 +707,8 @@ export class LinearCD {
                 target: `#${plot}`,
                 width: 400,
                 height: 400,
-                xAxis: { label: `${x.varName}-axis`, domain: [ex - 10, ex + 10] }, // center plot on the intersection point
-                yAxis: { label: `${y.varName}-axis`, domain: [ey - 10, ey + 10] },
+                xAxis: { label: `${x.varName}-axis`, domain: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10] }, // center plot on the intersection point
+                yAxis: { label: `${y.varName}-axis`, domain: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10] },
                 grid: false,
                 data,
                 annotations
@@ -764,8 +726,8 @@ export class LinearCD {
             function renderMatrixKaTeX(matrix, container) {
                 let matrixString = '\\begin{bmatrix}';
                 matrix.forEach((row, idx) => {
-                    matrixString += row.slice(0, -1).map(coef => coef.toString()).join(' & ');
-                    matrixString += ' & \\vert & ' + row[row.length - 1]; // Adds the augmented column
+                    matrixString += row.slice(0, -1).map(coef => f(coef)).join(' & ');
+                    matrixString += ' & \\vert & ' + f(row[row.length - 1]); // Adds the augmented column
                     if (idx < matrix.length - 1) matrixString += ' \\\\ ';
                 });
                 matrixString += '\\end{bmatrix}';
@@ -782,7 +744,7 @@ export class LinearCD {
             // Show the preview container
             noSolutionPreviewContainer.style.display = 'block';
 
-            return { };
+            return {};
         }
     }
 }
