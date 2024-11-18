@@ -5,6 +5,15 @@ function f(number) {
     return Fraction(number).toFraction();
 }
 
+const tip = {
+    xLine: true, 
+    yLine: true, 
+    renderer: (_, __, i) => {}
+};
+
+const premiseColor = '#80cbc4';
+const conclusionColor = '#b89aef';
+
 export class LinearCD {
     showObvious = false;
 
@@ -407,14 +416,16 @@ export class LinearCD {
             // set dependent and independent variables
             const index1 = vars.indexOf(select1);
             const index2 = vars.indexOf(select2);
-            const dependentIndex = index1;
-            const independentIndex = index2;
+            const independentIndex = index1;
+            const dependentIndex = index2;
             const annotations = [
                 { x: solutions[independentIndex], text: `${select1} = ${Fraction(solutions[independentIndex]).toFraction()}` },
                 { y: solutions[dependentIndex], text: `${select2} = ${Fraction(solutions[dependentIndex]).toFraction()}` }
             ];
 
-            const data = matrix.map(row => {
+            const data = [];
+            
+            matrix.forEach((row, i) => {
                 // Replace all other variables with their solutions except for the selected free variables
                 const adjustedRow = row.slice(0, -1).map((coef, i) => {
                     if (i !== independentIndex && i !== dependentIndex) {
@@ -434,31 +445,26 @@ export class LinearCD {
 
                 // Construct the function string for function-plot
                 const fn = `(${Fraction(row[row.length - 1]).sub(Fraction(constantTerm))} - (${Fraction(independentTerm)})x) / (${Fraction(dependentCoefficient)})`;
-
+                const color = i !== matrix.length-1 ? premiseColor : conclusionColor;
                 if (Fraction(dependentCoefficient).equals(0)) { // can't be expressed as f(x), must use annotation
                     if (!Fraction(independentTerm).equals(0)) {
                         const v = Fraction(row[row.length - 1]).sub(Fraction(constantTerm)).div(Fraction(independentTerm));
                         // f(v) === f(solutions[independentIndex]), could use either
-                        annotations.push({ x: eval(f(v)) });
+                        annotations.push({ x: eval(f(v)), color });
                     } else {
-                        console.error('both of the selected variables canceled')
+                        console.error('neither of the selected variables can be plotted.')
                     }
-
-                    // TODO to highlight: document.querySelectorAll(`${plot} .annotations')[2].style.strokeWidth = '5px' 
+                } else {
+                    data.push({ fn, color, updateOnMouseMove: false });
                 }
-
-                return { fn, updateOnMouseMove: false };
-            });
+            }); 
 
             // Make emphazis on the intersection point
-            const points = {
-                points: [
-                    [solutions[independentIndex], solutions[dependentIndex]]
-                ],
+            data.push({
+                points: [[solutions[independentIndex], solutions[dependentIndex]]],
                 fnType: 'points',
                 graphType: 'scatter'
-            };
-            data.push(points);
+            });
 
             const text = solutions
                 .filter(s => !isNaN(s))
@@ -478,6 +484,7 @@ export class LinearCD {
 
             // Use function-plot to draw the plot
             const p = functionPlot({
+                tip,
                 target: `#${plot}`,
                 width: 400,
                 height: 400,
@@ -488,7 +495,12 @@ export class LinearCD {
                 annotations
             });
 
-            //document.querySelectorAll(`#${plot} .annotations path`)[2].style.stroke = 'black';
+            annotations.forEach((a, i) => {
+                if (a.color) {
+                    document.querySelectorAll(`#${plot} .annotations path`)[i].style.stroke = a.color;
+                }
+            });
+
             return { plot: p, hl: highlighter };
         }
 
@@ -497,74 +509,51 @@ export class LinearCD {
             slidersContainer.innerHTML = '';
             slidersContainer.style.display = 'block';
 
-            const dependentVars = [];
-            const sliders = {};
+            const dependent = vars.slice(0, -(data.free));
+            const independent = {};
 
-            // First pass to identify dependent variables
-            data.solutions.forEach((solution) => {
-                
-                let lowestIndex = Infinity;
-                let lowestVar = '';
+            vars.slice(vars.length-data.free).forEach(varName => {
+                if (varName && !dependent.includes(varName)) { // Check if varName is not a dependent variable
+                    if (independent[varName] === undefined) { // Create a slider if it hasn't been created yet
+                        const slider = document.createElement('input');
+                        slider.type = 'range';
+                        slider.min = '-10';
+                        slider.max = '10';
+                        slider.value = '0'; // Default value
+                        slider.step = '0.1';
+                        slider.id = `slider-${varName}`;
 
-                solution.slice(0, -1).forEach(part => {
-                    const varName = part.v;
-                    const varIndex = vars.indexOf(varName);
-                    if (varIndex < lowestIndex) {
-                        lowestIndex = varIndex;
-                        lowestVar = varName;
+                        const label = document.createElement('label');
+                        label.id = `${plot}-label-${varName}`;
+                        label.htmlFor = slider.id;
+                        label.style = "display:block"
+                        label.textContent = `${varName}: 0`;
+
+                        // Update display as slider value changes
+                        slider.oninput = () => {
+                            independent[varName] = parseFloat(slider.value);
+                            updateInfinite(data, dependent, independent, vars);
+                            label.textContent = `${varName}: ${slider.value}`;
+                            document.getElementById(`${plot}-sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
+                        };
+
+                        const sliderContainer = document.createElement('div');
+                        sliderContainer.style = "display: inline-block";
+                        sliderContainer.appendChild(label);
+                        sliderContainer.appendChild(slider);
+                        slidersContainer.appendChild(sliderContainer);
+
+                        // Initialize slider value in the map
+                        independent[varName] = parseFloat(slider.value);
                     }
-                });
-
-                dependentVars.push(lowestVar);
-            });
-
-            // Second pass to set up sliders for all independent variables
-            data.solutions.forEach((solution) => {
-                solution.forEach(part => {
-                    const varName = part.v;
-
-                    if (varName && !dependentVars.includes(varName)) { // Check if varName is not a dependent variable
-                        if (sliders[varName] === undefined) { // Create a slider if it hasn't been created yet
-                            const slider = document.createElement('input');
-                            slider.type = 'range';
-                            slider.min = '-10';
-                            slider.max = '10';
-                            slider.value = '0'; // Default value
-                            slider.step = '0.1';
-                            slider.id = `slider-${varName}`;
-
-                            const label = document.createElement('label');
-                            label.id = `${plot}-label-${varName}`;
-                            label.htmlFor = slider.id;
-                            label.style = "display:block"
-                            label.textContent = `${varName}: 0`;
-
-                            // Update display as slider value changes
-                            slider.oninput = () => {
-                                sliders[varName] = parseFloat(slider.value);
-                                updateInfinite(data, dependentVars, sliders, vars);
-                                label.textContent = `${varName}: ${slider.value}`;
-                                document.getElementById(`${plot}-sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
-                            };
-
-                            const sliderContainer = document.createElement('div');
-                            sliderContainer.style = "display: inline-block";
-                            sliderContainer.appendChild(label);
-                            sliderContainer.appendChild(slider);
-                            slidersContainer.appendChild(sliderContainer);
-
-                            // Initialize slider value in the map
-                            sliders[varName] = parseFloat(slider.value);
-                        }
-                    }
-                });
+                }
             });
 
             // Initial plot with default values
-            return updateInfinite(data, dependentVars, sliders, vars);
+            return updateInfinite(data, dependent, independent, vars);
         }
 
-        function updateInfinite(_data, dependentVars, sliders, vars) {
+        function updateInfinite(_data, dependent, independent, vars) {
             document.getElementById(plot).innerHTML = '';
             const solutions = _data.solutions;
             const matrix = _data.matrix;
@@ -574,7 +563,7 @@ export class LinearCD {
             // Iterate over solutions in reverse to handle dependencies correctly
             for (let i = solutions.length - 1; i >= 0; i--) {
                 const sol = solutions[i];
-                const dependentVar = dependentVars[i];
+                const dependentVar = dependent[i];
                 let terms = sol.slice(0, -1);
                 let constantTerm = Fraction(sol[sol.length-1].c);
                 let equationParts = [];
@@ -588,7 +577,7 @@ export class LinearCD {
                     if (varName === dependentVar) {
                         dependentCoef = Fraction(coef); // Coefficient of the dependent variable
                     } else {
-                        let value = sliders[varName] || 0; // Default to slider or zero
+                        let value = independent[varName] || 0; // Default to slider or zero
                         // If the variable has been solved in this loop, use its calculated value
                         if (dependentValues[varName] !== undefined) {
                             value = dependentValues[varName];
@@ -632,8 +621,6 @@ export class LinearCD {
 
             const x = { varName: vars[0], fn: dependentValues[vars[0]] };
             const y = { varName: vars[1], fn: dependentValues[vars[1]] };
-            const ex = f(x.fn);
-            const ey = f(y.fn);
 
             const annotations = [
                 { x: eval(f(x.fn)), text: `${x.varName} = ${f(x.fn)}` },
@@ -661,8 +648,8 @@ export class LinearCD {
                         let value = undefined;
 
                         if (currentVar !== x.varName && currentVar !== y.varName) { // already in incognitaCoef and dependentCoef, respectively 
-                            if (sliders[currentVar] !== undefined || dependentValues[currentVar]) {
-                                value = sliders[currentVar] !== undefined ? sliders[currentVar] : dependentValues[currentVar];
+                            if (independent[currentVar] !== undefined || dependentValues[currentVar]) {
+                                value = independent[currentVar] !== undefined ? independent[currentVar] : dependentValues[currentVar];
                                 replacedSum = Fraction(replacedSum).add(Fraction(coef).mul(Fraction(value)));
                             } else {
                                 console.error('this can\'t happen -- variables should be in either the sliders or dependentValues map')
@@ -673,27 +660,23 @@ export class LinearCD {
 
                 // Build the function string for ploter: f(x) = c - (Ax + sum) / B 
                 const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / ${f(dependentCoef)}`;
-
+                const color = i !== matrix.length-1 ? premiseColor : conclusionColor;
                 if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
                     if (!Fraction(independentCoef).equals(0)) {
                         // solve for x because y is canceled (0f(x)): x = (sum - c)/A 
                         const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
-                        annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}` },);
+                        annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
                     } else {
                         console.error('both of the selected variables canceled');
                     }
-
-                    // TODO to highlight: document.querySelectorAll(`${plot} .annotations')[2].style.strokeWidth = '5px' 
+                } else {
+                    data.push({ fn: equation, color, updateOnMouseMove: false });
                 }
-
-                data.push({
-                    fn: equation,
-                    updateOnMouseMove: false
-                });
             }
 
             // Use function-plot to draw the plot
             const p = functionPlot({
+                tip,
                 target: `#${plot}`,
                 width: 400,
                 height: 400,
@@ -702,6 +685,12 @@ export class LinearCD {
                 grid: false,
                 data,
                 annotations
+            });
+
+            annotations.forEach((a, i) => {
+                if (a.color) {
+                    document.querySelectorAll(`#${plot} .annotations path`)[i].style.stroke = a.color;
+                }
             });
 
             return { plot: p, hl: highlighter };
