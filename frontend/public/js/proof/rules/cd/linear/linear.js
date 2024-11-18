@@ -145,9 +145,8 @@ export class LinearCD {
             container.innerHTML = '';
 
             const solutions = this.solve(data.ops[data.current], variables);
-            console.log(solutions.solutions)
-
             const plots = { 'cd-linear-plot': undefined };
+            
             Object.keys(plots).forEach(plot => {
                 displaySolution(plot, solutions.solutions, variables);
                 plots[plot] = this.vis(plot, solutions, variables);
@@ -513,39 +512,37 @@ export class LinearCD {
             const independent = {};
 
             vars.slice(vars.length-data.free).forEach(varName => {
-                if (varName && !dependent.includes(varName)) { // Check if varName is not a dependent variable
-                    if (independent[varName] === undefined) { // Create a slider if it hasn't been created yet
-                        const slider = document.createElement('input');
-                        slider.type = 'range';
-                        slider.min = '-10';
-                        slider.max = '10';
-                        slider.value = '0'; // Default value
-                        slider.step = '0.1';
-                        slider.id = `slider-${varName}`;
+                if (independent[varName] === undefined) { // Create a slider if it hasn't been created yet
+                    const slider = document.createElement('input');
+                    slider.type = 'range';
+                    slider.min = '-10';
+                    slider.max = '10';
+                    slider.value = '0'; // Default value
+                    slider.step = '0.1';
+                    slider.id = `slider-${varName}`;
 
-                        const label = document.createElement('label');
-                        label.id = `${plot}-label-${varName}`;
-                        label.htmlFor = slider.id;
-                        label.style = "display:block"
-                        label.textContent = `${varName}: 0`;
+                    const label = document.createElement('label');
+                    label.id = `${plot}-label-${varName}`;
+                    label.htmlFor = slider.id;
+                    label.style = "display:block"
+                    label.textContent = `${varName}: 0`;
 
-                        // Update display as slider value changes
-                        slider.oninput = () => {
-                            independent[varName] = parseFloat(slider.value);
-                            updateInfinite(data, dependent, independent, vars);
-                            label.textContent = `${varName}: ${slider.value}`;
-                            document.getElementById(`${plot}-sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
-                        };
-
-                        const sliderContainer = document.createElement('div');
-                        sliderContainer.style = "display: inline-block";
-                        sliderContainer.appendChild(label);
-                        sliderContainer.appendChild(slider);
-                        slidersContainer.appendChild(sliderContainer);
-
-                        // Initialize slider value in the map
+                    // Update display as slider value changes
+                    slider.oninput = () => {
                         independent[varName] = parseFloat(slider.value);
-                    }
+                        updateInfinite(data, dependent, independent, vars);
+                        label.textContent = `${varName}: ${slider.value}`;
+                        document.getElementById(`${plot}-sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
+                    };
+
+                    const sliderContainer = document.createElement('div');
+                    sliderContainer.style = "display: inline-block";
+                    sliderContainer.appendChild(label);
+                    sliderContainer.appendChild(slider);
+                    slidersContainer.appendChild(sliderContainer);
+
+                    // Initialize slider value in the map
+                    independent[varName] = parseFloat(slider.value);
                 }
             });
 
@@ -647,20 +644,21 @@ export class LinearCD {
                         let currentVar = vars[idx];
                         let value = undefined;
 
-                        if (currentVar !== x.varName && currentVar !== y.varName) { // already in incognitaCoef and dependentCoef, respectively 
-                            if (independent[currentVar] !== undefined || dependentValues[currentVar]) {
-                                value = independent[currentVar] !== undefined ? independent[currentVar] : dependentValues[currentVar];
-                                replacedSum = Fraction(replacedSum).add(Fraction(coef).mul(Fraction(value)));
+                        if (currentVar !== x.varName && currentVar !== y.varName) { // already in independentCoef and dependentCoef, respectively 
+                            if (independent[currentVar] !== undefined) {
+                                value = independent[currentVar];
                             } else {
-                                console.error('this can\'t happen -- variables should be in either the sliders or dependentValues map')
+                                value = dependentValues[currentVar];
                             }
+                            replacedSum = Fraction(replacedSum).add(Fraction(coef).mul(Fraction(value)));
                         }
                     }
                 });
 
-                // Build the function string for ploter: f(x) = c - (Ax + sum) / B 
+                // build the function string for plotter
                 const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / ${f(dependentCoef)}`;
                 const color = i !== matrix.length-1 ? premiseColor : conclusionColor;
+
                 if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
                     if (!Fraction(independentCoef).equals(0)) {
                         // solve for x because y is canceled (0f(x)): x = (sum - c)/A 
