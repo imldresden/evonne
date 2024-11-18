@@ -1,14 +1,6 @@
 import { controls, createVisContainer } from "../cd-rules.js";
 import { utils } from "../../rules.js";
 
-const regex_terms = /\(?(-?\d+(?:[\/\.]\d+)?)\)?([a-zA-Z]+\d?)/g; // Extract terms like '1.00x1'
-const regex_term = /\(?(-?\d+(?:[\/\.]\d+)?)\)?([a-zA-Z]+\d?)/; // Separates term into [match, '1.00', 'x1']
-
-function strip(number) {
-    return parseFloat(number).toPrecision(12) / 1;
-    //return Fraction(number)
-}
-
 function f(number) {
     return Fraction(number).toFraction();
 }
@@ -189,15 +181,14 @@ export class LinearCD {
                     let solutions = [];
 
                     matrix.forEach(row => {
-                        let equationParts = [];
+                        let equation = [];
                         for (let j = 0; j < numCols; j++) {
                             if (Fraction(row[j]).abs().gt(tolerance)) {
-                                equationParts.push(`(${f(row[j])})${variables[j]}`);
+                                equation.push({ c: f(row[j]), v: variables[j] });
                             }
                         }
-                        if (equationParts.length > 0) {
-                            // Join all parts and append the equals sign with the last constant value
-                            let equation = equationParts.join(' + ') + ` = ${f(row[numCols])}`;
+                        if (equation.length > 0) {
+                            equation.push({ c: f(row[numCols]) });
                             solutions.push(equation);
                         }
                     });
@@ -511,12 +502,12 @@ export class LinearCD {
 
             // First pass to identify dependent variables
             data.solutions.forEach((solution) => {
-                const parts = solution.match(regex_terms);
+                
                 let lowestIndex = Infinity;
                 let lowestVar = '';
 
-                parts.forEach(part => {
-                    const [_, __, varName] = part.match(regex_term);
+                solution.slice(0, -1).forEach(part => {
+                    const varName = part.v;
                     const varIndex = vars.indexOf(varName);
                     if (varIndex < lowestIndex) {
                         lowestIndex = varIndex;
@@ -529,12 +520,10 @@ export class LinearCD {
 
             // Second pass to set up sliders for all independent variables
             data.solutions.forEach((solution) => {
-                const parts = solution.match(regex_terms);
+                solution.forEach(part => {
+                    const varName = part.v;
 
-                parts.forEach(part => {
-                    const [_, __, varName] = part.match(regex_term);
-
-                    if (!dependentVars.includes(varName)) { // Check if varName is not a dependent variable
+                    if (varName && !dependentVars.includes(varName)) { // Check if varName is not a dependent variable
                         if (sliders[varName] === undefined) { // Create a slider if it hasn't been created yet
                             const slider = document.createElement('input');
                             slider.type = 'range';
@@ -586,14 +575,15 @@ export class LinearCD {
             for (let i = solutions.length - 1; i >= 0; i--) {
                 const sol = solutions[i];
                 const dependentVar = dependentVars[i];
-                let terms = sol.split("=")[0].trim().match(regex_terms);
-                let constantTerm = Fraction(sol.split("=")[1].trim());
+                let terms = sol.slice(0, -1);
+                let constantTerm = Fraction(sol[sol.length-1].c);
                 let equationParts = [];
                 let equationPreviewParts = [];
                 let dependentCoef;
 
                 terms.forEach(term => {
-                    const [_, coef, varName] = term.match(regex_term);
+                    const coef = term.c;
+                    const varName = term.v
 
                     if (varName === dependentVar) {
                         dependentCoef = Fraction(coef); // Coefficient of the dependent variable
