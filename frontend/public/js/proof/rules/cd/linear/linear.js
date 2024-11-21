@@ -101,6 +101,8 @@ function solve(data) {
             let numRows = system.length;
             let numCols = system[0].length;
 
+            //system.forEach(row => console.log(row.map(c => Fraction(c).toFraction()).join("  ")));
+
             for (let i = 0; i < numRows; i++) {
                 let maxRow = i;
                 for (let k = i + 1; k < numRows; k++) {
@@ -756,10 +758,6 @@ export class LinearCD {
     
                         }
 
-
-                        
-                        
-
                         for (let i = 0; i < frees.length; i++) {
                             if (frees[i] === d.target.value && i !== idx) {
                                 frees[i] == previous;
@@ -767,7 +765,14 @@ export class LinearCD {
                         }
 
                         frees[idx] = d.target.value;
-                        vars = [select1.value, select2.value, ...frees];
+                        const deps = [];
+                        vars.forEach(v => {
+                            if (v !== select1.value && v !== select2.value && !frees.includes(v)) {
+                                deps.push(v)
+                            }
+                        })
+                        vars = [select1.value, select2.value, ...deps, ...frees];
+                        console.log(vars)
                         const solution = solve(struct);
                         createSliders(solution);
                         return visualizeInfiniteSolutions(plot, solution);
@@ -798,7 +803,7 @@ export class LinearCD {
         const ctrls = document.createElement('div');
         container.appendChild(ctrls);
         ctrls.innerHTML =
-            `<div id="linear-vis-controls" style="display: none;margin:10px;">
+            `<div id="linear-vis-controls" style="display: none;margin-left:25px;margin-right:25px;">
                 <div> Plot Axes: </div>
                 <label id="l-var1" for="var1">&nbsp;X-axis:</label>
                 <select id="var1" class="browser-default"></select>
