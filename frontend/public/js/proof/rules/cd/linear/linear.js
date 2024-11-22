@@ -800,16 +800,16 @@ export class LinearCD {
                     .attr("class", "text-eq premise")
                     .on('mouseover', () => {
                         d3.select(`#eq-${pr.id}`).classed("hl-text", true);
-                        //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2)
-                        //hl[pr.id].svg().style.stroke = 'red' 
-                        //hl[pr.id].svg().style.opacity = 1
-                        hl[pr.id].svg().style.strokeWidth = 5
+                        //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
+                        //hl[pr.id].svg().style.stroke = 'red';
+                        //hl[pr.id].svg().style.opacity = 1;
+                        hl[pr.id].svg().style.strokeWidth = 5;
                     })
                     .on('mouseout', () => {
                         d3.select(`#eq-${pr.id}`).classed("hl-text", false);
-                        //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1)
-                        //hl[pr.id].svg().style.stroke = hl[pr.id].color
-                        hl[pr.id].svg().style.strokeWidth = 1
+                        //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
+                        //hl[pr.id].svg().style.stroke = hl[pr.id].color;
+                        hl[pr.id].svg().style.strokeWidth = 1;
                     })
                 const l = printEquation(pr.constraint, where);
                 if (l > maxLength) {
@@ -824,16 +824,16 @@ export class LinearCD {
                 .attr("class", "text-eq conclusion")
                 .on('mouseover', () => {
                     d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", true);
-                    //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2) 
-                    //hl[op.conclusion.id].svg().style.stroke = 'red'
-                    //hl[op.conclusion.id].svg().style.opacity = 1
-                    hl[op.conclusion.id].svg().style.strokeWidth = 5
+                    //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
+                    //hl[op.conclusion.id].svg().style.stroke = 'red';
+                    //hl[op.conclusion.id].svg().style.opacity = 1;
+                    hl[op.conclusion.id].svg().style.strokeWidth = 5;
                 })
                 .on('mouseout', () => { 
                     d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", false);
-                    //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1)
-                    //hl[op.conclusion.id].svg().style.stroke = hl[op.conclusion.id].color
-                    hl[op.conclusion.id].svg().style.strokeWidth = 1
+                    //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
+                    //hl[op.conclusion.id].svg().style.stroke = hl[op.conclusion.id].color;
+                    hl[op.conclusion.id].svg().style.strokeWidth = 1;
                 });
                 
             const l = printEquation(op.conclusion.constraint, where);
