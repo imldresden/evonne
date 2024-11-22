@@ -593,7 +593,7 @@ export class LinearCD {
             frees = [];
             const freeVarsContainer = document.getElementById(`slidersContainer`);
             freeVarsContainer.innerHTML = '<div>Free Variables:</div>';
-            freeVarsContainer.style = 'display:block';
+            freeVarsContainer.style = 'display:grid';
 
             const sliders = {};
 
@@ -693,7 +693,7 @@ export class LinearCD {
 
         const container = document.getElementById('explanation-container');
         container.style = `min-height:400px;margin-top:15px;display:flex;height:${
-            118 + data.free ? data.free * 59 : 0
+            118 + data.free ? data.free * 100 : 0
         }px`;
         container.innerHTML = '';
 
