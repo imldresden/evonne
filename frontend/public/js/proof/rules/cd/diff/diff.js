@@ -565,7 +565,7 @@ export class DifferenceCD {
             cy.nodes().forEach(d => {
                 d.data({v: d.data().og})
             })
-            animateNegativeCycle(cy, { nid: params.manual.id})
+            animateNegativeCycle(cy, { nid: params.manual.id })
         }
         const varInput = document.getElementById('var-input')
         varInput.value = "";

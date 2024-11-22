@@ -1,5 +1,6 @@
 import { controls, createVisContainer } from "../cd-rules.js";
 import { utils } from "../../rules.js";
+import { throttle } from "../../../../utils/throttle.js";
 
 function f(number) {
     return Fraction(number).toFraction();
@@ -8,16 +9,27 @@ function f(number) {
 const tip = {
     xLine: true,
     yLine: true,
-    renderer: (_, __, i) => { }
+    renderer: throttle((x, y) => { 
+        d3.selectAll(".text-eq").classed("hl-text", false);
+        Object.keys(hl).forEach(d => {
+            if (hl[d].evaluate({x, y})) {
+                d3.select(`#eq-${d}`).classed("hl-text", true);
+                //console.log(`x:${x}, y:${x} intersects with: ${d}`);
+            }
+        })
+    }, 50)
 };
 
 const premiseColor = '#80cbc4';
 const conclusionColor = '#b89aef';
 const plot = 'cd-linear-plot';
-let struct = {};
-let vars = [];
-let frees = [];
 
+let struct = {}; // copy of the node/subproof data 
+let vars = []; // list of variables. The order of this list determines the order of the solutions, which allows us to "target" which variables will be free in case of infinite solutions.
+let frees = []; // the indices of this list correspond to the ids of the dropdowns to select free variables
+let hl = {}; // correspondence between equation ids from `struct` and the plotter line (svg) that should be altered when highlighting occurs
+
+// gaussian elimination using Fraction.js
 function solve(data) {
     function solveEquations(systemInput, singleInput) {
         function extractSolutions(matrix, tolerance, solutionType) {
@@ -184,8 +196,8 @@ function vis(plot, solution) {
         container.appendChild(vis);
     }
 
-    vis.innerHTML = `
-        <div id=${plot}> </div>
+    vis.innerHTML = 
+        `<div id=${plot}> </div>
 
         <div id="${plot}-noSolutionPreviewContainer" style="display: none;">
             <div style="text-align:center"> 
@@ -210,13 +222,6 @@ function vis(plot, solution) {
 function visualizeUniqueSolution(plot, _data) {
     const matrix = _data.matrix;
     const solutions = _data.solutions;
-
-    if (!vars || vars.length === 0) {
-        console.error('Variable names are undefined or empty');
-        return; // Stop execution if varNames is not defined
-    }
-
-    const highlighter = {};
     const select1 = document.getElementById(`var1`).value;
     const select2 = document.getElementById(`var2`).value;
 
@@ -231,8 +236,10 @@ function visualizeUniqueSolution(plot, _data) {
     ];
 
     const data = [];
-
+    let annots = 0; 
     matrix.forEach((row, i) => {
+        const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
+        const color = i !== matrix.length - 1 ? premiseColor : conclusionColor;
         // Replace all other variables with their solutions except for the selected free variables
         const adjustedRow = row.slice(0, -1).map((coef, i) => {
             if (i !== independentIndex && i !== dependentIndex) {
@@ -251,18 +258,35 @@ function visualizeUniqueSolution(plot, _data) {
         }, 0);
 
         // Construct the function string for function-plot
-        const fn = `(${Fraction(row[row.length - 1]).sub(Fraction(constantTerm))} - (${Fraction(independentTerm)})x) / (${Fraction(dependentCoefficient)})`;
-        const color = i !== matrix.length - 1 ? premiseColor : conclusionColor;
+        const c = Fraction(row[row.length - 1]).sub(Fraction(constantTerm));
+        const fn = `(${f(c)} - (${Fraction(independentTerm)})x) / (${Fraction(dependentCoefficient)})`;
+        
         if (Fraction(dependentCoefficient).equals(0)) { // can't be expressed as f(x), must use annotation
             if (!Fraction(independentTerm).equals(0)) {
                 const v = Fraction(row[row.length - 1]).sub(Fraction(constantTerm)).div(Fraction(independentTerm));
                 // f(v) === f(solutions[independentIndex]), could use either
                 annotations.push({ x: eval(f(v)), color });
+                hl[id] = { 
+                    svg: () => document.querySelectorAll(`#${plot} .annotations path`)[annotations.length-1], 
+                    evaluate: point => Fraction(v).equals(Fraction(point.x)),
+                    color 
+                };
+                annots += 1;
             } else {
                 console.error('neither of the selected variables can be plotted.')
             }
         } else {
             data.push({ fn, color, updateOnMouseMove: false });
+            hl[id] = { 
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - annots)], 
+                evaluate: (point) => {
+                    const p = Fraction(independentTerm).mul(Fraction(point.x));
+                    const s = Fraction(c).sub(p);
+                    const d = s.div(Fraction(dependentCoefficient));
+                    return d.equals(Fraction(point.y));
+                },
+                color 
+            };
         }
     });
 
@@ -301,6 +325,7 @@ function visualizeUniqueSolution(plot, _data) {
         data,
         annotations
     });
+    document.querySelector('.function-plot .zoom-and-drag').onmouseout = () => d3.selectAll(".text-eq").classed("hl-text", false);
 
     annotations.forEach((a, i) => {
         if (a.color) {
@@ -308,7 +333,7 @@ function visualizeUniqueSolution(plot, _data) {
         }
     });
 
-    return { plot: p, hl: highlighter };
+    return { plot: p, hl };
 }
 
 function visualizeInfiniteSolutions(plot, _data) {
@@ -324,7 +349,6 @@ function visualizeInfiniteSolutions(plot, _data) {
     const solutions = _data.solutions;
     const matrix = _data.matrix;
     const dependentValues = {}; // Store computed values for dependent variables
-    const highlighter = {};
 
     // Iterate over solutions in reverse to handle dependencies correctly
     for (let i = solutions.length - 1; i >= 0; i--) {
@@ -395,8 +419,11 @@ function visualizeInfiniteSolutions(plot, _data) {
 
     const data = [];
     let simplified = false; // plot 2D solution + true: all equations, false: only conclusion
-
+    let annots = 0;
     for (let i = 0; i < matrix.length; i++) {
+        const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
+        const color = i !== matrix.length - 1 ? premiseColor : conclusionColor;
+
         if (simplified && i !== matrix.length - 1) {
             continue; // only plots 2D solution + conclusion equation
         }
@@ -426,18 +453,33 @@ function visualizeInfiniteSolutions(plot, _data) {
 
         // build the function string for plotter
         const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / ${f(dependentCoef)}`;
-        const color = i !== matrix.length - 1 ? premiseColor : conclusionColor;
 
         if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
             if (!Fraction(independentCoef).equals(0)) {
                 // solve for x because y is canceled (0f(x)): x = (sum - c)/A 
                 const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
                 annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
+                hl[id] = { 
+                    svg: () => document.querySelectorAll(`#${plot} .annotations path`)[annotations.length-1], 
+                    evaluate: point => Fraction(v).equals(Fraction(point.x)),
+                    color
+                };
+                annots += 1;
             } else {
                 console.error('both of the selected variables canceled');
             }
         } else {
             data.push({ fn: equation, color, updateOnMouseMove: false });
+            hl[id] = { 
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - annots)], 
+                evaluate: (point) => {
+                    const p = Fraction(independentCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
+                    const s = Fraction(constantTerm).sub(p);
+                    const d = s.div(Fraction(dependentCoef));
+                    return d.equals(Fraction(point.y));
+                },
+                color 
+            };
         }
     }
 
@@ -454,13 +496,15 @@ function visualizeInfiniteSolutions(plot, _data) {
         annotations
     });
 
+    document.querySelector('.function-plot .zoom-and-drag').onmouseout = () => d3.selectAll(".text-eq").classed("hl-text", false);
+
     annotations.forEach((a, i) => {
         if (a.color) {
             document.querySelectorAll(`#${plot} .annotations path`)[i].style.stroke = a.color;
         }
     });
 
-    return { plot: p, hl: highlighter };
+    return { plot: p, hl };
 }
 
 function visualizeNoSolutions(plot, data) {
@@ -488,13 +532,202 @@ function visualizeNoSolutions(plot, data) {
     renderMatrixKaTeX(data.echelon, finalStatePreview);
 
     // Show the preview container
-    noSolutionPreviewContainer.style.display = 'block';
+    noSolutionPreviewContainer.style = 'display:block';
 
     return {};
 }
 
 export class LinearCD {
     showObvious = false;
+
+    createPlotControls(data) {
+        function generateVariableSelectors(data) {
+            if (vars.length > 2) {
+                const controls = document.querySelector(`#linear-vis-controls`);
+                controls.style = 'display:inline-block;min-width:250px;margin-left:25px;margin-right:25px;';
+                const select1 = document.querySelector(`#var1`);
+                const select2 = document.querySelector(`#var2`);
+                select1.innerHTML = '';
+                select2.innerHTML = '';
+                vars.forEach(varName => {
+                    const opt1 = new Option(varName, varName);
+                    const opt2 = new Option(varName, varName);
+
+                    if (opt2.value === vars[1]) {
+                        opt1.disabled = true;
+                    }
+                    if (opt1.value === vars[0]) {
+                        opt2.disabled = true;
+                    }
+
+                    select1.add(opt1);
+                    select2.add(opt2);
+                });
+                select1.value = vars[0];
+                select2.value = vars[1];
+
+                function update(d) {
+                    const other = d.target.id === "var1" ? `#var2 option` : `#var1 option`;
+
+                    document.querySelectorAll(other).forEach(opt => {
+                        opt.disabled = false;
+                        if (opt.value === d.target.value) {
+                            opt.disabled = true;
+                        }
+                    });
+
+                    switch (data.type) {
+                        case 'unique solution':
+                            return visualizeUniqueSolution(plot, data);
+                        case 'infinite solutions':
+                            vars = [select1.value, select2.value, ...vars.filter(v => v !== select1.value && v !== select2.value)];
+                            const solution = solve(struct);
+                            createSliders(solution);
+                            return visualizeInfiniteSolutions(plot, solution);
+                        case 'no solution':
+                            return visualizeNoSolutions(plot, solution);
+                    }
+                }
+
+                select1.onchange = update;
+                select2.onchange = update;
+            } else {
+                console.log('at least 3 variables needed for controls to be needed')
+            }
+        }
+
+        function createSliders(data) {
+            frees = [];
+            const freeVarsContainer = document.getElementById(`slidersContainer`);
+            freeVarsContainer.innerHTML = '<div>Free Variables:</div>';
+            freeVarsContainer.style = 'display:block';
+
+            const sliders = {};
+
+            vars.slice(vars.length - data.free).forEach((varName, i) => {
+                if (sliders[varName] === undefined) {
+                    // create select to replace free variable
+                    const select = document.createElement('select');
+                    select.id = `select-free-${i}`;
+                    select.style = "display:block;";
+                    vars.forEach(vName => select.add(new Option(vName, vName)));
+                    select.value = varName;
+
+                    // create slider to specify free variable value
+                    const slider = document.createElement('input');
+                    slider.type = 'range';
+                    slider.min = '-10';
+                    slider.max = '10';
+                    slider.value = '0'; // Default value
+                    slider.step = '0.1';
+                    slider.id = `slider-${varName}`;
+
+                    const label = document.createElement('label');
+                    label.id = `label-${varName}`;
+                    label.htmlFor = slider.id;
+                    label.style = "display:block;float:right;"
+                    label.textContent = `${varName}: 0`;
+
+                    const sliderContainer = document.createElement('div');
+                    sliderContainer.style = "display:inline-block;width:200px";
+                    sliderContainer.appendChild(label);
+                    sliderContainer.appendChild(slider);
+
+                    // add to controls 
+                    const varContainer = document.createElement('div');
+                    varContainer.style = "display: inline-flex";
+                    varContainer.appendChild(select);
+                    varContainer.appendChild(sliderContainer);
+                    freeVarsContainer.appendChild(varContainer);
+
+                    // interaction 
+                    select.onchange = (d) => {
+                        const select1 = document.getElementById(`var1`);
+                        const select2 = document.getElementById(`var2`);
+                        const idx = +d.target.id.split('select-free-')[1];
+                        const previous = frees[idx]
+
+                        let replaced = '';
+                        if (d.target.value === select1.value) {
+                            select1.value = previous;
+                            replaced = 'var1'
+                        }
+
+                        if (d.target.value === select2.value) {
+                            select2.value = previous;
+                            replaced = 'var2'
+                        }
+
+                        if (replaced !== '') {
+                            const other = replaced === "var1" ? `#var2 option` : `#var1 option`;
+                            document.querySelectorAll(other).forEach(opt => {
+                                opt.disabled = false;
+                                if (opt.value === document.getElementById(replaced).value) {
+                                    opt.disabled = true;
+                                }
+                            });
+    
+                        }
+
+                        for (let i = 0; i < frees.length; i++) {
+                            if (frees[i] === d.target.value && i !== idx) {
+                                frees[i] = previous;
+                            }
+                        }
+
+                        frees[idx] = d.target.value;
+                        const deps = vars.filter(v => v !== select1.value && v !== select2.value && !frees.includes(v));
+                        vars = [select1.value, select2.value, ...deps, ...frees];
+                        const solution = solve(struct);
+                        createSliders(solution);
+                        return visualizeInfiniteSolutions(plot, solution);
+                    }
+
+                    slider.oninput = () => {
+                        sliders[varName] = parseFloat(slider.value);
+                        label.textContent = `${varName}: ${slider.value}`;
+                        document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
+                        visualizeInfiniteSolutions(plot, data);
+                    };
+
+                    sliders[varName] = parseFloat(slider.value);
+                    frees.push(varName);
+                }
+            });
+
+            return sliders;
+        }
+
+        const container = document.getElementById('explanation-container');
+        container.style = `min-height:400px;margin-top:15px;display:flex;height:${
+            118 + data.free ? data.free * 59 : 0
+        }px`;
+        container.innerHTML = '';
+
+        const ctrls = document.createElement('div');
+        container.appendChild(ctrls);
+        ctrls.innerHTML =
+            `<div id="linear-vis-controls" style="display:none">
+                <div> Plot Axes: </div>
+                <label id="l-var1" for="var1">&nbsp;X-axis:</label>
+                <select id="var1" class="browser-default"></select>
+                <label id="l-var2" for="var2">&nbsp;Y-axis:</label>
+                <select id="var2" class="browser-default"></select>
+                &nbsp;
+                <div id="slidersContainer" style="display: none;"> </div>
+            </div>`;
+
+        generateVariableSelectors(data);
+
+        switch (data.type) {
+            case 'infinite solutions':
+                createSliders(data);
+                break;
+            case 'no solution':
+                console.log(data.free);
+                break;
+        }
+    }
 
     draw(data, params, where) {
         function getVariables(data) {
@@ -568,16 +801,47 @@ export class LinearCD {
 
             let maxLength = 0;
             Object.values(op.premises).forEach((pr, i) => {
-                const l = printEquation(pr.constraint, input.append("span").attr("id", "eq-" + pr.id).attr("class", "text-eq premise"));
+                const where = input
+                    .append("span").attr("id", "eq-" + pr.id)
+                    .attr("class", "text-eq premise")
+                    .on('mouseover', () => {
+                        d3.select(`#eq-${pr.id}`).classed("hl-text", true);
+                        Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2)
+                        hl[pr.id].svg().style.stroke = 'red' // note: stroke-width does not work with some lines because of the way functionPlot samples the functions
+                        hl[pr.id].svg().style.opacity = 1
+                    })
+                    .on('mouseout', () => {
+                        d3.select(`#eq-${pr.id}`).classed("hl-text", false);
+                        Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1)
+                        hl[pr.id].svg().style.stroke = hl[pr.id].color
+                    })
+                const l = printEquation(pr.constraint, where);
                 if (l > maxLength) {
                     maxLength = l;
                 }
                 input.append("br");
-
             });
 
-            utils.addMidRule([maxLength], input);
-            printEquation(op.conclusion.constraint, input.append("span").attr("id", "eq-" + op.conclusion.id).attr("class", "text-eq conclusion"));
+            const hr = utils.addMidRule([maxLength], input, `${plot}-mid-rule`);
+            const where = input
+                .append("span").attr("id", "eq-" + op.conclusion.id)
+                .attr("class", "text-eq conclusion")
+                .on('mouseover', () => {
+                    d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", true);
+                    Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2) 
+                    hl[op.conclusion.id].svg().style.stroke = 'red'
+                    hl[op.conclusion.id].svg().style.opacity = 1
+                })
+                .on('mouseout', () => { 
+                    d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", false);
+                    Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1)
+                    hl[op.conclusion.id].svg().style.stroke = hl[op.conclusion.id].color
+                });
+                
+            const l = printEquation(op.conclusion.constraint, where);
+            if (l > maxLength) {
+                hr.attr('width', utils.getRuleLength([l]));
+            }
         }
 
         function displaySolution(plot, values) {
@@ -618,6 +882,7 @@ export class LinearCD {
             displayEquationSystem(data.ops[data.current], vars);
 
             struct = structuredClone(data.ops[data.current]);
+            hl = {};
             const solutions = solve(struct);
 
             this.createPlotControls(solutions);
@@ -626,204 +891,6 @@ export class LinearCD {
 
             document.removeEventListener('cd-l-hl', highlightText);
             document.addEventListener('cd-l-hl', highlightText);
-        }
-    };
-
-    createPlotControls(data) {
-        function generateVariableSelectors(data) {
-            if (vars.length > 2) {
-                const controls = document.querySelector(`#linear-vis-controls`);
-                controls.style.display = 'inline-block';
-                const select1 = document.querySelector(`#var1`);
-                const select2 = document.querySelector(`#var2`);
-                select1.innerHTML = '';
-                select2.innerHTML = '';
-                vars.forEach(varName => {
-                    const opt1 = new Option(varName, varName);
-                    const opt2 = new Option(varName, varName);
-
-                    if (opt2.value === vars[1]) {
-                        opt1.disabled = true;
-                    }
-                    if (opt1.value === vars[0]) {
-                        opt2.disabled = true;
-                    }
-
-                    select1.add(opt1);
-                    select2.add(opt2);
-                });
-                select1.value = vars[0];
-                select2.value = vars[1];
-
-                function update(d) {
-                    const other = d.target.id === "var1" ? `#var2 option` : `#var1 option`;
-
-                    document.querySelectorAll(other).forEach(opt => {
-                        opt.disabled = false;
-                        if (opt.value === d.target.value) {
-                            opt.disabled = true;
-                        }
-                    });
-
-                    switch (data.type) {
-                        case 'unique solution':
-                            return visualizeUniqueSolution(plot, data);
-                        case 'infinite solutions':
-                            vars = [select1.value, select2.value, ...vars.filter(v => v !== select1.value && v !== select2.value)];
-                            const solution = solve(struct);
-                            createSliders(solution);
-                            return visualizeInfiniteSolutions(plot, solution);
-                        case 'no solution':
-                            return visualizeNoSolutions(plot, solution);
-                    }
-                }
-
-                select1.onchange = update;
-                select2.onchange = update;
-            } else {
-                console.log('at least 3 variables needed for controls to be needed')
-            }
-        }
-
-        function createSliders(data) {
-            frees = [];
-            const freeVarsContainer = document.getElementById(`slidersContainer`);
-            freeVarsContainer.innerHTML = '<div>Free Variables:</div>';
-            freeVarsContainer.style.display = 'block';
-
-            const sliders = {};
-
-            vars.slice(vars.length - data.free).forEach((varName, i) => {
-                if (sliders[varName] === undefined) {
-                    // create select to replace free variable
-                    const select = document.createElement('select');
-                    select.id = `select-free-${i}`;
-                    select.style = "display:block";
-                    vars.forEach(vName => select.add(new Option(vName, vName)));
-                    select.value = varName;
-
-                    // create slider to specify free variable value
-                    const slider = document.createElement('input');
-                    slider.type = 'range';
-                    slider.min = '-10';
-                    slider.max = '10';
-                    slider.value = '0'; // Default value
-                    slider.step = '0.1';
-                    slider.id = `slider-${varName}`;
-
-                    const label = document.createElement('label');
-                    label.id = `label-${varName}`;
-                    label.htmlFor = slider.id;
-                    label.style = "display:block;float:right;"
-                    label.textContent = `${varName}: 0`;
-
-                    const sliderContainer = document.createElement('div');
-                    sliderContainer.style = "display: inline-block";
-                    sliderContainer.appendChild(label);
-                    sliderContainer.appendChild(slider);
-
-                    // add to controls 
-                    const varContainer = document.createElement('div');
-                    varContainer.style = "display: inline-flex";
-                    varContainer.appendChild(select);
-                    varContainer.appendChild(sliderContainer);
-                    freeVarsContainer.appendChild(varContainer);
-
-                    // interaction 
-                    select.onchange = (d) => {
-                        const select1 = document.getElementById(`var1`);
-                        const select2 = document.getElementById(`var2`);
-                        const idx = +d.target.id.split('select-free-')[1];
-                        const previous = frees[idx]
-
-                        let replaced = '';
-                        if (d.target.value === select1.value) {
-                            select1.value = previous;
-                            replaced = 'var1'
-                        }
-
-                        if (d.target.value === select2.value) {
-                            select2.value = previous;
-                            replaced = 'var2'
-                        }
-
-                        if (replaced !== '') {
-                            const other = replaced === "var1" ? `#var2 option` : `#var1 option`;
-                            document.querySelectorAll(other).forEach(opt => {
-                                opt.disabled = false;
-                                if (opt.value === document.getElementById(replaced).value) {
-                                    opt.disabled = true;
-                                }
-                            });
-    
-                        }
-
-                        for (let i = 0; i < frees.length; i++) {
-                            if (frees[i] === d.target.value && i !== idx) {
-                                frees[i] == previous;
-                            }
-                        }
-
-                        frees[idx] = d.target.value;
-                        const deps = [];
-                        vars.forEach(v => {
-                            if (v !== select1.value && v !== select2.value && !frees.includes(v)) {
-                                deps.push(v)
-                            }
-                        })
-                        vars = [select1.value, select2.value, ...deps, ...frees];
-                        console.log(vars)
-                        const solution = solve(struct);
-                        createSliders(solution);
-                        return visualizeInfiniteSolutions(plot, solution);
-                    }
-
-                    slider.oninput = () => {
-                        sliders[varName] = parseFloat(slider.value);
-                        label.textContent = `${varName}: ${slider.value}`;
-                        document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
-                        visualizeInfiniteSolutions(plot, data)
-                    };
-
-                    sliders[varName] = parseFloat(slider.value);
-                    frees.push(varName);
-                }
-            });
-
-            return sliders;
-        }
-
-        const container = document.getElementById('explanation-container');
-        container.style.minHeight = '400px';
-        container.style.height = `${118 + data.free ? data.free * 59 : 0}px`;
-        container.style.marginTop = "15px"
-        container.style.display = 'flex';
-        container.innerHTML = '';
-
-        const ctrls = document.createElement('div');
-        container.appendChild(ctrls);
-        ctrls.innerHTML =
-            `<div id="linear-vis-controls" style="display: none;margin-left:25px;margin-right:25px;">
-                <div> Plot Axes: </div>
-                <label id="l-var1" for="var1">&nbsp;X-axis:</label>
-                <select id="var1" class="browser-default"></select>
-                <label id="l-var2" for="var2">&nbsp;Y-axis:</label>
-                <select id="var2" class="browser-default"></select>
-                &nbsp;
-                <div id="slidersContainer" style="display: none;"> </div>
-            </div>`;
-
-        generateVariableSelectors(data);
-
-        switch (data.type) {
-            case 'unique solution':
-                break;
-            case 'infinite solutions':
-                const sliders = createSliders(data);
-                break;
-            case 'no solution':
-                console.log(data.free);
-                break;
         }
     }
 }

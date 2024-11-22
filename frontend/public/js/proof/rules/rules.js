@@ -76,9 +76,14 @@ const utils = {
         div.append("br");
     },
 
-    addMidRule: function (lengths, _div) {
+    addMidRule: function (lengths, _div, id) {
         const d = _div ? _div : div;
-        d.append("hr").attr("class", "mid").attr("width", Math.min(div.node().getBoundingClientRect().width, this.getRuleLength(lengths)));
+        const hr = d.append("hr").attr("class", "mid");
+        if(id) {
+            hr.attr('id', id);
+        }
+        hr.attr("width", Math.min(div.node().getBoundingClientRect().width, this.getRuleLength(lengths)));
+        return hr;
     },
 
     getRuleLength: function (lengths) {
