@@ -106,49 +106,45 @@ function solve(data) {
             return { type: 'unique solution', state: matrix, free: 0 };
         }
 
-        try {
-            const tolerance = 0;
-            const augMatrix = structuredClone(systemInput).concat([singleInput[0]]);
-            let system = structuredClone(systemInput); // the system that will be reduced, without the conclusion
-            let numRows = system.length;
-            let numCols = system[0].length;
+        const tolerance = 0;
+        const augMatrix = structuredClone(systemInput).concat([singleInput[0]]);
+        let system = structuredClone(systemInput); // the system that will be reduced, without the conclusion
+        let numRows = system.length;
+        let numCols = system[0].length;
 
-            //system.forEach(row => console.log(row.map(c => Fraction(c).toFraction()).join("  ")));
+        //system.forEach(row => console.log(row.map(c => Fraction(c).toFraction()).join("  ")));
 
-            for (let i = 0; i < numRows; i++) {
-                let maxRow = i;
-                for (let k = i + 1; k < numRows; k++) {
-                    if (Fraction(system[k][i]).abs().gt(system[maxRow][i])) {
-                        maxRow = k;
-                    }
+        for (let i = 0; i < numRows; i++) {
+            let maxRow = i;
+            for (let k = i + 1; k < numRows; k++) {
+                if (Fraction(system[k][i]).abs().gt(system[maxRow][i])) {
+                    maxRow = k;
                 }
-                [system[i], system[maxRow]] = [system[maxRow], system[i]];
+            }
+            [system[i], system[maxRow]] = [system[maxRow], system[i]];
 
-                for (let k = i + 1; k < numRows; k++) {
-                    let c = Fraction(-1).mul(system[k][i]).div(system[i][i]);
-                    for (let j = i; j < numCols; j++) {
-                        system[k][j] = Fraction(system[k][j]).add(c.mul(system[i][j]));
-                        if (Fraction(system[k][j]).abs().lt(tolerance)) {
-                            system[k][j] = Fraction(0);
-                        }
+            for (let k = i + 1; k < numRows; k++) {
+                let c = Fraction(-1).mul(system[k][i]).div(system[i][i]);
+                for (let j = i; j < numCols; j++) {
+                    system[k][j] = Fraction(system[k][j]).add(c.mul(system[i][j]));
+                    if (Fraction(system[k][j]).abs().lt(tolerance)) {
+                        system[k][j] = Fraction(0);
                     }
                 }
             }
-
-            const analysis = analyzeSolutions(system);
-            const solutions = extractSolutions(system, tolerance, analysis.type);
-
-            return {
-                type: analysis.type,
-                matrix: augMatrix, // augmented matrix with premises + conclusion
-                echelon: system, // the reduced premise-only system
-                solutions: solutions,
-                free: analysis.free // free variable count for 'infinite solutions'
-            };
-        } catch (error) {
-            console.error('Error processing equations:', error);
-            return { error: error.message };
         }
+
+        const analysis = analyzeSolutions(system);
+        const solutions = extractSolutions(system, tolerance, analysis.type);
+
+        return {
+            type: analysis.type,
+            matrix: augMatrix, // augmented matrix with premises + conclusion
+            echelon: system, // the reduced premise-only system
+            solutions: solutions,
+            free: analysis.free // free variable count for 'infinite solutions'
+        };
+    
     }
     const systemData = [];
     const singleData = [];
@@ -159,7 +155,7 @@ function solve(data) {
         header.forEach(h => {
             // must compare directly to undefined
             if (p.constraint[h] !== undefined) {
-                eq.push(Fraction(p.constraint[h]));
+                eq.push(Fraction(p.constraint[h].replace(/\s+/g, '')));
             } else {
                 eq.push(Fraction(0));
             }
@@ -172,7 +168,7 @@ function solve(data) {
         header.forEach(h => {
             // must compare directly to undefined
             if (data.conclusion.constraint[h] !== undefined) {
-                eq.push(Fraction(data.conclusion.constraint[h]));
+                eq.push(Fraction(data.conclusion.constraint[h].replace(/\s+/g, '')));
             } else {
                 eq.push(Fraction(0));
             }
@@ -259,7 +255,7 @@ function visualizeUniqueSolution(plot, _data) {
 
         // Construct the function string for function-plot
         const c = Fraction(row[row.length - 1]).sub(Fraction(constantTerm));
-        const fn = `(${f(c)} - (${Fraction(independentTerm)})x) / (${Fraction(dependentCoefficient)})`;
+        const fn = `(${f(c)} - (${f(independentTerm)})x) / (${f(dependentCoefficient)})`;
         
         if (Fraction(dependentCoefficient).equals(0)) { // can't be expressed as f(x), must use annotation
             if (!Fraction(independentTerm).equals(0)) {
@@ -452,7 +448,7 @@ function visualizeInfiniteSolutions(plot, _data) {
         });
 
         // build the function string for plotter
-        const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / ${f(dependentCoef)}`;
+        const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / (${f(dependentCoef)})`;
 
         if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
             if (!Fraction(independentCoef).equals(0)) {
@@ -542,58 +538,55 @@ export class LinearCD {
 
     createPlotControls(data) {
         function generateVariableSelectors(data) {
-            if (vars.length > 2) {
-                const controls = document.querySelector(`#linear-vis-controls`);
-                controls.style = 'display:inline-block;min-width:250px;margin-left:25px;margin-right:25px;';
-                const select1 = document.querySelector(`#var1`);
-                const select2 = document.querySelector(`#var2`);
-                select1.innerHTML = '';
-                select2.innerHTML = '';
-                vars.forEach(varName => {
-                    const opt1 = new Option(varName, varName);
-                    const opt2 = new Option(varName, varName);
+            const controls = document.querySelector(`#linear-vis-controls`);
+            controls.style = 'display:inline-block;min-width:250px;margin-left:25px;margin-right:25px;';
+            const select1 = document.querySelector(`#var1`);
+            const select2 = document.querySelector(`#var2`);
+            select1.innerHTML = '';
+            select2.innerHTML = '';
+            vars.forEach(varName => {
+                const opt1 = new Option(varName, varName);
+                const opt2 = new Option(varName, varName);
 
-                    if (opt2.value === vars[1]) {
-                        opt1.disabled = true;
-                    }
-                    if (opt1.value === vars[0]) {
-                        opt2.disabled = true;
-                    }
-
-                    select1.add(opt1);
-                    select2.add(opt2);
-                });
-                select1.value = vars[0];
-                select2.value = vars[1];
-
-                function update(d) {
-                    const other = d.target.id === "var1" ? `#var2 option` : `#var1 option`;
-
-                    document.querySelectorAll(other).forEach(opt => {
-                        opt.disabled = false;
-                        if (opt.value === d.target.value) {
-                            opt.disabled = true;
-                        }
-                    });
-
-                    switch (data.type) {
-                        case 'unique solution':
-                            return visualizeUniqueSolution(plot, data);
-                        case 'infinite solutions':
-                            vars = [select1.value, select2.value, ...vars.filter(v => v !== select1.value && v !== select2.value)];
-                            const solution = solve(struct);
-                            createSliders(solution);
-                            return visualizeInfiniteSolutions(plot, solution);
-                        case 'no solution':
-                            return visualizeNoSolutions(plot, solution);
-                    }
+                if (opt2.value === vars[1]) {
+                    opt1.disabled = true;
+                }
+                if (opt1.value === vars[0]) {
+                    opt2.disabled = true;
                 }
 
-                select1.onchange = update;
-                select2.onchange = update;
-            } else {
-                console.log('at least 3 variables needed for controls to be needed')
+                select1.add(opt1);
+                select2.add(opt2);
+            });
+            select1.value = vars[0];
+            select2.value = vars[1];
+
+            function update(d) {
+                const other = d.target.id === "var1" ? `#var2 option` : `#var1 option`;
+
+                document.querySelectorAll(other).forEach(opt => {
+                    opt.disabled = false;
+                    if (opt.value === d.target.value) {
+                        opt.disabled = true;
+                    }
+                });
+
+                switch (data.type) {
+                    case 'unique solution':
+                        return visualizeUniqueSolution(plot, data);
+                    case 'infinite solutions':
+                        vars = [select1.value, select2.value, ...vars.filter(v => v !== select1.value && v !== select2.value)];
+                        const solution = solve(struct);
+                        createSliders(solution);
+                        return visualizeInfiniteSolutions(plot, solution);
+                    case 'no solution':
+                        return visualizeNoSolutions(plot, solution);
+                }
             }
+
+            select1.onchange = update;
+            select2.onchange = update;
+        
         }
 
         function createSliders(data) {
@@ -731,17 +724,18 @@ export class LinearCD {
 
     draw(data, params, where) {
         function getVariables(data) {
-            const set = new Set(Object.values(data.ops).map(d => {
-                const premises = (d.premises.map(p => Object.keys(p.constraint))).flat(1);
-                if (!d.conclusion.constraint.bottom) {
-                    return [...premises, ...Object.keys(d.conclusion.constraint)];
-                }
-                return [...premises];
-            }).flat(1));
+            const premises = data.premises.map(p => Object.keys(p.constraint)).flat(1);
+            let s;
+            if (!data.conclusion.constraint.bottom) {
+                s = new Set([...premises, ...Object.keys(data.conclusion.constraint)]);
+            } else {
+                s = new Set([...premises]);
+            }
 
-            set.delete("_rhs");
-            set.delete("_asserted");
-            return Array.from(set);
+            s.delete("_rhs");
+            s.delete("_asserted");
+            return Array.from(s);
+
         }
 
         function displayEquationSystem(op, variables) {
@@ -874,7 +868,7 @@ export class LinearCD {
         utils.addTitle("Gaussian Elimination");
 
         const { input, output } = createVisContainer(params, where);
-        vars = getVariables(data).sort();
+        vars = getVariables(data.ops[data.current]).sort();
         const showObvious = this.showObvious;
 
         if (data.ops[data.current]) {
