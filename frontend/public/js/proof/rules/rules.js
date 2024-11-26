@@ -2,7 +2,7 @@ import { proof } from "../../proof/proof.js";
 import { DLRules } from "./dl-rules.js";
 import { CDRules } from "./cd/cd-rules.js";
 
-let popup, div, params;
+let popover, div, params;
 
 const rule_sets = {
     dl: new DLRules(),
@@ -48,7 +48,7 @@ function makeDraggable(elmnt, handle) {
 
 const utils = {
     addTitle: function (text) {
-        let title = div.append("header").attr("id", "popup-handle-bar")
+        let title = div.append("header").attr("id", "popover-handle-bar")
 
         title.append("i")
             .attr("class", "material-icons right modal-button")
@@ -60,7 +60,7 @@ const utils = {
         title.append("i")
             .attr("class", "material-icons left modal-button")
             .attr("title", params.large ? "Minimize" : "Maximize")
-            .attr("id", "enlarge-popup")
+            .attr("id", "enlarge-popover")
             .style("margin-left", "15px")
             .html(params.large ? "fullscreen_exit" : "fullscreen")
             .on("click", () => proof.rules.enlargeExplanation())
@@ -119,7 +119,7 @@ const utils = {
 class RulesHelper {
     // private methods 
     #renderExplanation() {
-        if (popup) { popup.remove(); }
+        if (popover) { popover.remove(); }
 
         const event = params.event;
         const premises = params.premises;
@@ -127,20 +127,20 @@ class RulesHelper {
         const data = params.data;
         const sp = params.subProof;
 
-        popup = d3.select("body")
+        popover = d3.select("body")
             .append("div")
-            .attr("class", "explanation-popup")
-            .attr("id", "explanation-popup-ID");
+            .attr("class", "explanation-popover")
+            .attr("id", "explanation-popover-ID");
 
-        div = popup
-            .append("div").attr("class", "popupText")
+        div = popover
+            .append("div").attr("class", "popoverText")
             .attr("id", "explanationTextSpan");
 
         if (params.large) {
             const p = d3.select("#proof-view").node().getBoundingClientRect();
             params.p = p;
 
-            d3.select("#explanation-popup-ID")
+            d3.select("#explanation-popover-ID")
                 .style("width", `${p.width}px`)
                 .style("height", `${p.height}px`)
                 .style("left", 0)
@@ -165,10 +165,10 @@ class RulesHelper {
         if (proof.ruleExplanationPosition === "mousePosition") {
             proof.rules.#setPositionRelativeToMouse(event)
         } else {
-            popup.classed(proof.rules.#getPositionClass(proof.ruleExplanationPosition), true);
+            popover.classed(proof.rules.#getPositionClass(proof.ruleExplanationPosition), true);
         }
 
-        makeDraggable(document.getElementById("explanation-popup-ID"), document.getElementById("popup-handle-bar"));
+        makeDraggable(document.getElementById("explanation-popover-ID"), document.getElementById("popover-handle-bar"));
     }
 
     #getPositionClass(ruleExplanationPosition) {
@@ -197,7 +197,7 @@ class RulesHelper {
                 ? proof.height - height
                 : event.pageY;
 
-            popup.style("left", x + "px").style("top", y + "px");
+            popover.style("left", x + "px").style("top", y + "px");
         }
     }
 
@@ -231,16 +231,16 @@ class RulesHelper {
         }
     }
 
-    #lastPopupTriggerID = null;
+    #lastPopoverTriggerID = null;
 
-    addPopupToNodes() {
+    addPopoverToNodes() {
         let proofView = proof.svg;
 
         proofView.selectAll(".rule").each(x => {
             proofView.select("#N" + x.data.source.id).on("click", (event, node) => {// } 
-                if (node.data.source.id !== proof.rules.#lastPopupTriggerID) {
+                if (node.data.source.id !== proof.rules.#lastPopoverTriggerID) {
                     proof.rules.openExplanation({ event }, [node]);
-                    proof.rules.#lastPopupTriggerID = node.data.source.id;
+                    proof.rules.#lastPopoverTriggerID = node.data.source.id;
                 } else {
                     proof.rules.destroyExplanation({ event, node });
                 }
@@ -308,9 +308,9 @@ class RulesHelper {
             proof.update();
 		}
 
-        if (popup) { popup.remove(); }
+        if (popover) { popover.remove(); }
 
-        proof.rules.#lastPopupTriggerID = null;
+        proof.rules.#lastPopoverTriggerID = null;
         proof.nodeVisuals.setFullOpacityToAll();
         d3.selectAll("#H1 text").text("help_outline");
         

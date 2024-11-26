@@ -15,7 +15,7 @@ const maxVerticalCompactnessInput = document.getElementById("maxVerticalCompactn
 const shorteningMethodSelection = document.getElementById("shorteningMode");
 const maxLengthInput = document.getElementById("maximumLength");
 const maxLengthInputReset = document.getElementById("maximumLengthReset");
-const explanationPopupPositionSelection = document.getElementById("explanationPopupPosition");
+const explanationPopoverPositionSelection = document.getElementById("explanationPopoverPosition");
 
 //Toggle buttons
 const allowOverlapBtn = document.getElementById("toggleAllowOverlap");
@@ -161,9 +161,9 @@ const controls = [
         type: 'change'
     },
     {
-        name: "explanationPopupPositionSelection",
-        el: explanationPopupPositionSelection,
-        fn: explanationPopupPositionSelectionFunction,
+        name: "explanationPopoverPositionSelection",
+        el: explanationPopoverPositionSelection,
+        fn: explanationPopoverPositionSelectionFunction,
         type: 'change'
     },
     {
@@ -407,8 +407,8 @@ function shorteningMethodSelectionFunction() {
     proof.update();
 }
 
-function explanationPopupPositionSelectionFunction() {
-    proof.ruleExplanationPosition = explanationPopupPositionSelection.value;
+function explanationPopoverPositionSelectionFunction() {
+    proof.ruleExplanationPosition = explanationPopoverPositionSelection.value;
     proof.update();
 }
 
@@ -464,7 +464,7 @@ function init() {
 
     updateShorteningButton();
 
-    explanationPopupPositionSelection.value = proof.ruleExplanationPosition;
+    explanationPopoverPositionSelection.value = proof.ruleExplanationPosition;
 
     proofWidthRange.max = fixDecimals(maxHorizontalCompactnessInput.value * proof.width);
     proofWidthRange.min = fixDecimals(minHorizontalCompactnessInput.value * proof.width);

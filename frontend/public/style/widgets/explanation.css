@@ -1,6 +1,6 @@
 @import "../colors.css";
 
-.explanation-popup {
+.explanation-popover {
     position: absolute;
     display: inline-block;
     height: fit-content;
@@ -42,7 +42,7 @@
     bottom: 10px;
 }
 
-.explanation-popup>.popupText {
+.explanation-popover>.popoverText {
     background-color: #fafafa;
     color: black;
     text-align: center;
@@ -51,7 +51,7 @@
     display: block;
 }
 
-.popupText h2 {
+.popoverText h2 {
     font-size: 1.5em;
     margin: 8px 10px 10px 10px;
 }
@@ -129,7 +129,7 @@
     text-decoration-color: var(--color-purple-dark);
 }
 
-#popup-handle-bar {
+#popover-handle-bar {
     cursor: pointer;
 }
 

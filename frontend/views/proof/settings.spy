@@ -106,10 +106,10 @@
         </div>
       </h4>
 
-      <!-- Form for selecting the position of the rule explanation popup -->
+      <!-- Form for selecting the position of the rule explanation popover -->
       <label>Explanation Position</label>
       <div class="modal-option modal-option-select">
-        <select id="explanationPopupPosition" class="browser-default">
+        <select id="explanationPopoverPosition" class="browser-default">
           <option value="leftBottom">Left Bottom Corner</option>
           <!-- <option value="rightBottom">Right Bottom Corner</option>
         <option value="rightTop">Right Top Corner</option>
