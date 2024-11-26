@@ -4,7 +4,6 @@
 <link rel="stylesheet" href="/libs/hack-font/build/web/hack.css">
 <link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">
 <link rel="stylesheet" href="/style/widgets/general.css">
-<link rel="stylesheet" href="/style/widgets/parallel-coords.css">
 <link rel="stylesheet" href="/libs/cytoscape-context-menus/cytoscape-context-menus.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">

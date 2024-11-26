@@ -211,8 +211,8 @@ export class TreeNavigation {
             proof.axioms.addFunctionButtonsToNodes();
         }
 
-        // add popups to rules
-        proof.rules.addPopupToNodes();
+        // add popovers to rules
+        proof.rules.addPopoverToNodes();
     }
 
     createHierarchy(data) {
