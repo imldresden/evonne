@@ -112,7 +112,7 @@ function controls({ data }, where, params) {
 }
 
 function createVisContainer(params, where, extra = 0) {
-    const exp = where.append("div").attr("class", "tooltiptext flexy");
+    const exp = where.append("div").attr("class", "popupText flexy");
     exp.html(`
         <div id='cd-left'></div>
         <div id='cd-divider'></div>

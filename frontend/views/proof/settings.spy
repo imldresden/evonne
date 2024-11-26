@@ -106,10 +106,10 @@
         </div>
       </h4>
 
-      <!-- Form for selecting the position of the rule explanation tooltip -->
-      <label>Tooltip Position</label>
+      <!-- Form for selecting the position of the rule explanation popup -->
+      <label>Explanation Position</label>
       <div class="modal-option modal-option-select">
-        <select id="toolTipPosition" class="browser-default">
+        <select id="explanationPopupPosition" class="browser-default">
           <option value="leftBottom">Left Bottom Corner</option>
           <!-- <option value="rightBottom">Right Bottom Corner</option>
         <option value="rightTop">Right Top Corner</option>

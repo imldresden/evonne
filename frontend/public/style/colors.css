@@ -1,10 +1,4 @@
 :root {
-    --pcp-bubble-cursor-color: #a3a3a3;
-    --pcp-bg-stroke: #c4c4c4ea;
-    --pcp-text-fill: #333333;
-    --pcp-axes-lines: #6b6b6b;
-    --pcp-bg: #fafafa;
-    
     --color-primary: #799c78 !important;
     --color-primary-light: #a6c0a5 !important;
     --color-primary-transparent-70: hsla(118, 26%, 74%, 0.7) !important;

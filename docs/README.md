@@ -68,7 +68,7 @@ If you installed evonne locally, you can access the examples files from the `fro
 
 ### Proof View
 
-Every proof has exactly one *purple* node representing the final conclusion. *Green* nodes in a proof represent axioms asserted in the ontology and from which the final conclusion is derived. *Blue* nodes represent inferred axioms. *Gray* nodes represent the label of a logical inference. Clicking a gray node shows a "Rule Explanation" tooltip that contains more details about an inference, for example:
+Every proof has exactly one *purple* node representing the final conclusion. *Green* nodes in a proof represent axioms asserted in the ontology and from which the final conclusion is derived. *Blue* nodes represent inferred axioms. *Gray* nodes represent the label of a logical inference. Clicking a gray node shows a "Rule Explanation" popup that contains more details about an inference, for example:
 
 <p align="center">
 	<kbd align="center">

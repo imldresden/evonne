@@ -2,7 +2,7 @@ import { proof } from "../../proof/proof.js";
 import { DLRules } from "./dl-rules.js";
 import { CDRules } from "./cd/cd-rules.js";
 
-let tooltip, div, params;
+let popup, div, params;
 
 const rule_sets = {
     dl: new DLRules(),
@@ -48,7 +48,7 @@ function makeDraggable(elmnt, handle) {
 
 const utils = {
     addTitle: function (text) {
-        let title = div.append("header").attr("id", "tooltip-handle-bar")
+        let title = div.append("header").attr("id", "popup-handle-bar")
 
         title.append("i")
             .attr("class", "material-icons right modal-button")
@@ -60,7 +60,7 @@ const utils = {
         title.append("i")
             .attr("class", "material-icons left modal-button")
             .attr("title", params.large ? "Minimize" : "Maximize")
-            .attr("id", "enlarge-tooltip")
+            .attr("id", "enlarge-popup")
             .style("margin-left", "15px")
             .html(params.large ? "fullscreen_exit" : "fullscreen")
             .on("click", () => proof.rules.enlargeExplanation())
@@ -119,7 +119,7 @@ const utils = {
 class RulesHelper {
     // private methods 
     #renderExplanation() {
-        if (tooltip) { tooltip.remove(); }
+        if (popup) { popup.remove(); }
 
         const event = params.event;
         const premises = params.premises;
@@ -127,20 +127,20 @@ class RulesHelper {
         const data = params.data;
         const sp = params.subProof;
 
-        tooltip = d3.select("body")
+        popup = d3.select("body")
             .append("div")
-            .attr("class", "tooltip-explanation")
-            .attr("id", "toolTipID");
+            .attr("class", "explanation-popup")
+            .attr("id", "explanation-popup-ID");
 
-        div = tooltip
-            .append("div").attr("class", "tooltiptext")
+        div = popup
+            .append("div").attr("class", "popupText")
             .attr("id", "explanationTextSpan");
 
         if (params.large) {
             const p = d3.select("#proof-view").node().getBoundingClientRect();
             params.p = p;
 
-            d3.select("#toolTipID")
+            d3.select("#explanation-popup-ID")
                 .style("width", `${p.width}px`)
                 .style("height", `${p.height}px`)
                 .style("left", 0)
@@ -165,10 +165,10 @@ class RulesHelper {
         if (proof.ruleExplanationPosition === "mousePosition") {
             proof.rules.#setPositionRelativeToMouse(event)
         } else {
-            tooltip.classed(proof.rules.#getPositionClass(proof.ruleExplanationPosition), true);
+            popup.classed(proof.rules.#getPositionClass(proof.ruleExplanationPosition), true);
         }
 
-        makeDraggable(document.getElementById("toolTipID"), document.getElementById("tooltip-handle-bar"));
+        makeDraggable(document.getElementById("explanation-popup-ID"), document.getElementById("popup-handle-bar"));
     }
 
     #getPositionClass(ruleExplanationPosition) {
@@ -197,7 +197,7 @@ class RulesHelper {
                 ? proof.height - height
                 : event.pageY;
 
-            tooltip.style("left", x + "px").style("top", y + "px");
+            popup.style("left", x + "px").style("top", y + "px");
         }
     }
 
@@ -231,16 +231,16 @@ class RulesHelper {
         }
     }
 
-    #lastToolTipTriggerID = null;
+    #lastPopupTriggerID = null;
 
-    addTooltipToNodes() {
+    addPopupToNodes() {
         let proofView = proof.svg;
 
         proofView.selectAll(".rule").each(x => {
             proofView.select("#N" + x.data.source.id).on("click", (event, node) => {// } 
-                if (node.data.source.id !== proof.rules.#lastToolTipTriggerID) {
+                if (node.data.source.id !== proof.rules.#lastPopupTriggerID) {
                     proof.rules.openExplanation({ event }, [node]);
-                    proof.rules.#lastToolTipTriggerID = node.data.source.id;
+                    proof.rules.#lastPopupTriggerID = node.data.source.id;
                 } else {
                     proof.rules.destroyExplanation({ event, node });
                 }
@@ -308,9 +308,9 @@ class RulesHelper {
             proof.update();
 		}
 
-        if (tooltip) { tooltip.remove(); }
+        if (popup) { popup.remove(); }
 
-        proof.rules.#lastToolTipTriggerID = null;
+        proof.rules.#lastPopupTriggerID = null;
         proof.nodeVisuals.setFullOpacityToAll();
         d3.selectAll("#H1 text").text("help_outline");
         

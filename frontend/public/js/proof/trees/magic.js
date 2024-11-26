@@ -620,7 +620,7 @@ export class MagicNavigation {
 		}
 	}
 
-	appendCircleAndText(group, text, tooltip, _class = '') {
+	appendCircleAndText(group, text, title, _class = '') {
 		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -632,7 +632,7 @@ export class MagicNavigation {
 			.attr("y", 0)
 			.text(text);
 		group.append("title")
-			.text(tooltip)
+			.text(title)
 	}
 
 	getMagic(root, actionName) {

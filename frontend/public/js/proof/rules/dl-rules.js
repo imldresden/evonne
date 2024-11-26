@@ -94,12 +94,12 @@ export class DLRules {
                 this.displayObject.append("span").attr("class", "tab");
 
             this.displayObject
-                .append("span").attr("class", "text-toolTip")
+                .append("span").attr("class", "text-popup")
                     .style("color", l1 === conLHS?"#000000":colors[i-1]).text(l1)
 
                 .append("span").attr("class", "text-black").text(subsumesDisplay)
 
-                .append("span").attr("class", "text-toolTip")
+                .append("span").attr("class", "text-popup")
                     .style("color", r1 === conRHS?"#000000":colors[i]).text(r1);
 
             midLengths.push(l1.length+subsumesDisplay.length+r1.length);
@@ -146,12 +146,12 @@ export class DLRules {
                 this.displayObject.append("span").attr("class", "tab")
 
             this.displayObject
-                .append("span").attr("class", "text-toolTip")
+                .append("span").attr("class", "text-popup")
                     .style("color", i === 0?"#000000":colors[i-1]).text(lhs)
 
                 .append("span").attr("class", "text-black").text(subsumesDisplay)
 
-                .append("span").attr("class", "text-toolTip")
+                .append("span").attr("class", "text-popup")
                     .style("color", i === premiseLengths?"#000000":colors[i]).text(rhs);
 
             midLengths.push(lhs.length+subsumesDisplay.length+rhs.length)
