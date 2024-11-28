@@ -3,27 +3,29 @@
 <html lang="en">
 
 <head>
-  <title>{{ title }} - Ontology</title>
+  <title>{{ title }}</title>
 
   << styles >>
 
+  <link rel="stylesheet" href="/style/proof.css">
   <link rel="stylesheet" href="/style/ontology.css">
+  <link rel="stylesheet" href="/style/ce.css">
 </head>
 
 <body>
-
-  << menus/menu >>
-  << modals/file-upload >>
-  << modals/axiom >>
+  
+  << widgets/menus/menu >>
+  << widgets/modals/file-upload >>
+  << widgets/modals/advanced-settings >>
+  << widgets/modals/axiom >>
 
   <main id="container-main">
     <!-- everything gets added via main.js -->
   </main>
 
-  << menus/settings >> 
-
-  << scripts >> 
+  << widgets/menus/settings >>
   
+  << scripts >>
   <script src="/js/ontology/repairs.js"></script>
   <script src="/js/main/main.js" type="module"></script>
 </body>

@@ -10,8 +10,8 @@
 
 <body>
 
-  << menus/menu >>
-  << modals/file-upload >>
+  << widgets/menus/menu >>
+  << widgets/modals/file-upload >>
 
   <div class="container welcome-container">
     <div class="row wide-row" style="display: table;">
@@ -72,7 +72,7 @@
           </div>
         </div>
       
-        << main/progress >> 
+        << widgets/progress >> 
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-@import "./nodes.css";
+/* uses colors from @import "./nodes.css"; */ 
 
 :root {
 	--color-node-fill: hsl(205, 87%, 94%);
@@ -110,14 +110,14 @@ input:checked + .slider:before {
 
 	border: 2px solid transparent;
 	border-radius: 4px;
-	background-color: #fafafa;
+	background-color: var(--color-gray-lighter);
 	text-align: left;
 	cursor: pointer;
 	font-size: 12px;
 	font-weight: lighter;
 }
 .repair-entry:focus {
-	background-color: #fafafa;
+	background-color: var(--color-gray-lighter);;
 	border: 2px solid #efefef;
 }
 .repair-entry.locked > .lock-sign {

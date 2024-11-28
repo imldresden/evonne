@@ -12,7 +12,7 @@
 
 <body>
 
-  << menus/menu >>
+  << widgets/menus/menu >>
 
   <main id="inference-container">
     <div id="inference-view">
@@ -25,7 +25,7 @@
     </div>
 
 
-    << menus/thumbnail >>
+    << widgets/menus/thumbnail >>
   </main>
 
   << scripts >>

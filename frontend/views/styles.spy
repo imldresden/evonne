@@ -1,10 +1,6 @@
 <link rel="shortcut icon" type="image/svg" href="/favicon.svg"/>
-
 <link rel="stylesheet" href="/libs/materialize-css/dist/css/materialize.css">
 <link rel="stylesheet" href="/libs/hack-font/build/web/hack.css">
 <link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">
 <link rel="stylesheet" href="/style/widgets/general.css">
 <link rel="stylesheet" href="/libs/cytoscape-context-menus/cytoscape-context-menus.css">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>

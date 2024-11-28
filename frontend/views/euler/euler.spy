@@ -12,12 +12,12 @@
 
 <body>
 
-  << menus/menu >>
+  << widgets/menus/menu >>
 
   <main id="euler-container">
     <div id="euler-view"></div>
 
-    << menus/thumbnail >>
+    << widgets/menus/thumbnail >>
   </main>
 
   << scripts >>

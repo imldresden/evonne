@@ -1,4 +1,4 @@
-@import "./nodes.css";
+/* uses colors from @import "./nodes.css"; */
 
 #inference-view {
     width: 100%;

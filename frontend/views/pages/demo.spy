@@ -9,7 +9,7 @@
 
 <body class="overflowable">
   
-  << menus/menu >>
+  << widgets/menus/menu >>
 
   <div class="container"> 
     <div class="row" style="display: table;">
@@ -36,7 +36,7 @@
           <br>
           
           {{ examples }}
-          << main/progress >> 
+          << widgets/progress >> 
         </div>
         
 

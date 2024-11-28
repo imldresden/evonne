@@ -1,4 +1,6 @@
+/* single point of entry to load styles - do not duplicate @imports in other .css files! */ 
 @import "../colors.css";
+@import "../nodes.css";
 @import "explanation.css";
 @import "minimap.css";
 @import "sidebar.css";

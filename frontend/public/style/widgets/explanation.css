@@ -1,17 +1,17 @@
-@import "../colors.css";
+/* uses colors from @import "../colors.css"; */
 
 .explanation-popover {
     position: absolute;
     display: inline-block;
     height: fit-content;
-    background-color: #fafafa;
+    background-color: var(--color-gray-lighter);
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 }
 
 .explanation-container {
     display: block;
     width: 100%;
-    background-color: var(--color-gray-light);
+    background-color: var(--color-gray-lighter);
     text-align: justify !important;
 }
 
@@ -43,7 +43,7 @@
 }
 
 .explanation-popover>.popoverText {
-    background-color: #fafafa;
+    background-color: var(--color-gray-lighter);
     color: black;
     text-align: center;
     border-radius: 2px;

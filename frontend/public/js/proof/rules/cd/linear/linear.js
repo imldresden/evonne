@@ -23,6 +23,7 @@ const tip = {
 const premiseColor = '#80cbc4';
 const conclusionColor = '#b89aef';
 const plot = 'cd-linear-plot';
+const eval_tolerance = 0.001;
 
 let struct = {}; // copy of the node/subproof data 
 let vars = []; // list of variables. The order of this list determines the order of the solutions, which allows us to "target" which variables will be free in case of infinite solutions.
@@ -192,19 +193,12 @@ function vis(plot, solution) {
         container.appendChild(vis);
     }
 
-    vis.innerHTML = 
-        `<div id=${plot}> </div>
+    vis.innerHTML = `<div id=${plot}> </div>`;
 
-        <div id="${plot}-noSolutionPreviewContainer" style="display: none;">
-            <div style="text-align:center"> 
-            <h2>The System Has No Solution</h2>
-            <span>Augmented Matrix:</span>
-            <div id="${plot}-initialStatePreview" class="preview"></div>
-            <span>Echelon Form:</span>
-            <div id="${plot}-finalStatePreview" class="preview"></div>
-            </div>
-        </div>`;
+    return visByType(solution);
+}
 
+function visByType(solution) {
     switch (solution.type) {
         case 'unique solution':
             return visualizeUniqueSolution(plot, solution);
@@ -264,7 +258,9 @@ function visualizeUniqueSolution(plot, _data) {
                 annotations.push({ x: eval(f(v)), color });
                 hl[id] = { 
                     svg: () => document.querySelectorAll(`#${plot} .annotations path`)[annotations.length-1], 
-                    evaluate: point => Fraction(v).equals(Fraction(point.x)),
+                    evaluate: point => 
+                        Fraction(v).gt(Fraction(point.x - eval_tolerance)) && 
+                        Fraction(v).lt(Fraction(point.x + eval_tolerance)),
                     color 
                 };
                 annots += 1;
@@ -279,7 +275,7 @@ function visualizeUniqueSolution(plot, _data) {
                     const p = Fraction(independentTerm).mul(Fraction(point.x));
                     const s = Fraction(c).sub(p);
                     const d = s.div(Fraction(dependentCoefficient));
-                    return d.equals(Fraction(point.y));
+                    return d.gt(Fraction(point.y - eval_tolerance)) && d.lt(Fraction(point.y + eval_tolerance));
                 },
                 color 
             };
@@ -405,8 +401,11 @@ function visualizeInfiniteSolutions(plot, _data) {
         }
     }
 
-    const x = { varName: vars[0], fn: dependentValues[vars[0]] };
-    const y = { varName: vars[1], fn: dependentValues[vars[1]] };
+    const select1 = document.querySelector(`#var1`);
+    const select2 = document.querySelector(`#var2`);
+
+    const x = { varName: select1.value, fn: dependentValues[select1.value] || independent[select1.value]};
+    const y = { varName: select2.value, fn: dependentValues[select2.value] || independent[select2.value] };
 
     const annotations = [
         { x: eval(f(x.fn)), text: `${x.varName} = ${f(x.fn)}` },
@@ -457,24 +456,27 @@ function visualizeInfiniteSolutions(plot, _data) {
                 annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
                 hl[id] = { 
                     svg: () => document.querySelectorAll(`#${plot} .annotations path`)[annotations.length-1], 
-                    evaluate: point => Fraction(v).equals(Fraction(point.x)),
+                    evaluate: point => 
+                        Fraction(v).gt(Fraction(point.x - eval_tolerance)) && 
+                        Fraction(v).lt(Fraction(point.x + eval_tolerance)),
                     color
                 };
                 annots += 1;
             } else {
-                console.error('both of the selected variables canceled');
+                console.log(row.map(r => f(r)))
+                console.log('both of the selected variables canceled -- no intersection');
             }
         } else {
             data.push({ fn: equation, color, updateOnMouseMove: false, graphType: 'polyline' });
             hl[id] = { 
+                color,
                 svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - annots)], 
                 evaluate: (point) => {
                     const p = Fraction(independentCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
                     const s = Fraction(constantTerm).sub(p);
                     const d = s.div(Fraction(dependentCoef));
-                    return d.equals(Fraction(point.y));
-                },
-                color 
+                    return d.gt(Fraction(point.y - eval_tolerance)) && d.lt(Fraction(point.y + eval_tolerance));
+                } 
             };
         }
     }
@@ -503,34 +505,8 @@ function visualizeInfiniteSolutions(plot, _data) {
     return { plot: p, hl };
 }
 
-function visualizeNoSolutions(plot, data) {
-    const initialStatePreview = document.getElementById(`${plot}-initialStatePreview`);
-    const finalStatePreview = document.getElementById(`${plot}-finalStatePreview`);
-    const noSolutionPreviewContainer = document.getElementById(`${plot}-noSolutionPreviewContainer`);
-
-    // Function to render matrix using KaTeX
-    function renderMatrixKaTeX(matrix, container) {
-        let matrixString = '\\begin{bmatrix}';
-        matrix.forEach((row, idx) => {
-            matrixString += row.slice(0, -1).map(coef => f(coef)).join(' & ');
-            matrixString += ' & \\vert & ' + f(row[row.length - 1]); // Adds the augmented column
-            if (idx < matrix.length - 1) matrixString += ' \\\\ ';
-        });
-        matrixString += '\\end{bmatrix}';
-
-        // Clear previous content and render new matrix
-        container.innerHTML = '';
-        katex.render(matrixString, container, { throwOnError: false, displayMode: true });
-    }
-
-    // Render initial and final state matrices
-    renderMatrixKaTeX(data.matrix.slice(0, data.matrix.length - 1), initialStatePreview);
-    renderMatrixKaTeX(data.echelon, finalStatePreview);
-
-    // Show the preview container
-    noSolutionPreviewContainer.style = 'display:block';
-
-    return {};
+function visualizeNoSolutions(plot, _data) {
+    visualizeInfiniteSolutions(plot, _data);    
 }
 
 export class LinearCD {
@@ -571,17 +547,8 @@ export class LinearCD {
                     }
                 });
 
-                switch (data.type) {
-                    case 'unique solution':
-                        return visualizeUniqueSolution(plot, data);
-                    case 'infinite solutions':
-                        vars = [select1.value, select2.value, ...vars.filter(v => v !== select1.value && v !== select2.value)];
-                        const solution = solve(struct);
-                        createSliders(solution);
-                        return visualizeInfiniteSolutions(plot, solution);
-                    case 'no solution':
-                        return visualizeNoSolutions(plot, solution);
-                }
+                const solution = solve(struct);
+                visByType(solution);
             }
 
             select1.onchange = update;
@@ -590,6 +557,8 @@ export class LinearCD {
         }
 
         function createSliders(data) {
+            if (data.free <= 0) { return; }
+
             frees = [];
             const freeVarsContainer = document.getElementById(`slidersContainer`);
             freeVarsContainer.innerHTML = '<div>Free Variables:</div>';
@@ -635,32 +604,8 @@ export class LinearCD {
 
                     // interaction 
                     select.onchange = (d) => {
-                        const select1 = document.getElementById(`var1`);
-                        const select2 = document.getElementById(`var2`);
                         const idx = +d.target.id.split('select-free-')[1];
                         const previous = frees[idx]
-
-                        let replaced = '';
-                        if (d.target.value === select1.value) {
-                            select1.value = previous;
-                            replaced = 'var1'
-                        }
-
-                        if (d.target.value === select2.value) {
-                            select2.value = previous;
-                            replaced = 'var2'
-                        }
-
-                        if (replaced !== '') {
-                            const other = replaced === "var1" ? `#var2 option` : `#var1 option`;
-                            document.querySelectorAll(other).forEach(opt => {
-                                opt.disabled = false;
-                                if (opt.value === document.getElementById(replaced).value) {
-                                    opt.disabled = true;
-                                }
-                            });
-    
-                        }
 
                         for (let i = 0; i < frees.length; i++) {
                             if (frees[i] === d.target.value && i !== idx) {
@@ -669,18 +614,18 @@ export class LinearCD {
                         }
 
                         frees[idx] = d.target.value;
-                        const deps = vars.filter(v => v !== select1.value && v !== select2.value && !frees.includes(v));
-                        vars = [select1.value, select2.value, ...deps, ...frees];
+                        const comp = vars.filter(v => !frees.includes(v));
+                        vars = [...comp, ...frees];
                         const solution = solve(struct);
                         createSliders(solution);
-                        return visualizeInfiniteSolutions(plot, solution);
+                        visByType(solution);
                     }
 
                     slider.oninput = () => {
                         sliders[varName] = parseFloat(slider.value);
                         label.textContent = `${varName}: ${slider.value}`;
                         document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
-                        visualizeInfiniteSolutions(plot, data);
+                        visByType(data);
                     };
 
                     sliders[varName] = parseFloat(slider.value);
@@ -711,15 +656,7 @@ export class LinearCD {
             </div>`;
 
         generateVariableSelectors(data);
-
-        switch (data.type) {
-            case 'infinite solutions':
-                createSliders(data);
-                break;
-            case 'no solution':
-                console.log(data.free);
-                break;
-        }
+        createSliders(data);
     }
 
     draw(data, params, where) {

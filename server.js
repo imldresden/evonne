@@ -51,7 +51,7 @@ if (!existsSync(dataDir)) {
 }
 
 app.get('/test', (req, res) => {
-  res.render('main/test.spy', {
+  res.render('pages/test.spy', {
     title: "evonne lib",
     uuid: uuidv4(),
   });
@@ -62,57 +62,27 @@ app.get('/uuid', (req, res) => {
 });
 
 // pages
-app.get('/', (req, res) => {
+const page = (req, res) => {
   const id = req.query.id;
   if (!id) {
     renderMain(req, res);
   } else {
     ensureIfExample(id, res);
-    res.render('main/split.spy', {
+    res.render('pages/main.spy', {
       title,
       uuid: id,
       settings_specific: '<< proof/settings >> << ontology/settings >> << ce/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
-      menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << proof/menu >> << ontology/menu >>`,
-      general_settings: '<< menus/shortening >>'
+      menu_specific: `${MODE === 'demo' ? '' : '<< widgets/menus/projects >> << widgets/menus/compute >>'} << proof/menu >> << ontology/menu >>`,
+      general_settings: '<< widgets/menus/shortening >>'
     });
   }
-});
+}
 
-app.get('/ontology', (req, res) => {
-  const id = req.query.id;
-  if (!id) {
-    renderMain(req, res);
-  } else {
-    ensureIfExample(id, res);
-    res.render('ontology/ontology.spy', {
-      title,
-      uuid: id,
-      settings_specific: '<< ontology/settings >>',
-      sidebars_specific: '<< ontology/repairs >>',
-      menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'} << ontology/menu >>`,
-      general_settings: '<< menus/shortening >>'
-    });
-  }
-});
-
-app.get('/proof', (req, res) => {
-  const id = req.query.id;
-  if (!id) {
-    renderMain(req, res);
-  } else {
-    ensureIfExample(id, res);
-    res.render('proof/proof.spy', {
-      title,
-      uuid: id,
-      settings_specific: '<< proof/settings >>',
-      advanced_settings_specific: '<< proof/advanced-settings >>',
-      menu_specific: `${MODE === 'demo' ? '' : '<< menus/projects >> << menus/compute >>'}  << proof/menu >>`,
-      general_settings: '<< menus/shortening >>'
-    });
-  }
-});
+app.get('/', page);
+app.get('/ontology', page);
+app.get('/proof', page);
 
 app.get('/euler', (_, response) => {
   response.render('euler/euler.spy')
@@ -529,21 +499,21 @@ function printOutput(p) {
 }
 
 function getExamples(req) {
-  return `<< main/examples-${req.query.examples ? req.query.examples : EXAMPLES} >>`;
+  return `<< widgets/examples/examples-${req.query.examples ? req.query.examples : EXAMPLES} >>`;
 }
 
 function renderMain(req, res) {
   if (MODE === 'demo') {
-    res.render('main/demo.spy', {
+    res.render('pages/demo.spy', {
       title,
       uuid: uuidv4(),
       examples: getExamples(req),
     });
   } else {
-    res.render('main/main.spy', {
+    res.render('pages/welcome.spy', {
       title,
       uuid: uuidv4(),
-      menu_specific: '<< menus/projects >>',
+      menu_specific: '<< widgets/menus/projects >>',
       examples: getExamples(req),
     });
   }
