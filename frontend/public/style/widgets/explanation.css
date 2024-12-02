@@ -142,3 +142,7 @@
 .top-right-legend {
     display: none;
 }
+
+.material-tooltip {
+    text-align: left;
+}

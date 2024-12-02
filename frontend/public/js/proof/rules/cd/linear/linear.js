@@ -199,14 +199,39 @@ function vis(plot, solution) {
 }
 
 function visByType(solution) {
+    const leftControls = document.querySelector('.bar-left');
+    const question = document.createElement('a'); 
+    question.setAttribute("class", "bar-button")
+    question.setAttribute("data-position", "top")
+    question.innerHTML = `<i class="material-icons" style="font-size: 23px;">help_outline</i>`
+        
     switch (solution.type) {
         case 'unique solution':
-            return visualizeUniqueSolution(plot, solution);
+            question.setAttribute("data-tooltip", 
+                `The conclusion equation shares, and therefore intersects <br> 
+                the solution of the premise equation system.`
+            );
+            visualizeUniqueSolution(plot, solution);
+            break;
         case 'infinite solutions':
-            return visualizeInfiniteSolutions(plot, solution);
+            question.setAttribute("data-tooltip", 
+                `The conclusion equation shares, and therefore intersects <br> 
+                the solution of the premise equation system. <br>
+                This holds regardless of which variables are selected as free.`
+            );
+            visualizeInfiniteSolutions(plot, solution);
+            break;
         case 'no solution':
-            return visualizeNoSolutions(plot, solution);
+            question.setAttribute("data-tooltip", 
+                `The premise equation system has no solution, meaning that <br>
+                at least two lines do not intersect`
+            );
+            visualizeNoSolutions(plot, solution);
+            break;
     }
+    leftControls.appendChild(question);
+    M.Tooltip.init(question)
+
 }
 
 function visualizeUniqueSolution(plot, _data) {
@@ -463,8 +488,8 @@ function visualizeInfiniteSolutions(plot, _data) {
                 };
                 annots += 1;
             } else {
-                console.log(row.map(r => f(r)))
-                console.log('both of the selected variables canceled -- no intersection');
+                // console.log(row.map(r => f(r)))
+                // console.log('both of the selected variables canceled -- no intersection');
             }
         } else {
             data.push({ fn: equation, color, updateOnMouseMove: false, graphType: 'polyline' });
