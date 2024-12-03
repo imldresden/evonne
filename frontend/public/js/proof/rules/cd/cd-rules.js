@@ -107,8 +107,6 @@ function controls({ data }, where, params) {
     replay.on("click", (e, d) => {
         proof.rules.openExplanation(params, params.nodes)
     });
-    
-    
 }
 
 function createVisContainer(params, where, extra = 0) {

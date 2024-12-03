@@ -10,6 +10,10 @@ const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? ` -Є` : ` -${n}Є`);
 
 let timeout;
 
+function f(number) {
+    return Fraction(number).toFraction();
+}
+
 function ineqGraphHighlight (ev) {
     const eid = ev.detail.eid; 
     d3.selectAll(".text-eq").classed("hl-text", false);
@@ -424,8 +428,7 @@ export class DifferenceCD {
                 if (cWeight > 0) {
                     console.error("hamiltonian cycle not negative")
                 } else if (cWeight === 0) {
-                    
-                    const epsilonCheck = cycle.filter(e => (""+e.data().label).includes(EPSILON))
+                    const epsilonCheck = cycle.filter(e => (""+e.data().label).includes(EPSILON));
                     if (!epsilonCheck) {
                         console.error("hamiltonian cycle not negative")
                     }
@@ -433,7 +436,7 @@ export class DifferenceCD {
 
                 const ncycle = sortCycleEdges(cycle, startId);
 
-                let i = 0, ep = 0, cycleValue = 0, current;
+                let i = 0, ep = 0, cycleValue = Fraction(0), current;
 
                 const highlightNextEle = function () {
                     current = ncycle[i];
@@ -445,20 +448,28 @@ export class DifferenceCD {
                         n.data({
                             og: n.data().v,
                             v: `${n.data().v} = ${
-                                strip(params.manual.value + cycleValue)
+                                f(Fraction(params.manual.value)
+                                    .add(Fraction(cycleValue))
+                                )
                             }${EPSILONS(ep)}`
                         })
                     }
 
                     if (label.includes(EPSILON)) {
-                        cycleValue += eval(current.data().label.split(EPSILON)[0]);
+                        cycleValue = cycleValue.add(
+                            Fraction(current.data().label.split(EPSILON)[0])
+                        );
                         ep = 1;
                     } else {
-                        cycleValue += eval(current.data().label);
+                        cycleValue = cycleValue.add(
+                            Fraction(current.data().label)
+                        );
                     }
-                    strip(cycleValue)
 
-                    d3.select("#cycle-val").text(`${cycleValue !== 0 ? cycleValue : ""}${EPSILONS(ep)}`);
+                    d3.select("#cycle-val").text(`${
+                        !Fraction(cycleValue).equals(0) ? f(cycleValue) : ""
+                    }${EPSILONS(ep)}`);
+
                     i += 1;
                     if (i < ncycle.length) {
                         timeout = setTimeout(highlightNextEle, 1000);
@@ -468,7 +479,9 @@ export class DifferenceCD {
                                 const n = cy.nodes(`#${startId.nid}`)
                                 n.data({
                                     v: `${n.data().v} = ${
-                                        strip(params.manual.value + cycleValue)
+                                        f(Fraction(params.manual.value)
+                                            .add(Fraction(cycleValue))
+                                        )
                                     }${EPSILONS(ep)}`
                                 })
                                 n.addClass("highlighted")
@@ -536,6 +549,26 @@ export class DifferenceCD {
 
         const ruleName = getRuleName(data.ops[data.current].name);
         utils.addTitle(ruleName);
+
+        const header = document.getElementById('ruleName');
+        document.getElementById('question')?.remove();
+
+        const question = document.createElement('a'); 
+        question.setAttribute("class", "question");
+        question.setAttribute("class", "bar-button");
+        question.setAttribute("data-position", "top");
+        question.innerHTML = `<i class="material-icons" style="font-size: 23px;margin:5px">help_outline</i>`;
+            
+        question.setAttribute("data-tooltip", 
+            `By expressing the premises and conclusion (or its negation) <br> 
+            as a graph of dependencies, a negative cycle indicates how variables <br> 
+            become equal to more than one value, which is a contradiction. <br>
+            Double-click on a variable node to see how a value becomes negative.`
+        );
+        
+        header.appendChild(question);
+        M.Tooltip.init(question);
+
         const operationHeight = getHeight(data);
         const { input, output } = createVisContainer(params, where, operationHeight);
         d3.select('#cd-divider').style('height', operationHeight);

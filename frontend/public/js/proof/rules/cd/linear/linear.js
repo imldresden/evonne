@@ -206,12 +206,14 @@ function vis(plot, solution) {
 }
 
 function visByType(solution) {
-    const leftControls = document.querySelector('.bar-left');
-    leftControls.innerHTML = ""
+    const header = document.getElementById('ruleName');
+    document.getElementById('question')?.remove();
+
     const question = document.createElement('a'); 
-    question.setAttribute("class", "bar-button")
-    question.setAttribute("data-position", "top")
-    question.innerHTML = `<i class="material-icons" style="font-size: 23px;">help_outline</i>`
+    question.setAttribute("class", "question");
+    question.setAttribute("class", "bar-button");
+    question.setAttribute("data-position", "top");
+    question.innerHTML = `<i class="material-icons" style="font-size: 23px;margin:5px">help_outline</i>`;
         
     switch (solution.type) {
         case 'unique solution':
@@ -238,9 +240,9 @@ function visByType(solution) {
             visualizeNoSolutions(plot, solution);
             break;
     }
-    leftControls.appendChild(question);
-    M.Tooltip.init(question)
-
+    
+    header.appendChild(question);
+    M.Tooltip.init(question);
 }
 
 function visualizeUniqueSolution(plot, _data) {
@@ -406,7 +408,7 @@ function visualizeInfiniteSolutions(plot, _data) {
 
     document.getElementById(plot).innerHTML = '';
     
-    let dependentValues = {}; // Store computed values for dependent variables
+    const dependentValues = {}; // Store computed values for dependent variables
 
     // Iterate over solutions in reverse to handle dependencies correctly
     for (let i = solutions.length - 1; i >= 0; i--) {
@@ -416,13 +418,13 @@ function visualizeInfiniteSolutions(plot, _data) {
         let terms = sol.slice(0, -1);
         let constantTerm = sol[sol.length - 1].c;
         let equationParts = [];
-        let replacedEquationParts = [];
+        let debug = [];
         let equationPreviewParts = [];
         let dependentCoef;
         
         terms.forEach(term => {
             const coef = term.c;
-            const varName = term.v
+            const varName = term.v;
 
             if (varName === dependentVar) {
                 dependentCoef = coef; // Coefficient of the dependent variable
@@ -435,8 +437,8 @@ function visualizeInfiniteSolutions(plot, _data) {
                 }
 
                 equationParts.push(coef.mul(value));
-                replacedEquationParts.push(`${coef}${varName}`);
-                equationPreviewParts.push(`(${f(coef)})*(${f(value)})`);
+                equationPreviewParts.push(`${f(coef)}${varName}`);
+                debug.push(`(${f(coef)})*(${f(value)})`);
             }
         });
 
@@ -466,16 +468,12 @@ function visualizeInfiniteSolutions(plot, _data) {
         const solutionPreview = `${varName} = ${solved}`;
         const independentTerms = equationParts.reduce((acc, part) => acc.add(part), Fraction(0));
         
-        console.log(`${dependentVar} = ${f(independentTerms)}`)
-
         if (!Fraction(dependentCoef).equals(0)) {
-            const it = independentTerms
-            const s = constantTerm.sub(it);
-            const fn = `${f(s.div(dependentCoef))}`;
+            const s = constantTerm.sub(independentTerms);
+            const fn = s.div(dependentCoef);
             document.getElementById(`sol-${varName}`).innerHTML = `${solutionPreview} = ${f(fn)}`;
-            dependentValues[dependentVar] = f(fn); // Store the calculated value
+            dependentValues[dependentVar] = fn; // Store the calculated value
         }
-        console.log(dependentValues)
     }
 
     const select1 = document.querySelector(`#var1`);
@@ -701,12 +699,12 @@ export class LinearCD {
                     }
 
                     slider.oninput = () => {
-                        sliders[varName] = f(slider.value);
+                        sliders[varName] = Fraction(slider.value);
                         label.textContent = `${varName}: ${slider.value}`;
                         visByType(data);
                     };
 
-                    sliders[varName] = f(slider.value);
+                    sliders[varName] = Fraction(slider.value);
                     frees.push(varName);
                 }
             });
