@@ -554,7 +554,7 @@ export class DifferenceCD {
         document.getElementById('question')?.remove();
 
         const question = document.createElement('a'); 
-        question.setAttribute("class", "question");
+        question.setAttribute("id", "question");
         question.setAttribute("class", "bar-button");
         question.setAttribute("data-position", "top");
         question.innerHTML = `<i class="material-icons" style="font-size: 23px;margin:5px">help_outline</i>`;
