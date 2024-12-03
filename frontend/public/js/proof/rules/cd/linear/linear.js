@@ -46,10 +46,6 @@ function solve(data) {
                         sum = Fraction(sum).add(Fraction(matrix[i][j]).mul(Fraction(solutions[j])));
                     }
                     solutions[i] = Fraction(matrix[i][numCols - 1]).sub(Fraction(sum)).div(Fraction(matrix[i][i]));
-
-                    if (Fraction(solutions[i]).abs().lt(tolerance)) {
-                        solutions[i] = Fraction(0);
-                    }
                 }
 
                 return solutions;
@@ -87,13 +83,13 @@ function solve(data) {
             matrix.forEach((row) => {
                 let nonZeroFound = false;
                 for (let j = 0; j < numCols; j++) {
-                    if (Fraction(row[j]).abs().gt(0)) {
+                    if (!Fraction(row[j]).equals(0)) {
                         free--;
                         nonZeroFound = true;
                         break;
                     }
                 }
-                if (!nonZeroFound && Fraction(row[numCols]).abs().gt(0)) {
+                if (!nonZeroFound && !Fraction(row[numCols]).equals(0)) {
                     hasSolution = false; // No solution if a row has all zeros and a non-zero constant
                 }
             });
@@ -113,24 +109,35 @@ function solve(data) {
         let numRows = system.length;
         let numCols = system[0].length;
 
-        //system.forEach(row => console.log(row.map(c => Fraction(c).toFraction()).join("  ")));
+        // gaussian elimination based on https://matrixcalc.org/slu.html
+        let offset = 0;
 
         for (let i = 0; i < numRows; i++) {
-            let maxRow = i;
-            for (let k = i + 1; k < numRows; k++) {
-                if (Fraction(system[k][i]).abs().gt(system[maxRow][i])) {
-                    maxRow = k;
-                }
+            if (i + offset >= numCols) {
+                break; // can't reduce anymore
             }
-            [system[i], system[maxRow]] = [system[maxRow], system[i]];
 
-            for (let k = i + 1; k < numRows; k++) {
-                let c = Fraction(-1).mul(system[k][i]).div(system[i][i]);
-                for (let j = i; j < numCols; j++) {
-                    system[k][j] = Fraction(system[k][j]).add(c.mul(system[i][j]));
-                    if (Fraction(system[k][j]).abs().lt(tolerance)) {
-                        system[k][j] = Fraction(0);
+            if (Fraction(system[i][i + offset]).equals(0)) { // avoids divisions by zero
+                let pivot = i;
+                for (let k = i + 1; k < numRows; k++) {
+                    if (!Fraction(system[k][i + offset]).equals(0)) {
+                        pivot = k;
+                        break;
                     }
+                }
+
+                if (pivot === i) { // no suitable replacement found
+                    offset += 1;
+                    i -= 1; 
+                    continue; 
+                }
+                [system[i], system[pivot]] = [system[pivot], system[i]];
+            }
+            
+            for (let k = i + 1; k < numRows; k++) {
+                let c = Fraction(-1).mul(system[k][i + offset]).div(system[i][i + offset]);
+                for (let j = i + offset; j < numCols; j++) {
+                    system[k][j] = Fraction(system[k][j]).add(c.mul(system[i][j]));
                 }
             }
         }
@@ -200,6 +207,7 @@ function vis(plot, solution) {
 
 function visByType(solution) {
     const leftControls = document.querySelector('.bar-left');
+    leftControls.innerHTML = ""
     const question = document.createElement('a'); 
     question.setAttribute("class", "bar-button")
     question.setAttribute("data-position", "top")
@@ -208,14 +216,14 @@ function visByType(solution) {
     switch (solution.type) {
         case 'unique solution':
             question.setAttribute("data-tooltip", 
-                `The conclusion equation shares, and therefore intersects <br> 
+                `The conclusion equation shares, (and therefore intersects) <br> 
                 the solution of the premise equation system.`
             );
             visualizeUniqueSolution(plot, solution);
             break;
         case 'infinite solutions':
             question.setAttribute("data-tooltip", 
-                `The conclusion equation shares, and therefore intersects <br> 
+                `The conclusion equation shares (and therefore intersects) <br> 
                 the solution of the premise equation system. <br>
                 This holds regardless of which variables are selected as free.`
             );
@@ -224,7 +232,8 @@ function visByType(solution) {
         case 'no solution':
             question.setAttribute("data-tooltip", 
                 `The premise equation system has no solution, meaning that <br>
-                at least two lines do not intersect`
+                at least two lines do not intersect as they don't share their <br>
+                solution space.`
             );
             visualizeNoSolutions(plot, solution);
             break;
@@ -353,24 +362,57 @@ function visualizeUniqueSolution(plot, _data) {
     return { plot: p, hl };
 }
 
+function getFreeVariables(data) {
+    const echelon = data.echelon;
+    const numberFree = data.free;
+    const dependent = [];
+    
+    let free = [];
+    let offset = 0;
+    
+    for (let i = 0; i < echelon.length; i++) { 
+        if (i + offset >= echelon[0].length) {
+            break; // can't reduce anymore
+        }
+
+        if (!Fraction(echelon[i][i + offset]).equals(0)) {
+            dependent.push(vars[i + offset])
+        } else {
+            free.push(vars[i + offset]);
+            offset += 1;
+            i -= 1;
+            continue;
+        }
+    }
+    
+    if (free.length === 0) {
+        free = vars.slice(vars.length -(numberFree));
+    }
+
+    return { dependent, free }
+}
+
 function visualizeInfiniteSolutions(plot, _data) {
-    const dependent = vars.slice(0, -(_data.free));
+    const matrix = _data.matrix;
+    const { dependent, free } = getFreeVariables(_data);
+    const solutions = _data.solutions;
     const independent = {};
-    vars.slice(vars.length - _data.free).forEach(varName => {
+    
+    free.forEach(varName => {
         const slider = document.getElementById(`slider-${varName}`);
         independent[varName] = parseFloat(slider.value);
         document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
     });
 
     document.getElementById(plot).innerHTML = '';
-    const solutions = _data.solutions;
-    const matrix = _data.matrix;
+    
     const dependentValues = {}; // Store computed values for dependent variables
 
     // Iterate over solutions in reverse to handle dependencies correctly
     for (let i = solutions.length - 1; i >= 0; i--) {
         const sol = solutions[i];
         const dependentVar = dependent[i];
+
         let terms = sol.slice(0, -1);
         let constantTerm = Fraction(sol[sol.length - 1].c);
         let equationParts = [];
@@ -398,12 +440,14 @@ function visualizeInfiniteSolutions(plot, _data) {
         const varName = dependentVar;
         const independentTermsPreview = equationPreviewParts.join(" + ");
         let solved = independentTermsPreview;
-
-        if (equationPreviewParts.length === 1) {
-            solved = ` - ${solved}`;
-        } else {
-            solved = ` - (${solved})`;
-        }
+        
+        if (equationPreviewParts.length !== 0) {
+            if (equationPreviewParts.length === 1) {
+                solved = ` - ${solved}`;
+            } else {
+                solved = ` - (${solved})`;
+            }        
+        } 
 
         if (constantTerm !== 0) {
             solved = `${f(constantTerm)}${solved}`;
@@ -590,14 +634,16 @@ export class LinearCD {
             freeVarsContainer.style = 'display:grid';
 
             const sliders = {};
-
-            vars.slice(vars.length - data.free).forEach((varName, i) => {
+    
+            const { _ , free} = getFreeVariables(data); 
+            
+            free.forEach((varName, i) => {
                 if (sliders[varName] === undefined) {
                     // create select to replace free variable
                     const select = document.createElement('select');
                     select.id = `select-free-${i}`;
                     select.style = "display:block;";
-                    vars.forEach(vName => select.add(new Option(vName, vName)));
+                    vars.forEach(v => select.add(new Option(v, v)));
                     select.value = varName;
 
                     // create slider to specify free variable value
