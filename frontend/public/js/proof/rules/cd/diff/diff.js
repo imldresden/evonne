@@ -561,7 +561,7 @@ export class DifferenceCD {
             
         question.setAttribute("data-tooltip", 
             `By expressing the premises and conclusion (or its negation) <br> 
-            as a graph of dependencies, a negative cycle indicates how variables <br> 
+            as a graph of inequalities, a negative cycle shows how variables <br> 
             become equal to more than one value, which is a contradiction. <br>
             Double-click on a variable node to see how a value becomes negative.`
         );
