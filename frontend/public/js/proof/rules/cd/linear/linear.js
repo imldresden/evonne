@@ -41,11 +41,11 @@ function solve(data) {
 
                 // Solve for unique solutions
                 for (let i = numRows - 1; i >= 0; i--) {
-                    let sum = 0;
+                    let sum = Fraction(0);
                     for (let j = i + 1; j < numCols - 1; j++) {
-                        sum = Fraction(sum).add(Fraction(matrix[i][j]).mul(Fraction(solutions[j])));
+                        sum = sum.add(Fraction(matrix[i][j]).mul(Fraction(solutions[j])));
                     }
-                    solutions[i] = Fraction(matrix[i][numCols - 1]).sub(Fraction(sum)).div(Fraction(matrix[i][i]));
+                    solutions[i] = Fraction(matrix[i][numCols - 1]).sub(sum).div(Fraction(matrix[i][i]));
                 }
 
                 return solutions;
@@ -58,11 +58,11 @@ function solve(data) {
                     let equation = [];
                     for (let j = 0; j < numCols; j++) {
                         if (Fraction(row[j]).abs().gt(tolerance)) {
-                            equation.push({ c: f(row[j]), v: vars[j] });
+                            equation.push({ c: Fraction(row[j]), v: vars[j] });
                         }
                     }
                     if (equation.length > 0) {
-                        equation.push({ c: f(row[numCols]) });
+                        equation.push({ c: Fraction(row[numCols]) });
                         solutions.push(equation);
                     }
                 });
@@ -255,8 +255,8 @@ function visualizeUniqueSolution(plot, _data) {
     const independentIndex = index1;
     const dependentIndex = index2;
     const annotations = [
-        { x: solutions[independentIndex], text: `${select1} = ${Fraction(solutions[independentIndex]).toFraction()}` },
-        { y: solutions[dependentIndex], text: `${select2} = ${Fraction(solutions[dependentIndex]).toFraction()}` }
+        { x: solutions[independentIndex], text: `${select1} = ${f(solutions[independentIndex])}` },
+        { y: solutions[dependentIndex], text: `${select2} = ${f(solutions[dependentIndex])}` }
     ];
 
     const data = [];
@@ -401,12 +401,12 @@ function visualizeInfiniteSolutions(plot, _data) {
     free.forEach(varName => {
         const slider = document.getElementById(`slider-${varName}`);
         independent[varName] = parseFloat(slider.value);
-        document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
+        document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${f(slider.value)}`;
     });
 
     document.getElementById(plot).innerHTML = '';
     
-    const dependentValues = {}; // Store computed values for dependent variables
+    let dependentValues = {}; // Store computed values for dependent variables
 
     // Iterate over solutions in reverse to handle dependencies correctly
     for (let i = solutions.length - 1; i >= 0; i--) {
@@ -414,31 +414,36 @@ function visualizeInfiniteSolutions(plot, _data) {
         const dependentVar = dependent[i];
 
         let terms = sol.slice(0, -1);
-        let constantTerm = Fraction(sol[sol.length - 1].c);
+        let constantTerm = sol[sol.length - 1].c;
         let equationParts = [];
+        let replacedEquationParts = [];
         let equationPreviewParts = [];
         let dependentCoef;
-
+        
         terms.forEach(term => {
             const coef = term.c;
             const varName = term.v
 
             if (varName === dependentVar) {
-                dependentCoef = Fraction(coef); // Coefficient of the dependent variable
+                dependentCoef = coef; // Coefficient of the dependent variable
             } else {
                 let value = independent[varName] || 0; // Default to slider or zero
+                
                 // If the variable has been solved in this loop, use its calculated value
                 if (dependentValues[varName] !== undefined) {
                     value = dependentValues[varName];
                 }
-                equationParts.push(Fraction(coef).mul(Fraction(value)));
-                equationPreviewParts.push(`${coef}${varName}`);
+
+                equationParts.push(coef.mul(value));
+                replacedEquationParts.push(`${coef}${varName}`);
+                equationPreviewParts.push(`(${f(coef)})*(${f(value)})`);
             }
         });
 
         // Build the function string for preview
         const varName = dependentVar;
         const independentTermsPreview = equationPreviewParts.join(" + ");
+
         let solved = independentTermsPreview;
         
         if (equationPreviewParts.length !== 0) {
@@ -459,15 +464,18 @@ function visualizeInfiniteSolutions(plot, _data) {
 
         // var = const - (rest of eq) / coef
         const solutionPreview = `${varName} = ${solved}`;
-        const independentTerms = equationParts.reduce((acc, part) => Fraction(acc).add(Fraction(part)), 0);
+        const independentTerms = equationParts.reduce((acc, part) => acc.add(part), Fraction(0));
+        
+        console.log(`${dependentVar} = ${f(independentTerms)}`)
 
         if (!Fraction(dependentCoef).equals(0)) {
-            const it = Fraction(independentTerms)
-            const s = Fraction(constantTerm).sub(Fraction(it));
-            const fn = `${f(Fraction(s).div(f(dependentCoef)))}`;
-            document.getElementById(`sol-${varName}`).innerHTML = `${solutionPreview} = ${fn}`;
+            const it = independentTerms
+            const s = constantTerm.sub(it);
+            const fn = `${f(s.div(dependentCoef))}`;
+            document.getElementById(`sol-${varName}`).innerHTML = `${solutionPreview} = ${f(fn)}`;
             dependentValues[dependentVar] = f(fn); // Store the calculated value
         }
+        console.log(dependentValues)
     }
 
     const select1 = document.querySelector(`#var1`);
@@ -649,8 +657,8 @@ export class LinearCD {
                     // create slider to specify free variable value
                     const slider = document.createElement('input');
                     slider.type = 'range';
-                    slider.min = '-10';
-                    slider.max = '10';
+                    slider.min = '-100';
+                    slider.max = '100';
                     slider.value = '0'; // Default value
                     slider.step = '0.1';
                     slider.id = `slider-${varName}`;
@@ -693,13 +701,12 @@ export class LinearCD {
                     }
 
                     slider.oninput = () => {
-                        sliders[varName] = parseFloat(slider.value);
+                        sliders[varName] = f(slider.value);
                         label.textContent = `${varName}: ${slider.value}`;
-                        document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
                         visByType(data);
                     };
 
-                    sliders[varName] = parseFloat(slider.value);
+                    sliders[varName] = f(slider.value);
                     frees.push(varName);
                 }
             });
@@ -831,17 +838,21 @@ export class LinearCD {
                 .append("span").attr("id", "eq-" + op.conclusion.id)
                 .attr("class", "text-eq conclusion")
                 .on('mouseover', () => {
-                    d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", true);
-                    //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
-                    //hl[op.conclusion.id].svg().style.stroke = 'red';
-                    //hl[op.conclusion.id].svg().style.opacity = 1;
-                    hl[op.conclusion.id].svg().style.strokeWidth = 5;
+                    if (!op.conclusion.constraint.bottom) {
+                        d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", true);
+                        //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
+                        //hl[op.conclusion.id].svg().style.stroke = 'red';
+                        //hl[op.conclusion.id].svg().style.opacity = 1;
+                        hl[op.conclusion.id].svg().style.strokeWidth = 5;
+                    }
                 })
                 .on('mouseout', () => { 
-                    d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", false);
-                    //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
-                    //hl[op.conclusion.id].svg().style.stroke = hl[op.conclusion.id].color;
-                    hl[op.conclusion.id].svg().style.strokeWidth = 1;
+                    if (!op.conclusion.constraint.bottom) {
+                        d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", false);
+                        //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
+                        //hl[op.conclusion.id].svg().style.stroke = hl[op.conclusion.id].color;
+                        hl[op.conclusion.id].svg().style.strokeWidth = 1;
+                    }
                 });
                 
             const l = printEquation(op.conclusion.constraint, where);
