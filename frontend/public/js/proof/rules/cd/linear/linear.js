@@ -590,7 +590,46 @@ function getRelevantVariables(data) {
         return vars.filter((_, i) => !Fraction(data.matrix[data.matrix.length - 1][i]).equals(0));
     } else {
         // TODO: if there is no solution, we must test for a case where there are different intersections, or none. 
-        return vars;
+        // this version only detects parallel lines
+
+        const parallel = [];
+        for (let i = 0; i < data.echelon.length - 1; i++) { // don't include conclusion, which we know is zeroes
+            const constant = data.matrix[i][data.matrix[i].length-1];
+            // console.log(`comparing eq ${i}: ${data.matrix[i].map(v => f(v)).join(" + ")}`);
+
+            for (let j = i + 1; j <= data.echelon.length - 1; j++) { 
+                const compare = data.matrix[j][data.matrix[j].length-1];
+
+                // console.log(`to eq ${j}: ${data.matrix[j].map(v => f(v)).join(" + ")}`);
+
+                let matches = [];
+                if (!Fraction(constant).equals(Fraction(compare))) {
+                    // check if equations are the same
+                    matches = data.matrix[i].filter((v, k) => Fraction(v).equals(Fraction(data.matrix[j][k])));
+                } else {
+                    // check if equations are multiples of each other
+                    matches = data.matrix[i].filter((_v, k) => { 
+                        const v = Fraction(_v);
+                        const w = Fraction(data.matrix[j][k]);
+                        if (v.equals(0)) {
+                            return w.equals(0);
+                        } else {
+                            return w.div(v).equals(w);
+                        }
+                    });
+                }
+
+                if (matches.length === data.matrix[i].length - 1) {
+                    parallel.push({ eq1: i, eq2: j});
+                }
+            }
+        }
+
+        if (parallel.length === 0) {
+            console.error('could not identify parallel lines despite there not being a solution');
+        } else {
+            return vars.filter((_, i) => !Fraction(data.matrix[parallel[0].eq1][i]).equals(0));    
+        }
     }
 } 
 
