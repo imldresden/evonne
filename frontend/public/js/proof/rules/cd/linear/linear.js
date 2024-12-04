@@ -206,6 +206,7 @@ function vis(plot, solution) {
 }
 
 function visByType(solution) {
+    hl = {};
     const header = document.getElementById('ruleName');
     document.getElementById('question')?.remove();
 
@@ -262,7 +263,7 @@ function visualizeUniqueSolution(plot, _data) {
     ];
 
     const data = [];
-    let annots = 0; 
+    let skips = 0; 
     matrix.forEach((row, i) => {
         const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
         const color = i !== matrix.length - 1 ? premiseColor : conclusionColor;
@@ -299,14 +300,14 @@ function visualizeUniqueSolution(plot, _data) {
                         Fraction(v).lt(Fraction(point.x + eval_tolerance)),
                     color 
                 };
-                annots += 1;
             } else {
                 console.error('neither of the selected variables can be plotted.')
             }
+            skips += 1;
         } else {
             data.push({ fn, color, updateOnMouseMove: false, graphType: 'polyline' });
             hl[id] = { 
-                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - annots)], 
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - skips)], 
                 evaluate: (point) => {
                     const p = Fraction(independentTerm).mul(Fraction(point.x));
                     const s = Fraction(c).sub(p);
@@ -489,7 +490,7 @@ function visualizeInfiniteSolutions(plot, _data) {
 
     const data = [];
     let simplified = false; // plot 2D solution + true: all equations, false: only conclusion
-    let annots = 0;
+    let skips = 0;
     for (let i = 0; i < matrix.length; i++) {
         const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
         const color = i !== matrix.length - 1 ? premiseColor : conclusionColor;
@@ -536,16 +537,15 @@ function visualizeInfiniteSolutions(plot, _data) {
                         Fraction(v).lt(Fraction(point.x + eval_tolerance)),
                     color
                 };
-                annots += 1;
             } else {
-                // console.log(row.map(r => f(r)))
-                // console.log('both of the selected variables canceled -- no intersection');
+                console.log('both of the selected variables canceled');
             }
+            skips += 1;
         } else {
             data.push({ fn: equation, color, updateOnMouseMove: false, graphType: 'polyline' });
             hl[id] = { 
                 color,
-                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - annots)], 
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - skips)], 
                 evaluate: (point) => {
                     const p = Fraction(independentCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
                     const s = Fraction(constantTerm).sub(p);
@@ -584,6 +584,16 @@ function visualizeNoSolutions(plot, _data) {
     visualizeInfiniteSolutions(plot, _data);    
 }
 
+function getRelevantVariables(data) {
+    if (data.type !== 'no solution') {
+        // if there is/are solution(s), we only care about the variables in the conclusion. 
+        return vars.filter((_, i) => !Fraction(data.matrix[data.matrix.length - 1][i]).equals(0));
+    } else {
+        // TODO: if there is no solution, we must test for a case where there are different intersections, or none. 
+        return vars;
+    }
+} 
+
 export class LinearCD {
     showObvious = false;
 
@@ -595,7 +605,8 @@ export class LinearCD {
             const select2 = document.querySelector(`#var2`);
             select1.innerHTML = '';
             select2.innerHTML = '';
-            vars.forEach(varName => {
+            
+            getRelevantVariables(data).forEach(varName => {
                 const opt1 = new Option(varName, varName);
                 const opt2 = new Option(varName, varName);
 
@@ -816,13 +827,20 @@ export class LinearCD {
                         //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
                         //hl[pr.id].svg().style.stroke = 'red';
                         //hl[pr.id].svg().style.opacity = 1;
-                        hl[pr.id].svg().style.strokeWidth = 5;
+                        const el = hl[pr.id];
+                        if (el && el.svg()) {
+                            el.svg().style.strokeWidth = 5;
+                        }
+                        
                     })
                     .on('mouseout', () => {
                         d3.select(`#eq-${pr.id}`).classed("hl-text", false);
                         //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
                         //hl[pr.id].svg().style.stroke = hl[pr.id].color;
-                        hl[pr.id].svg().style.strokeWidth = 1;
+                        const el = hl[pr.id];
+                        if (el && el.svg()) {
+                            el.svg().style.strokeWidth = 1;
+                        }
                     })
                 const l = printEquation(pr.constraint, where);
                 if (l > maxLength) {
@@ -841,7 +859,10 @@ export class LinearCD {
                         //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
                         //hl[op.conclusion.id].svg().style.stroke = 'red';
                         //hl[op.conclusion.id].svg().style.opacity = 1;
-                        hl[op.conclusion.id].svg().style.strokeWidth = 5;
+                        const el = hl[op.conclusion.id];
+                        if (el && el.svg()) {
+                            el.svg().style.strokeWidth = 5;
+                        }
                     }
                 })
                 .on('mouseout', () => { 
@@ -849,7 +870,10 @@ export class LinearCD {
                         d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", false);
                         //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
                         //hl[op.conclusion.id].svg().style.stroke = hl[op.conclusion.id].color;
-                        hl[op.conclusion.id].svg().style.strokeWidth = 1;
+                        const el = hl[op.conclusion.id];
+                        if (el && el.svg()) {
+                            el.svg().style.strokeWidth = 1;
+                        }
                     }
                 });
                 
