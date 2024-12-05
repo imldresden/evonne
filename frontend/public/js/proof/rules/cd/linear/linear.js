@@ -96,7 +96,7 @@ function solve(data) {
             });
 
             if (!hasSolution) {
-                return { type: 'no solution', state: matrix, free: matrix[0].length - 1 };
+                return { type: 'no solution', state: matrix, free: 0 };
             }
             if (free > 0) {
                 return { type: 'infinite solutions', state: matrix, free };
@@ -302,7 +302,7 @@ function visualizeUniqueSolution(plot, _data) {
                     color 
                 };
             } else {
-                console.error('neither of the selected variables can be plotted.')
+                //console.error('neither of the selected variables can be plotted.')
             }
             skips += 1;
         } else {
@@ -530,7 +530,7 @@ function visualizeInfiniteSolutions(plot, _data) {
         if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
             if (!Fraction(independentCoef).equals(0)) {
                 // solve for x because y is canceled (0f(x)): x = (c - sum)/A 
-                console.log(equation)
+                
                 const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
                 annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
                 hl[id] = { 
@@ -541,8 +541,8 @@ function visualizeInfiniteSolutions(plot, _data) {
                     color
                 };
             } else {
-                console.log(equation)
-                console.log('both of the selected variables canceled');
+                //console.log(equation)
+                //console.log('both of the selected variables canceled');
             }
             skips += 1;
         } else {
