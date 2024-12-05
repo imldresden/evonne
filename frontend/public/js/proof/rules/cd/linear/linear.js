@@ -989,7 +989,9 @@ export class LinearCD {
             const solutions = solve(struct);
 
             this.createPlotControls(solutions);
-            displaySolution(plot, solutions.solutions);
+            if (solutions.type !== 'no solution') {
+                displaySolution(plot, solutions.solutions);
+            }
             vis(plot, solutions);
 
             document.removeEventListener('cd-l-hl', highlightText);
