@@ -306,8 +306,9 @@ function visualizeUniqueSolution(plot, _data) {
             skips += 1;
         } else {
             data.push({ fn, color, updateOnMouseMove: false, graphType: 'polyline' });
+            const ind = i - skips;
             hl[id] = { 
-                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - skips)], 
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, ind)], 
                 evaluate: (point) => {
                     const p = Fraction(independentTerm).mul(Fraction(point.x));
                     const s = Fraction(c).sub(p);
@@ -525,6 +526,11 @@ function visualizeInfiniteSolutions(plot, _data) {
         // build the function string for plotter
         const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / (${f(dependentCoef)})`;
 
+        console.log(matrix[i].map(m => f(m)))
+        console.log(x.varName)
+        console.log(y.varName)
+        console.log(equation)
+
         if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
             if (!Fraction(independentCoef).equals(0)) {
                 // solve for x because y is canceled (0f(x)): x = (sum - c)/A 
@@ -543,9 +549,10 @@ function visualizeInfiniteSolutions(plot, _data) {
             skips += 1;
         } else {
             data.push({ fn: equation, color, updateOnMouseMove: false, graphType: 'polyline' });
+            const ind = i - skips;
             hl[id] = { 
                 color,
-                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - skips)], 
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, ind)], 
                 evaluate: (point) => {
                     const p = Fraction(independentCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
                     const s = Fraction(constantTerm).sub(p);
@@ -589,46 +596,61 @@ function getRelevantVariables(data) {
         // if there is/are solution(s), we only care about the variables in the conclusion. 
         return vars.filter((_, i) => !Fraction(data.matrix[data.matrix.length - 1][i]).equals(0));
     } else {
-        // TODO: if there is no solution, we must test for a case where there are different intersections, or none. 
-        // this version only detects parallel lines
-
         const parallel = [];
         for (let i = 0; i < data.echelon.length - 1; i++) { // don't include conclusion, which we know is zeroes
-            const constant = data.matrix[i][data.matrix[i].length-1];
-            // console.log(`comparing eq ${i}: ${data.matrix[i].map(v => f(v)).join(" + ")}`);
-
+            const constant = data.matrix[i][data.matrix[i].length-1]; // console.log(`comparing eq ${i}: ${data.matrix[i].map(v => f(v)).join(" + ")}`);
+            
             for (let j = i + 1; j <= data.echelon.length - 1; j++) { 
-                const compare = data.matrix[j][data.matrix[j].length-1];
-
-                // console.log(`to eq ${j}: ${data.matrix[j].map(v => f(v)).join(" + ")}`);
+                const compare = data.matrix[j][data.matrix[j].length-1]; // console.log(`to eq ${j}: ${data.matrix[j].map(v => f(v)).join(" + ")}`);
 
                 let matches = [];
-                if (!Fraction(constant).equals(Fraction(compare))) {
-                    // check if equations are the same
-                    matches = data.matrix[i].filter((v, k) => Fraction(v).equals(Fraction(data.matrix[j][k])));
-                } else {
-                    // check if equations are multiples of each other
-                    matches = data.matrix[i].filter((_v, k) => { 
-                        const v = Fraction(_v);
+                if (!Fraction(constant).equals(Fraction(compare))) { // e.g. x + y = 2; x + y = 3
+                    // check if coeficients are the same
+                    matches = Object.keys(data.matrix[i]).slice(0, -1).filter((ind, k) => { 
+                        const v = Fraction(data.matrix[i][ind]);
                         const w = Fraction(data.matrix[j][k]);
-                        if (v.equals(0)) {
-                            return w.equals(0);
+
+                        if (v.equals(0) || w.equals(0)) { 
+                            return false; // variable gets cancelled out
+                        } else {
+                            return v.equals(w);
+                        }
+                    });
+                } else { // e.g., x + y = 2; 2x + 2y = 2
+                    // check if coefficients are multiples of each other
+                    matches = Object.keys(data.matrix[i]).slice(0, -1).filter((ind, k) => { 
+                        const v = Fraction(data.matrix[i][ind]);
+                        const w = Fraction(data.matrix[j][k]);
+                        
+                        if (v.equals(0) || w.equals(0)) { 
+                            return false; // variable gets cancelled out
                         } else {
                             return w.div(v).equals(w);
                         }
                     });
                 }
 
-                if (matches.length === data.matrix[i].length - 1) {
-                    parallel.push({ eq1: i, eq2: j});
+                // at least a pair of variables has:
+                // a) equal coefficients with different constant OR 
+                // b) coef multiple of each other with same constant
+
+                if (matches.length >= 2) { 
+                    parallel.push({ eq1: i, eq2: j, vars: matches.map(ind => vars[ind])});
                 }
             }
         }
 
         if (parallel.length === 0) {
             console.error('could not identify parallel lines despite there not being a solution');
+            return vars; 
         } else {
-            return vars.filter((_, i) => !Fraction(data.matrix[parallel[0].eq1][i]).equals(0));    
+            return parallel.sort((a, b) => { 
+                if (a.vars.length === b.vars.length) {
+                    return 0;
+                } else {
+                    return a.vars.length < b.vars.length ? 1 : -1;
+                }
+            })[0].vars;
         }
     }
 } 
@@ -645,22 +667,24 @@ export class LinearCD {
             select1.innerHTML = '';
             select2.innerHTML = '';
             
-            getRelevantVariables(data).forEach(varName => {
+            const rVars = getRelevantVariables(data)
+            rVars.forEach(varName => {
                 const opt1 = new Option(varName, varName);
                 const opt2 = new Option(varName, varName);
 
-                if (opt2.value === vars[1]) {
+                if (opt2.value === rVars[1]) {
                     opt1.disabled = true;
                 }
-                if (opt1.value === vars[0]) {
+                if (opt1.value === rVars[0]) {
                     opt2.disabled = true;
                 }
 
                 select1.add(opt1);
                 select2.add(opt2);
             });
-            select1.value = vars[0];
-            select2.value = vars[1];
+            
+            select1.value = rVars[0];
+            select2.value = rVars[1];
 
             function update(d) {
                 const other = d.target.id === "var1" ? `#var2 option` : `#var1 option`;
