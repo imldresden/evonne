@@ -24,6 +24,7 @@ const premiseColor = '#80cbc4';
 const conclusionColor = '#b89aef';
 const plot = 'cd-linear-plot';
 const eval_tolerance = 0.001;
+const dims = 500;
 
 let struct = {}; // copy of the node/subproof data 
 let vars = []; // list of variables. The order of this list determines the order of the solutions, which allows us to "target" which variables will be free in case of infinite solutions.
@@ -347,8 +348,8 @@ function visualizeUniqueSolution(plot, _data) {
     const p = functionPlot({
         tip,
         target: `#${plot}`,
-        width: 400,
-        height: 400,
+        width: dims,
+        height: dims,
         xAxis: { label: `${select1}-axis`, domain: [solutions[independentIndex] - 10, solutions[independentIndex] + 10] },
         yAxis: { label: `${select2}-axis`, domain: [solutions[dependentIndex] - 10, solutions[dependentIndex] + 10] },
         grid: false,
@@ -526,14 +527,10 @@ function visualizeInfiniteSolutions(plot, _data) {
         // build the function string for plotter
         const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / (${f(dependentCoef)})`;
 
-        console.log(matrix[i].map(m => f(m)))
-        console.log(x.varName)
-        console.log(y.varName)
-        console.log(equation)
-
         if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
             if (!Fraction(independentCoef).equals(0)) {
-                // solve for x because y is canceled (0f(x)): x = (sum - c)/A 
+                // solve for x because y is canceled (0f(x)): x = (c - sum)/A 
+                console.log(equation)
                 const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
                 annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
                 hl[id] = { 
@@ -544,6 +541,7 @@ function visualizeInfiniteSolutions(plot, _data) {
                     color
                 };
             } else {
+                console.log(equation)
                 console.log('both of the selected variables canceled');
             }
             skips += 1;
@@ -567,8 +565,8 @@ function visualizeInfiniteSolutions(plot, _data) {
     const p = functionPlot({
         tip,
         target: `#${plot}`,
-        width: 400,
-        height: 400,
+        width: dims,
+        height: dims,
         xAxis: { label: `${x.varName}-axis`, domain: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10] }, // center plot on the intersection point
         yAxis: { label: `${y.varName}-axis`, domain: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10] },
         grid: false,
@@ -661,7 +659,12 @@ export class LinearCD {
     createPlotControls(data) {
         function generateVariableSelectors(data) {
             const controls = document.querySelector(`#linear-vis-controls`);
-            controls.style = 'display:inline-block;min-width:250px;margin-left:25px;margin-right:25px;';
+            controls.style = `display:inline-block;
+                min-width:250px;
+                padding-left:25px;
+                padding-right:25px;
+                max-height:${dims}px;
+                overflow-y:auto`;
             const select1 = document.querySelector(`#var1`);
             const select2 = document.querySelector(`#var2`);
             select1.innerHTML = '';
@@ -787,9 +790,7 @@ export class LinearCD {
         }
 
         const container = document.getElementById('explanation-container');
-        container.style = `min-height:400px;margin-top:15px;display:flex;height:${
-            118 + data.free ? data.free * 100 : 0
-        }px`;
+        container.style = `min-height:400px;margin-top:15px;display:flex;height:${dims+20}px`;
         container.innerHTML = '';
 
         const ctrls = document.createElement('div');
