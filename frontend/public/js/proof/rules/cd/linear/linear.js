@@ -231,7 +231,7 @@ function visByType(solution) {
                 the solution of the premise equation system. <br>
                 This holds regardless of which variables are selected as free.`
             );
-            visualizeInfiniteSolutions(plot, solution);
+            visualizeEquations(plot, solution);
             break;
         case 'no solution':
             question.setAttribute("data-tooltip", 
@@ -397,7 +397,7 @@ function getFreeVariables(data) {
     return { dependent, free }
 }
 
-function visualizeInfiniteSolutions(plot, _data) {
+function visualizeEquations(plot, _data, annotate = true) {
     const matrix = _data.matrix;
     const { dependent, free } = getFreeVariables(_data);
     const solutions = _data.solutions;
@@ -485,10 +485,10 @@ function visualizeInfiniteSolutions(plot, _data) {
     const x = { varName: select1.value, fn: dependentValues[select1.value] || independent[select1.value]};
     const y = { varName: select2.value, fn: dependentValues[select2.value] || independent[select2.value] };
 
-    const annotations = [
+    const annotations = annotate ? [
         { x: eval(f(x.fn)), text: `${x.varName} = ${f(x.fn)}` },
         { y: eval(f(y.fn)), text: `${y.varName} = ${f(y.fn)}` }
-    ];
+    ] : [];
 
     const data = [];
     let simplified = false; // plot 2D solution + true: all equations, false: only conclusion
@@ -586,7 +586,7 @@ function visualizeInfiniteSolutions(plot, _data) {
 }
 
 function visualizeNoSolutions(plot, _data) {
-    visualizeInfiniteSolutions(plot, _data);    
+    visualizeEquations(plot, _data, false);    
 }
 
 function getRelevantVariables(data) {
