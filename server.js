@@ -48,6 +48,7 @@ const proofFileName = 'proof';
 const externalProofFileName = proofFileName+'.json';
 
 const constraintsFileName = 'constraints.txt';
+const concreteDomainFileName = 'concreteDomain.txt';
 
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
@@ -240,7 +241,7 @@ app.get('/project', (req, res) => {
   const reasonerPath = path.join(target, 'reasoner.txt');
   status.reasoner = existsSync(reasonerPath) ? readFileSync(reasonerPath).toString() : "n/a";
 
-  const cdNamePath = path.join(target, 'concreteDomain.txt');
+  const cdNamePath = path.join(target, concreteDomainFileName);
   status.concreteDomainName = existsSync(cdNamePath) ? readFileSync(cdNamePath).toString() : "n/a";
 
   //Rule names can be replaced based on a map specified the "ruleNames.tmap" file
@@ -388,7 +389,7 @@ app.post('/explain', (req, res) => {
   const ontPath = path.join(projPath, ontology);
 
   const preserve = ['.owl', 'sig.txt', 'reasoner.txt', 'cnsHierarchy.json', 'cnsOriginal.json',
-    externalProofFileName, constraintsFileName, 'concreteDomain.txt'];
+    externalProofFileName, constraintsFileName, concreteDomainFileName];
 
   readdirSync(projPath).forEach(function (file) {
     for (const p of preserve) {
