@@ -24,6 +24,7 @@ const premiseColor = '#80cbc4';
 const conclusionColor = '#b89aef';
 const plot = 'cd-linear-plot';
 const eval_tolerance = 0.001;
+const dims = 500;
 
 let struct = {}; // copy of the node/subproof data 
 let vars = []; // list of variables. The order of this list determines the order of the solutions, which allows us to "target" which variables will be free in case of infinite solutions.
@@ -41,11 +42,11 @@ function solve(data) {
 
                 // Solve for unique solutions
                 for (let i = numRows - 1; i >= 0; i--) {
-                    let sum = 0;
+                    let sum = Fraction(0);
                     for (let j = i + 1; j < numCols - 1; j++) {
-                        sum = Fraction(sum).add(Fraction(matrix[i][j]).mul(Fraction(solutions[j])));
+                        sum = sum.add(Fraction(matrix[i][j]).mul(Fraction(solutions[j])));
                     }
-                    solutions[i] = Fraction(matrix[i][numCols - 1]).sub(Fraction(sum)).div(Fraction(matrix[i][i]));
+                    solutions[i] = Fraction(matrix[i][numCols - 1]).sub(sum).div(Fraction(matrix[i][i]));
                 }
 
                 return solutions;
@@ -58,11 +59,11 @@ function solve(data) {
                     let equation = [];
                     for (let j = 0; j < numCols; j++) {
                         if (Fraction(row[j]).abs().gt(tolerance)) {
-                            equation.push({ c: f(row[j]), v: vars[j] });
+                            equation.push({ c: Fraction(row[j]), v: vars[j] });
                         }
                     }
                     if (equation.length > 0) {
-                        equation.push({ c: f(row[numCols]) });
+                        equation.push({ c: Fraction(row[numCols]) });
                         solutions.push(equation);
                     }
                 });
@@ -95,7 +96,7 @@ function solve(data) {
             });
 
             if (!hasSolution) {
-                return { type: 'no solution', state: matrix, free: matrix[0].length - 1 };
+                return { type: 'no solution', state: matrix, free: 0 };
             }
             if (free > 0) {
                 return { type: 'infinite solutions', state: matrix, free };
@@ -206,12 +207,15 @@ function vis(plot, solution) {
 }
 
 function visByType(solution) {
-    const leftControls = document.querySelector('.bar-left');
-    leftControls.innerHTML = ""
+    hl = {};
+    const header = document.getElementById('ruleName');
+    document.getElementById('question')?.remove();
+
     const question = document.createElement('a'); 
-    question.setAttribute("class", "bar-button")
-    question.setAttribute("data-position", "top")
-    question.innerHTML = `<i class="material-icons" style="font-size: 23px;">help_outline</i>`
+    question.setAttribute("id", "question");
+    question.setAttribute("class", "bar-button");
+    question.setAttribute("data-position", "top");
+    question.innerHTML = `<i class="material-icons" style="font-size: 23px;margin:5px">help_outline</i>`;
         
     switch (solution.type) {
         case 'unique solution':
@@ -227,7 +231,7 @@ function visByType(solution) {
                 the solution of the premise equation system. <br>
                 This holds regardless of which variables are selected as free.`
             );
-            visualizeInfiniteSolutions(plot, solution);
+            visualizeEquations(plot, solution);
             break;
         case 'no solution':
             question.setAttribute("data-tooltip", 
@@ -238,9 +242,9 @@ function visByType(solution) {
             visualizeNoSolutions(plot, solution);
             break;
     }
-    leftControls.appendChild(question);
-    M.Tooltip.init(question)
-
+    
+    header.appendChild(question);
+    M.Tooltip.init(question);
 }
 
 function visualizeUniqueSolution(plot, _data) {
@@ -255,12 +259,12 @@ function visualizeUniqueSolution(plot, _data) {
     const independentIndex = index1;
     const dependentIndex = index2;
     const annotations = [
-        { x: solutions[independentIndex], text: `${select1} = ${Fraction(solutions[independentIndex]).toFraction()}` },
-        { y: solutions[dependentIndex], text: `${select2} = ${Fraction(solutions[dependentIndex]).toFraction()}` }
+        { x: solutions[independentIndex], text: `${select1} = ${f(solutions[independentIndex])}` },
+        { y: solutions[dependentIndex], text: `${select2} = ${f(solutions[dependentIndex])}` }
     ];
 
     const data = [];
-    let annots = 0; 
+    let skips = 0; 
     matrix.forEach((row, i) => {
         const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
         const color = i !== matrix.length - 1 ? premiseColor : conclusionColor;
@@ -297,14 +301,15 @@ function visualizeUniqueSolution(plot, _data) {
                         Fraction(v).lt(Fraction(point.x + eval_tolerance)),
                     color 
                 };
-                annots += 1;
             } else {
-                console.error('neither of the selected variables can be plotted.')
+                //console.error('neither of the selected variables can be plotted.')
             }
+            skips += 1;
         } else {
             data.push({ fn, color, updateOnMouseMove: false, graphType: 'polyline' });
+            const ind = i - skips;
             hl[id] = { 
-                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - annots)], 
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, ind)], 
                 evaluate: (point) => {
                     const p = Fraction(independentTerm).mul(Fraction(point.x));
                     const s = Fraction(c).sub(p);
@@ -343,8 +348,8 @@ function visualizeUniqueSolution(plot, _data) {
     const p = functionPlot({
         tip,
         target: `#${plot}`,
-        width: 400,
-        height: 400,
+        width: dims,
+        height: dims,
         xAxis: { label: `${select1}-axis`, domain: [solutions[independentIndex] - 10, solutions[independentIndex] + 10] },
         yAxis: { label: `${select2}-axis`, domain: [solutions[dependentIndex] - 10, solutions[dependentIndex] + 10] },
         grid: false,
@@ -385,14 +390,14 @@ function getFreeVariables(data) {
         }
     }
     
-    if (free.length === 0) {
+    if (free.length === 0 || data.type === 'no solution') {
         free = vars.slice(vars.length -(numberFree));
     }
 
     return { dependent, free }
 }
 
-function visualizeInfiniteSolutions(plot, _data) {
+function visualizeEquations(plot, _data, annotate = true) {
     const matrix = _data.matrix;
     const { dependent, free } = getFreeVariables(_data);
     const solutions = _data.solutions;
@@ -401,7 +406,7 @@ function visualizeInfiniteSolutions(plot, _data) {
     free.forEach(varName => {
         const slider = document.getElementById(`slider-${varName}`);
         independent[varName] = parseFloat(slider.value);
-        document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
+        document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${f(slider.value)}`;
     });
 
     document.getElementById(plot).innerHTML = '';
@@ -414,31 +419,36 @@ function visualizeInfiniteSolutions(plot, _data) {
         const dependentVar = dependent[i];
 
         let terms = sol.slice(0, -1);
-        let constantTerm = Fraction(sol[sol.length - 1].c);
+        let constantTerm = sol[sol.length - 1].c;
         let equationParts = [];
+        let debug = [];
         let equationPreviewParts = [];
         let dependentCoef;
-
+        
         terms.forEach(term => {
             const coef = term.c;
-            const varName = term.v
+            const varName = term.v;
 
             if (varName === dependentVar) {
-                dependentCoef = Fraction(coef); // Coefficient of the dependent variable
+                dependentCoef = coef; // Coefficient of the dependent variable
             } else {
                 let value = independent[varName] || 0; // Default to slider or zero
+                
                 // If the variable has been solved in this loop, use its calculated value
                 if (dependentValues[varName] !== undefined) {
                     value = dependentValues[varName];
                 }
-                equationParts.push(Fraction(coef).mul(Fraction(value)));
-                equationPreviewParts.push(`${coef}${varName}`);
+
+                equationParts.push(coef.mul(value));
+                equationPreviewParts.push(`${f(coef)}${varName}`);
+                debug.push(`(${f(coef)})*(${f(value)})`);
             }
         });
 
         // Build the function string for preview
         const varName = dependentVar;
         const independentTermsPreview = equationPreviewParts.join(" + ");
+
         let solved = independentTermsPreview;
         
         if (equationPreviewParts.length !== 0) {
@@ -459,14 +469,13 @@ function visualizeInfiniteSolutions(plot, _data) {
 
         // var = const - (rest of eq) / coef
         const solutionPreview = `${varName} = ${solved}`;
-        const independentTerms = equationParts.reduce((acc, part) => Fraction(acc).add(Fraction(part)), 0);
-
+        const independentTerms = equationParts.reduce((acc, part) => acc.add(part), Fraction(0));
+        
         if (!Fraction(dependentCoef).equals(0)) {
-            const it = Fraction(independentTerms)
-            const s = Fraction(constantTerm).sub(Fraction(it));
-            const fn = `${f(Fraction(s).div(f(dependentCoef)))}`;
-            document.getElementById(`sol-${varName}`).innerHTML = `${solutionPreview} = ${fn}`;
-            dependentValues[dependentVar] = f(fn); // Store the calculated value
+            const s = constantTerm.sub(independentTerms);
+            const fn = s.div(dependentCoef);
+            document.getElementById(`sol-${varName}`).innerHTML = `${solutionPreview} = ${f(fn)}`;
+            dependentValues[dependentVar] = fn; // Store the calculated value
         }
     }
 
@@ -476,14 +485,14 @@ function visualizeInfiniteSolutions(plot, _data) {
     const x = { varName: select1.value, fn: dependentValues[select1.value] || independent[select1.value]};
     const y = { varName: select2.value, fn: dependentValues[select2.value] || independent[select2.value] };
 
-    const annotations = [
+    const annotations = annotate ? [
         { x: eval(f(x.fn)), text: `${x.varName} = ${f(x.fn)}` },
         { y: eval(f(y.fn)), text: `${y.varName} = ${f(y.fn)}` }
-    ];
+    ] : [];
 
     const data = [];
     let simplified = false; // plot 2D solution + true: all equations, false: only conclusion
-    let annots = 0;
+    let skips = 0;
     for (let i = 0; i < matrix.length; i++) {
         const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
         const color = i !== matrix.length - 1 ? premiseColor : conclusionColor;
@@ -520,7 +529,8 @@ function visualizeInfiniteSolutions(plot, _data) {
 
         if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
             if (!Fraction(independentCoef).equals(0)) {
-                // solve for x because y is canceled (0f(x)): x = (sum - c)/A 
+                // solve for x because y is canceled (0f(x)): x = (c - sum)/A 
+                
                 const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
                 annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
                 hl[id] = { 
@@ -530,16 +540,17 @@ function visualizeInfiniteSolutions(plot, _data) {
                         Fraction(v).lt(Fraction(point.x + eval_tolerance)),
                     color
                 };
-                annots += 1;
             } else {
-                // console.log(row.map(r => f(r)))
-                // console.log('both of the selected variables canceled -- no intersection');
+                //console.log(equation)
+                //console.log('both of the selected variables canceled');
             }
+            skips += 1;
         } else {
             data.push({ fn: equation, color, updateOnMouseMove: false, graphType: 'polyline' });
+            const ind = i - skips;
             hl[id] = { 
                 color,
-                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, i - annots)], 
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, ind)], 
                 evaluate: (point) => {
                     const p = Fraction(independentCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
                     const s = Fraction(constantTerm).sub(p);
@@ -554,8 +565,8 @@ function visualizeInfiniteSolutions(plot, _data) {
     const p = functionPlot({
         tip,
         target: `#${plot}`,
-        width: 400,
-        height: 400,
+        width: dims,
+        height: dims,
         xAxis: { label: `${x.varName}-axis`, domain: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10] }, // center plot on the intersection point
         yAxis: { label: `${y.varName}-axis`, domain: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10] },
         grid: false,
@@ -575,8 +586,72 @@ function visualizeInfiniteSolutions(plot, _data) {
 }
 
 function visualizeNoSolutions(plot, _data) {
-    visualizeInfiniteSolutions(plot, _data);    
+    visualizeEquations(plot, _data, false);    
 }
+
+function getRelevantVariables(data) {
+    if (data.type !== 'no solution') {
+        // if there is/are solution(s), we only care about the variables in the conclusion. 
+        return vars.filter((_, i) => !Fraction(data.matrix[data.matrix.length - 1][i]).equals(0));
+    } else {
+        const parallel = [];
+        for (let i = 0; i < data.echelon.length - 1; i++) { // don't include conclusion, which we know is zeroes
+            const constant = data.matrix[i][data.matrix[i].length-1]; // console.log(`comparing eq ${i}: ${data.matrix[i].map(v => f(v)).join(" + ")}`);
+            
+            for (let j = i + 1; j <= data.echelon.length - 1; j++) { 
+                const compare = data.matrix[j][data.matrix[j].length-1]; // console.log(`to eq ${j}: ${data.matrix[j].map(v => f(v)).join(" + ")}`);
+
+                let matches = [];
+                if (!Fraction(constant).equals(Fraction(compare))) { // e.g. x + y = 2; x + y = 3
+                    // check if coeficients are the same
+                    matches = Object.keys(data.matrix[i]).slice(0, -1).filter((ind, k) => { 
+                        const v = Fraction(data.matrix[i][ind]);
+                        const w = Fraction(data.matrix[j][k]);
+
+                        if (v.equals(0) || w.equals(0)) { 
+                            return false; // variable gets cancelled out
+                        } else {
+                            return v.equals(w);
+                        }
+                    });
+                } else { // e.g., x + y = 2; 2x + 2y = 2
+                    // check if coefficients are multiples of each other
+                    matches = Object.keys(data.matrix[i]).slice(0, -1).filter((ind, k) => { 
+                        const v = Fraction(data.matrix[i][ind]);
+                        const w = Fraction(data.matrix[j][k]);
+                        
+                        if (v.equals(0) || w.equals(0)) { 
+                            return false; // variable gets cancelled out
+                        } else {
+                            return w.div(v).equals(w);
+                        }
+                    });
+                }
+
+                // at least a pair of variables has:
+                // a) equal coefficients with different constant OR 
+                // b) coef multiple of each other with same constant
+
+                if (matches.length >= 2) { 
+                    parallel.push({ eq1: i, eq2: j, vars: matches.map(ind => vars[ind])});
+                }
+            }
+        }
+
+        if (parallel.length === 0) {
+            console.error('could not identify parallel lines despite there not being a solution');
+            return vars; 
+        } else {
+            return parallel.sort((a, b) => { 
+                if (a.vars.length === b.vars.length) {
+                    return 0;
+                } else {
+                    return a.vars.length < b.vars.length ? 1 : -1;
+                }
+            })[0].vars;
+        }
+    }
+} 
 
 export class LinearCD {
     showObvious = false;
@@ -584,27 +659,35 @@ export class LinearCD {
     createPlotControls(data) {
         function generateVariableSelectors(data) {
             const controls = document.querySelector(`#linear-vis-controls`);
-            controls.style = 'display:inline-block;min-width:250px;margin-left:25px;margin-right:25px;';
+            controls.style = `display:inline-block;
+                min-width:250px;
+                padding-left:25px;
+                padding-right:25px;
+                max-height:${dims}px;
+                overflow-y:auto`;
             const select1 = document.querySelector(`#var1`);
             const select2 = document.querySelector(`#var2`);
             select1.innerHTML = '';
             select2.innerHTML = '';
-            vars.forEach(varName => {
+            
+            const rVars = getRelevantVariables(data)
+            rVars.forEach(varName => {
                 const opt1 = new Option(varName, varName);
                 const opt2 = new Option(varName, varName);
 
-                if (opt2.value === vars[1]) {
+                if (opt2.value === rVars[1]) {
                     opt1.disabled = true;
                 }
-                if (opt1.value === vars[0]) {
+                if (opt1.value === rVars[0]) {
                     opt2.disabled = true;
                 }
 
                 select1.add(opt1);
                 select2.add(opt2);
             });
-            select1.value = vars[0];
-            select2.value = vars[1];
+            
+            select1.value = rVars[0];
+            select2.value = rVars[1];
 
             function update(d) {
                 const other = d.target.id === "var1" ? `#var2 option` : `#var1 option`;
@@ -649,8 +732,8 @@ export class LinearCD {
                     // create slider to specify free variable value
                     const slider = document.createElement('input');
                     slider.type = 'range';
-                    slider.min = '-10';
-                    slider.max = '10';
+                    slider.min = '-100';
+                    slider.max = '100';
                     slider.value = '0'; // Default value
                     slider.step = '0.1';
                     slider.id = `slider-${varName}`;
@@ -693,13 +776,12 @@ export class LinearCD {
                     }
 
                     slider.oninput = () => {
-                        sliders[varName] = parseFloat(slider.value);
+                        sliders[varName] = Fraction(slider.value);
                         label.textContent = `${varName}: ${slider.value}`;
-                        document.getElementById(`sol-${varName}`).innerHTML = `${varName} = ${slider.value}`;
                         visByType(data);
                     };
 
-                    sliders[varName] = parseFloat(slider.value);
+                    sliders[varName] = Fraction(slider.value);
                     frees.push(varName);
                 }
             });
@@ -708,9 +790,7 @@ export class LinearCD {
         }
 
         const container = document.getElementById('explanation-container');
-        container.style = `min-height:400px;margin-top:15px;display:flex;height:${
-            118 + data.free ? data.free * 100 : 0
-        }px`;
+        container.style = `min-height:400px;margin-top:15px;display:flex;height:${dims+20}px`;
         container.innerHTML = '';
 
         const ctrls = document.createElement('div');
@@ -811,13 +891,20 @@ export class LinearCD {
                         //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
                         //hl[pr.id].svg().style.stroke = 'red';
                         //hl[pr.id].svg().style.opacity = 1;
-                        hl[pr.id].svg().style.strokeWidth = 5;
+                        const el = hl[pr.id];
+                        if (el && el.svg()) {
+                            el.svg().style.strokeWidth = 5;
+                        }
+                        
                     })
                     .on('mouseout', () => {
                         d3.select(`#eq-${pr.id}`).classed("hl-text", false);
                         //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
                         //hl[pr.id].svg().style.stroke = hl[pr.id].color;
-                        hl[pr.id].svg().style.strokeWidth = 1;
+                        const el = hl[pr.id];
+                        if (el && el.svg()) {
+                            el.svg().style.strokeWidth = 1;
+                        }
                     })
                 const l = printEquation(pr.constraint, where);
                 if (l > maxLength) {
@@ -831,17 +918,27 @@ export class LinearCD {
                 .append("span").attr("id", "eq-" + op.conclusion.id)
                 .attr("class", "text-eq conclusion")
                 .on('mouseover', () => {
-                    d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", true);
-                    //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
-                    //hl[op.conclusion.id].svg().style.stroke = 'red';
-                    //hl[op.conclusion.id].svg().style.opacity = 1;
-                    hl[op.conclusion.id].svg().style.strokeWidth = 5;
+                    if (!op.conclusion.constraint.bottom) {
+                        d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", true);
+                        //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 0.2);
+                        //hl[op.conclusion.id].svg().style.stroke = 'red';
+                        //hl[op.conclusion.id].svg().style.opacity = 1;
+                        const el = hl[op.conclusion.id];
+                        if (el && el.svg()) {
+                            el.svg().style.strokeWidth = 5;
+                        }
+                    }
                 })
                 .on('mouseout', () => { 
-                    d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", false);
-                    //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
-                    //hl[op.conclusion.id].svg().style.stroke = hl[op.conclusion.id].color;
-                    hl[op.conclusion.id].svg().style.strokeWidth = 1;
+                    if (!op.conclusion.constraint.bottom) {
+                        d3.select(`#eq-${op.conclusion.id}`).classed("hl-text", false);
+                        //Object.keys(hl).forEach(d => hl[d].svg().style.opacity = 1);
+                        //hl[op.conclusion.id].svg().style.stroke = hl[op.conclusion.id].color;
+                        const el = hl[op.conclusion.id];
+                        if (el && el.svg()) {
+                            el.svg().style.strokeWidth = 1;
+                        }
+                    }
                 });
                 
             const l = printEquation(op.conclusion.constraint, where);
@@ -892,7 +989,9 @@ export class LinearCD {
             const solutions = solve(struct);
 
             this.createPlotControls(solutions);
-            displaySolution(plot, solutions.solutions);
+            if (solutions.type !== 'no solution') {
+                displaySolution(plot, solutions.solutions);
+            }
             vis(plot, solutions);
 
             document.removeEventListener('cd-l-hl', highlightText);
