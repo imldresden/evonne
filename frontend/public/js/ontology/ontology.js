@@ -7,6 +7,7 @@ import { params } from "../layouts/cola.js";
 import { showRepairsTab } from "../utils/controls.js";
 import { owlFunctions } from "../utils/myOWL.js";
 import { throttle } from "../utils/throttle.js";
+import {ReasonerName} from "../utils/ReasonerName.js";
 
 const socket = io();
 
@@ -36,6 +37,7 @@ const shortenAllInOntologyBtn = document.getElementById("shortenAllInOntologyBtn
 const openProof = document.getElementById('openProofInNew');
 const resetStickyPositionsBtn = document.getElementById('resetStickyPositions');
 const rerunSimulationBtn = document.getElementById('rerunSimulation');
+const reasonerChoice = document.getElementById('classificationReasoner');
 
 const thingsWithListeners = [
   { type: 'click', thing: btnShowSignature, fn: btnShowSignatureFunction },
@@ -349,6 +351,12 @@ async function labelNodes(layout = true) {
   }
 }
 
+export function getCDName() {
+  if (reasonerChoice.value === ReasonerName.elkCD())
+    return document.getElementById('concreteDomain').value;
+  return "";
+}
+
 function loadOntology(e) {
   const ontology = e.target.files[0];
   progress('Uploading...');
@@ -357,8 +365,9 @@ function loadOntology(e) {
     progress('Extracting concept names...');
 
     //Ontology file name changes after translating to OWL/XML format
-    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + owlFunctions.getOWlFileName(ontology.name) + '&reasoner=' +
-      document.getElementById('classificationReasoner').value)
+    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + owlFunctions.getOWlFileName(ontology.name) +
+        '&reasoner=' + reasonerChoice.value +
+        '&cd='+ getCDName())
       .then(computed => {
         console.log('concepts extracted: ', computed);
         progress('Concepts extracted.');
@@ -371,7 +380,7 @@ function loadOntology(e) {
       .catch(error => {
         console.error('Error:', error);
       });
-    document.getElementById("reasoner-choice-upload").style.display = "none";
+    //document.getElementById("reasonerChoiceUpload").style.display = "none";
   }, 'ontology' );
 }
 
@@ -647,4 +656,8 @@ function setupOntologyMinimap(cy) {
   cy.navigator(defaults);
 }
 
-export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology }
+function loadConstraints(event) {
+  upload(event.target.files[0], undefined, 'constraints');
+}
+
+export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology, loadConstraints }

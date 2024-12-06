@@ -1,5 +1,6 @@
-import { loadOntology, loadLayout, loadAtomicDecomposition } from '../ontology/ontology.js';
-import { loadProof, loadSignature } from '../main/main.js';
+import {loadOntology, loadLayout, loadAtomicDecomposition, loadConstraints} from '../ontology/ontology.js';
+import { loadProof, loadSignature} from '../main/main.js';
+import {ReasonerName} from "./ReasonerName.js";
 
 const listenerFunctions = [loadProof, loadOntology, loadLayout];
 const fileUploadInput = document.getElementById('browseButton');
@@ -29,11 +30,33 @@ createBlankProject && createBlankProject.addEventListener("click", async () => {
   }
 });
 
+function setReasonerOptionValues() {
+  document.getElementById("elkOption").value = ReasonerName.elk();
+  document.getElementById("elkCDOption").value = ReasonerName.elkCD();
+  document.getElementById("hermitOption").value = ReasonerName.hermit();
+}
 
 // for uploading the actual ontology, project menu 
 const uploadOntologyTriggers = Array.from(document.getElementsByClassName("uploadOntologyTrigger"));
 uploadOntologyTriggers.forEach(trigger => {
-  document.getElementById("reasoner-choice-upload").style.display = "block";
+  setReasonerOptionValues();
+
+  const loadConstraintsTextField = document.getElementById("browseConstraintsFilePath");
+  loadConstraintsTextField.value = "";
+
+  const reasonerChoice = document.getElementById('classificationReasoner');
+  const CDChoiceDiv = document.getElementById("CDChoice");
+  reasonerChoice.addEventListener("change",()=>{
+    if (reasonerChoice.value === ReasonerName.elkCD()){
+      CDChoiceDiv.style.display = "block";
+    }else{
+      CDChoiceDiv.style.display = "none";
+    }
+  });
+
+  const loadConstraintsFileBtn = document.getElementById("browseConstraintsButton");
+  loadConstraintsFileBtn.addEventListener("change",loadConstraints);
+
   trigger.addEventListener("click", () => {
     adaptUploadFileModal('n ontology for a new project');
     //We now allow the user to upload any file format. We internally convert to OWL XML format

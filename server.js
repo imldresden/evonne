@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from "module";
 import * as path from 'path';
 import { owlFunctions } from "./frontend/public/js/utils/myOWL.js";
+import { ReasonerName } from "./frontend/public/js/utils/ReasonerName.js";
 
 const require = createRequire(import.meta.url);
 require('dotenv').config();
@@ -45,6 +46,8 @@ const fs = require('fs');
 
 const proofFileName = 'proof';
 const externalProofFileName = proofFileName+'.json';
+
+const constraintsFileName = 'constraints.txt';
 
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
@@ -119,6 +122,8 @@ app.get('/project', (req, res) => {
     names: {},
     explanation: { type: '' },
     reasoner: '',
+    concreteDomainConstraints: '',
+    concreteDomainName:'',
   };
 
   const files = readdirSync(target);
@@ -162,6 +167,10 @@ app.get('/project', (req, res) => {
     ) {
       status.ontology = owlFunctions.getOWlFileName(file); // there is more than one
       flags.ontology = true;
+    }
+
+    if (file.endsWith(constraintsFileName)){
+      status.concreteDomainConstraints = file;
     }
   });
 
@@ -231,6 +240,9 @@ app.get('/project', (req, res) => {
   const reasonerPath = path.join(target, 'reasoner.txt');
   status.reasoner = existsSync(reasonerPath) ? readFileSync(reasonerPath).toString() : "n/a";
 
+  const cdNamePath = path.join(target, 'concreteDomain.txt');
+  status.concreteDomainName = existsSync(cdNamePath) ? readFileSync(cdNamePath).toString() : "n/a";
+
   //Rule names can be replaced based on a map specified the "ruleNames.tmap" file
   const ruleNamesMapPath = './ruleNames.tmap';
   status.ruleNamesMap = parseMap(existsSync(ruleNamesMapPath) ? readFileSync(ruleNamesMapPath).toString() : "");
@@ -266,6 +278,10 @@ app.post('/upload', (req, res) => {
 
     if (req.body.type === 'signature') {
       renameSync(uploadPath, path.join(uploadsDir, 'sig.txt'));
+    }
+
+    if (req.body.type === 'constraints') {
+      renameSync(uploadPath, path.join(uploadsDir, constraintsFileName));
     }
 
     if (req.body.type === 'ontology') {
@@ -323,14 +339,24 @@ app.get('/extract-names', (req, res) => {
 
   const projPath = path.join(dataDir, id);
   const ontPath = path.join(projPath, req.query.ontology);
+  const  constraintsPath = path.join(projPath,constraintsFileName);
 
   //TODO: progress bar (consider spawnSync)
-  const names = spawn('java', [
-    '-jar', 'externalTools/extractNames.jar',
-    '-o', ontPath,
-    '-od', projPath,
-    '-r', req.query.reasoner,
-  ], { encoding: 'utf-8' });
+  const names = req.query.reasoner === ReasonerName.elkCD() ?
+      spawn('java', [
+          '-jar', 'externalTools/extractNames.jar',
+          '-o', ontPath,
+          '-od', projPath,
+          '-r', 'elk',
+          '-cdn', req.query.cd,
+          '-c', constraintsPath
+  ]) :
+      spawn('java', [
+          '-jar', 'externalTools/extractNames.jar',
+          '-o', ontPath,
+          '-od', projPath,
+          '-r', req.query.reasoner
+  ]);
   printOutput(names);
 
   names.on("exit", function () {
@@ -361,7 +387,8 @@ app.post('/explain', (req, res) => {
   const axiom = req.body.lhs + " SubClassOf: " + req.body.rhs;
   const ontPath = path.join(projPath, ontology);
 
-  const preserve = ['.owl', 'sig.txt', 'reasoner.txt', 'cnsHierarchy.json', 'cnsOriginal.json', externalProofFileName];
+  const preserve = ['.owl', 'sig.txt', 'reasoner.txt', 'cnsHierarchy.json', 'cnsOriginal.json',
+    externalProofFileName, constraintsFileName, 'concreteDomain.txt'];
 
   readdirSync(projPath).forEach(function (file) {
     for (const p of preserve) {
@@ -373,8 +400,10 @@ app.post('/explain', (req, res) => {
   });
 
   const type = req.body.type;
+  const cdName = req.body.concreteDomainName;
+  console.log(cdName)
   if (type === 'pr') { // expects a proof
-    prove({ id, req, axiom, projPath, ontology, ontPath });
+    prove({ id, req, axiom, projPath, ontology, ontPath, cdName });
   }
 
   if (type === 'ce') { // expects a counterexample
@@ -585,14 +614,14 @@ function convertOntology(ontFile, ontDir) {
   }
 }
 
-function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
+function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
   console.log('computing proofs for ' + axiom);
 
   const genMethod = req.body.method;
-  const sigPath = req.body.signaturePath;
+  const sigPath = req.body.signaturePath;//TODO:we rename to sig.txt on upload, no need to send the name anymore
   const translate2NL = req.body.translate2NL === "true" ? "" : "-nt";
   const proofs = generateProofs({
-    ontPath, axiom, projPath, sigPath, genMethod, translate2NL
+    ontPath, axiom, projPath, sigPath, genMethod, translate2NL, cdName
   });
 
   printOutput(proofs);
@@ -681,8 +710,30 @@ function prove({ id, req, axiom, projPath, ontology, ontPath } = {}) {
 
   function generateProofs(params) {
 
-    const { ontPath, projPath, genMethod, translate2NL } = params;
+    const { ontPath, projPath, genMethod, translate2NL, cdName } = params;
     let { axiom, sigPath } = params;
+    const constraintsPath = path.join(projPath, constraintsFileName);
+
+    console.log("***" + cdName + "***")
+
+    if(["LinearConstraints", "QGreater"].includes(cdName)){
+      console.log("GENERATION METHOD -> Concrete Domain Proof!");
+
+      return spawn('java', [
+        '-jar', 'externalTools/explain.jar',
+        '--ontology-path', ontPath,
+        '--constraints-path', constraintsPath,
+        '--concrete-domain-name', cdName,
+        '--conclusion-axiom', axiom,
+        '--output-type', 'graph',
+        '--output-label', proofFileName,
+        '--output-directory', projPath,
+        // '--proof-type', proofType, TODO:adapt this once the CD proofs types are supported
+        '--signature-file-path', sigPath,
+        '-no-image',
+        translate2NL
+      ]);
+    }
 
     console.log("GENERATION METHOD -> " + genMethod);
 

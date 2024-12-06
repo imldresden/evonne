@@ -11,8 +11,8 @@
       <label>Reasoner</label>
       <div class="input-wrapper modal-option">
         <select id="diagnosesReasoner" class="browser-default">
-          <option value="elk" selected>Elk</option>
-          <option value="hermit">Hermit</option>
+          <option id=elkOptionDiagnoses selected>Elk</option>
+          <option id=hermitOptionDiagnoses>Hermit</option>
         </select>
       </div>
 

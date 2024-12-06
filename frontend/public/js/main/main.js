@@ -3,6 +3,7 @@ import { init_ontology } from '../ontology/ontology.js';
 import { init_counter } from '../ce/ce.js';
 import { upload } from '../utils/upload-file.js';
 import { init as init_controls, init_resizer } from '../utils/controls.js'
+import {ReasonerName} from "../utils/ReasonerName.js";
 
 let status = {};
 let interval = undefined;
@@ -214,6 +215,11 @@ function init_views(loop = false) {
           const gswh = document.getElementById('general-settings-with-header');
           const svm = document.getElementById('split-view-menu');
 
+          //Set values for the reasoner user for the diagnoses
+          document.getElementById("elkOptionDiagnoses").value = ReasonerName.elk();
+          document.getElementById("hermitOptionDiagnoses").value = ReasonerName.hermit();
+
+
           if (pswh) { pswh.style.display = proof; }
           if (pm) { pm.style.display = proof; }
           if (oswh) { oswh.style.display = ad; }
@@ -310,6 +316,11 @@ function computeAxiomsBtnFunction() {
     : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 
+  if (status.reasoner === ReasonerName.elkCD()){
+    body.append('constraintsFile', status.concreteDomainConstraints)
+    body.append('concreteDomainName', status.concreteDomainName)
+  }
+
   fetch('/explain', {
     method: 'POST',
     body,
@@ -335,14 +346,19 @@ function blockProofMethods(reasoner) {
   if (!reasoner)
     return;
 
-  if (reasoner.toLowerCase() === "hermit") {
-    valuesToBlock = ["1", "2", "3"];
+  if (reasoner === ReasonerName.hermit()) {
+    valuesToBlock = ["1", "2", "3", "13"];
     options[3].selected = true;
   }
 
-  else if (reasoner.toLowerCase() === "elk") {
-    valuesToBlock = ["4", "5", "6", "7", "8", "9", "10", "11", "12"];
+  else if (reasoner === ReasonerName.elk()) {
+    valuesToBlock = ["4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
     options[0].selected = true;
+  }
+
+  else if (reasoner === ReasonerName.elkCD()){
+    valuesToBlock = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+    options[12].selected = true;
   }
 
   for (let i = 0; i < options.length; i++) {

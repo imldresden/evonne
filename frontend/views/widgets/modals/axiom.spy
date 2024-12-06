@@ -47,6 +47,7 @@
             <option value="10">FAME Forgetting-Based Symbol Minimal Proof</option>
             <option value="11">FAME Forgetting-Based Size Minimal Proof</option>
             <option value="12">FAME Forgetting-Based Weighted Size Minimal Proof</option>
+            <option value="13">Size Minimal Combined Proof</option>
           </select>
         </div>
       </div>
