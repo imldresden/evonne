@@ -717,7 +717,8 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
 
     console.log("***" + cdName + "***")
 
-    if(["LinearConstraints", "QGreater"].includes(cdName)){
+    //TODO use consts for the string values of the domains. Use them also in process-data.js, file-upload.spy
+    if(["LinearConstraints", "DifferenceConstraints"].includes(cdName)){
       console.log("GENERATION METHOD -> Concrete Domain Proof!");
 
       return spawn('java', [

@@ -26,7 +26,7 @@
         <div class="input-wrapper modal-option">
           <select id="concreteDomain" class="browser-default">
             <option value="LinearConstraints" selected>Linear Equations</option>
-            <option value="QGreater">Difference Logic</option>
+            <option value="DifferenceConstraints">Difference Logic</option>
           </select>
         </div>
       </div>

@@ -90,11 +90,11 @@ function buildCDRule({ d, data }) {
     let domain = '';
     const CDName = data.querySelector('concreteDomainMap').getAttribute("CDName");
 
-    if (CDName === 'Linear Constraints') {
+    if (CDName === 'LinearConstraints') {
         domain = 'linear'
     }
     
-    if (CDName === 'Difference Constraints') {
+    if (CDName === 'DifferenceConstraints') {
         domain = 'diff'
     }
 
