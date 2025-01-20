@@ -48,7 +48,7 @@ export class DifferenceCD {
         "equal": "=",
         "greaterThan": ">",
         "lessThan": "<",
-        "lessOrEqualThan": "≤",
+        "lessThanOrEqualTo": "≤",
         "greaterOrEqualThan": "≥",
     }
 
@@ -307,7 +307,7 @@ export class DifferenceCD {
                             label: -c, weight: -c, negated
                         } // y−x < −c  ... (x, y) -c 
                     });
-                } else if (p.type === "lessOrEqualThan") { // (-) x <= c (-e) OR x - y <= c (-e)
+                } else if (p.type === "lessThanOrEqualTo") { // (-) x <= c (-e) OR x - y <= c (-e)
                     const klhs = Object.keys(lhs);
                     if (klhs.length === 1) {
                         const x = klhs[0];
