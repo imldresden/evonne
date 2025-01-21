@@ -974,7 +974,7 @@ export class LinearCD {
             d3.selectAll(`#eq-${Array.from(e.detail.ids).join(', #eq-')}`).classed("hl-text", true)
         }
 
-        utils.addTitle("Gaussian Elimination");
+        utils.addTitle("Equations Plot");
 
         const { input, output } = createVisContainer(params, where);
         vars = getVariables(data.ops[data.current]).sort();
