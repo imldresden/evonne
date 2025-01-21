@@ -272,6 +272,10 @@ class RulesHelper {
     }
 
     openExplanation(_params, nodes) {
+        if (!proof.showPopover) {
+            return;
+        }
+        
         if (_params.event.ctrlKey && proof.compactInteraction) {
 			nodes[0].children = nodes[0]._children; // expand rule
             nodes[0].children?.forEach(c => {

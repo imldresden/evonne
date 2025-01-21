@@ -457,6 +457,8 @@ function init() {
     layoutToggleBtn.checked = proof.isLinear || false;
     planarToggleBtn.checked = proof.linear.isBreadthFirst || false;
     showRulesBtn.checked = proof.showRules || false;
+    showSubProofsBtn.checked = proof.showSubProofs || false;
+
     getPlanarWrapper() ? getPlanarWrapper().style.display = "none" : "";
 
     shorteningMethodSelection.value = globals.shorteningMethod;
