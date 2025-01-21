@@ -316,8 +316,14 @@ app.get('/create', (req, res) => {
   if (!existsSync(dest)) {
     mkdirSync(dest);
   } else {
-    res.status(400).send('Project already exists.');
-    return;
+    
+    readdirSync(dest).forEach(function (file) {
+      removeFile(path.join(dest, file));
+    });
+
+    // TODO: commented only for the study! Remove the `removeFile` above and uncomment the next lines afterwards 
+    //res.status(400).send('Project already exists.');
+    //return;
   }
 
   try {
