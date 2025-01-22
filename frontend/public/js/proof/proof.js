@@ -66,7 +66,7 @@ const conf = {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
 
     const url = new URL(window.location.toLocaleString()).searchParams;
-    if (url.get("cond") === "sp-no") {
+    if (url.get("cond") === "sp") {
       proof.showSubProofs = true;
       proof.showPopover = false;
     }
