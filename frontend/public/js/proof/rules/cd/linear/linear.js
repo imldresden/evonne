@@ -22,6 +22,7 @@ const tip = {
 
 const premiseColor = '#80cbc4';
 const conclusionColor = '#b89aef';
+const unsatColor = '#F78C85';
 const plot = 'cd-linear-plot';
 const eval_tolerance = 0.001;
 const dims = 500;
@@ -96,7 +97,7 @@ function solve(data) {
             });
 
             if (!hasSolution) {
-                return { type: 'no solution', state: matrix, free: 0 };
+                return { type: 'no solution', state: matrix, free: numCols - 2 };
             }
             if (free > 0) {
                 return { type: 'infinite solutions', state: matrix, free };
@@ -235,9 +236,8 @@ function visByType(solution) {
             break;
         case 'no solution':
             question.setAttribute("data-tooltip", 
-                `The premise equation system has no solution, meaning that <br>
-                at least two lines do not intersect as they don't share their <br>
-                solution space.`
+                `The premise equation system has no solution, so the plot will show <br>
+                either parallel lines or a variable taking more than one value.`
             );
             visualizeNoSolutions(plot, solution);
             break;
@@ -391,8 +391,15 @@ function getFreeVariables(data) {
         }
     }
     
-    if (free.length === 0 || data.type === 'no solution') {
+    if (free.length === 0) {
         free = vars.slice(vars.length -(numberFree));
+    }
+
+    
+    if (data.type === 'no solution') {
+        const select1 = document.querySelector(`#var1`).value;
+        const select2 = document.querySelector(`#var2`).value;
+        free = vars.filter(v => v !== select1 && v !== select2);
     }
 
     return { dependent, free }
@@ -492,7 +499,7 @@ function visualizeEquations(plot, _data, annotate = true) {
     ] : [];
 
     const data = [];
-    let simplified = false; // plot 2D solution + true: all equations, false: only conclusion
+    let simplified = false; // plot 2D solution + true: only conclusion, false: all equations
     let skips = 0;
     for (let i = 0; i < matrix.length; i++) {
         const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
@@ -588,71 +595,124 @@ function visualizeEquations(plot, _data, annotate = true) {
 }
 
 function visualizeNoSolutions(plot, _data) {
-    visualizeEquations(plot, _data, false);    
+    //visualizeEquations(plot, _data, false);
+    const matrix = _data.matrix;
+    const { free } = getFreeVariables(_data);
+    const independent = {};
+    
+    free.forEach(varName => {
+        const slider = document.getElementById(`slider-${varName}`);
+        independent[varName] = parseFloat(slider.value);
+    });
+
+    document.getElementById(plot).innerHTML = '';
+
+    const select1 = document.querySelector(`#var1`);
+    const select2 = document.querySelector(`#var2`);
+
+    const x = { varName: select1.value, fn: independent[select1.value]};
+    const y = { varName: select2.value, fn: independent[select2.value] };
+
+    const annotations = [];
+
+    const data = [];
+    let simplified = false; // plot 2D solution + true: only conclusion, false: all equations
+    let skips = 0;
+    for (let i = 0; i < matrix.length; i++) {
+        const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
+        const color = unsatColor;
+
+        if (simplified && i !== matrix.length - 1) {
+            continue; // only plots 2D solution + conclusion equation
+        }
+
+        const row = matrix[i];
+        const dependentCoef = row[vars.indexOf(y.varName)];
+        const independentCoef = row[vars.indexOf(x.varName)];
+        const constantTerm = row[row.length - 1];
+        let replacedSum = 0;
+
+        // Construct the equation for the dependent variable (y)
+        row.slice(0, -1).forEach((coef, idx) => {
+            if (!Fraction(coef).equals(0)) {
+                let currentVar = vars[idx];
+                let value = undefined;
+
+                if (currentVar !== x.varName && currentVar !== y.varName) { // already in independentCoef and dependentCoef, respectively 
+                    value = independent[currentVar]; 
+                    replacedSum = Fraction(replacedSum).add(Fraction(coef).mul(Fraction(value)));
+                }
+            }
+        });
+
+        // build the function string for plotter
+        const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / (${f(dependentCoef)})`;
+
+        if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
+            if (!Fraction(independentCoef).equals(0)) {
+                // solve for x because y is canceled (0f(x)): x = (c - sum)/A 
+                
+                const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
+                annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
+                const ind = annotations.length-1;
+                hl[id] = { 
+                    svg: () => document.querySelectorAll(`#${plot} .annotations path`)[ind], 
+                    evaluate: point => 
+                        Fraction(v).gt(Fraction(point.x - eval_tolerance)) && 
+                        Fraction(v).lt(Fraction(point.x + eval_tolerance)),
+                    color
+                };
+            } else {
+                //console.log(equation)
+                //console.log('both of the selected variables canceled');
+            }
+            skips += 1;
+        } else {
+            data.push({ fn: equation, color, updateOnMouseMove: false, graphType: 'polyline' });
+            const ind = i - skips;
+            hl[id] = { 
+                color,
+                svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, ind)], 
+                evaluate: (point) => {
+                    const p = Fraction(independentCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
+                    const s = Fraction(constantTerm).sub(p);
+                    const d = s.div(Fraction(dependentCoef));
+                    return d.gt(Fraction(point.y - eval_tolerance)) && d.lt(Fraction(point.y + eval_tolerance));
+                } 
+            };
+        }
+    }
+
+    // Use function-plot to draw the plot
+    const p = functionPlot({
+        tip,
+        target: `#${plot}`,
+        width: dims,
+        height: dims,
+        xAxis: { label: `${x.varName}-axis`, domain: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10] }, // center plot on the intersection point
+        yAxis: { label: `${y.varName}-axis`, domain: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10] },
+        grid: false,
+        data,
+        annotations
+    });
+
+    document.querySelector('.function-plot .zoom-and-drag').onmouseout = () => d3.selectAll(".text-eq").classed("hl-text", false);
+
+    annotations.forEach((a, i) => {
+        if (a.color) {
+            document.querySelectorAll(`#${plot} .annotations path`)[i].style.stroke = a.color;
+        }
+    });
+
+    return { plot: p, hl };
 }
 
 function getRelevantVariables(data) {
     if (data.type !== 'no solution') {
         // if there is/are solution(s), we only care about the variables in the conclusion. 
         return vars.filter((_, i) => !Fraction(data.matrix[data.matrix.length - 1][i]).equals(0));
-    } else {
-        const parallel = [];
-        for (let i = 0; i < data.echelon.length - 1; i++) { // don't include conclusion, which we know is zeroes
-            const constant = data.matrix[i][data.matrix[i].length-1]; // console.log(`comparing eq ${i}: ${data.matrix[i].map(v => f(v)).join(" + ")}`);
-            
-            for (let j = i + 1; j <= data.echelon.length - 1; j++) { 
-                const compare = data.matrix[j][data.matrix[j].length-1]; // console.log(`to eq ${j}: ${data.matrix[j].map(v => f(v)).join(" + ")}`);
-
-                let matches = [];
-                if (!Fraction(constant).equals(Fraction(compare))) { // e.g. x + y = 2; x + y = 3
-                    // check if coeficients are the same
-                    matches = Object.keys(data.matrix[i]).slice(0, -1).filter((ind, k) => { 
-                        const v = Fraction(data.matrix[i][ind]);
-                        const w = Fraction(data.matrix[j][k]);
-
-                        if (v.equals(0) || w.equals(0)) { 
-                            return false; // variable gets cancelled out
-                        } else {
-                            return v.equals(w);
-                        }
-                    });
-                } else { // e.g., x + y = 2; 2x + 2y = 2
-                    // check if coefficients are multiples of each other
-                    matches = Object.keys(data.matrix[i]).slice(0, -1).filter((ind, k) => { 
-                        const v = Fraction(data.matrix[i][ind]);
-                        const w = Fraction(data.matrix[j][k]);
-                        
-                        if (v.equals(0) || w.equals(0)) { 
-                            return false; // variable gets cancelled out
-                        } else {
-                            return w.div(v).equals(w);
-                        }
-                    });
-                }
-
-                // at least a pair of variables has:
-                // a) equal coefficients with different constant OR 
-                // b) coef multiple of each other with same constant
-
-                if (matches.length >= 2) { 
-                    parallel.push({ eq1: i, eq2: j, vars: matches.map(ind => vars[ind])});
-                }
-            }
-        }
-
-        if (parallel.length === 0) {
-            console.error('could not identify parallel lines despite there not being a solution');
-            return vars; 
-        } else {
-            return parallel.sort((a, b) => { 
-                if (a.vars.length === b.vars.length) {
-                    return 0;
-                } else {
-                    return a.vars.length < b.vars.length ? 1 : -1;
-                }
-            })[0].vars;
-        }
-    }
+    } 
+    return vars;
 } 
 
 export class LinearCD {
@@ -672,7 +732,7 @@ export class LinearCD {
             select1.innerHTML = '';
             select2.innerHTML = '';
             
-            const rVars = getRelevantVariables(data)
+            const rVars = getRelevantVariables(data);
             rVars.forEach(varName => {
                 const opt1 = new Option(varName, varName);
                 const opt2 = new Option(varName, varName);
@@ -702,6 +762,9 @@ export class LinearCD {
                 });
 
                 const solution = solve(struct);
+                if (solution.type === 'no solution') {
+                    createSliders(solution);
+                }
                 visByType(solution);
             }
 
@@ -715,7 +778,7 @@ export class LinearCD {
 
             frees = [];
             const freeVarsContainer = document.getElementById(`slidersContainer`);
-            freeVarsContainer.innerHTML = '<div>Free Variables:</div>';
+            freeVarsContainer.innerHTML = data.type === 'no solution' ? '<div>Other Variables:</div>' : '<div>Free Variables:</div>';
             freeVarsContainer.style = 'display:grid';
 
             const sliders = {};
@@ -737,14 +800,22 @@ export class LinearCD {
                     slider.min = '-100';
                     slider.max = '100';
                     slider.value = '0'; // Default value
-                    slider.step = '0.1';
+                    slider.step = '0.001';
                     slider.id = `slider-${varName}`;
 
                     const label = document.createElement('label');
                     label.id = `label-${varName}`;
                     label.htmlFor = slider.id;
-                    label.style = "display:block;float:right;"
+                    label.style = "display:block;float:right;width:150px"
                     label.textContent = `${varName}: 0`;
+                    label.addEventListener("dblclick", () => {
+                        console.log(slider.type)
+                        if (slider.type === 'text') {
+                            slider.type = 'range';
+                        } else {
+                            slider.type = 'text';
+                        }
+                    });
 
                     const sliderContainer = document.createElement('div');
                     sliderContainer.style = "display:inline-block;width:200px";
