@@ -41,7 +41,7 @@ window.onload = function () {
 
         project.innerHTML = proj;
         project.onclick = () => {
-          window.location.replace("/?id=" + proj);
+          window.location.replace("/proof?id=" + proj); // TODO only for study, remove `proof`
         }
 
         projects.appendChild(project);

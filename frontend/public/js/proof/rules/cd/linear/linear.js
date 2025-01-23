@@ -294,8 +294,9 @@ function visualizeUniqueSolution(plot, _data) {
                 const v = Fraction(row[row.length - 1]).sub(Fraction(constantTerm)).div(Fraction(independentTerm));
                 // f(v) === f(solutions[independentIndex]), could use either
                 annotations.push({ x: eval(f(v)), color });
+                const ind = annotations.length-1
                 hl[id] = { 
-                    svg: () => document.querySelectorAll(`#${plot} .annotations path`)[annotations.length-1], 
+                    svg: () => document.querySelectorAll(`#${plot} .annotations path`)[ind], 
                     evaluate: point => 
                         Fraction(v).gt(Fraction(point.x - eval_tolerance)) && 
                         Fraction(v).lt(Fraction(point.x + eval_tolerance)),
@@ -533,8 +534,9 @@ function visualizeEquations(plot, _data, annotate = true) {
                 
                 const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
                 annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
+                const ind = annotations.length-1;
                 hl[id] = { 
-                    svg: () => document.querySelectorAll(`#${plot} .annotations path`)[annotations.length-1], 
+                    svg: () => document.querySelectorAll(`#${plot} .annotations path`)[ind], 
                     evaluate: point => 
                         Fraction(v).gt(Fraction(point.x - eval_tolerance)) && 
                         Fraction(v).lt(Fraction(point.x + eval_tolerance)),

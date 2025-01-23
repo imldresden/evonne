@@ -66,7 +66,7 @@ const conf = {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
 
     const url = new URL(window.location.toLocaleString()).searchParams;
-    if (url.get("cond") === "sp") {
+    if (url.get("cond") === "sp") { // TODO remove this, and extra extract-examples in package.json
       proof.showSubProofs = true;
       proof.showPopover = false;
     }
