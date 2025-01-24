@@ -615,6 +615,7 @@ function visualizeNoSolutions(plot, _data) {
     const data = [];
     let skips = 0;
     for (let i = 0; i < matrix.length - 1; i++) {
+        document.getElementById(`evEq-${i}`).className = "";
         const id = struct.premises[i].id;
         const color = unsatColor;
         const row = matrix[i];
