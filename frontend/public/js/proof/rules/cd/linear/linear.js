@@ -510,8 +510,8 @@ function visualizeEquations(plot, _data, annotate = true) {
         }
 
         const row = matrix[i];
-        const dependentCoef = row[vars.indexOf(y.varName)];
-        const independentCoef = row[vars.indexOf(x.varName)];
+        const yCoef = row[vars.indexOf(y.varName)];
+        const xCoef = row[vars.indexOf(x.varName)];
         const constantTerm = row[row.length - 1];
         let replacedSum = 0;
 
@@ -521,7 +521,7 @@ function visualizeEquations(plot, _data, annotate = true) {
                 let currentVar = vars[idx];
                 let value = undefined;
 
-                if (currentVar !== x.varName && currentVar !== y.varName) { // already in independentCoef and dependentCoef, respectively 
+                if (currentVar !== x.varName && currentVar !== y.varName) { // already in xCoef and yCoef 
                     if (independent[currentVar] !== undefined) {
                         value = independent[currentVar];
                     } else {
@@ -533,13 +533,13 @@ function visualizeEquations(plot, _data, annotate = true) {
         });
 
         // build the function string for plotter
-        const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / (${f(dependentCoef)})`;
+        const equation = `(${f(constantTerm)} - (${f(xCoef)}x + ${f(replacedSum)})) / (${f(yCoef)})`;
 
-        if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
-            if (!Fraction(independentCoef).equals(0)) {
+        if (Fraction(yCoef).equals(0)) { // can't be expressed as f(x), must use annotation
+            if (!Fraction(xCoef).equals(0)) {
                 // solve for x because y is canceled (0f(x)): x = (c - sum)/A 
                 
-                const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
+                const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(xCoef));
                 annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
                 const ind = annotations.length-1;
                 hl[id] = { 
@@ -561,9 +561,9 @@ function visualizeEquations(plot, _data, annotate = true) {
                 color,
                 svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, ind)], 
                 evaluate: (point) => {
-                    const p = Fraction(independentCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
+                    const p = Fraction(xCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
                     const s = Fraction(constantTerm).sub(p);
-                    const d = s.div(Fraction(dependentCoef));
+                    const d = s.div(Fraction(yCoef));
                     return d.gt(Fraction(point.y - eval_tolerance)) && d.lt(Fraction(point.y + eval_tolerance));
                 } 
             };
@@ -595,7 +595,6 @@ function visualizeEquations(plot, _data, annotate = true) {
 }
 
 function visualizeNoSolutions(plot, _data) {
-    //visualizeEquations(plot, _data, false);
     const matrix = _data.matrix;
     const { free } = getFreeVariables(_data);
     const independent = {};
@@ -609,26 +608,18 @@ function visualizeNoSolutions(plot, _data) {
 
     const select1 = document.querySelector(`#var1`);
     const select2 = document.querySelector(`#var2`);
-
-    const x = { varName: select1.value, fn: independent[select1.value]};
+    const x = { varName: select1.value, fn: independent[select1.value] };
     const y = { varName: select2.value, fn: independent[select2.value] };
-
     const annotations = [];
 
     const data = [];
-    let simplified = false; // plot 2D solution + true: only conclusion, false: all equations
     let skips = 0;
-    for (let i = 0; i < matrix.length; i++) {
-        const id = i !== matrix.length - 1 ? struct.premises[i].id : struct.conclusion.id;
+    for (let i = 0; i < matrix.length - 1; i++) {
+        const id = struct.premises[i].id;
         const color = unsatColor;
-
-        if (simplified && i !== matrix.length - 1) {
-            continue; // only plots 2D solution + conclusion equation
-        }
-
         const row = matrix[i];
-        const dependentCoef = row[vars.indexOf(y.varName)];
-        const independentCoef = row[vars.indexOf(x.varName)];
+        const yCoef = row[vars.indexOf(y.varName)];
+        const xCoef = row[vars.indexOf(x.varName)];
         const constantTerm = row[row.length - 1];
         let replacedSum = 0;
 
@@ -638,21 +629,34 @@ function visualizeNoSolutions(plot, _data) {
                 let currentVar = vars[idx];
                 let value = undefined;
 
-                if (currentVar !== x.varName && currentVar !== y.varName) { // already in independentCoef and dependentCoef, respectively 
+                if (currentVar !== x.varName && currentVar !== y.varName) { // already in xCoef and yCoef
                     value = independent[currentVar]; 
                     replacedSum = Fraction(replacedSum).add(Fraction(coef).mul(Fraction(value)));
                 }
             }
         });
 
-        // build the function string for plotter
-        const equation = `(${f(constantTerm)} - (${f(independentCoef)}x + ${f(replacedSum)})) / (${f(dependentCoef)})`;
+        let evaluated = `${f(replacedSum)} = ${f(row[row.length-1])}`;
 
-        if (Fraction(dependentCoef).equals(0)) { // can't be expressed as f(x), must use annotation
-            if (!Fraction(independentCoef).equals(0)) {
+        // build the function string for plotter
+        const equation = `(${f(constantTerm)} - (${f(xCoef)}x + ${f(replacedSum)})) / (${f(yCoef)})`;
+        
+        if (!Fraction(yCoef).equals(0)) {
+            evaluated = `${f(yCoef)}${y.varName} + ` + evaluated;
+        }
+
+        if (!Fraction(xCoef).equals(0)) {
+            evaluated = `${f(xCoef)}${x.varName} + ` + evaluated;
+        }
+
+        document.getElementById(`evEq-${i}`).innerHTML = evaluated;
+
+        if (Fraction(yCoef).equals(0)) { // can't be expressed as f(x), must use annotation
+            if (!Fraction(xCoef).equals(0)) {
+                
                 // solve for x because y is canceled (0f(x)): x = (c - sum)/A 
                 
-                const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(independentCoef));
+                const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(xCoef));
                 annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
                 const ind = annotations.length-1;
                 hl[id] = { 
@@ -663,8 +667,9 @@ function visualizeNoSolutions(plot, _data) {
                     color
                 };
             } else {
-                //console.log(equation)
-                //console.log('both of the selected variables canceled');
+                if (!Fraction(replacedSum).equals(Fraction(row[row.length-1]))) {
+                    document.getElementById(`evEq-${i}`).className = "text-red";
+                }
             }
             skips += 1;
         } else {
@@ -674,9 +679,9 @@ function visualizeNoSolutions(plot, _data) {
                 color,
                 svg: () => document.querySelectorAll(`#${plot} .graph path.line`)[Math.max(0, ind)], 
                 evaluate: (point) => {
-                    const p = Fraction(independentCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
+                    const p = Fraction(xCoef).mul(Fraction(point.x)).add(Fraction(replacedSum));
                     const s = Fraction(constantTerm).sub(p);
-                    const d = s.div(Fraction(dependentCoef));
+                    const d = s.div(Fraction(yCoef));
                     return d.gt(Fraction(point.y - eval_tolerance)) && d.lt(Fraction(point.y + eval_tolerance));
                 } 
             };
@@ -787,13 +792,6 @@ export class LinearCD {
             
             free.forEach((varName, i) => {
                 if (sliders[varName] === undefined) {
-                    // create select to replace free variable
-                    const select = document.createElement('select');
-                    select.id = `select-free-${i}`;
-                    select.style = "display:block;";
-                    vars.forEach(v => select.add(new Option(v, v)));
-                    select.value = varName;
-
                     // create slider to specify free variable value
                     const slider = document.createElement('input');
                     slider.type = 'range';
@@ -806,10 +804,9 @@ export class LinearCD {
                     const label = document.createElement('label');
                     label.id = `label-${varName}`;
                     label.htmlFor = slider.id;
-                    label.style = "display:block;float:right;width:150px"
+                    label.style = "display:block;margin-left:10px;min-width:150px"
                     label.textContent = `${varName}: 0`;
                     label.addEventListener("dblclick", () => {
-                        console.log(slider.type)
                         if (slider.type === 'text') {
                             slider.type = 'range';
                         } else {
@@ -825,29 +822,40 @@ export class LinearCD {
                     // add to controls 
                     const varContainer = document.createElement('div');
                     varContainer.style = "display: inline-flex";
-                    varContainer.appendChild(select);
+
+                    if (data.type !== 'no solution') {
+                        // create select to replace free variable
+                        const select = document.createElement('select');
+                        select.id = `select-free-${i}`;
+                        select.style = "display:block;";
+                        vars.forEach(v => select.add(new Option(v, v)));
+                        select.value = varName;
+                        
+                        select.onchange = (d) => {
+                            const idx = +d.target.id.split('select-free-')[1];
+                            const previous = frees[idx]
+
+                            for (let i = 0; i < frees.length; i++) {
+                                if (frees[i] === d.target.value && i !== idx) {
+                                    frees[i] = previous;
+                                }
+                            }
+
+                            frees[idx] = d.target.value;
+                            const comp = vars.filter(v => !frees.includes(v));
+                            vars = [...comp, ...frees];
+                            const solution = solve(struct);
+                            createSliders(solution);
+                            visByType(solution);
+                        }
+
+                        varContainer.appendChild(select);
+                    }
+                    
                     varContainer.appendChild(sliderContainer);
                     freeVarsContainer.appendChild(varContainer);
 
                     // interaction 
-                    select.onchange = (d) => {
-                        const idx = +d.target.id.split('select-free-')[1];
-                        const previous = frees[idx]
-
-                        for (let i = 0; i < frees.length; i++) {
-                            if (frees[i] === d.target.value && i !== idx) {
-                                frees[i] = previous;
-                            }
-                        }
-
-                        frees[idx] = d.target.value;
-                        const comp = vars.filter(v => !frees.includes(v));
-                        vars = [...comp, ...frees];
-                        const solution = solve(struct);
-                        createSliders(solution);
-                        visByType(solution);
-                    }
-
                     slider.oninput = () => {
                         sliders[varName] = Fraction(slider.value);
                         label.textContent = `${varName}: ${slider.value}`;
@@ -1042,6 +1050,13 @@ export class LinearCD {
             });
         }
 
+        function displayEvaluatedEquations(plot, struct) {
+            struct.premises.forEach((v, i) => {
+                output.append("span").attr("id", `evEq-${i}`).attr("class", "text-eq premise")
+                output.append("br");
+            });
+        }
+
         function highlightText(e) {
             d3.selectAll(".text-eq").classed("hl-text", false);
             d3.selectAll(`#eq-${Array.from(e.detail.ids).join(', #eq-')}`).classed("hl-text", true)
@@ -1064,6 +1079,8 @@ export class LinearCD {
             this.createPlotControls(solutions);
             if (solutions.type !== 'no solution') {
                 displaySolution(plot, solutions.solutions);
+            } else {
+                displayEvaluatedEquations(plot, struct)
             }
             vis(plot, solutions);
 
