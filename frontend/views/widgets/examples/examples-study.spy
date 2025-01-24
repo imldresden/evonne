@@ -6,9 +6,15 @@
         2. Difference Equations - Unsatisfiable
     </div>
     <div onclick="loadExample('linear-inf', 'linear-inf')" class="collection-item">
-        3. Linear Equations - Infinite Solutions
+        3. Linear Equations - Infinite Solutions (1)
     </div>
     <div onclick="loadExample('linear-unsat', 'linear-unsat')" class="collection-item">
-        4. Linear Equations - No solution 
+        4. Linear Equations - No solution (1)
+    </div>
+    <div onclick="loadExample('linear-inf', 'linear-inf-2')" class="collection-item">
+        5. Linear Equations - Infinite Solutions (2)
+    </div>
+    <div onclick="loadExample('linear-unsat', 'linear-unsat-2')" class="collection-item">
+        6. Linear Equations - No solution (2)
     </div>
 </div>
