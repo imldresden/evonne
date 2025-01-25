@@ -32,7 +32,7 @@ let vars = []; // list of variables. The order of this list determines the order
 let frees = []; // the indices of this list correspond to the ids of the dropdowns to select free variables
 let hl = {}; // correspondence between equation ids from `struct` and the plotter line (svg) that should be altered when highlighting occurs
 let fnPlot; // the function-plot vis object that is initialized by all solution types
-let solBkp; // copy of the solution in the plot
+let solObj; // copy of the solution in the plot
 
 // gaussian elimination using Fraction.js
 function solve(data) {
@@ -800,12 +800,11 @@ export class LinearCD {
                     }
                 });
 
-                const solution = solve(struct);
-                solBkp = solution;
-                if (solution.type === 'no solution') {
-                    createSliders(solution);
+                solObj = solve(struct);
+                if (solObj.type === 'no solution') {
+                    createSliders(solObj);
                 }
-                visByType(solution);
+                visByType(solObj);
             }
 
             select1.onchange = update;
@@ -879,10 +878,9 @@ export class LinearCD {
                             frees[idx] = d.target.value;
                             const comp = vars.filter(v => !frees.includes(v));
                             vars = [...comp, ...frees];
-                            const solution = solve(struct);
-                            solBkp = solution;
-                            createSliders(solution);
-                            visByType(solution);
+                            solObj = solve(struct);
+                            createSliders(solObj);
+                            visByType(solObj);
                         }
 
                         varContainer.appendChild(select);
@@ -1127,16 +1125,14 @@ export class LinearCD {
 
             struct = structuredClone(data.ops[data.current]);
             hl = {};
-            const solutions = solve(struct);
-            solBkp = solutions;
-
-            this.createPlotControls(solutions);
-            if (solutions.type !== 'no solution') {
-                displaySolution(plot, solutions.solutions);
+            solObj = solve(struct);
+            this.createPlotControls(solObj);
+            if (solObj.type !== 'no solution') {
+                displaySolution(plot, solObj.solutions);
             } else {
                 displayEvaluatedEquations(plot, struct)
             }
-            vis(plot, solutions);
+            vis(plot, solObj);
 
             document.removeEventListener('cd-l-hl', highlightText);
             document.addEventListener('cd-l-hl', highlightText);
