@@ -359,6 +359,10 @@ input[type="range"]::-ms-thumb {
 	background: var(--color-primary);
 	box-shadow: none !important;
 }
+input[type="checkbox"].filled-in:checked + span:not(.lever):after {
+	background: var(--color-primary);
+	border-color: var(--color-primary);
+}
 input[type="range"] + .thumb {
 	display: none;
 }

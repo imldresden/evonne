@@ -31,6 +31,8 @@ let struct = {}; // copy of the node/subproof data
 let vars = []; // list of variables. The order of this list determines the order of the solutions, which allows us to "target" which variables will be free in case of infinite solutions.
 let frees = []; // the indices of this list correspond to the ids of the dropdowns to select free variables
 let hl = {}; // correspondence between equation ids from `struct` and the plotter line (svg) that should be altered when highlighting occurs
+let fnPlot; // the function-plot vis object that is initialized by all solution types
+let solBkp; // copy of the solution in the plot
 
 // gaussian elimination using Fraction.js
 function solve(data) {
@@ -207,7 +209,7 @@ function vis(plot, solution) {
     return visByType(solution);
 }
 
-function visByType(solution) {
+function visByType(solution, domains = false) {
     hl = {};
     const header = document.getElementById('ruleName');
     document.getElementById('question')?.remove();
@@ -232,14 +234,15 @@ function visByType(solution) {
                 the solution of the premise equation system. <br>
                 This holds regardless of which variables are selected as free.`
             );
-            visualizeEquations(plot, solution);
+            visualizeEquations(plot, solution, domains);
             break;
         case 'no solution':
             question.setAttribute("data-tooltip", 
-                `The premise equation system has no solution, so the plot will show <br>
-                either parallel lines or a variable taking more than one value.`
+                `The premise equation system has no solution, so the lines in the plot <br>
+                either don't all intersect in the same point, or an equation will show <br> 
+                a false equivalence (i.e., number = other number).`
             );
-            visualizeNoSolutions(plot, solution);
+            visualizeNoSolutions(plot, solution, domains);
             break;
     }
     
@@ -345,14 +348,18 @@ function visualizeUniqueSolution(plot, _data) {
         color: 'black'
     });
 
+    // center plot on the intersection point
+    const xDomain = [solutions[independentIndex] - 10, solutions[independentIndex] + 10];
+    const yDomain = [solutions[dependentIndex] - 10, solutions[dependentIndex] + 10];
+    
     // Use function-plot to draw the plot
     const p = functionPlot({
         tip,
         target: `#${plot}`,
         width: dims,
         height: dims,
-        xAxis: { label: `${select1}-axis`, domain: [solutions[independentIndex] - 10, solutions[independentIndex] + 10] },
-        yAxis: { label: `${select2}-axis`, domain: [solutions[dependentIndex] - 10, solutions[dependentIndex] + 10] },
+        xAxis: { label: `${select1}-axis`, domain: xDomain },
+        yAxis: { label: `${select2}-axis`, domain: yDomain },
         grid: false,
         data,
         annotations
@@ -365,7 +372,7 @@ function visualizeUniqueSolution(plot, _data) {
         }
     });
 
-    return { plot: p, hl };
+    fnPlot = { plot: p, hl };
 }
 
 function getFreeVariables(data) {
@@ -405,7 +412,7 @@ function getFreeVariables(data) {
     return { dependent, free }
 }
 
-function visualizeEquations(plot, _data, annotate = true) {
+function visualizeEquations(plot, _data, domains = false) {
     const matrix = _data.matrix;
     const { dependent, free } = getFreeVariables(_data);
     const solutions = _data.solutions;
@@ -493,10 +500,10 @@ function visualizeEquations(plot, _data, annotate = true) {
     const x = { varName: select1.value, fn: dependentValues[select1.value] || independent[select1.value]};
     const y = { varName: select2.value, fn: dependentValues[select2.value] || independent[select2.value] };
 
-    const annotations = annotate ? [
+    const annotations = [
         { x: eval(f(x.fn)), text: `${x.varName} = ${f(x.fn)}` },
         { y: eval(f(y.fn)), text: `${y.varName} = ${f(y.fn)}` }
-    ] : [];
+    ];
 
     const data = [];
     let simplified = false; // plot 2D solution + true: only conclusion, false: all equations
@@ -570,19 +577,36 @@ function visualizeEquations(plot, _data, annotate = true) {
         }
     }
 
+    // center plot on the intersection point
+    const doms = { 
+        x: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10], 
+        y: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10]
+    }
+
+    let xDomain = doms.x;
+    let yDomain = doms.y;
+    
+    if (domains && !document.getElementById('center-at-sol').checked) {
+        xDomain = fnPlot.plot.meta.xScale.domain(); 
+        yDomain = fnPlot.plot.meta.yScale.domain(); 
+    }
+
     // Use function-plot to draw the plot
-    const p = functionPlot({
+    const params = {
         tip,
         target: `#${plot}`,
         width: dims,
         height: dims,
-        xAxis: { label: `${x.varName}-axis`, domain: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10] }, // center plot on the intersection point
-        yAxis: { label: `${y.varName}-axis`, domain: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10] },
+        xAxis: { label: `${x.varName}-axis`, domain: xDomain }, 
+        yAxis: { label: `${y.varName}-axis`, domain: yDomain },
         grid: false,
         data,
-        annotations
-    });
+        annotations, 
+        doms
+    };
 
+    document.getElementById(`center-ctrl`).style = 'display:grid';
+    const p = functionPlot(params);
     document.querySelector('.function-plot .zoom-and-drag').onmouseout = () => d3.selectAll(".text-eq").classed("hl-text", false);
 
     annotations.forEach((a, i) => {
@@ -591,10 +615,10 @@ function visualizeEquations(plot, _data, annotate = true) {
         }
     });
 
-    return { plot: p, hl };
+    fnPlot = { plot: p, hl, params };
 }
 
-function visualizeNoSolutions(plot, _data) {
+function visualizeNoSolutions(plot, _data, domains) {
     const matrix = _data.matrix;
     const { free } = getFreeVariables(_data);
     const independent = {};
@@ -689,18 +713,34 @@ function visualizeNoSolutions(plot, _data) {
         }
     }
 
+    // center plot on the intersection point
+    const doms = { 
+        x: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10], 
+        y: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10]
+    }
+
+    let xDomain = doms.x;
+    let yDomain = doms.y;
+    
+    if (domains) {
+        xDomain = fnPlot.plot.meta.xScale.domain(); 
+        yDomain = fnPlot.plot.meta.yScale.domain(); 
+    }
+
     // Use function-plot to draw the plot
-    const p = functionPlot({
+    const params = {
         tip,
         target: `#${plot}`,
         width: dims,
         height: dims,
-        xAxis: { label: `${x.varName}-axis`, domain: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10] }, // center plot on the intersection point
-        yAxis: { label: `${y.varName}-axis`, domain: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10] },
+        xAxis: { label: `${x.varName}-axis`, domain: xDomain }, 
+        yAxis: { label: `${y.varName}-axis`, domain: yDomain },
         grid: false,
         data,
-        annotations
-    });
+        annotations, 
+        doms
+    }
+    const p = functionPlot(params);
 
     document.querySelector('.function-plot .zoom-and-drag').onmouseout = () => d3.selectAll(".text-eq").classed("hl-text", false);
 
@@ -710,7 +750,7 @@ function visualizeNoSolutions(plot, _data) {
         }
     });
 
-    return { plot: p, hl };
+    fnPlot = { plot: p, hl, params };
 }
 
 function getRelevantVariables(data) {
@@ -726,13 +766,6 @@ export class LinearCD {
 
     createPlotControls(data) {
         function generateVariableSelectors(data) {
-            const controls = document.querySelector(`#linear-vis-controls`);
-            controls.style = `display:inline-block;
-                min-width:250px;
-                padding-left:25px;
-                padding-right:25px;
-                max-height:${dims}px;
-                overflow-y:auto`;
             const select1 = document.querySelector(`#var1`);
             const select2 = document.querySelector(`#var2`);
             select1.innerHTML = '';
@@ -768,6 +801,7 @@ export class LinearCD {
                 });
 
                 const solution = solve(struct);
+                solBkp = solution;
                 if (solution.type === 'no solution') {
                     createSliders(solution);
                 }
@@ -776,7 +810,6 @@ export class LinearCD {
 
             select1.onchange = update;
             select2.onchange = update;
-        
         }
 
         function createSliders(data) {
@@ -784,7 +817,7 @@ export class LinearCD {
 
             frees = [];
             const freeVarsContainer = document.getElementById(`slidersContainer`);
-            freeVarsContainer.innerHTML = data.type === 'no solution' ? '<div>Other Variables:</div>' : '<div>Free Variables:</div>';
+            freeVarsContainer.innerHTML = '<div>Other Variables:</div>';
             freeVarsContainer.style = 'display:grid';
 
             const sliders = {};
@@ -825,6 +858,7 @@ export class LinearCD {
                     varContainer.style = "display: inline-flex";
 
                     if (data.type !== 'no solution') {
+                        freeVarsContainer.innerHTML = '<div>Free Variables:</div>';
                         // create select to replace free variable
                         const select = document.createElement('select');
                         select.id = `select-free-${i}`;
@@ -834,7 +868,7 @@ export class LinearCD {
                         
                         select.onchange = (d) => {
                             const idx = +d.target.id.split('select-free-')[1];
-                            const previous = frees[idx]
+                            const previous = frees[idx];
 
                             for (let i = 0; i < frees.length; i++) {
                                 if (frees[i] === d.target.value && i !== idx) {
@@ -846,6 +880,7 @@ export class LinearCD {
                             const comp = vars.filter(v => !frees.includes(v));
                             vars = [...comp, ...frees];
                             const solution = solve(struct);
+                            solBkp = solution;
                             createSliders(solution);
                             visByType(solution);
                         }
@@ -860,7 +895,8 @@ export class LinearCD {
                     slider.oninput = () => {
                         sliders[varName] = Fraction(slider.value);
                         label.textContent = `${varName}: ${slider.value}`;
-                        visByType(data);
+                        
+                        visByType(data, true);
                     };
 
                     sliders[varName] = Fraction(slider.value);
@@ -878,7 +914,13 @@ export class LinearCD {
         const ctrls = document.createElement('div');
         container.appendChild(ctrls);
         ctrls.innerHTML =
-            `<div id="linear-vis-controls" style="display:none">
+            `<div id="linear-vis-controls" 
+                style="display:inline-block;
+                        min-width:250px;
+                        padding-left:25px;
+                        padding-right:25px;
+                        max-height:${dims}px;
+                        overflow-y:auto">
                 <div> Plot Axes: </div>
                 <label id="l-var1" for="var1">&nbsp;X-axis:</label>
                 <select id="var1" class="browser-default"></select>
@@ -886,10 +928,21 @@ export class LinearCD {
                 <select id="var2" class="browser-default"></select>
                 &nbsp;
                 <div id="slidersContainer" style="display: none;"> </div>
+                &nbsp;
+                <div id="center-ctrl" style="display: none;"> 
+                    <label>
+                        <input id="center-at-sol" type="checkbox" class="filled-in" />
+                        <span>Center at solution</span>
+                    </label>
+                </div>
             </div>`;
 
         generateVariableSelectors(data);
         createSliders(data);
+        document.getElementById('center-at-sol').addEventListener("change", e => { 
+            console.log(solBkp)
+            visByType(solBkp);
+        })
     }
 
     draw(data, params, where) {
@@ -905,7 +958,6 @@ export class LinearCD {
             s.delete("_rhs");
             s.delete("_asserted");
             return Array.from(s);
-
         }
 
         function displayEquationSystem(op, variables) {
@@ -1076,6 +1128,7 @@ export class LinearCD {
             struct = structuredClone(data.ops[data.current]);
             hl = {};
             const solutions = solve(struct);
+            solBkp = solutions;
 
             this.createPlotControls(solutions);
             if (solutions.type !== 'no solution') {
