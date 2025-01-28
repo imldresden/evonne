@@ -19,8 +19,7 @@
 }
 
 .node {
-	font-size: smaller;
-	font-family: Hack, monospace;
+	font-size: 12px;
 }
 
 .node.rule text,

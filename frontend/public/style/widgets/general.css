@@ -98,12 +98,18 @@ fieldset {
 
 /* Typography */
 body {
-	font-family: Hack, monospace;
 	font-size: 16px;
 	font-weight: 300;
 }
 
-button {
+body, 
+.brand-logo, 
+.menuEntry text, 
+.ui, h1, h2, h3, h4, h5, 
+button, input, optgroup, select, textarea,
+.select-wrapper input.select-dropdown,
+.custom-menu-item,
+.node {
 	font-family: Hack, monospace;
 }
 
@@ -168,10 +174,6 @@ label {
 	margin-top: 9px;
 	margin-left: 2px;
 	fill: white;
-}
-
-.brand-logo {
-	font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 .menu-entry,
@@ -245,7 +247,6 @@ section.modal-section:not(:last-of-type) {
 
 .select-wrapper input.select-dropdown {
 	margin: 0;
-	font-family: Hack, monospace;
 	padding-bottom: 8px;
 }
 .select-wrapper input.select-dropdown:focus {

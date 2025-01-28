@@ -9,7 +9,7 @@ const colors = {
 const edge = {
   "text-background-opacity": 1,
   "text-background-color": "#fafafa",
-  'font-family': 'Hack, monospace',
+  'font-family': 'monospace',
   'label': 'data(label)',
   'font-size': 7,
   'curve-style': 'bezier', //taxi
@@ -21,7 +21,7 @@ const edge = {
 }
 
 const node = {
-  'font-family': 'Hack, monospace',
+  'font-family': 'monospace',
   'font-size': 7,
   "text-valign": "center",
   "text-halign": "center",

@@ -23,7 +23,6 @@
         "fraction.js": "^5.1.1",
         "fs": "0.0.1-security",
         "function-plot": "^1.25.1",
-        "hack-font": "^3.3.0",
         "material-icons": "^1.13.9",
         "materialize-css": "^1.0.0-rc.2",
         "move-file-cli": "^3.0.0",

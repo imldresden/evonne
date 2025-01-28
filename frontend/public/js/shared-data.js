@@ -6,7 +6,7 @@ import { ContextMenu } from "./utils/context-menu.js";
 
 const globals = {
   shorteningMethod: "camel",
-  fontCharacterWidth: 8.1,
+  fontCharacterWidth: 7.25,
   contextMenu: new ContextMenu(),
   labelsShorteningHelper: new LabelsShorteningHelper(),  
 }

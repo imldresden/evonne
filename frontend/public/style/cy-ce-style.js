@@ -8,7 +8,7 @@ const colors = {
 }
 
 const edge = {
-  'font-family': 'Hack, monospace',
+  'font-family': 'monospace',
   'font-size': 7,
   'curve-style': 'bezier',
   'width': 'data(width)',
