@@ -1,20 +1,26 @@
 <div class="collection" id="examples">
     <div onclick="loadExample('diff-inf', 'diff-inf')" class="collection-item">
-        1. Difference Equations - Infinite Solutions 
+        1. Difference Equations - Infinite Solutions (1)
     </div>
     <div onclick="loadExample('diff-unsat', 'diff-unsat')" class="collection-item">
-        2. Difference Equations - Unsatisfiable
+        2. Difference Equations - Unsatisfiable (1)
+    </div>
+    <div onclick="loadExample('diff-inf-2', 'diff-inf-2')" class="collection-item">
+        3. Difference Equations - Infinite Solutions (2)
+    </div>
+    <div onclick="loadExample('diff-unsat-2', 'diff-unsat-2')" class="collection-item">
+        4. Difference Equations - Unsatisfiable (2)
     </div>
     <div onclick="loadExample('linear-inf', 'linear-inf')" class="collection-item">
-        3. Linear Equations - Infinite Solutions (1)
+        5. Linear Equations - Infinite Solutions (1)
     </div>
     <div onclick="loadExample('linear-unsat', 'linear-unsat')" class="collection-item">
-        4. Linear Equations - No solution (1)
+        6. Linear Equations - No solution (1)
     </div>
-    <div onclick="loadExample('linear-inf', 'linear-inf-2')" class="collection-item">
-        5. Linear Equations - Infinite Solutions (2)
+    <div onclick="loadExample('linear-inf-2', 'linear-inf-2')" class="collection-item">
+        7. Linear Equations - Infinite Solutions (2)
     </div>
-    <div onclick="loadExample('linear-unsat', 'linear-unsat-2')" class="collection-item">
-        6. Linear Equations - No solution (2)
+    <div onclick="loadExample('linear-unsat-2', 'linear-unsat-2')" class="collection-item">
+        8. Linear Equations - No solution (2)
     </div>
 </div>
