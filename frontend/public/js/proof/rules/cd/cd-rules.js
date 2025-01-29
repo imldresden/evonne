@@ -25,7 +25,7 @@ function combineSteps(data, name) {
     if (keys.length === 1) {
         return data;
     } else {
-        const d = { id: "combined", premises: [], name: `Negative Cycle\n${name}` };
+        const d = { id: "combined", premises: [], name: `Negative Cycle - ${name}` };
         const s = new Set();
         keys.forEach(id => {
             d.domain = data.ops[id].domain;
