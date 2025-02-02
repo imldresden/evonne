@@ -223,9 +223,9 @@ function init_resizer() {
       document.onkeyup = function (e) {
         startRedrawCSS();
         const which = e.which || e.buttons;
-        if ((e.ctrlKey || e.altKey) && which == 39) {
+        if ((e.ctrlKey || e.altKey) && which === 39) {
           prevSibling.style.width = '100%';
-        } else if ((e.ctrlKey || e.altKey) && which == 37) {
+        } else if ((e.ctrlKey || e.altKey) && which === 37) {
           prevSibling.style.width = '0%';
         }
         finishRedrawCSS();

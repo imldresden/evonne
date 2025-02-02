@@ -2,7 +2,7 @@ import { utils } from "../../rules.js";
 import { controls, createVisContainer } from "../cd-rules.js";
 import { stylesheet } from "../../../../../style/cy-cd-style.js";
 import { params as cola } from "../../../../layouts/cola.js";
-import { hamiltonianCycle } from "./hamiltonian-cycle.js";
+import { negativeWeightHamilton } from "./hamiltonian-cycle.js";
 import { throttle } from "../../../../utils/throttle.js";
 
 const EPSILON = " - Є";
@@ -319,6 +319,7 @@ export class DifferenceCD {
                         const edge = {
                             id: `e-${i++}`, eid: p.eid,
                             label: `${c}${_epsilon}`,
+                            epsilon:_epsilon,
                             weight: c,
                             negated
                         }
@@ -346,6 +347,7 @@ export class DifferenceCD {
                                 id: `e-${i++}`, eid: p.eid, negated,
                                 source: nodes[y], target: nodes[x],
                                 label: `${c}${_epsilon}`,
+                                epsilon: _epsilon,
                                 weight: c,
                             } // x−y <= c  ... (y, x) c
                         });
@@ -417,7 +419,7 @@ export class DifferenceCD {
                     start = cy.nodes()[Math.floor(Math.random() * (l))]; // starts at random node 
                 }
                 
-                const hC = hamiltonianCycle({
+                const hC = negativeWeightHamilton({
                     root: `#${start.data().id}`,
                     directed: true,
                     weight: (edge) => edge.data().weight,
@@ -466,10 +468,14 @@ export class DifferenceCD {
                         );
                     }
 
-                    d3.select("#cycle-val").text(`${
-                        !Fraction(cycleValue).equals(0) ? f(cycleValue) : ""
-                    }${EPSILONS(ep)}`);
-
+                    if (ep !== 0) {
+                        d3.select("#cycle-val").text(`${
+                            !Fraction(cycleValue).equals(0) ? f(cycleValue) : ""
+                        }${EPSILONS(ep)}`);
+                    } else {
+                        d3.select("#cycle-val").text(`${f(cycleValue)}${EPSILONS(ep)}`);
+                    }
+                    
                     i += 1;
                     if (i < ncycle.length) {
                         timeout = setTimeout(highlightNextEle, 1000);

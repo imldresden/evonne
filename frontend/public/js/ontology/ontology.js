@@ -260,7 +260,7 @@ function processData(data) {
     });
 
     const edgeFromParent = edges.find((edge) => edge.source === id);
-    const parentId = edgeFromParent == null ? "" : edgeFromParent.target;
+    const parentId = edgeFromParent === null ? "" : edgeFromParent.target;
 
     const text = getNodeTextList({ signature, axioms });
     let longest = 1;

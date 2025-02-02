@@ -171,7 +171,7 @@ const thumbnailViewer = function (options) {
 
         const scopeContainer = document.querySelector(options.containerSelector + " .scope-container");
         const updateMainViewPan = function (evt) {
-            if (evt.which == 0 && evt.button == 0) {
+            if (evt.which === 0 && evt.button === 0) {
                 return false;
             }
             _updateMainViewPan(evt.clientX, evt.clientY, scopeContainer, _main, _thumb);
