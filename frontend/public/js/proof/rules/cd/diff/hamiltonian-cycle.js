@@ -135,7 +135,7 @@ function negativeWeightHamilton (options, _eles) {
         console.error("can't decide for cycle");
     }
 
-    if (weightSum > 0) { // should only happen if there was not a single <= premise
+    if (weightSum > 0 && multiple) { // should only happen if there was not a single <= premise
         let w = 0;
         
         for (let i = path.length - 2; i >= 0; i--) {
