@@ -287,7 +287,7 @@ export class AxiomsHelper {
 	        const s = [];
         	let curr = d;
  
-        	while (curr !== null || s.length > 0) {
+        	while (curr != null || s.length > 0) {
 				curr.children && curr.children.forEach(c => {	
 					s.push(c);
 					curr = c;

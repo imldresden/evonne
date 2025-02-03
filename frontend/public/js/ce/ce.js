@@ -837,7 +837,7 @@ function processData(mapper, model) {
       }
     })
     // const edgeFromParent = edgeData.find((edge) => edge.source === id);
-    const parentId = edgeFromParent === null ? "" : edgeFromParent.target;
+    const parentId = edgeFromParent == null ? "" : edgeFromParent.target;
     labels = labels.replace(/\[|\]|\s/g, "").split(",");
     const text = labels;
     let longest = 1;
@@ -867,7 +867,7 @@ function processData(mapper, model) {
       }
     });
     // Updating Label and setting the important label as Important Concept
-    if (importantLabel !== null) {
+    if (importantLabel != null) {
       let labelIndex = labels.indexOf(importantLabel);
       if (labelIndex === -1) {
         labels.unshift(importantLabel);

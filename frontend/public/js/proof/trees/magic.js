@@ -176,11 +176,11 @@ export class MagicNavigation {
 	}
 
 	checkIfNewMagicIsNeeded(treeRoot, mainRoot) {
-		if (treeRoot.children === null) {
+		if (treeRoot.children == null) {
 			return false;
 		}
 
-		if (treeRoot.children[0].children === null) {
+		if (treeRoot.children[0].children == null) {
 			return false;
 		}
 
@@ -191,7 +191,7 @@ export class MagicNavigation {
 				continue;
 			}
 
-			if (premise[i].children !== null && premise[i].children[0].children !== null) {
+			if (premise[i].children != null && premise[i].children[0].children != null) {
 				toCheck = premise[i].children[0].children;
 				for (let j = 0; j < toCheck.length; j++) {
 					found = mainRoot.descendants()
@@ -222,7 +222,7 @@ export class MagicNavigation {
 	}
 
 	pullUp(treeRoot) {
-		const magicImpossible = treeRoot.parent === null || treeRoot.data.target.type !== "mrule";
+		const magicImpossible = treeRoot.parent == null || treeRoot.data.target.type !== "mrule";
 		if (proof.isDrawing || magicImpossible) {
 			return;
 		}
@@ -252,7 +252,7 @@ export class MagicNavigation {
 			newData.push(x.data)
 			//check if the new premise is already a premise of the magic rule, if so keep it and all its descendants
 			alreadyThere = treeRoot.parent.children.filter(y => y !== treeRoot).find(y => y.data.source.id === x.data.source.id);
-			if (alreadyThere !== null) {
+			if (alreadyThere != null) {
 				alreadyThere.descendants().filter(y => y !== alreadyThere).forEach(y => {
 					newData.push(y.data);
 				});
@@ -362,7 +362,7 @@ export class MagicNavigation {
 
 	pushUp(treeRoot) {
 		//when magic is not possible
-		const magicImpossible = treeRoot.children === null || treeRoot.children[0].children === null || treeRoot.parent === null;
+		const magicImpossible = treeRoot.children == null || treeRoot.children[0].children == null || treeRoot.parent == null;
 		if (proof.isDrawing || magicImpossible) {
 			return;
 		}
@@ -383,8 +383,8 @@ export class MagicNavigation {
 		});
 
 		treeRoot.parent.children.filter(x => x !== treeRoot).forEach(x => {
-			if (x.children !== null) {
-				if (x.children[0].children !== null) {
+			if (x.children != null) {
+				if (x.children[0].children != null) {
 					x.children[0].children.forEach(y => {
 						//don't add tautologies
 						if (y.children[0].data.source.element !== "Asserted Conclusion" && !y.children[0].children) {
@@ -405,7 +405,7 @@ export class MagicNavigation {
 
 		newData.push(this.getNewEdge(newMagicBox, treeRoot.parent.data.target));
 
-		if (treeRoot.parent.parent !== null) {
+		if (treeRoot.parent.parent != null) {
 			this.addAllBut(treeRoot.parent.parent, newData);
 		}
 
@@ -415,7 +415,7 @@ export class MagicNavigation {
 
 	pullDown(treeRoot) {
 		//when magic is not possible
-		const magicImpossible = treeRoot.children === null || treeRoot.children[0].data.source.type !== "mrule";
+		const magicImpossible = treeRoot.children == null || treeRoot.children[0].data.source.type !== "mrule";
 		if (proof.isDrawing || magicImpossible) {
 			return;
 		}
@@ -447,8 +447,8 @@ export class MagicNavigation {
 				//first, count how many axioms would not need a magic rule
 				relevantPremiseCount = relevantPremise.length;
 
-				if (grandChild.children !== null) {
-					if (grandChild.children[0].children !== null) {
+				if (grandChild.children != null) {
+					if (grandChild.children[0].children != null) {
 						grandChild.children[0].children.forEach(c => {
 							if (relevantPremise.some(r => r.data.source.id === c.data.source.id)) {
 								relevantPremiseCount--;
@@ -512,7 +512,7 @@ export class MagicNavigation {
 
 	pushDown(treeRoot) {
 		//when magic is not possible
-		const magicImpossible = treeRoot.children === null || treeRoot.children[0].children === null || treeRoot.parent === null;
+		const magicImpossible = treeRoot.children == null || treeRoot.children[0].children == null || treeRoot.parent == null;
 
 		if (proof.isDrawing || magicImpossible) {
 			return;
@@ -542,8 +542,8 @@ export class MagicNavigation {
 			});
 
 		// treeRoot.parent.children.filter(x=>x!=treeRoot).forEach(x=>{
-		// 	if(x.children !== null){
-		// 		if(x.children[0].children !== null){
+		// 	if(x.children != null){
+		// 		if(x.children[0].children != null){
 		// 			x.children[0].children.forEach(y=>{
 		// 				//don't add tautologies
 		// 				if(y.children[0].data.source.element!="Asserted Conclusion"){
@@ -566,7 +566,7 @@ export class MagicNavigation {
 
 		newData.push(this.getNewEdge(newMagicBox, treeRoot.parent.data.target));
 
-		if (treeRoot.parent.parent !== null) {
+		if (treeRoot.parent.parent != null) {
 			this.addAllBut(treeRoot.parent.parent, newData);
 		}
 
@@ -595,7 +595,7 @@ export class MagicNavigation {
 	getRoot(object) {
 		let root = object;
 
-		while (root.parent !== null) {
+		while (root.parent != null) {
 			root = root.parent;
 		}
 

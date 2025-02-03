@@ -49,7 +49,7 @@ function negativeWeightHamilton (options, _eles) {
             return { can: false };
         }
 
-        // reutnr false if vertex already in path
+        // return false if vertex already in path
         for (const p of path) {
             if (p === v) { 
                 return { can: false };
