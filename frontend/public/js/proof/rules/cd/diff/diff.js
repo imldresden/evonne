@@ -455,13 +455,12 @@ export class DifferenceCD {
 
                     if (startId.nid) {
                         const og = n.data().og ? n.data().og : n.data().v;
-                        const cv = `${
-                            f(Fraction(params.manual.value).add(Fraction(cycleValue)))
-                        }${EPSILONS(ep)}`;
+                        const fv = Fraction(params.manual.value).add(Fraction(cycleValue));
+                        const cv = `${f(fv)}${EPSILONS(ep)}`;
 
                         n.data({og, v: `${n.data().v} ${i === 0 ? '=' : '<=' } ${cv}`})
 
-                        if (og === ZERO && cv !== "0") {
+                        if (og === ZERO && cv !== "0" && fv.lte(0)) {
                             n.addClass("highlighted");
                         }
                     }
