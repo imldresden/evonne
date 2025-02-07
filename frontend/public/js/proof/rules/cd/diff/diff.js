@@ -459,7 +459,7 @@ export class DifferenceCD {
                             f(Fraction(params.manual.value).add(Fraction(cycleValue)))
                         }${EPSILONS(ep)}`;
 
-                        n.data({og, v: `${n.data().v} = ${cv}`})
+                        n.data({og, v: `${n.data().v} ${i === 0 ? '=' : '<=' } ${cv}`})
 
                         if (og === ZERO && cv !== "0") {
                             n.addClass("highlighted");
@@ -495,7 +495,7 @@ export class DifferenceCD {
                                 const og = sn.data().og ? sn.data().og : sn.data().v;
                                 sn.data({
                                     og, 
-                                    v: `${sn.data().v} = ${
+                                    v: `${sn.data().v} <= ${
                                         f(Fraction(params.manual.value)
                                             .add(Fraction(cycleValue))
                                         )
