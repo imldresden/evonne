@@ -143,7 +143,7 @@ export class DifferenceCD {
                         .attr("class", "text-eq premise")
                         .on('mouseover', ()=> dispatchHighlightCustomEvent(cid))
                         .on('mouseout', ()=> dispatchHighlightCustomEvent(cid))
-                        .on('click', ()=> animateNegativeCycle(cy, { sid: cid }));
+                        .on('click', ()=> animateNegativeCycle(cy, { sid: cid, nid: params.manual?.id }));
                     printTerms(pr.constraint.lhs, constraint);
                     constraint.append("span").attr("class", "text-black").text(" " + types[pr.constraint.type] + " ");
                     printTerms(pr.constraint.rhs, constraint);
@@ -181,7 +181,7 @@ export class DifferenceCD {
                             .attr("class", "text-eq conclusion")
                             .on('mouseover', () => dispatchHighlightCustomEvent(ncid))
                             .on('mouseout', () => dispatchUndoHighlightCustomEvent(ncid))
-                            .on('click', ()=> animateNegativeCycle(cy, { sid: ncid }));
+                            .on('click', ()=> animateNegativeCycle(cy, { sid: ncid, nid: params.manual?.id }));
                         cons.append("br");
                         cons.append("span").attr("class", "tab");
                         printTerms(c.lhs, cons);
@@ -446,9 +446,15 @@ export class DifferenceCD {
                     current.addClass("highlighted");
                     const label = `${current.data().label}`;
                     
+                    
+                    const n = cy.nodes(`#${current.data().source}`);
+                    const _og = n.data().og;
+                    if (n.data().og) {
+                        n.data({og: _og, v: _og});
+                    }
+
                     if (startId.nid) {
-                        const n = cy.nodes(`#${current.data().source}`)
-                        const og = n.data().v;
+                        const og = n.data().og ? n.data().og : n.data().v;
                         const cv = `${
                             f(Fraction(params.manual.value).add(Fraction(cycleValue)))
                         }${EPSILONS(ep)}`;
@@ -485,16 +491,18 @@ export class DifferenceCD {
                     } else {
                         setTimeout(() => {
                             if (startId.nid) {
-                                const n = cy.nodes(`#${startId.nid}`)
-                                n.data({
-                                    v: `${n.data().v} = ${
+                                const sn = cy.nodes(`#${startId.nid}`);
+                                const og = sn.data().og ? sn.data().og : sn.data().v;
+                                sn.data({
+                                    og, 
+                                    v: `${sn.data().v} = ${
                                         f(Fraction(params.manual.value)
                                             .add(Fraction(cycleValue))
                                         )
                                     }${EPSILONS(ep)}`
                                 })
-                                n.addClass("highlighted")
-                            }
+                                sn.addClass("highlighted");
+                            } 
                         }, 1000);
                     }
                 };
