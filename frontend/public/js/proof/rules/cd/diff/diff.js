@@ -455,7 +455,7 @@ export class DifferenceCD {
 
                         n.data({og, v: `${n.data().v} = ${cv}`})
 
-                        if (og === ZERO && cv !== ZERO) {
+                        if (og === ZERO && cv !== "0") {
                             n.addClass("highlighted");
                         }
                     }
