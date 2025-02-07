@@ -325,7 +325,7 @@ function visualizeUniqueSolution(plot, _data) {
         }
     });
 
-    // Make emphazis on the intersection point
+    // Make emphasis on the intersection point
     data.push({
         points: [[solutions[independentIndex], solutions[dependentIndex]]],
         fnType: 'points',
@@ -1137,5 +1137,7 @@ export class LinearCD {
             document.removeEventListener('cd-l-hl', highlightText);
             document.addEventListener('cd-l-hl', highlightText);
         }
+
+        utils.showMeasure();
     }
 }

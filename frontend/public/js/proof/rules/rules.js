@@ -46,6 +46,8 @@ function makeDraggable(elmnt, handle) {
     }
 }
 
+const measure = {};
+
 const utils = {
     addTitle: function (text) {
         let title = div.append("header").attr("id", "popover-handle-bar")
@@ -114,6 +116,35 @@ const utils = {
         }
         return colors;
     },
+
+    setMeasure() {
+        if (performance && performance.memory) {
+            measure.memory = performance.memory.usedJSHeapSize; 
+            measure.timeStamp = console.time();
+        }
+    },
+
+    
+    showMeasure() {
+        // https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string
+        function fileSizeIEC(bytes) {
+            if (bytes === 0) {
+                return `0B`;
+            }
+            const exponent = Math.floor(Math.log(bytes) / Math.log(1024.0))
+            const decimal = (bytes / Math.pow(1024.0, exponent)).toFixed(exponent ? 2 : 0)
+            return `${decimal} ${exponent ? `${'kMGTPEZY'[exponent - 1]}iB` : 'B'}`
+        }
+    
+        if (performance && performance.memory) {
+            const end = {};
+            end.memory = performance.memory.usedJSHeapSize;
+            console.log("used heap size:")
+            console.log(`${fileSizeIEC(end.memory - measure.memory)}`)
+            console.log("time spent:")
+            console.timeEnd()
+        }
+    }
 }
 
 class RulesHelper {
@@ -272,6 +303,8 @@ class RulesHelper {
     }
 
     openExplanation(_params, nodes) {
+        utils.setMeasure();
+
         if (!proof.showPopover) {
             return;
         }

@@ -5,6 +5,7 @@ import { params as cola } from "../../../../layouts/cola.js";
 import { negativeWeightHamilton } from "./hamiltonian-cycle.js";
 import { throttle } from "../../../../utils/throttle.js";
 
+const ZERO = "(0)";
 const EPSILON = " - Є";
 const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? ` -Є` : ` -${n}Є`);
 
@@ -205,7 +206,7 @@ export class DifferenceCD {
             // expects x = c, x > c, x + c = y
             const edges = [];
             const nodes = {};
-            const x0 = "(0)";
+            const x0 = ZERO;
 
             const constraints = [
                 ...op.premises.map(p => { 
@@ -447,14 +448,16 @@ export class DifferenceCD {
                     
                     if (startId.nid) {
                         const n = cy.nodes(`#${current.data().source}`)
-                        n.data({
-                            og: n.data().v,
-                            v: `${n.data().v} = ${
-                                f(Fraction(params.manual.value)
-                                    .add(Fraction(cycleValue))
-                                )
-                            }${EPSILONS(ep)}`
-                        })
+                        const og = n.data().v;
+                        const cv = `${
+                            f(Fraction(params.manual.value).add(Fraction(cycleValue)))
+                        }${EPSILONS(ep)}`;
+
+                        n.data({og, v: `${n.data().v} = ${cv}`})
+
+                        if (og === ZERO && cv !== ZERO) {
+                            n.addClass("highlighted");
+                        }
                     }
 
                     if (label.includes(EPSILON)) {
@@ -532,7 +535,7 @@ export class DifferenceCD {
             cy.nodes()
                 .on("dbltap", e => {
                     const variable = e.target.data();
-                    if (variable.v !== "(0)") {
+                    if (variable.v !== ZERO) {
                         params.manual = setManualValue(params, variable);
                         document.getElementById("explanation-probe").style.display = "flex";
                         document.getElementById("var-input-desc").innerHTML = `Set a value for "${variable.og}" and see it propagate in the graph!` 
@@ -610,5 +613,7 @@ export class DifferenceCD {
         varInput.value = "";
         varInput.addEventListener('change', playWithVar)
         document.getElementById('play-with-var').addEventListener('click', playWithVar)
+
+        utils.showMeasure();
     }
 }

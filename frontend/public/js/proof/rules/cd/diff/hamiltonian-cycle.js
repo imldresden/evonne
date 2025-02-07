@@ -131,10 +131,6 @@ function negativeWeightHamilton (options, _eles) {
         } // could be that the cycle has weight 0 and epsilons
     }
 
-    if (weightSum === 0 && multiple) {
-        console.error("can't decide for cycle");
-    }
-
     if (weightSum > 0 && multiple) { // should only happen if there was not a single <= premise
         let w = 0;
         
