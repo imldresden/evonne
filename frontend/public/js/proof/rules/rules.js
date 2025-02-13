@@ -185,6 +185,7 @@ class RulesHelper {
             const originalRuleName = proof.ruleNameMapHelper.getOriginalName(alternativeRuleName);
             rule_sets.dl.draw({ div, premises, conclusion, alternativeRuleName, originalRuleName });
         } else if (data.source.type === "CDRule") {
+            utils.setMeasure();
             rule_sets.cd.draw({ div, data: sp, params });
         } else if (data.source.type === "mrule" || data.source.type === "krule") {
             return;
@@ -303,8 +304,6 @@ class RulesHelper {
     }
 
     openExplanation(_params, nodes) {
-        utils.setMeasure();
-
         if (!proof.showPopover) {
             return;
         }

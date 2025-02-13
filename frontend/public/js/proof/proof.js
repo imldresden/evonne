@@ -184,6 +184,10 @@ function init_proof({
     proof.proofFile = { name: file };
   }
 
+  if (proof.proofFile.name === `out_${new URL(window.location.toLocaleString()).searchParams.get("id")}_graphML0.t.xml`) {
+    console.log("PROOF BELONGS TO BENCHMARK TEST")
+  }
+
   // Configure Socket IO
   let socket = io();
   socket.on("highlight axioms", (data) => {
