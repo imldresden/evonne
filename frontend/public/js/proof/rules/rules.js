@@ -117,15 +117,15 @@ const utils = {
         return colors;
     },
 
-    setMeasure() {
+    setMeasure(name) {
         if (performance && performance.memory) {
             measure.memory = performance.memory.usedJSHeapSize; 
-            measure.timeStamp = console.time();
+            measure.timeStamp = console.time(name);
         }
     },
 
     
-    showMeasure() {
+    showMeasure(name) {
         // https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string
         function fileSizeIEC(bytes) {
             if (bytes === 0) {
@@ -137,12 +137,7 @@ const utils = {
         }
     
         if (performance && performance.memory) {
-            const end = {};
-            end.memory = performance.memory.usedJSHeapSize;
-            console.log("used heap size:")
-            console.log(`${fileSizeIEC(end.memory - measure.memory)}`)
-            console.log("time spent:")
-            console.timeEnd()
+            console.timeEnd(name);
         }
     }
 }
@@ -185,7 +180,7 @@ class RulesHelper {
             const originalRuleName = proof.ruleNameMapHelper.getOriginalName(alternativeRuleName);
             rule_sets.dl.draw({ div, premises, conclusion, alternativeRuleName, originalRuleName });
         } else if (data.source.type === "CDRule") {
-            utils.setMeasure();
+            utils.setMeasure(params.subProof.name);
             rule_sets.cd.draw({ div, data: sp, params });
         } else if (data.source.type === "mrule" || data.source.type === "krule") {
             return;

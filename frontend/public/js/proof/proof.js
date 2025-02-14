@@ -185,7 +185,7 @@ function init_proof({
   }
 
   if (proof.proofFile.name === `out_${new URL(window.location.toLocaleString()).searchParams.get("id")}_graphML0.t.xml`) {
-    console.log("PROOF BELONGS TO BENCHMARK TEST")
+    console.log(`PROOF ${proof.proofFile.name} BENCHMARK:`)
   }
 
   // Configure Socket IO

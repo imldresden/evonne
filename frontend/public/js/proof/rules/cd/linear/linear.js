@@ -817,6 +817,9 @@ export class LinearCD {
             frees = [];
             const freeVarsContainer = document.getElementById(`slidersContainer`);
             freeVarsContainer.innerHTML = '<div>Other Variables:</div>';
+            if (data.type !== 'no solution') {
+                freeVarsContainer.innerHTML = '<div>Free Variables:</div>';
+            }
             freeVarsContainer.style = 'display:grid';
 
             const sliders = {};
@@ -857,7 +860,6 @@ export class LinearCD {
                     varContainer.style = "display: inline-flex";
 
                     if (data.type !== 'no solution') {
-                        freeVarsContainer.innerHTML = '<div>Free Variables:</div>';
                         // create select to replace free variable
                         const select = document.createElement('select');
                         select.id = `select-free-${i}`;
@@ -938,7 +940,6 @@ export class LinearCD {
         generateVariableSelectors(data);
         createSliders(data);
         document.getElementById('center-at-sol').addEventListener("change", e => { 
-            console.log(solBkp)
             visByType(solBkp);
         })
     }
@@ -1138,6 +1139,6 @@ export class LinearCD {
             document.addEventListener('cd-l-hl', highlightText);
         }
 
-        utils.showMeasure();
+        utils.showMeasure(params.subProof.name);
     }
 }

@@ -50,5 +50,8 @@
         "download-examples": "mkdir \"./frontend/public/examples\" & curl \"https://cloud.perspicuous-computing.science/s/ecz5srM7mDMwP2t/download\" -o ./examples.zip && npm run extract-examples",
         "extract-examples": "extract-zip \"./examples.zip\" ./ && recursive-delete \"./frontend/public/data\" && move-file \"./examples-dev/\" \"./frontend/public/data\" ./ && extract-zip \"./examples.zip\" ./ && recursive-delete \"./frontend/public/examples\" && move-file \"./examples-dev/\" \"./frontend/public/examples\" "
     },
-    "main": "server.js"
+    "main": "server.js",
+    "devDependencies": {
+        "cypress": "^14.0.3"
+    }
 }

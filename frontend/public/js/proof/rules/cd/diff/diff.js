@@ -621,6 +621,6 @@ export class DifferenceCD {
         varInput.addEventListener('change', playWithVar)
         document.getElementById('play-with-var').addEventListener('click', playWithVar)
 
-        utils.showMeasure();
+        utils.showMeasure(params.subProof.name);
     }
 }

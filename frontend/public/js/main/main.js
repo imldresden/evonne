@@ -174,7 +174,7 @@ function init_views(loop = false) {
     .then(res => res.json())
     .then(res => {
       status = res;
-      console.log(status);
+      //console.log(status);
 
       if (res.status === 'custom' || res.reasoner === 'n/a') { // blank project
         clearInterval(interval);
