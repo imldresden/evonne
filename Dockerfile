@@ -15,25 +15,11 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-### 3. python 3.8 
-RUN apt update && \
-    apt install --no-install-recommends -y build-essential software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt install --no-install-recommends -y python3.8 python3.8-dev python3.8-distutils && \
-    apt clean && rm -rf /var/lib/apt/lists/*
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2
-RUN curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python3 get-pip.py --force-reinstall && \
-    rm get-pip.py
-
-### 4. clingo
-RUN python3 -m pip install --user --upgrade clingo
-
 ### 5. install app
 COPY package.json ./
 RUN npm install pm2 -g
-RUN npm install --production
+RUN npm install extract-zip-relative-path -g
+RUN npm install --omit=dev
 
 COPY frontend ./frontend/
 COPY .env ./
