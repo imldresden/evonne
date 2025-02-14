@@ -1,16 +1,12 @@
-FROM ubuntu:18.04
+FROM ubuntu:25.04
 WORKDIR /usr/src/evonne
 
 ### 1. node 20
 RUN apt-get update && \
-    apt-get install -y curl gnupg build-essential && \
-    curl --silent --location https://deb.nodesource.com/setup_20.x | bash - && \
-    # remove useless files from the current layer
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /var/lib/apt/lists.d/* && \
-    apt-get autoremove && \
-    apt-get clean && \
-    apt-get autoclean
+    apt-get install curl -y && \
+    curl -sL https://deb.nodesource.com/setup_20.x | bash && \
+    apt-get install nodejs -y && \
+    node -v && npm -v
 
 ### 2. java 
 RUN apt-get update && \
