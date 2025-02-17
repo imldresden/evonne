@@ -18,6 +18,7 @@ import { createRequire } from "module";
 import * as path from 'path';
 import { owlFunctions } from "./frontend/public/js/utils/myOWL.js";
 import { ReasonerName } from "./frontend/public/js/utils/ReasonerName.js";
+import {ProofType} from "./frontend/public/js/utils/ProofType.js";
 
 const require = createRequire(import.meta.url);
 require('dotenv').config();
@@ -696,21 +697,21 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
     let minWTreeOpts = ["3", "7", "12"];
     let minDepthOpts = ["2", "5", "10"];
 
-    let proofType = 'MinimalTreeSize';
+    let proofType = ProofType.minimalTreeSize();
     // CONDENSED MINIMAL PROOF
     if (sigPath !== "NoSignature") {
-      proofType = 'CondensedMinimalTreeSize';
+      proofType = ProofType.condensedMinimalTreeSize();
       if (minDepthOpts.includes(genMethod))
-        proofType = 'CondensedMinimalDepth';
+        proofType = ProofType.condensedMinimalDepth();
       else if (minWTreeOpts.includes(genMethod))
-        proofType = 'CondensedMinimalWeightedTreeSize';
+        proofType = ProofType.condensedMinimalWeightedTreeSize();
     }
     // MINIMAL PROOF
     else {
       if (minDepthOpts.includes(genMethod))
-        proofType = 'MinimalDepth';
+        proofType = ProofType.minimalDepth();
       else if (minWTreeOpts.includes(genMethod))
-        proofType = 'MinimalWeightedTreeSize';
+        proofType = ProofType.minimalWeightedTreeSize();
     }
     return proofType;
   }
