@@ -7,7 +7,7 @@
 
 ## Local Installation: 
 ### Requirements:
-* **NodeJS**: v. 15+ 
+* **NodeJS**: v. 20+ 
 * **Python** : `runtime.txt` & `requirements.txt` (`python3 -m pip install --user --upgrade clingo`)
 * **Java**: v. 16+
 

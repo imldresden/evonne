@@ -3,7 +3,7 @@
     <i class="material-icons right modal-button modal-close">close</i>
     <header>
       <h2>Specify Input</h2>
-      <p>Please indicate the following options to generate a proof and an atomic decomposition.</p>
+      <p>Please indicate the following options to generate an explanation.</p>
     </header>
 
     <h4>Select Axiom Concepts</h4>
