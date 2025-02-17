@@ -15,7 +15,13 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-### 5. install app
+### 3. pip
+RUN apt-get update && apt install python3-pip -y 
+
+### 4. clingo
+RUN python3 -m pip install --user --upgrade --break-system-packages clingo
+
+### 5. install evonne 
 COPY package.json ./
 RUN npm install pm2 -g
 RUN npm install extract-zip-relative-path -g
