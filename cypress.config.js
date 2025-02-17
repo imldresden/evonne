@@ -6,5 +6,7 @@ export default defineConfig({
       // implement node event listeners here
     },
     defaultCommandTimeout: 25000,
+    experimentalMemoryManagement: true,
+    numTestsKeptInMemory: 0
   },
 });

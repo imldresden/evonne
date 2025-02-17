@@ -5,18 +5,10 @@ const excl = new Set([
 ]);
 
 describe("Open Concrete Domain rule popovers", () => {
-  for (let i = 50; i <= 59; i++) {
+  for (let i = 50; i <= 79; i++) {
     if (!excl.has(i)) {
       it(`open popovers in ${i}`, () => {
-        cy.visit(
-          `http://localhost:3000/proof?id=${i}`
-          //  {
-          //   onBeforeLoad(win) {
-          //     cy.stub(win.console, 'log').as('consoleLog')
-          //     cy.stub(win.console, 'error').as('consoleError')
-          //   }
-          // }
-        );
+        cy.visit(`http://localhost:3000/proof?id=${i}`);
         cy.wait(1500);
 
         cy.get("#proof-view").within((proof) => {
@@ -28,7 +20,6 @@ describe("Open Concrete Domain rule popovers", () => {
             });
         });
 
-        
         cy.wait(500);
     });
     }
