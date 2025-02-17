@@ -409,7 +409,7 @@ app.post('/explain', (req, res) => {
 
   const type = req.body.type;
   const cdName = req.body.concreteDomainName;
-  console.log(cdName)
+  // console.log(cdName)
   if (type === 'pr') { // expects a proof
     prove({ id, req, axiom, projPath, ontology, ontPath, cdName });
   }
@@ -722,7 +722,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
     let { axiom, sigPath } = params;
     const constraintsPath = path.join(projPath, constraintsFileName);
 
-    console.log("***" + cdName + "***")
+    // console.log("***" + cdName + "***")
 
     //TODO use consts for the string values of the domains. Use them also in process-data.js, file-upload.spy
     if(["LinearConstraints", "DifferenceConstraints"].includes(cdName)){
