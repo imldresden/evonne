@@ -46,6 +46,8 @@ function makeDraggable(elmnt, handle) {
     }
 }
 
+const measure = {};
+
 const utils = {
     addTitle: function (text) {
         let title = div.append("header").attr("id", "popover-handle-bar")
@@ -114,6 +116,30 @@ const utils = {
         }
         return colors;
     },
+
+    setMeasure(name) {
+        if (performance && performance.memory) {
+            measure.memory = performance.memory.usedJSHeapSize; 
+            measure.timeStamp = console.time(name);
+        }
+    },
+
+    
+    showMeasure(name) {
+        // https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string
+        function fileSizeIEC(bytes) {
+            if (bytes === 0) {
+                return `0B`;
+            }
+            const exponent = Math.floor(Math.log(bytes) / Math.log(1024.0))
+            const decimal = (bytes / Math.pow(1024.0, exponent)).toFixed(exponent ? 2 : 0)
+            return `${decimal} ${exponent ? `${'kMGTPEZY'[exponent - 1]}iB` : 'B'}`
+        }
+    
+        if (performance && performance.memory) {
+            console.timeEnd(name);
+        }
+    }
 }
 
 class RulesHelper {
@@ -154,6 +180,7 @@ class RulesHelper {
             const originalRuleName = proof.ruleNameMapHelper.getOriginalName(alternativeRuleName);
             rule_sets.dl.draw({ div, premises, conclusion, alternativeRuleName, originalRuleName });
         } else if (data.source.type === "CDRule") {
+            utils.setMeasure(params.subProof.name);
             rule_sets.cd.draw({ div, data: sp, params });
         } else if (data.source.type === "mrule" || data.source.type === "krule") {
             return;

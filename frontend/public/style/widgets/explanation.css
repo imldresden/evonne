@@ -60,15 +60,28 @@
     display: flex;
 }
 
+span { 
+    word-wrap:break-word;
+}
+
 #cd-left { 
     text-align: left;
     margin-left: 25px;
     margin-right: 10px;
+    max-width: 700px;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+
 
 #cd-right {
     text-align: left;
     margin-right: 25px;
+    max-width: 700px;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #cd-divider {

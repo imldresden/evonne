@@ -27,7 +27,7 @@ export class TreeNavigation {
         // add a custom link from the root node, needed for the stratify function
         this._edges.push({
             id: "L-1",
-            source: data.nodes.filter((x) => x.isRoot)[0],
+            source: Object.values(data.nodes).filter((x) => x.isRoot)[0],
             target: "",
         });
 

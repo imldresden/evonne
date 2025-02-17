@@ -123,8 +123,9 @@ function buildCDRule({ d, data }) {
 }
 
 function getNodes(data, edges) {
+    const allNodes = {}
     // Compute nodes
-    return [].map.call(data.querySelectorAll("node"), (d) => {
+    data.querySelectorAll("node").forEach((d) => {
 
         const node = { id: d.id };
         const dataNodes = d.childNodes; // querySelectorAll(`[*|id='${d.id}']>data`);
@@ -159,15 +160,17 @@ function getNodes(data, edges) {
         const outgoingEdges = edges.filter((edge) => edge.source === d.id);
         node.isRoot = outgoingEdges.length === 0;
 
-        return node;
+        allNodes[node.id] = node;
     });
+
+    return allNodes;
 }
 
 function addNodesToEdges(nodes, edges) {
     // add the node data to the edge data
     edges.forEach((d) => {
-        d.source = nodes.find((b) => b.id === d.source);
-        d.target = nodes.find((b) => b.id === d.target);
+        d.source = nodes[d.source];
+        d.target = nodes[d.target];
     });
 
     return { nodes, edges };

@@ -2,9 +2,10 @@ import { utils } from "../../rules.js";
 import { controls, createVisContainer } from "../cd-rules.js";
 import { stylesheet } from "../../../../../style/cy-cd-style.js";
 import { params as cola } from "../../../../layouts/cola.js";
-import { hamiltonianCycle } from "./hamiltonian-cycle.js";
+import { negativeWeightHamilton } from "./hamiltonian-cycle.js";
 import { throttle } from "../../../../utils/throttle.js";
 
+const ZERO = "(0)";
 const EPSILON = " - Є";
 const EPSILONS = (n) => n === 0 ? "" : (n === 1 ? ` -Є` : ` -${n}Є`);
 
@@ -142,7 +143,7 @@ export class DifferenceCD {
                         .attr("class", "text-eq premise")
                         .on('mouseover', ()=> dispatchHighlightCustomEvent(cid))
                         .on('mouseout', ()=> dispatchHighlightCustomEvent(cid))
-                        .on('click', ()=> animateNegativeCycle(cy, { sid: cid }));
+                        .on('click', ()=> animateNegativeCycle(cy, { sid: cid, nid: params.manual?.id }));
                     printTerms(pr.constraint.lhs, constraint);
                     constraint.append("span").attr("class", "text-black").text(" " + types[pr.constraint.type] + " ");
                     printTerms(pr.constraint.rhs, constraint);
@@ -180,7 +181,7 @@ export class DifferenceCD {
                             .attr("class", "text-eq conclusion")
                             .on('mouseover', () => dispatchHighlightCustomEvent(ncid))
                             .on('mouseout', () => dispatchUndoHighlightCustomEvent(ncid))
-                            .on('click', ()=> animateNegativeCycle(cy, { sid: ncid }));
+                            .on('click', ()=> animateNegativeCycle(cy, { sid: ncid, nid: params.manual?.id }));
                         cons.append("br");
                         cons.append("span").attr("class", "tab");
                         printTerms(c.lhs, cons);
@@ -205,7 +206,7 @@ export class DifferenceCD {
             // expects x = c, x > c, x + c = y
             const edges = [];
             const nodes = {};
-            const x0 = "(0)";
+            const x0 = ZERO;
 
             const constraints = [
                 ...op.premises.map(p => { 
@@ -319,6 +320,7 @@ export class DifferenceCD {
                         const edge = {
                             id: `e-${i++}`, eid: p.eid,
                             label: `${c}${_epsilon}`,
+                            epsilon:_epsilon,
                             weight: c,
                             negated
                         }
@@ -346,6 +348,7 @@ export class DifferenceCD {
                                 id: `e-${i++}`, eid: p.eid, negated,
                                 source: nodes[y], target: nodes[x],
                                 label: `${c}${_epsilon}`,
+                                epsilon: _epsilon,
                                 weight: c,
                             } // x−y <= c  ... (y, x) c
                         });
@@ -417,7 +420,7 @@ export class DifferenceCD {
                     start = cy.nodes()[Math.floor(Math.random() * (l))]; // starts at random node 
                 }
                 
-                const hC = hamiltonianCycle({
+                const hC = negativeWeightHamilton({
                     root: `#${start.data().id}`,
                     directed: true,
                     weight: (edge) => edge.data().weight,
@@ -443,16 +446,23 @@ export class DifferenceCD {
                     current.addClass("highlighted");
                     const label = `${current.data().label}`;
                     
+                    
+                    const n = cy.nodes(`#${current.data().source}`);
+                    const _og = n.data().og;
+                    if (n.data().og) {
+                        n.data({og: _og, v: _og});
+                    }
+
                     if (startId.nid) {
-                        const n = cy.nodes(`#${current.data().source}`)
-                        n.data({
-                            og: n.data().v,
-                            v: `${n.data().v} = ${
-                                f(Fraction(params.manual.value)
-                                    .add(Fraction(cycleValue))
-                                )
-                            }${EPSILONS(ep)}`
-                        })
+                        const og = n.data().og ? n.data().og : n.data().v;
+                        const fv = Fraction(params.manual.value).add(Fraction(cycleValue));
+                        const cv = `${f(fv)}${EPSILONS(ep)}`;
+
+                        n.data({og, v: `${n.data().v} ${i === 0 ? '=' : '<=' } ${cv}`})
+
+                        if (og === ZERO && cv !== "0" && fv.lte(0)) {
+                            n.addClass("highlighted");
+                        }
                     }
 
                     if (label.includes(EPSILON)) {
@@ -466,26 +476,32 @@ export class DifferenceCD {
                         );
                     }
 
-                    d3.select("#cycle-val").text(`${
-                        !Fraction(cycleValue).equals(0) ? f(cycleValue) : ""
-                    }${EPSILONS(ep)}`);
-
+                    if (ep !== 0) {
+                        d3.select("#cycle-val").text(`${
+                            !Fraction(cycleValue).equals(0) ? f(cycleValue) : ""
+                        }${EPSILONS(ep)}`);
+                    } else {
+                        d3.select("#cycle-val").text(`${f(cycleValue)}${EPSILONS(ep)}`);
+                    }
+                    
                     i += 1;
                     if (i < ncycle.length) {
                         timeout = setTimeout(highlightNextEle, 1000);
                     } else {
                         setTimeout(() => {
                             if (startId.nid) {
-                                const n = cy.nodes(`#${startId.nid}`)
-                                n.data({
-                                    v: `${n.data().v} = ${
+                                const sn = cy.nodes(`#${startId.nid}`);
+                                const og = sn.data().og ? sn.data().og : sn.data().v;
+                                sn.data({
+                                    og, 
+                                    v: `${sn.data().v} <= ${
                                         f(Fraction(params.manual.value)
                                             .add(Fraction(cycleValue))
                                         )
                                     }${EPSILONS(ep)}`
                                 })
-                                n.addClass("highlighted")
-                            }
+                                sn.addClass("highlighted");
+                            } 
                         }, 1000);
                     }
                 };
@@ -526,7 +542,7 @@ export class DifferenceCD {
             cy.nodes()
                 .on("dbltap", e => {
                     const variable = e.target.data();
-                    if (variable.v !== "(0)") {
+                    if (variable.v !== ZERO) {
                         params.manual = setManualValue(params, variable);
                         document.getElementById("explanation-probe").style.display = "flex";
                         document.getElementById("var-input-desc").innerHTML = `Set a value for "${variable.og}" and see it propagate in the graph!` 
@@ -604,5 +620,7 @@ export class DifferenceCD {
         varInput.value = "";
         varInput.addEventListener('change', playWithVar)
         document.getElementById('play-with-var').addEventListener('click', playWithVar)
+
+        utils.showMeasure(params.subProof.name);
     }
 }

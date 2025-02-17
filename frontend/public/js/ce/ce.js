@@ -786,7 +786,7 @@ function calcBoxWidth(longestString) {
 }
 
 function calcBoxHeight(stringList) {
-  if (stringList == 'Group') {
+  if (stringList === 'Group') {
     return (stringList.length + 35) + "px";
   }
   else {

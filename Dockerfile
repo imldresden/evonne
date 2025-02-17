@@ -1,21 +1,12 @@
-FROM ubuntu:18.04
+FROM ubuntu:25.04
 WORKDIR /usr/src/evonne
 
-### 1. node 16
+### 1. node 20
 RUN apt-get update && \
-    apt-get install -y curl gnupg build-essential && \
-    curl --silent --location https://deb.nodesource.com/setup_16.x | bash - && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-    apt-get remove -y --purge cmdtest && \
-    apt-get update && \
-    apt-get install -y nodejs yarn && \
-    # remove useless files from the current layer
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /var/lib/apt/lists.d/* && \
-    apt-get autoremove && \
-    apt-get clean && \
-    apt-get autoclean
+    apt-get install curl -y && \
+    curl -sL https://deb.nodesource.com/setup_20.x | bash && \
+    apt-get install nodejs -y && \
+    node -v && npm -v
 
 ### 2. java 
 RUN apt-get update && \
@@ -24,25 +15,17 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-### 3. python 3.8 
-RUN apt update && \
-    apt install --no-install-recommends -y build-essential software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt install --no-install-recommends -y python3.8 python3.8-dev python3.8-distutils && \
-    apt clean && rm -rf /var/lib/apt/lists/*
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2
-RUN curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python3 get-pip.py --force-reinstall && \
-    rm get-pip.py
+### 3. pip
+RUN apt-get update && apt install python3-pip -y 
 
 ### 4. clingo
-RUN python3 -m pip install --user --upgrade clingo
+RUN python3 -m pip install --user --upgrade --break-system-packages clingo
 
-### 5. install app
+### 5. install evonne 
 COPY package.json ./
 RUN npm install pm2 -g
-RUN npm install 
+RUN npm install extract-zip-relative-path -g
+RUN npm install --omit=dev
 
 COPY frontend ./frontend/
 COPY .env ./

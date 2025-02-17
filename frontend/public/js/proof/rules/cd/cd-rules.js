@@ -153,7 +153,7 @@ class CDRules {
             _data = combineSteps(_data, params.subProof.name);
         }
 
-        console.log(_data)
+        //console.log(_data)
 
         if (this.diff.isDifference(_data)) { 
             this.diff.draw(_data, params, div);
