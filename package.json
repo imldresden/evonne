@@ -19,7 +19,7 @@
         "dotenv": "14.2.0",
         "express": "4.17.1",
         "express-fileupload": "1.2.1",
-        "extract-zip-relative-path": "2.0.4",
+        "extract-zip-relative-path": "^2.0.4",
         "fraction.js": "5.1.1",
         "fs": "0.0.1-security",
         "function-plot": "1.25.1",
