@@ -73,7 +73,12 @@ export class DifferenceCD {
     }
 
     async draw(data, params, where) {
-        const getRuleName = (rn) => this.rules[rn] ? `${rn} (${this.rules[rn]})` : rn;
+        const getRuleName = (rn) => {
+            if (params.isSubProof && params.subProof.name) {
+                return params.subProof.name;
+            }
+            return this.rules[rn] && `[${this.rules[rn]}]` !== rn ? `${rn} (${this.rules[rn]})` : rn
+        }
         let cy;
         
         function displayRule(op) {

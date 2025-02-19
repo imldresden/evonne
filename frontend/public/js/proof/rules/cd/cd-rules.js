@@ -52,7 +52,7 @@ function controls({ data }, where, params) {
         const complete = righted.append("a")
             .attr("class", "bar-button tooltipped")
             .attr("id", "entire-subproof")
-            .attr("title", params.isSubProof?"Show Single Inference":"Show Entire Numerical Subproof");
+            .attr("title", params.isSubProof?"Show Single Inference":"Show Numerical Subproof");
         complete.append("i")
             .attr("class", "material-icons")
             .text(params.isSubProof?"unfold_less":"unfold_more")

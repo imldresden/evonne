@@ -786,10 +786,22 @@ export class LinearCD {
                 select1.add(opt1);
                 select2.add(opt2);
             });
+
             
             select1.value = rVars[0];
             select2.value = rVars[1];
-
+            if (rVars.length === 1 && vars.length > 1) {
+                let other;
+                vars
+                    .filter((_, i) => Fraction(data.matrix[data.matrix.length - 1][i]).equals(0))
+                    .forEach(v => {
+                        const opt = new Option(v, v);
+                        other = v;
+                        select2.add(opt);
+                    });
+                select2.value = other;
+            }
+            
             function update(d) {
                 const other = d.target.id === "var1" ? `#var2 option` : `#var1 option`;
 
