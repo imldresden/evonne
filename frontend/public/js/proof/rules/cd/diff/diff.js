@@ -75,7 +75,7 @@ export class DifferenceCD {
     async draw(data, params, where) {
         const getRuleName = (rn) => {
             if (params.isSubProof && params.subProof.name) {
-                return params.subProof.name;
+                return `Negative Cycle - ${params.subProof.name}`;
             }
             return this.rules[rn] && `[${this.rules[rn]}]` !== rn ? `${rn} (${this.rules[rn]})` : rn
         }
@@ -128,22 +128,23 @@ export class DifferenceCD {
                 });
             }
 
-            input.append("span").text("Premises:")
-            input.append("br");
+            const premisesBox = input.append("div").attr('class', 'premises-box')
+            premisesBox.append("span").text("Premises:")
+            premisesBox.append("br");
 
             op.premises.forEach((pr, i) => {
                 if (i !== 0) {
-                    input.append("br");
+                    premisesBox.append("br");
                 }
 
-                input.append("span").attr("class", "tab");
+                premisesBox.append("span").attr("class", "tab");
                 
                 if (pr.constraint.bottom) {
-                    input.append("span").attr("class", "tab");
-                    input.append("span").attr("id", `eq-${pr.bottom.id}`).attr("class", "text-red").text("⊥");
+                    premisesBox.append("span").attr("class", "tab");
+                    premisesBox.append("span").attr("id", `eq-${pr.bottom.id}`).attr("class", "text-red").text("⊥");
                 } else {
                     const cid = `eq-${pr.id}`;
-                    const constraint = input.append("span")
+                    const constraint = premisesBox.append("span")
                         .attr("id", cid)
                         .attr("class", "text-eq premise")
                         .on('mouseover', ()=> dispatchHighlightCustomEvent(cid))
@@ -156,12 +157,15 @@ export class DifferenceCD {
             });
 
             if (op.conclusion.constraint.bottom) {
-                input.append("br");
+                output.append("br");
+                output.append("br");
                 output.append("span").text("Conclusion:");
                 output.append("br");
                 output.append("span").attr("class", "tab");
                 output.append("span").attr("id", `eq-${op.conclusion.id}`).attr("class", "text-red").text("⊥");
             } else {
+                output.append("br");
+                output.append("br");
                 output.append("span").text("Conclusion:");
                 output.append("br");
                 output.append("span").attr("class", "tab");
@@ -198,7 +202,7 @@ export class DifferenceCD {
                 }
             }
 
-            const negCValue = input.append("span")
+            const negCValue = output.append("span")
                 .attr("class", "text-black")
                 .style("display", "block")
                 .style("text-align", "left")
@@ -550,7 +554,8 @@ export class DifferenceCD {
                     if (variable.v !== ZERO) {
                         params.manual = setManualValue(params, variable);
                         document.getElementById("explanation-probe").style.display = "flex";
-                        document.getElementById("var-input-desc").innerHTML = `Set a value for "${variable.og}" and see it propagate in the graph!` 
+                        document.getElementById("var-input-desc").innerHTML = `Propagate a value for "${variable.og}"!`
+                        cy.resize();
                     }
                 });
             
@@ -591,8 +596,9 @@ export class DifferenceCD {
         M.Tooltip.init(question);
 
         const operationHeight = getHeight(data);
+        params.wide = true;
         const { input, output } = createVisContainer(params, where, operationHeight);
-        d3.select('#cd-divider').style('height', operationHeight);
+        //d3.select('#cd-divider').style('height', operationHeight);
         const showObvious = this.showObvious;
         const types = this.types;
 

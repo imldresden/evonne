@@ -25,7 +25,7 @@ function combineSteps(data, name) {
     if (keys.length === 1) {
         return data;
     } else {
-        const d = { id: "combined", premises: [], name: `Negative Cycle - ${name}` };
+        const d = { id: "combined", premises: [], name };
         const s = new Set();
         keys.forEach(id => {
             d.domain = data.ops[id].domain;
@@ -110,34 +110,57 @@ function controls({ data }, where, params) {
 }
 
 function createVisContainer(params, where, extra = 0) {
-    const exp = where.append("div").attr("class", "popoverText flexy");
-    exp.html(`
-        <div id='cd-left'></div>
-        <div id='cd-divider'></div>
-        <div id='cd-right'></div> 
-    `);
+    function addProbe(where) {
+        where.append("div")
+            .attr("class", "explanation-probe")
+            .attr("id", "explanation-probe")
+            .html(`
+                <div class="input-field flexy">
+                    <input id="var-input" type="number" step="0.01">
+                    <label for="var-input" class="active" id="var-input-desc"></label>
+                    &nbsp;
+                    <button class="btn-small btn-primary" id="play-with-var" title="See animation"><i class="material-icons">play_arrow</i></button>
+                </div>
+            `);
+    }
 
-    where.append("div")
-        .attr("class", "explanation-probe")
-        .attr("id", "explanation-probe")
-        .html(`
-            <div class="input-field flexy">
-                <input id="var-input" type="number" step="0.01">
-                <label for="var-input" class="active" id="var-input-desc"></label>
-                &nbsp;
-                <button class="btn-small btn-primary" id="play-with-var" title="See animation"><i class="material-icons">play_arrow</i></button>
-            </div>
+    if (params.wide) {
+        const wide = where.append("div").attr("class", "flexy");
+
+        const exp = wide.append("div").attr("class", "popoverText flexy");
+        exp.html(`
+            <div id='cd-left'></div>
+            <div id='cd-divider'></div>
+        `);
+        addProbe(where);
+
+        //Add visualization
+        wide.append("div")
+            .attr("class", "explanation-container")
+            .attr("id", "explanation-container")
+            .style("width", params.large ? "100%" : "500px")
+            .style("height", params.large ? `${params.p.height - (50 + extra)}px` : "450px")
+    
+        return { input: d3.select('#cd-left'), output: d3.select('#cd-left'), };
+    } else {
+        const exp = where.append("div").attr("class", "popoverText flexy");
+        exp.html(`
+            <div id='cd-left'></div>
+            <div id='cd-divider'></div>
+            <div id='cd-right'></div> 
         `);
 
-    //Add visualization
-    where.append("div")
-        .attr("class", "explanation-container")
-        .attr("id", "explanation-container")
-        .style("height", params.large ? `${params.p.height - (150 + extra)}px` : "350px")
-        .style("width", "100%")
-
-
-    return { input: d3.select('#cd-left'), output: d3.select('#cd-right'), };
+        addProbe(where);
+        //Add visualization
+        where.append("div")
+            .attr("class", "explanation-container")
+            .attr("id", "explanation-container")
+            .style("height", params.large ? `${params.p.height - (150 + extra)}px` : "350px")
+            .style("width", "100%")
+    
+    
+        return { input: d3.select('#cd-left'), output: d3.select('#cd-right'), };
+    }
 }
 
 class CDRules {
