@@ -1,26 +1,26 @@
 const ProofType = {
     minimalTreeSize:function () {
-        return "mintreesize";
+        return "MinimalTreeSize";
     },
 
     condensedMinimalTreeSize:function (){
-        return "conmintreesize";
+        return "CondensedMinimalTreeSize";
     },
 
     minimalDepth:function (){
-        return "mindepth";
+        return "MinimalDepth";
     },
 
     condensedMinimalDepth:function (){
-        return "conmindepth";
+        return "CondensedMinimalDepth";
     },
 
     minimalWeightedTreeSize:function (){
-        return "minwtreesize";
+        return "MinimalWeightedTreeSize";
     },
 
     condensedMinimalWeightedTreeSize:function (){
-        return "conminwtreesize";
+        return "CondensedMinimalWeightedTreeSize";
     },
 }
 
