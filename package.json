@@ -19,7 +19,6 @@
         "dotenv": "14.2.0",
         "express": "4.17.1",
         "express-fileupload": "1.2.1",
-        "extract-zip-relative-path": "^2.0.4",
         "fraction.js": "5.1.1",
         "fs": "0.0.1-security",
         "function-plot": "1.25.1",
@@ -40,15 +39,15 @@
         "webcola": "3.3.8"
     },
     "scripts": {
-        "download-all": "npm run download-jars && npm run download-examples",
+        "download-all": "npm run download-examples && npm run download-jars",
         "start": "npm run download-all && node server.js",
         "dev": "node server.js",
         "start-ci": "PORT=7007 forever start server.js",
         "stop-ci": "forever stopall",
         "download-jars": "mkdir \"./externalTools\" & curl -L \"https://cloud.perspicuous-computing.science/s/tDkfjWiDoXWf4P5/download\" -o ./tools.zip && npm run extract-jars",
-        "extract-jars": "extract-zip \"./tools.zip\" ./ && recursive-delete \"./externalTools\" && move-file \"./backend-tools-dev/\" \"./externalTools/\" ",
+        "extract-jars": "unzip -o \"./tools.zip\" && recursive-delete \"./externalTools\" && move-file \"./backend-tools-dev/\" \"./externalTools/\" ",
         "download-examples": "mkdir \"./frontend/public/examples\" & curl -L \"https://cloud.perspicuous-computing.science/s/ecz5srM7mDMwP2t/download\" -o ./examples.zip && npm run extract-examples",
-        "extract-examples": "extract-zip \"./examples.zip\" ./ && recursive-delete \"./frontend/public/data\" && move-file \"./examples-dev/\" \"./frontend/public/data\" ./ && extract-zip \"./examples.zip\" ./ && recursive-delete \"./frontend/public/examples\" && move-file \"./examples-dev/\" \"./frontend/public/examples\" "
+        "extract-examples": "unzip -o \"./examples.zip\" && recursive-delete \"./frontend/public/data\" && move-file \"./examples-dev/\" \"./frontend/public/data\" ./ && unzip -o \"./examples.zip\" && recursive-delete \"./frontend/public/examples\" && move-file \"./examples-dev/\" \"./frontend/public/examples\" "
     },
     "main": "server.js",
     "devDependencies": {
