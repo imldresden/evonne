@@ -45,7 +45,7 @@
         "dev": "node server.js",
         "start-ci": "PORT=7007 forever start server.js",
         "stop-ci": "forever stopall",
-        "download-jars": "mkdir \"./externalTools\" & curl \"https://cloud.perspicuous-computing.science/s/tDkfjWiDoXWf4P5/download\" -o ./tools.zip && npm run extract-jars",
+        "download-jars": "mkdir \"./externalTools\" & curl \"https://cloud.perspicuous-computing.science/s/tDkfjWiDoXWf4P5/download/\" -o ./tools.zip && npm run extract-jars",
         "extract-jars": "extract-zip \"./tools.zip\" ./ && recursive-delete \"./externalTools\" && move-file \"./backend-tools-dev/\" \"./externalTools/\" ",
         "download-examples": "mkdir \"./frontend/public/examples\" & curl \"https://cloud.perspicuous-computing.science/s/ecz5srM7mDMwP2t/download\" -o ./examples.zip && npm run extract-examples",
         "extract-examples": "extract-zip \"./examples.zip\" ./ && recursive-delete \"./frontend/public/data\" && move-file \"./examples-dev/\" \"./frontend/public/data\" ./ && extract-zip \"./examples.zip\" ./ && recursive-delete \"./frontend/public/examples\" && move-file \"./examples-dev/\" \"./frontend/public/examples\" "
