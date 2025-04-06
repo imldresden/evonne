@@ -3,6 +3,7 @@ WORKDIR /usr/src/evonne
 
 ### 1. node 20
 RUN apt-get update && \
+    apt-get install unzip -y && \
     apt-get install curl -y && \
     curl -sL https://deb.nodesource.com/setup_20.x | bash && \
     apt-get install nodejs -y && \
