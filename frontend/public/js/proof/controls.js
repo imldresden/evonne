@@ -243,6 +243,7 @@ function layoutTndentedToggle() {
 
     proof.isCompact = compactToggleBtn.checked;
     proof.isLinear = proof.isCompact || layoutToggleBtn.checked;
+    proof.isMagic = !proof.isCompact && magicToggleBtn.checked;
     proof.compactInteraction = proof.isCompact;
 
     const t = document.getElementById("notCompactLayout");
