@@ -72,7 +72,7 @@ export class NodeVisualsHelper {
         
         if (proof.isCompact) {
             circle.attr("cy", 10).attr("cx", -15);
-            text.attr("y", 14).attr("x", -19);
+            text.attr("y", 14).attr("x", 99);
         } else {
             circle.attr("cy", 15).attr("cx", 0);
             text.attr("y", 19).attr("x", -4);
@@ -195,7 +195,10 @@ export class NodeVisualsHelper {
         //Remove old rectangles
         elements.selectAll(".bg-box").remove();
         //Add a rectangle for the tray of communication buttons
-        elements.filter(":not(.rule)").append("rect")
+
+        const rules = elements.filter(".rule");
+        const notRules = elements.filter(":not(.rule)");
+        notRules.append("rect")
             .attr("id", "backRect")
             .attr("class", "bg-box tray")
             .attr("x", -BOTTOM_TRAY_WIDTH / 2)
@@ -205,7 +208,7 @@ export class NodeVisualsHelper {
             .style("opacity", 0);
 
         //Add a rectangle for the tray of axiom display buttons
-        elements.filter(":not(.rule)").append("rect")
+        notRules.append("rect")
             .attr("id", "topRect")
             .attr("class", "bg-box tray")
             .attr("x", -TOP_TRAY_WIDTH / 2)
@@ -214,19 +217,24 @@ export class NodeVisualsHelper {
             .attr("height", TRAY_HEIGHT)
             .style("opacity", 0);
 
-        elements.filter(".rule")
+        rules
             .attr("cursor", "pointer")
             .attr("pointer-events", "all");
 
         //Add a rectangle for the label
-        elements.append("rect")
+        const nr = notRules.append("rect")
+            .attr("class", `bg-box ${proof.isCompact ? '': 'rounded-box'}`);
+
+        const r = rules.append("rect")
+            .attr("class", 'bg-box rounded-box');
+
+        [r, nr].forEach(n => n
             .attr("id", "frontRect")
-            .attr("class", `bg-box ${proof.isCompact ?  "": "rounded-box" }` )
-            .attr("x", d=> -(d.width) / 2)
+            .attr("x", d=> (-d.width) / 2)
             .attr("y", 0)
             .attr("width", d => d.width)
             .attr("height", d => d.height)
-            .classed("expanded", false);
+            .classed("expanded", false));
     }
 
     renderLabels() {
@@ -264,7 +272,7 @@ export class NodeVisualsHelper {
             elements[i].append("text")
                 .attr("id", elementsID[i])
                 .attr("class", elementsClass[i])
-                .attr("x", d => -(d.width) / 2 + TEXT_PAD)
+                .attr("x", d => (-d.width / 2) + (TEXT_PAD / (proof.isCompact ? 2 : 1)))
                 .attr("y", d => d.height / 1.5)
                 .text((d, i, nodes) => {
                     const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
@@ -361,8 +369,8 @@ export class NodeVisualsHelper {
             })
             .on("contextmenu", (e, d) => {
                 const menuItems = proof.axioms.menuItems;
-                e.preventDefault();
-                globals.contextMenu.create(e, d, menuItems.filter(m => m.filter && m.filter(d)), "#proof-view");
+                //e.preventDefault();
+                //globals.contextMenu.create(e, d, menuItems.filter(m => m.filter && m.filter(d)), "#proof-view");
             })
     }
 
@@ -575,7 +583,7 @@ export class NodeVisualsHelper {
         }
 
         const lines = label.split('\n');
-        node.width = Math.max(lines.map(l => l.length)) * globals.fontCharacterWidth;
+        node.width = label.length * globals.fontCharacterWidth;
         node.height = lines.length * this.nodeLineHeight;
 
         if (!proof.isCompact) {

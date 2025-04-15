@@ -23,6 +23,7 @@ const showRulesBtn = document.getElementById("toggleRulesDisplay");
 const showSubProofsBtn = document.getElementById("toggleSubproofsDisplay");
 const magicToggleBtn = document.getElementById("toggleMagicMode");
 const layoutToggleBtn = document.getElementById("toggleLayoutMode");
+const compactToggleBtn = document.getElementById("toggleCompactMode");
 const shortenRules = document.getElementById("toggleRuleNamesShortening");
 const planarToggleBtn = document.getElementById("togglePlanar");
 const overlapAllowingSettings = document.getElementById("proof-overlap-allowing-settings");
@@ -74,6 +75,12 @@ const controls = [
         name: "planarToggleBtn",
         el: planarToggleBtn,
         fn: planarToggleBtnFunction,
+        type: 'click'
+    },
+    {
+        name: "compactToggleBtn",
+        el: compactToggleBtn,
+        fn: layoutTndentedToggle,
         type: 'click'
     },
     {
@@ -228,6 +235,22 @@ function magicToggleBtnFunction() {
 
 function getPlanarWrapper() {
     return planarToggleBtn && document.getElementById("planar-div-wrapper");
+}
+
+function layoutTndentedToggle() {
+    // Clear the SVG content
+    proof.svgRootLayer.selectAll("*").remove();
+
+    proof.isCompact = compactToggleBtn.checked;
+    proof.isLinear = proof.isCompact || layoutToggleBtn.checked;
+    proof.compactInteraction = proof.isCompact;
+
+    const t = document.getElementById("notCompactLayout");
+    if (t) {
+        t.style.display = proof.isCompact ? "none" : "block";
+    }
+
+    proof.update({ reset: true });
 }
 
 function layoutToggleBtnFunction() {

@@ -184,7 +184,8 @@ function init_proof({
     proof.proofFile = { name: file };
   }
 
-  if (proof.proofFile.name === `out_${new URL(window.location.toLocaleString()).searchParams.get("id")}_graphML0.t.xml`) {
+  // TODO-REMOVE: Specific to benchmark
+  if (proof.proofFile?.name === `out_${new URL(window.location.toLocaleString()).searchParams.get("id")}_graphML0.t.xml`) {
     console.log(`PROOF ${proof.proofFile.name} BENCHMARK:`)
   }
 

@@ -67,6 +67,7 @@ app.get('/uuid', (req, res) => {
 });
 
 function listExamples() {
+  // TODO-REMOVE: Specific to benchmark
   let html = ''
   readdirSync(examplesDir).forEach(example => {
     if ((+example) >=0 && (+example) < 100) {

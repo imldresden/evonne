@@ -49,14 +49,16 @@
                 compactInteraction: false,
         } 
 
+        const example = 96
         const external = {
             div: "my-reasoning-tree",
-            path: "../data/test/4th-trace.xml",
+            path: `../data/${example}/out_${example}_graphML0.t.xml`,
             //path: "../data/test/test.t.xml",
             drawTime: 0,
             showRules: true,
             trays: { upper:false, lower:false },
             stepNavigator: false, 
+            ...compact
         }
 
         init_proof({ external });

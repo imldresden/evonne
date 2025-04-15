@@ -118,32 +118,45 @@
         </select>
       </div>
 
-      <div class="modal-option">
-        <label class="label-toggle">Linear Mode</label>
-        <div class="switch">
-          <label>
-            <input id="toggleLayoutMode" type="checkbox">
-            <span class="lever"></span>
-          </label>
+      <div id="notCompactLayout">
+        <div class="modal-option">
+          <label class="label-toggle">Linear Mode</label>
+          <div class="switch">
+            <label>
+              <input id="toggleLayoutMode" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-option" id="planar-div-wrapper">
+          <label class="label-toggle">Optimize premise distance</label>
+          <div class="switch">
+            <label>
+              <input id="togglePlanar" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
+        </div>
+        
+
+        <!-- Magic option -->
+        <div class="modal-option">
+          <label class="label-toggle">Magic Mode</label>
+          <div class="switch">
+            <label>
+              <input id="toggleMagicMode" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
         </div>
       </div>
 
-      <div class="modal-option" id="planar-div-wrapper">
-        <label class="label-toggle">Optimize premise distance</label>
-        <div class="switch">
-          <label>
-            <input id="togglePlanar" type="checkbox">
-            <span class="lever"></span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Magic option -->
       <div class="modal-option">
-        <label class="label-toggle">Magic Mode</label>
+        <label class="label-toggle">Compact Mode</label>
         <div class="switch">
           <label>
-            <input id="toggleMagicMode" type="checkbox">
+            <input id="toggleCompactMode" type="checkbox">
             <span class="lever"></span>
           </label>
         </div>
