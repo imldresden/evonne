@@ -23,4 +23,6 @@
     <div onclick="loadExample('linear-unsat-2', 'linear-unsat-2')" class="collection-item">
         8. Linear Equations - No solution (2)
     </div>
+
+    {{ other_examples }}
 </div>

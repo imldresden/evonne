@@ -26,7 +26,7 @@ const upload = require('express-fileupload');
 
 const MODE = process.env.MODE || 'demo';
 const PORT = process.env.PORT || 3000;
-const EXAMPLES = process.env.EXAMPLES || 'ijcar';
+const EXAMPLES = process.env.EXAMPLES || 'study';
 console.log("Environment: " + MODE);
 
 const app = express();
@@ -66,6 +66,18 @@ app.get('/uuid', (req, res) => {
   res.status(200).send(uuidv4());
 });
 
+function listExamples() {
+  let html = ''
+  readdirSync(examplesDir).forEach(example => {
+    if ((+example) >=0 && (+example) < 100) {
+      html += `<div onclick="loadExample('${example}', '${example}')" class="collection-item">
+          [BENCHMARK]: Case ${example}
+      </div>`
+    }
+  })
+  return html;
+}
+
 // pages
 const page = (req, res) => {
   const id = req.query.id;
@@ -80,7 +92,8 @@ const page = (req, res) => {
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
       menu_specific: `${MODE === 'demo' ? '' : '<< widgets/menus/projects >> << widgets/menus/compute >>'} << proof/menu >> << ontology/menu >>`,
-      general_settings: '<< widgets/menus/shortening >>'
+      general_settings: '<< widgets/menus/shortening >>',
+      other_examples: listExamples(),
     });
   }
 }
@@ -545,6 +558,7 @@ function renderMain(req, res) {
       title,
       uuid: uuidv4(),
       examples: getExamples(req),
+      other_examples: listExamples(),
     });
   } else {
     res.render('pages/welcome.spy', {
@@ -552,6 +566,7 @@ function renderMain(req, res) {
       uuid: uuidv4(),
       menu_specific: '<< widgets/menus/projects >>',
       examples: getExamples(req),
+      other_examples: listExamples(),
     });
   }
 }
