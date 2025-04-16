@@ -4,7 +4,7 @@ export class BasicShorteningFunctions {
     _CCToFull;
     _FullToCC;
     _CCToCount;
-    _maxLength = 7;
+    _maxLength = 4;
     _placeHolderToOriginal;
     _placeHolderToShort;
     _placeHolderCounter;

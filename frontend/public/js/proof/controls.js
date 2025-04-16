@@ -340,7 +340,17 @@ function proofHeightRangeResetBtnFunction() {
     proof.update();
 }
 
+function maxLengthInputLabelUpdate() {
+    const badge = maxLengthInput.parentNode
+        && maxLengthInput.parentNode.parentNode.querySelector("span.badge")
+
+    if (badge) {
+        badge.innerHTML = maxLengthInput.value
+    }
+}
+
 function maxLengthInputFunction() {
+    maxLengthInputLabelUpdate();
     if (globals.labelsShorteningHelper) {
         globals.labelsShorteningHelper.applyShortening(globals.shorteningMethod);
         proof.update();
@@ -349,13 +359,7 @@ function maxLengthInputFunction() {
 
 function maxLengthInputResetFunction() {
     maxLengthInput.value = globals.labelsShorteningHelper._bSFs._maxLength;
-    const badge = maxLengthInput.parentNode
-        && maxLengthInput.parentNode.parentNode.querySelector("span.badge")
-
-    if (badge) {
-        badge.innerHTML = maxLengthInput.value
-    }
-    
+    maxLengthInputLabelUpdate();
     proof.update();
 }
 

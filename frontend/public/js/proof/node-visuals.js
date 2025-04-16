@@ -278,7 +278,7 @@ export class NodeVisualsHelper {
                     const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
 
                     let label = this.getLabel(d.data.source, display)
-                    if (display && display === "shortened") {
+                    if (display && display === "shortened" && !label.includes('[')) {
                         label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
                     }
 
@@ -578,7 +578,7 @@ export class NodeVisualsHelper {
         
         let label = this.getLabel(node.data.source, display);
         
-        if (display && display === "shortened") {
+        if (display && display === "shortened" && !label.includes('[')) {
             label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
         }
 

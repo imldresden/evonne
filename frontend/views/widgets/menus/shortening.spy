@@ -19,7 +19,7 @@
         <i class="material-icons">replay</i>
       </button>
       <form action="#">
-        <span class="new badge" data-badge-caption="characters">4</span>
+        <span class="new badge" id="maximumLengthLabel" data-badge-caption="characters">4</span>
         <p class="range-field">
           <input type="range" id="maximumLength" style="border-color: transparent" min="3" max="30" value="7"
             step="1" />
