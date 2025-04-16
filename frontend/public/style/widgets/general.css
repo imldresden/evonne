@@ -446,3 +446,7 @@ span.badge.new {
 .option-rhs-false {
 	background-color: var(--color-orange-light);
 }
+
+.linearActive, .compactActive {
+	display: none;
+}

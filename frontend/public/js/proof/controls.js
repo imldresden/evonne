@@ -245,18 +245,18 @@ function layoutIndentedToggle() {
     proof.isLinear = proof.isCompact || layoutToggleBtn.checked;
     proof.isMagic = !proof.isCompact && magicToggleBtn.checked;
     proof.compactInteraction = proof.isCompact;
-    proof.linear.bottomRoot = !proof.isCompact;
-
+    
     const ts = Array.from(document.getElementsByClassName("notCompactLayout"));
-    if (proof.isLinear) {
+    if (proof.isCompact) {
+        proof.linear.bottomRoot = false;
         proof.allowOverlap = false;
-        ts.forEach(t => t.style.display = "none");
+        ts.forEach(t => t.classList.add('compactActive'));
     } else {
-        proof.allowOverlap = allowOverlapBtn.checked;
-        ts.forEach(t => t.style.display = "block");
+        proof.linear.bottomRoot = true;
+        proof.allowOverlap = !proof.isLinear && allowOverlapBtn.checked;
+        ts.forEach(t => t.classList.remove('compactActive'));
     }
 
-    ts.forEach(t => t.style.display = proof.isCompact ? "none" : "block");
     proof.update({ reset: true });
 }
 
@@ -270,11 +270,11 @@ function layoutToggleBtnFunction() {
     if (proof.isLinear) {
         proof.allowOverlap = false;
         getPlanarWrapper().style.display = "flex";
-        ts.forEach(t => t.style.display = "none");
+        ts.forEach(t => t.classList.add('linearActive'));
     } else {
         proof.allowOverlap = allowOverlapBtn.checked;
         getPlanarWrapper().style.display = "none";
-        ts.forEach(t => t.style.display = "block");
+        ts.forEach(t => t.classList.remove('linearActive'));
     }
     
     proof.update({ reset: true });
