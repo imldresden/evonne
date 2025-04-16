@@ -92,6 +92,8 @@ export class TreeNavigation {
             if (rts[t.source.id]) {
                 t.source.rule = rts[t.source.id].source; // copies the rule into the nodes that are made from it
                 t.source.subProof = t.source.rule.subProof;    
+            } else {
+                console.log(t.source.labels.default)
             }
 
             if (t.target !== "" && rules[t.target.id]) {
@@ -355,8 +357,8 @@ export class TreeNavigation {
         return input
             .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
             .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
-            .on("click", (_, d) => {
-                if (!proof.isMagic && d.source.data.target.type === "axiom") {
+            .on("click", (e, d) => {
+                if (e.ctrlKey && !proof.isMagic && d.source.data.target.type === "axiom") {
                     proof.tree.showSubTree(d.target);
                 }
             })
