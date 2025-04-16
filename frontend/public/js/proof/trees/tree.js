@@ -88,14 +88,12 @@ export class TreeNavigation {
             }
         });
 
-        console.log(targets)
-        console.log(rts)
         targets.forEach(t => {
             if (rts[t.source.id]) {
                 t.source.rule = rts[t.source.id].source; // copies the rule into the nodes that are made from it
                 t.source.subProof = t.source.rule.subProof;    
             }
-            
+
             if (t.target !== "" && rules[t.target.id]) {
                 t.target = rules[t.target.id].target; // replaces rule with rule target
             }
