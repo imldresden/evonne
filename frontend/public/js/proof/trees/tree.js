@@ -88,9 +88,14 @@ export class TreeNavigation {
             }
         });
 
+        console.log(targets)
+        console.log(rts)
         targets.forEach(t => {
-            t.source.rule = rts[t.source.id].source; // copies the rule into the nodes that are made from it
-            t.source.subProof = t.source.rule.subProof;
+            if (rts[t.source.id]) {
+                t.source.rule = rts[t.source.id].source; // copies the rule into the nodes that are made from it
+                t.source.subProof = t.source.rule.subProof;    
+            }
+            
             if (t.target !== "" && rules[t.target.id]) {
                 t.target = rules[t.target.id].target; // replaces rule with rule target
             }
@@ -335,7 +340,7 @@ export class TreeNavigation {
     }
 
     lineAttributes(input) {
-        if (proof.isCompact && proof.showRules) {
+        if (proof.isCompact) {
             input
                 .attr("marker-end", "")
                 .attr("class", d => `link cuttable dim ${(d.source.data.source.type === "rest" ? "torest" : "")
