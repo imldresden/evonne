@@ -26,13 +26,15 @@
     <fieldset>
       <h4>Compactness</h4>
 
-      <div class="modal-option">
-        <label class="label-toggle">Overlap Allowed</label>
-        <div class="switch">
-          <label>
-            <input id="toggleAllowOverlap" type="checkbox">
-            <span class="lever"></span>
-          </label>
+      <div class="notCompactLayout notLinearLayout">
+        <div class="modal-option">
+          <label class="label-toggle">Overlap Allowed</label>
+          <div class="switch">
+            <label>
+              <input id="toggleAllowOverlap" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -118,7 +120,7 @@
         </select>
       </div>
 
-      <div id="notCompactLayout">
+      <div class="notCompactLayout">
         <div class="modal-option">
           <label class="label-toggle">Linear Mode</label>
           <div class="switch">
@@ -153,7 +155,7 @@
       </div>
 
       <div class="modal-option">
-        <label class="label-toggle">Compact Mode</label>
+        <label class="label-toggle">Indented Compact Mode</label>
         <div class="switch">
           <label>
             <input id="toggleCompactMode" type="checkbox">

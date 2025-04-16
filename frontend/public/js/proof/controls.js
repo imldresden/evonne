@@ -80,7 +80,7 @@ const controls = [
     {
         name: "compactToggleBtn",
         el: compactToggleBtn,
-        fn: layoutTndentedToggle,
+        fn: layoutIndentedToggle,
         type: 'click'
     },
     {
@@ -237,7 +237,7 @@ function getPlanarWrapper() {
     return planarToggleBtn && document.getElementById("planar-div-wrapper");
 }
 
-function layoutTndentedToggle() {
+function layoutIndentedToggle() {
     // Clear the SVG content
     proof.svgRootLayer.selectAll("*").remove();
 
@@ -247,11 +247,16 @@ function layoutTndentedToggle() {
     proof.compactInteraction = proof.isCompact;
     proof.linear.bottomRoot = !proof.isCompact;
 
-    const t = document.getElementById("notCompactLayout");
-    if (t) {
-        t.style.display = proof.isCompact ? "none" : "block";
+    const ts = Array.from(document.getElementsByClassName("notCompactLayout"));
+    if (proof.isLinear) {
+        proof.allowOverlap = false;
+        ts.forEach(t => t.style.display = "none");
+    } else {
+        proof.allowOverlap = allowOverlapBtn.checked;
+        ts.forEach(t => t.style.display = "block");
     }
 
+    ts.forEach(t => t.style.display = proof.isCompact ? "none" : "block");
     proof.update({ reset: true });
 }
 
@@ -260,11 +265,16 @@ function layoutToggleBtnFunction() {
     proof.svgRootLayer.selectAll("*").remove();
 
     proof.isLinear = layoutToggleBtn.checked;
-
-    if (layoutToggleBtn.checked) {
+    const ts = Array.from(document.getElementsByClassName("notLinearLayout"));
+    
+    if (proof.isLinear) {
+        proof.allowOverlap = false;
         getPlanarWrapper().style.display = "flex";
+        ts.forEach(t => t.style.display = "none");
     } else {
+        proof.allowOverlap = allowOverlapBtn.checked;
         getPlanarWrapper().style.display = "none";
+        ts.forEach(t => t.style.display = "block");
     }
     
     proof.update({ reset: true });
