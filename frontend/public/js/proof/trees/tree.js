@@ -54,8 +54,7 @@ export class TreeNavigation {
         this.links = proof.svgRootLayer
             .append("g")
             .attr("id", "links")
-            .attr("cursor", "pointer")
-            .attr("pointer-events", "all");
+            .attr("cursor", "pointer");
 
         this.nodes = proof.svgRootLayer
             .append("g")

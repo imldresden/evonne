@@ -172,9 +172,7 @@ export class LinearNavigation {
         let offSetX = midpoint_x + ((this.bottomRoot ? 1 : -1) * offset * (dy / normalise));
         let offSetY = midpoint_y - offset * (dx / normalise);
 
-        const forward = "M" + x2 + "," + y2 + "S" + offSetX + "," + offSetY + " " + x1 + "," + y1;
-        const backward = "M" + x2 + "," + y1 + "C" + offSetX + "," + offSetY + " " + x1 + "," + y2 + " " + x1 + "," + y2;
         // close path on itself to avoid clickable block
-        return forward + backward; // bezier curves
+        return "M" + x2 + "," + y2 + "S" + offSetX + "," + offSetY + " " + x1 + "," + y1; // bezier curves
     }
 }

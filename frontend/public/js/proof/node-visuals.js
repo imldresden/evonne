@@ -217,9 +217,7 @@ export class NodeVisualsHelper {
             .attr("height", TRAY_HEIGHT)
             .style("opacity", 0);
 
-        rules
-            .attr("cursor", "pointer")
-            .attr("pointer-events", "all");
+        rules.attr("cursor", "pointer");
 
         //Add a rectangle for the label
         const nr = notRules.append("rect")
@@ -329,7 +327,6 @@ export class NodeVisualsHelper {
             proof.svg.selectAll(".node")
             .selectAll(".axiomButton")
             .attr("cursor", "pointer")
-            .attr("pointer-events", "all")
             .style("opacity", 0);
         }
         
