@@ -1,4 +1,3 @@
-import { nodeVisualsDefaults } from "../node-visuals.js";
 import { proof } from "../proof.js";
 import { utils as ruleUtils } from "../rules/rules.js";
 
@@ -22,7 +21,7 @@ export class LinearNavigation {
 
         const al = {};
         let c = 0;
-        let maxHeight = proof.height + 30;
+        let maxHeight = proof.height;
         orderedElements.forEach(d => {
             if (proof.isCompact || !ruleUtils.isRule(d.data.source.type)) {
                 al[d.data.source.id] = { axiom: d, pos: c, y: maxHeight};
@@ -31,38 +30,25 @@ export class LinearNavigation {
             }
         });
 
-            
-        if (proof.allowOverlap) {
-            const itemY = proof.height / (orderedElements.length < 2 ? 1 : orderedElements.length - 1);
-            linearLayout.each(d => {
-                d.x = 0.7 * proof.width - d.width / 2;
-                if (orderedElements.length < 2) {
-                    d.y = 0.01 * proof.height;
+        linearLayout.each(d => {
+            if (proof.isCompact) {
+                const m = ruleUtils.isRule(d.data.source.type) ? 1 : 0;
+                d.x = d.width / 2 + (d.depth - m)*5 + 30;
+                d.y = al[d.data.source.id].y;
+            } else {
+                if (ruleUtils.isRule(d.data.source.type)) {
+                    d.x = 0.7 * proof.width - d.width / 2 + d.width + 50;
+                    d.y = al[d.data.target.id].y - 15;    
                 } else {
-                    d.y = 1.01 * proof.height - ((orderedElements.indexOf(d)) * itemY);
-                }
-            });    
-        } else {
-            linearLayout.each(d => {
-                if (proof.isCompact) {
-                    const m = ruleUtils.isRule(d.data.source.type) ? 1 : 0;
-                    d.x = d.width / 2 + (d.depth - m)*5 - 10;
+                    d.x = 0.7 * proof.width - d.width / 2 + 15;
                     d.y = al[d.data.source.id].y;
-                } else {
-                    if (ruleUtils.isRule(d.data.source.type)) {
-                        d.x = 0.7 * proof.width - d.width / 2 + d.width + 50;
-                        d.y = al[d.data.target.id].y - 15;    
-                    } else {
-                        d.x = 0.7 * proof.width - d.width / 2 + 15;
-                        d.y = al[d.data.source.id].y;
-                    }
                 }
+            }
 
-                if (this.bottomRoot) {
-                    d.y = proof.height - d.y;
-                }                
-            });
-        }
+            if (this.bottomRoot) {
+                d.y = proof.height - d.y;
+            }                
+        });
         
         return linearLayout;
     }
@@ -133,7 +119,6 @@ export class LinearNavigation {
         y2 = proof.height - targetY + d.target.height / 2;
         y1 = proof.height - sourceY + d.source.height / 2;
 
-        
         if (proof.isCompact) { 
             x2 = targetX - .5 * d.target.width;
             x1 = sourceX - .5 * d.source.width + 2;    

@@ -27,8 +27,8 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
     
     <script type="module">
-        //import { init_proof, proof } from "https://unpkg.com/evonne@0.0.6/frontend/public/js/proof/proof.js";
-        import { init_proof, proof } from "http://localhost:3000/js/proof/proof.js";
+        //import { init_trace, proof } from "https://unpkg.com/evonne@0.0.6/frontend/public/js/proof/proof.js";
+        import { init_trace, proof } from "http://localhost:3000/js/proof/proof.js";
         
         const compact = {
             isLinear: true,
@@ -49,11 +49,11 @@
                 compactInteraction: false,
         } 
 
-        const example = 96
-        const external = {
+        //const path = "../data/e3-trace/tableresponse.json";
+        const path = "../data/diff-inf/proof_graphML0.t.xml"
+        const params = {
             div: "my-reasoning-tree",
-            path: `../data/${example}/out_${example}_graphML0.t.xml`,
-            //path: "../data/test/test.t.xml",
+            path,
             drawTime: 0,
             showRules: true,
             trays: { upper:false, lower:false },
@@ -61,7 +61,7 @@
             ...compact
         }
 
-        init_proof({ external });
+        init_trace(params);
 
         let compactOrNormal = true;
         const switchBtn = document.getElementById("change")
@@ -69,10 +69,10 @@
             
             const layout = compactOrNormal ? compact : normal;
 
-            init_proof({ external: {
-                ...external,
+            init_trace({
+                ...params,
                 ...layout
-            }}); 
+            }); 
 
             if (compactOrNormal) {
                 compactOrNormal = false;

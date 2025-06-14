@@ -3,7 +3,7 @@ import { proof } from "../proof.js";
 
 export class MagicNavigation {
 	
-	currentMagicAction = undefined;
+	currentMagicAction = "";
 	axiomNodesButConclusion = undefined;
 	axiomNodes = undefined;
 	inferredAxiomNodes = undefined;

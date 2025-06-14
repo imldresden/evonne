@@ -12,7 +12,7 @@ import { MagicNavigation } from "./trees/magic.js";
 import { controls, init as initControls } from "./controls.js";
 import { proof } from "./proof.js";
 import { globals } from "../shared-data.js";
-import {RuleNameMapHelper} from "./ruleNamesMapHelper.js";
+import { RuleNameMapHelper } from "./ruleNamesMapHelper.js";
 
 const conf = {
   div: "proof-container",
@@ -74,11 +74,14 @@ const conf = {
     if (file.endsWith(".json")) {
       d3.json(file).then(json => {
         proof.tree.init(getTreeFromJSON(json));
+        console.log(proof.tree)
       });
     } else {
       try { // file.endsWith(".t.xml"), or blob
         d3.xml(file).then(xml => {
+          console.log(xml)
           proof.tree.init(getTreeFromXML(xml));
+          console.log(proof.tree)
         });
       } catch (e) {
         console.error(e)
@@ -92,30 +95,91 @@ const conf = {
   }
 }
 
+function setDefinedProperty(srcObj, targetObj, prop) {
+  // explicitly write undefined to avoid confusion with truthy values (e.g. false flag)
+  if (srcObj[prop] !== undefined) { 
+    targetObj[prop] = srcObj[prop];
+  }
+}
+
 function setFromExternal(external) {
   proof.div = external.div || proof.div,
-  proof.isZoomPan = external.isZoomPan === undefined ? proof.isZoomPan : external.isZoomPan;
-
-  proof.isMagic = external.isMagic === undefined ? proof.isMagic : external.isMagic; 
+  [
+    'isZoomPan',
+    'isMagic',
+    'isLinear',
+    'isCompact',
+    'compactInteraction',
+    'showRules',
+    'showSubProofs',
+    'shortenAll', 
+    'isRuleShort', 
+    'allowOverlap',
+    'trays',
+    'stepNavigator',
+    'drawTime',
+  ].map(prop => setDefinedProperty(external, proof, prop));
   
-  proof.isLinear = external.isLinear  === undefined ? proof.isLinear : external.isLinear; 
-  proof.linear.isBreadthFirst = external.isBreadthFirst === undefined ? proof.linear.isBreadthFirst : external.isBreadthFirst;
-  proof.linear.bottomRoot = external.bottomRoot === undefined ? proof.linear.bottomRoot : external.bottomRoot;
+  setDefinedProperty(external, proof.linear, 'isBreadthFirst');
+  setDefinedProperty(external, proof.linear, 'bottomRoot');
   
-  proof.isCompact = external.isCompact === undefined ? proof.isCompact : external.isCompact; 
-  proof.compactInteraction = external.compactInteraction === undefined ? proof.compactInteraction : external.compactInteraction;
-
-  proof.showRules = external.showRules === undefined ? proof.showRules : external.showRules;
-  proof.showSubProofs = external.showSubProofs === undefined ? proof.showSubProofs : external.showSubProofs;
-
   globals.shorteningMethod = external.shorteningMethod || globals.shorteningMethod;
-  proof.shortenAll = external.shortenAll === undefined ? proof.shortenAll : external.shortenAll; 
-  proof.isRuleShort = external.isRuleShort === undefined ? proof.isRuleShort : external.isRuleShort;
-  proof.allowOverlap = external.allowOverlap === undefined ? proof.allowOverlap : external.allowOverlap; 
-  proof.trays = external.trays === undefined ? proof.trays : external.trays;
-  proof.stepNavigator = external.stepNavigator === undefined ? proof.stepNavigator : external.stepNavigator;
+}
+
+function addArrowheads(svg) {
+  svg
+  .append("defs")
+  .append("marker")
+  .attr("id", "arrowhead")
+  .attr("viewBox", [0, 0, 20, 20])
+  .attr("refX", 27)
+  .attr("refY", 10)
+  .attr("markerWidth", 8)
+  .attr("markerHeight", 8)
+  .attr("markerUnits", "userSpaceOnUse")
+  .attr("orient", "auto-start-reverse")
+  .append("path")
+  .attr("d", d3.line()([[0, 0], [0, 20], [20, 10]]))
+  .attr("fill", "darkgrey");
+}
+
+function init_trace(params = {}) {
+
+  d3.select(`#${proof.div}`).selectAll("*").remove();
+  setFromExternal(params);
+
+  if (proof.svgRootLayer) {
+    proof.svgRootLayer.selectAll("*").remove();
+  }
+
+  // Configure SVG
+  d3.select(`#${proof.div}`).html(`<svg id="proof-view" style="flex:1"> </svg>`).style("display", "flex");
+
+  proof.svg = d3.select("#proof-view");
+  proof.BBox = proof.svg.node().getBoundingClientRect();
+  proof.SVGwidth = proof.BBox.width;
+  proof.SVGheight = proof.BBox.height;
+  proof.margin = { top: 50, right: 50, bottom: 100, left: 50 };
+  proof.width = proof.SVGwidth - proof.margin.left - proof.margin.right;
+  proof.height = proof.SVGheight - proof.margin.top - proof.margin.bottom;
+  proof.svg.style("user-select", "none");
+  proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport");
+  addArrowheads(proof.svg);
+
+  proof.load(params.path);
   
-  proof.drawTime = external.drawTime === undefined ? proof.drawTime : external.drawTime; 
+  if (params.isZoomPan) {
+    svgPanZoom("#proof-view", {
+      zoomEnabled: true,
+      controlIconsEnabled: true,
+      fit: false,
+      center: false,
+      minZoom: 0.1,
+      dblClickZoomEnabled: false,
+    });  
+  }
+  
+  return proof;
 }
 
 function init_proof({
@@ -203,20 +267,7 @@ function init_proof({
     initControls();
   }
   
-  proof.svg
-    .append("defs")
-    .append("marker")
-    .attr("id", "arrowhead")
-    .attr("viewBox", [0, 0, 20, 20])
-    .attr("refX", 27)
-    .attr("refY", 10)
-    .attr("markerWidth", 8)
-    .attr("markerHeight", 8)
-    .attr("markerUnits", "userSpaceOnUse")
-    .attr("orient", "auto-start-reverse")
-    .append("path")
-    .attr("d", d3.line()([[0, 0], [0, 20], [20, 10]]))
-    .attr("fill", "darkgrey");
+  addArrowheads(proof.svg);
 
   if (external) {
     proof.load(external.path);
@@ -237,4 +288,4 @@ function getFileName() {
   return fileName;
 }
 
-export { init_proof, conf as proof }
+export { init_proof, init_trace, conf as proof }
