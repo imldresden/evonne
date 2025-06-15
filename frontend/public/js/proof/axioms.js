@@ -170,7 +170,7 @@ export class AxiomsHelper {
 	}
 
 	addCollapse() {
-		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BTN_CARET_SIZE, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.nodes
 			.filter(d => this.conditionToCollapse(d))
@@ -179,9 +179,10 @@ export class AxiomsHelper {
 
 		if (proof.isCompact) {
 			group.attr("class", "axiomButton btn-borderless")
-				.attr("transform", d => `translate(${- d.width / 2 - BTN_CIRCLE_SIZE - 3}, ${d.height / 2})`)
+				.attr("transform", d => `translate(${- d.width / 2 - BTN_CARET_SIZE}, ${d.height / 2})`)
 
-			group.append("text")
+			group.filter(d => !ruleUtils.isRule(d.data.source.type))
+				.append("text")
 				.attr("class", "material-icons")
 				.attr("x", 0)
 				.attr("y", 0)
@@ -229,7 +230,7 @@ export class AxiomsHelper {
 	}
 
 	addExpand() {
-		const { BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
+		const { BTN_CARET_SIZE, BTN_CIRCLE_SIZE } = nodeVisualsDefaults;
 
 		let group = this.nodes
 			.filter(d => this.conditionToExpand(d))
@@ -238,12 +239,14 @@ export class AxiomsHelper {
 
 		if (proof.isCompact) {
 			group.attr("class", "axiomButton btn-borderless")
-				.attr("transform", d => `translate(${- d.width / 2 - BTN_CIRCLE_SIZE - 3}, ${d.height / 2})`)
+				.attr("transform", d => `translate(${- d.width / 2 - BTN_CARET_SIZE}, ${d.height / 2})`)
 
-			group.append("text")
+			group.filter(d => !ruleUtils.isRule(d.data.source.type))
+				.append("text")
 				.attr("class", "material-icons")
 				.attr("x", 0)
 				.attr("y", 0)
+				.attr("font-size", BTN_CARET_SIZE)
 				.text("keyboard_arrow_right");
 		} else {
 			group.attr("class", "axiomButton btn-round")
@@ -507,7 +510,7 @@ export class AxiomsHelper {
 			})
 			.append("g").attr("opacity", 0).attr("id", "B03")
 			.attr("class", "axiomButton btn-view")
-			.attr("transform", d => `translate(${-(d.width / 2) + BOX_PADDING}, ${d.height - 7})`) // 
+			.attr("transform", d => `translate(${-(d.width / 2) + BOX_PADDING}, ${d.height - 7})`)
 			.on("click", (e, d) => {
 				showFullAxiom(e.currentTarget.parentNode);
 				proof.update();
@@ -615,7 +618,6 @@ export class AxiomsHelper {
 	addCollapsedIndicator() {
 		d3.selectAll(".collapse-indicator").remove();
 
-		
 		const offset = 3;
 
 		const collapsed = proof.svg

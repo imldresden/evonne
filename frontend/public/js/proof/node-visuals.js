@@ -14,6 +14,7 @@ export const nodeVisualsDefaults = {
     BTN_EXTEND_WIDTH: 20,
     BTN_EXTEND_HEIGHT: 20,
     BTN_CIRCLE_SIZE: 15,
+    BTN_CARET_SIZE: 10,
     BTN_TRIANGLE_SIZE: 20,
     TEXT_PAD: 8,
     AXIOM_TEXT_BOTTOM_SHIFT: 30,

@@ -1,6 +1,5 @@
 import { proof } from "../proof.js";
 
-
 function getNegs(id, data) {
     const nid = `~${id}`;
     if (!data.getElementById(nid)) {
@@ -188,6 +187,7 @@ function getTreeFromXML(data) {
 
     // read nodes
     let nodes = getNodes(data, edges);
+    console.log(nodes)
 
     return addNodesToEdges(nodes, edges);
 }
@@ -238,4 +238,4 @@ function computeTreeLayout(hierarchy) {
     return tree_layout;
 }
 
-export { getTreeFromXML, getTreeFromJSON, computeTreeLayout }
+export { getTreeFromXML, getTreeFromJSON, computeTreeLayout, addNodesToEdges }

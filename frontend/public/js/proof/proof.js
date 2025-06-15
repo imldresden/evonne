@@ -1,5 +1,6 @@
 import thumbnailViewer from "../utils/pan-zoom.js";
 import { getTreeFromXML, getTreeFromJSON } from "./data/process-data.js";
+import { getProofFromJSONTrace } from "./data/process-trace.js";
 
 import { AxiomsHelper } from "./axioms.js";
 import { RulesHelper } from "./rules/rules.js";
@@ -74,14 +75,51 @@ const conf = {
     if (file.endsWith(".json")) {
       d3.json(file).then(json => {
         proof.tree.init(getTreeFromJSON(json));
-        console.log(proof.tree)
       });
     } else {
       try { // file.endsWith(".t.xml"), or blob
         d3.xml(file).then(xml => {
           console.log(xml)
           proof.tree.init(getTreeFromXML(xml));
-          console.log(proof.tree)
+        });
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  },
+
+  load_trace: function (path) {
+    const url = new URL(window.location.toLocaleString()).searchParams;
+    const predicate = url.get("predicate");
+    const queries = url.getAll("query");
+
+    const message = {
+      queryType: "treeForTable", 
+      payload: {
+        "predicate": predicate, 
+        "tableEntries": { "queries": queries }
+      }
+    };
+
+    console.log(message)
+
+    // TODO: replace with broadcast channel query
+    const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
+    
+
+    if (file.endsWith(".json")) {
+      d3.json(file).then(json => {
+        proof.trace = json;
+        proof.tree.init(getProofFromJSONTrace(json));
+        proof.printType2Query = function () {
+          console.log(proof.trace)
+        }
+      });
+    } else {
+      try { // file.endsWith(".t.xml"), or blob
+        d3.xml(file).then(xml => {
+          console.log(xml)
+          proof.tree.init(getTreeFromXML(xml));
         });
       } catch (e) {
         console.error(e)
@@ -163,10 +201,10 @@ function init_trace(params = {}) {
   proof.width = proof.SVGwidth - proof.margin.left - proof.margin.right;
   proof.height = proof.SVGheight - proof.margin.top - proof.margin.bottom;
   proof.svg.style("user-select", "none");
-  proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport");
+  proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport").attr("transform", "translate(0, 10)");
   addArrowheads(proof.svg);
 
-  proof.load(params.path);
+  proof.load_trace(params.path);
   
   if (params.isZoomPan) {
     svgPanZoom("#proof-view", {

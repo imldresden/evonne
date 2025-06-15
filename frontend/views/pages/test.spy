@@ -18,16 +18,16 @@
 </head>
 
 <body>
-    
-    <button id="change"> Switch Layout </button>
-    <main id="my-reasoning-tree"></main>
     <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
     <script src="https://unpkg.com/materialize-css@1.0.0-rc.2/dist/js/materialize.min.js"></script>
     <script src="https://unpkg.com/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
     
+    <button id="change"> Switch Layout </button>
+    <button id="print-query-type2"> Print Query Type 2 (Console) </button>
+
+    <main id="my-reasoning-tree"></main>
     <script type="module">
-        //import { init_trace, proof } from "https://unpkg.com/evonne@0.0.6/frontend/public/js/proof/proof.js";
         import { init_trace, proof } from "http://localhost:3000/js/proof/proof.js";
         
         const compact = {
@@ -49,8 +49,8 @@
                 compactInteraction: false,
         } 
 
-        //const path = "../data/e3-trace/tableresponse.json";
-        const path = "../data/diff-inf/proof_graphML0.t.xml"
+        const path = "../data/e3-trace/tableresponse.json";
+        // const path = "../data/diff-inf/proof_graphML0.t.xml"
         const params = {
             div: "my-reasoning-tree",
             path,
@@ -64,9 +64,8 @@
         init_trace(params);
 
         let compactOrNormal = true;
-        const switchBtn = document.getElementById("change")
+        const switchBtn = document.getElementById("change");
         switchBtn.addEventListener("click", () => {
-            
             const layout = compactOrNormal ? compact : normal;
 
             init_trace({
@@ -79,7 +78,12 @@
             } else {
                 compactOrNormal = true;
             }
-        })
+        });
+
+        const qt2 = document.getElementById("print-query-type2");
+        qt2.addEventListener("click", () => {
+            console.log(proof.trace);
+        });
     </script>
 </body>
 
