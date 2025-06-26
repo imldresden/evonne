@@ -4,9 +4,9 @@ The Dockerfile builds nemo-web and evonnemo, then serves the static sites under 
 To use docker (after installing docker...), you can use `npm run docker` or: 
 
 ```bash 
-cd ../ 
-docker build . -t admin/evonnemo -f ./evonnemo/Dockerfile
-docker rm -f evonnemo && docker run --name=evonnemo -dp 5173:5173 admin/evonnemo
+cd ../ # next command uses files from parent folder
+docker build . -t evonnemo -f ./evonnemo/Dockerfile
+docker rm -f evonnemo && docker run --name=evonnemo -dp <port>:5173 evonnemo
 ```
 
 

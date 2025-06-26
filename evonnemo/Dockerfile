@@ -47,15 +47,11 @@ RUN mkdir nemoVSIX && \
 ENV NODE_OPTIONS=--max_old_space_size=4096
 RUN npm run build
 
-# vis 
-RUN mkdir -p /usr/src/evonne
-COPY . /usr/src/evonne
+# evonne on vite
+RUN npm install serve -g 
+WORKDIR /usr/src/evonnemo
+RUN mv /usr/src/nemo-all/nemo-web/dist /usr/src/evonnemo/nemo
+COPY ./evonnemo/dist /usr/src/evonnemo/evonne
 
-WORKDIR /usr/src/evonne/evonnemo/
-RUN npm install
-
-RUN mkdir nemo && \ 
-    cp -r /usr/src/nemo-all/nemo-web/dist/* /usr/src/evonne/evonnemo/nemo/
-
-EXPOSE 5173
-ENTRYPOINT [ "npm", "run", "dev", "--", "--host=0.0.0.0" ]
+EXPOSE 8000
+ENTRYPOINT [ "serve", "-p", "5173" ]

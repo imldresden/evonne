@@ -1,6 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/evonne/**", "destination": "/evonne/**" },
-    { "source": "/nemo/**", "destination": "/nemo/**" }
-  ]
-}
