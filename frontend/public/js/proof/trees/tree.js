@@ -200,12 +200,6 @@ export class TreeNavigation {
         proof.nodeVisuals.totalHeight = 0;
         proof.nodeVisuals.setNodeDimsAndMax(this.hierarchy);
         this.root = computeTreeLayout(this.hierarchy);
-
-        if (!proof.isZoomPan) {
-            proof.svg.attr("width", proof.nodeVisuals.maxNodeWidth + 100); 
-            proof.svg.attr("height", Math.max(proof.svg.attr("height"), proof.nodeVisuals.totalHeight + 20)); 
-        }
-
         this.drawTree(proof.drawTime);
         
         // add axiom buttons depending on the navigation mode (Normal vs Magic)

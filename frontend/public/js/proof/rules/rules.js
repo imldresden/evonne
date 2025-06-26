@@ -264,7 +264,11 @@ class RulesHelper {
         let proofView = proof.svg;
 
         proofView.selectAll(".rule").each(x => {
-            proofView.select("#N" + x.data.source.id).on("click", (event, node) => {// } 
+            proofView.select("#N" + x.data.source.id).on("click", (event, node) => {
+                if (event.target.id !== "frontRect" && event.target.id !== "ruleText") {
+                    return;
+                }
+                
                 if (node.data.source.id !== proof.rules.#lastPopoverTriggerID) {
                     proof.rules.openExplanation({ event }, [node]);
                     proof.rules.#lastPopoverTriggerID = node.data.source.id;

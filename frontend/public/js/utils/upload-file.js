@@ -20,8 +20,8 @@ function adaptUploadFileModal(whatToUpload) {
 // blank project 
 const createBlankProject = document.getElementById("createBlank");
 createBlankProject && createBlankProject.addEventListener("click", async () => {
-  const id = await (await fetch("/uuid")).text();
-  const response = await fetch("/create?id=" + id);
+  const id = await (await fetch("uuid")).text();
+  const response = await fetch("create?id=" + id);
   
   if (response.ok) {
     window.location.href = "/?id=" + id;
@@ -101,7 +101,7 @@ export function upload(file, fn, type = '') {
   formData.append('file', file);
   formData.append('type', type);
 
-  fetch('/upload', {
+  fetch('upload', {
     method: 'POST',
     body: formData
   })

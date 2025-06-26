@@ -26,6 +26,8 @@ const upload = require('express-fileupload');
 
 const MODE = process.env.MODE || 'demo';
 const PORT = process.env.PORT || 3000;
+const BASE = process.env.BASE || '/';
+
 const EXAMPLES = process.env.EXAMPLES || 'study';
 console.log("Environment: " + MODE);
 
@@ -33,6 +35,9 @@ const app = express();
 app.engine('spy', sprightly);
 app.set('views', './frontend/views');
 app.set('view engine', 'spy');
+
+const router = express.Router()
+app.use(BASE, router);
 app.use('/', express.static('./frontend/public'));
 app.use('/libs', express.static('./node_modules'));
 app.use(upload());
@@ -55,14 +60,14 @@ if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
 }
 
-app.get('/test', (req, res) => {
+router.get('/test', (req, res) => {
   res.render('pages/test.spy', {
     title: "evonne lib",
     uuid: uuidv4(),
   });
 });
 
-app.get('/uuid', (req, res) => {
+router.get('/uuid', (req, res) => {
   res.status(200).send(uuidv4());
 });
 
@@ -99,15 +104,15 @@ const page = (req, res) => {
   }
 }
 
-app.get('/', page);
-app.get('/ontology', page);
-app.get('/proof', page);
+router.get('/', page);
+router.get('/ontology', page);
+router.get('/proof', page);
 
-app.get('/euler', (_, response) => {
+router.get('/euler', (_, response) => {
   response.render('euler/euler.spy')
 });
 
-app.get('/inference', (_, response) => {
+router.get('/inference', (_, response) => {
   response.render('inference/inference.spy');
 });
 
@@ -123,7 +128,7 @@ function parseMap(mapStr) {
 }
 
 // resources
-app.get('/project', (req, res) => {
+router.get('/project', (req, res) => {
   const id = req.query.id;
   const target = path.join(dataDir, id);
 
@@ -266,14 +271,14 @@ app.get('/project', (req, res) => {
   res.status(200).send(status);
 });
 
-app.get('/projects', (req, res) => {
+router.get('/projects', (req, res) => {
   const projects = readdirSync(dataDir).filter(
     f => lstatSync(path.join(dataDir, f)).isDirectory()
   );
   res.status(200).send({ projects });
 });
 
-app.post('/upload', (req, res) => {
+router.post('/upload', (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
@@ -325,7 +330,7 @@ app.post('/upload', (req, res) => {
   });
 });
 
-app.get('/create', (req, res) => {
+router.get('/create', (req, res) => {
   const id = req.query.id;
   const dest = path.join(dataDir, id);
   if (!existsSync(dest)) {
@@ -350,7 +355,7 @@ app.get('/create', (req, res) => {
   res.status(200).send("done");
 });
 
-app.get('/extract-names', (req, res) => {
+router.get('/extract-names', (req, res) => {
   const id = req.query.id;
 
   if (sessions[id]) {
@@ -395,7 +400,7 @@ app.get('/extract-names', (req, res) => {
   });
 });
 
-app.post('/explain', (req, res) => {
+router.post('/explain', (req, res) => {
   const id = req.body.id;
 
   if (sessions[id]) {
