@@ -436,7 +436,7 @@ function proofHeightRangeFunction() {
 }
 
 function openOntologyFunction() {
-    window.open('/ontology?id=' + getSessionId())
+    window.open('ontology?id=' + getSessionId())
 }
 
 function shorteningMethodSelectionFunction() {

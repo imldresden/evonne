@@ -366,9 +366,9 @@ export class NodeVisualsHelper {
                 }
             })
             .on("contextmenu", (e, d) => {
-                const menuItems = proof.axioms.menuItems;
-                e.preventDefault();
-                globals.contextMenu.create(e, d, menuItems.filter(m => m.filter && m.filter(d)), "#proof-view");
+                // const menuItems = proof.axioms.menuItems;
+                // e.preventDefault();
+                // globals.contextMenu.create(e, d, menuItems.filter(m => m.filter && m.filter(d)), "#proof-view");
             })
     }
 

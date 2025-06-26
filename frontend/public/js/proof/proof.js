@@ -88,28 +88,15 @@ const conf = {
     }
   },
 
-  load_trace: function (path) {
-    const url = new URL(window.location.toLocaleString()).searchParams;
-    const predicate = url.get("predicate");
-    const queries = url.getAll("query");
-
-    const message = {
-      queryType: "treeForTable", 
-      payload: {
-        "predicate": predicate, 
-        "tableEntries": { "queries": queries }
-      }
-    };
-
-    console.log(message)
-
+  load_trace: function (path, query) {
     // TODO: replace with broadcast channel query
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
     
 
     if (file.endsWith(".json")) {
       d3.json(file).then(json => {
-        proof.trace = json;
+        query.payload.childInformation = json.payload.childInformation
+        proof.trace = query.payload;
         proof.tree.init(getProofFromJSONTrace(json));
         proof.printType2Query = function () {
           console.log(proof.trace)
@@ -157,9 +144,11 @@ function setFromExternal(external) {
     'stepNavigator',
     'drawTime',
   ].map(prop => setDefinedProperty(external, proof, prop));
-  
-  setDefinedProperty(external, proof.linear, 'isBreadthFirst');
-  setDefinedProperty(external, proof.linear, 'bottomRoot');
+
+  [
+    'isBreadthFirst',
+    'bottomRoot',
+  ].map(prop => setDefinedProperty(external, proof.linear, prop));
   
   globals.shorteningMethod = external.shorteningMethod || globals.shorteningMethod;
 }
@@ -204,7 +193,7 @@ function init_trace(params = {}) {
   proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport").attr("transform", "translate(0, 10)");
   addArrowheads(proof.svg);
 
-  proof.load_trace(params.path);
+  proof.load_trace(params.path, params.query);
   
   if (params.isZoomPan) {
     svgPanZoom("#proof-view", {

@@ -32,7 +32,7 @@ window.onload = function () {
   });
 
   const projects = document.getElementById("current-projects");
-  projects && fetch('/projects')
+  projects && fetch('projects')
     .then(res => res.json())
     .then(res => {
       res.projects.forEach(proj => {
@@ -170,7 +170,7 @@ function init_views(loop = false) {
 
   const modal = M.Modal.getInstance(document.getElementById('selectAxiomModal'));
 
-  fetch('/project/?id=' + getSessionId())
+  fetch('project/?id=' + getSessionId())
     .then(res => res.json())
     .then(res => {
       status = res;
@@ -321,7 +321,7 @@ function computeAxiomsBtnFunction() {
     body.append('concreteDomainName', status.concreteDomainName)
   }
 
-  fetch('/explain', {
+  fetch('explain', {
     method: 'POST',
     body,
   }).then(res => res.json())
@@ -336,7 +336,7 @@ function computeAxiomsBtnFunction() {
 }
 
 function openSplitFunction() {
-  window.open('/?id=' + getSessionId())
+  window.open('?id=' + getSessionId())
 }
 
 function blockProofMethods(reasoner) {

@@ -365,7 +365,7 @@ function loadOntology(e) {
     progress('Extracting concept names...');
 
     //Ontology file name changes after translating to OWL/XML format
-    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + owlFunctions.getOWlFileName(ontology.name) +
+    fetch('extract-names/?id=' + getSessionId() + '&ontology=' + owlFunctions.getOWlFileName(ontology.name) +
         '&reasoner=' + reasonerChoice.value +
         '&cd='+ getCDName())
       .then(computed => {
@@ -578,7 +578,7 @@ function flowStrengthResetFunction() {
 }
 
 function openProofFunction() {
-  window.open('/proof?id=' + getSessionId())
+  window.open('proof?id=' + getSessionId())
 }
 
 function keepNodes() {
