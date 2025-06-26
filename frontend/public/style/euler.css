@@ -1,0 +1,44 @@
+#euler-container {
+    overflow: auto;
+    text-align: center;
+    width: 100%;
+}
+
+#euler-view {
+    overflow: auto;
+    text-align: center;
+    width: 100%;
+    padding-top: 2%;
+    padding-bottom: 5%;
+}
+
+.textEquivalence {
+    font-size: x-large;
+    font-weight: bold;
+}
+
+.euler-diagram {
+    float: left;
+    margin: 1%;
+    background: #fefefe;
+    border: 1px solid;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 3px 3px #bbbbbb;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+

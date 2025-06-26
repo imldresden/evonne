@@ -1,0 +1,57 @@
+<!-- File upload modal -->
+<div id="uploadFileModal" class="modal upload-file-modal">
+
+  <div class="modal-content">
+    <i class="material-icons right modal-button modal-close">close</i>
+    <header>
+      <h3>File Upload</h3>
+    </header>
+
+    <div id="reasonerChoiceUpload" style="display:block">
+      <p>Select a reasoner to classify the ontology</p>
+      <div class="row">
+        <div class="input-wrapper modal-option">
+          <select id="classificationReasoner" class="browser-default">
+            <option id=elkOption selected>Elk</option>
+            <option id=hermitOption>Hermit</option>
+            <option id=elkCDOption>Concrete Domain Reasoner (ELK)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="CDChoice" style="display:none">
+      <p>Select a concrete domain</p>
+      <div class="row">
+        <div class="input-wrapper modal-option">
+          <select id="concreteDomain" class="browser-default">
+            <option value="LinearConstraints" selected>Linear Equations</option>
+            <option value="DifferenceConstraints">Difference Logic</option>
+          </select>
+        </div>
+      </div>
+      <div class="file-field input-field">
+        <p>Select constraints file</p>
+        <div class="btn btn-primary">
+          <i class="material-icons">upload</i>
+          <input id=browseConstraintsButton type="file">
+        </div>
+        <div class="file-path-wrapper">
+          <input id=browseConstraintsFilePath class="file-path validate" type="text">
+        </div>
+      </div>
+    </div>
+
+    <div class="file-field input-field">
+      <p>Select a file containing a<span id="what-is-uploaded"> </span> </p>
+      <div class="btn btn-primary">
+        <i class="material-icons">upload</i>
+        <input id=browseButton type="file">
+      </div>
+      <div class="file-path-wrapper">
+        <input id=browseFilePath class="file-path validate" type="text">
+      </div>
+    </div>
+
+  </div>
+</div>

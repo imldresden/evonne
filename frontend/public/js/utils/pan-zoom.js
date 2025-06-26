@@ -12,7 +12,11 @@ const thumbnailViewer = function (options) {
 
         const minimapSelector = options.containerSelector + " .minimap-view";
         const thumbViewObjectElem = document.querySelector(minimapSelector);
-        thumbViewObjectElem.remove();
+        if (thumbViewObjectElem) {
+            thumbViewObjectElem.remove();
+        } else {
+            return;
+        }
 
         const thumbSVG = document.getElementById(options.mainViewId).cloneNode(true);
         thumbSVG.classList.add("minimap", "minimap-view");
@@ -54,6 +58,8 @@ const thumbnailViewer = function (options) {
         const main = svgPanZoom("#" + options.mainViewId, {
             zoomEnabled: true,
             controlIconsEnabled: true,
+            beforePan: () => options.isZoomPan,
+            beforeZoom: () => options.isZoomPan,
             fit: false,
             center: true,
             minZoom: 0.1,
@@ -165,7 +171,7 @@ const thumbnailViewer = function (options) {
 
         const scopeContainer = document.querySelector(options.containerSelector + " .scope-container");
         const updateMainViewPan = function (evt) {
-            if (evt.which == 0 && evt.button == 0) {
+            if (evt.which === 0 && evt.button === 0) {
                 return false;
             }
             _updateMainViewPan(evt.clientX, evt.clientY, scopeContainer, _main, _thumb);

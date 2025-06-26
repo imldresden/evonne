@@ -1,0 +1,14 @@
+<!-- Global settings modal -->
+<div id="settingsModal" class="modal settings-modal">
+  <div class="modal-content">
+    <i class="material-icons right modal-button modal-close">close</i>
+    
+    <header>
+      <h2>Application Settings</h2>
+      <p>Adjust the settings of this application using the following options</p>
+    </header>
+    
+    {{ advanced_settings_specific }}
+
+  </div>
+</div>

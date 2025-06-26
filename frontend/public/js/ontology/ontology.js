@@ -1,211 +1,252 @@
-import thumbnailViewer from "../utils/pan-zoom.js";
-import { APP_GLOBALS as app, SharedData } from "../shared-data.js";
+import { globals } from "../shared-data.js";
 import { upload } from '../utils/upload-file.js';
 import { progress } from '../main/main.js';
-import {removeListeners} from "../proof/proof.js";
-import {BasicSophisticatedShorteningFunctions} from "../shortening/sophisticatedBasic.js";
+import { BasicShorteningFunctions } from "../shortening/basic.js";
+import { colors, stylesheet } from "../../style/cy-ontology-style.js";
+import { params } from "../layouts/cola.js";
+import { showRepairsTab } from "../utils/controls.js";
+import { owlFunctions } from "../utils/myOWL.js";
+import { throttle } from "../utils/throttle.js";
+import {ReasonerName} from "../utils/ReasonerName.js";
 
-const BOX_PADDING = 20;
 const socket = io();
 
-let nodes, links;
-let nodeData, edgeData;
-let updateLabels = false;
+let cy;
+const lastDraggedPositions = {};
 let showSignature = true;
 let wrapLines = false;
-let newSim = true;
 let ontologyFile = null;
 let adOntologyFile = null;
 let layoutFile = null;
-let margin = null;
-let contentWidth = null;
-let contentHeight = null;
 let showOriginal = null;
+let div = "ontology-container";
 
 const ontologyNodeId = "oN";
-const linkLengthFunctionInput = document.getElementById("linkLengthFunction");
-const linkLengthIdealValue = document.getElementById("linkLengthIdealValue");
-const linkLengthIdealValueReset = document.getElementById("linkLengthIdealValueReset");
 const flowDirection = document.getElementById("flowDirection");
 const flowStrength = document.getElementById("flowStrength");
 const flowStrengthReset = document.getElementById("flowStrengthReset");
 const maxLengthInput = document.getElementById("maximumLength");
 const btnShowSignature = document.querySelector("#btnShowSignature");
 const btnWrapLines = document.querySelector("#btnWrapLines");
+const btnAnimation = document.querySelector("#btnAnimation");
 const lineLengthInput = document.getElementById("lineLength");
 const resetLayoutButton = document.getElementById("resetLayoutButton");
 const saveLayoutButton = document.getElementById("saveLayoutButton");
 const showRepairsMenuButton = document.getElementById("showRepairsMenuButton");
 const shortenAllInOntologyBtn = document.getElementById("shortenAllInOntologyBtn");
 const openProof = document.getElementById('openProofInNew');
+const resetStickyPositionsBtn = document.getElementById('resetStickyPositions');
+const rerunSimulationBtn = document.getElementById('rerunSimulation');
+const reasonerChoice = document.getElementById('classificationReasoner');
 
-const eventDrawEnd = new CustomEvent("drawend", { detail: { main: "ontology-view" } });
-
-//Mapping elements with click event to their function
-const thingsWithClickListeners = new Map();
-thingsWithClickListeners.set(btnShowSignature,btnShowSignatureFunction);
-thingsWithClickListeners.set(btnWrapLines,btnWrapLinesFunction);
-thingsWithClickListeners.set(resetLayoutButton,resetLayout);
-thingsWithClickListeners.set(saveLayoutButton,saveLayout);
-thingsWithClickListeners.set(showRepairsMenuButton,showRepairsTab);
-thingsWithClickListeners.set(linkLengthIdealValueReset,linkLengthIdealValueResetFunction);
-thingsWithClickListeners.set(flowStrengthReset,flowStrengthResetFunction);
-thingsWithClickListeners.set(openProof,openProofFunction);
-thingsWithClickListeners.set(shortenAllInOntologyBtn,shortenAllInOntology);
-
-//Mapping elements with input event to their function
-const thingsWithInputListeners = new Map();
-thingsWithInputListeners.set(lineLengthInput,changeFunction);
-thingsWithInputListeners.set(maxLengthInput,maxLengthInputFunction);
-thingsWithInputListeners.set(linkLengthIdealValue,simulate);
-thingsWithInputListeners.set(flowStrength,simulate);
-
-//Mapping elements with change event to their function
-const thingsWithChangeListeners = new Map();
-thingsWithChangeListeners.set(linkLengthFunctionInput, changeFunction);
-thingsWithChangeListeners.set(flowDirection, changeFunction);
-
-//Mapping elements with restart event to their function
-const thingsWithRestartListeners = new Map();
-const documentFunctionClick = (event) => documentFunction(event);
-thingsWithRestartListeners.set(document, documentFunctionClick);
-
-let simulation;
+const thingsWithListeners = [
+  { type: 'click', thing: btnShowSignature, fn: btnShowSignatureFunction },
+  { type: 'click', thing: btnWrapLines, fn: btnWrapLinesFunction },
+  { type: 'click', thing: resetLayoutButton, fn: resetLayout },
+  { type: 'click', thing: saveLayoutButton, fn: saveLayout },
+  { type: 'click', thing: showRepairsMenuButton, fn: showRepairsTab },
+  { type: 'click', thing: flowStrengthReset, fn: flowStrengthResetFunction },
+  { type: 'click', thing: openProof, fn: openProofFunction },
+  { type: 'click', thing: shortenAllInOntologyBtn, fn: shortenAllInOntology },
+  { type: 'click', thing: resetStickyPositionsBtn, fn: resetStickyPositions },
+  { type: 'click', thing: rerunSimulationBtn, fn: rerunSimulation },
+  { type: 'input', thing: lineLengthInput, fn: throttle(labelNodes, 500) },
+  { type: 'input', thing: maxLengthInput, fn: maxLengthInputFunction },
+  { type: 'input', thing: flowStrength, fn: throttle(rerunLayout, 500) },
+  { type: 'change', thing: flowDirection, fn: throttle(rerunLayout, 500) },
+  { type: 'view_resize', thing: window, fn: () => cy.resize() },
+];
 
 // creates the content of the view based on the chosen/read data
-function createContent(data) {
-  simulation = cola.d3adaptor(d3).avoidOverlaps(true);
-  // Generate nodes and edges from the raw data
-  const processedData = processData(data);
-  nodeData = processedData.nodes;
-  edgeData = processedData.edges;
-
-  simulate();
-  update(); 
-}
-
-function simulate({
-  linkType = linkLengthFunctionInput.value,
-  linkValue = linkLengthIdealValue.value,
-  flowLayout = flowDirection.value,
-  flowLayoutValue = flowStrength.value,
-  startSeeds = [10, 20, 20]
-} = {}) {
-  if (updateLabels) {
-    nodes.selectAll(".label").selectAll("text").each((d, i, n) => {
-      let base = showSignature ? d.signature.split("\n") : d.axioms.split("\n");
-      let previousLineCount = 0;
-      if (/*shorteningModeInput.value === "none"*/showOriginal || d.revealed || d.tempRevealed) {
-        n.forEach((textElement, i) => {
-          if (wrapLines) {
-            const textContainer = d3.select(textElement)
-            const text = textContainer.text();
-            textContainer.html("")
-                .attr("x", 0)
-                .attr("y", previousLineCount + "em")
-
-            previousLineCount += Math.ceil(text.length / lineLengthInput.value);
-
-            for (let j = 0; j < Math.ceil(text.length / lineLengthInput.value); j++) {
-              textContainer.append("tspan")
-                  .attr("x", 0)
-                  .attr("dx", j ? "1em" : 0)
-                  .attr("dy", j ? "1em" : 0)
-                  .text(text.substring(lineLengthInput.value * j, lineLengthInput.value * (j + 1)))
-            }
-          } else {
-            textElement.innerHTML = base[i];
-          }
-        });
-      }else{
-        n.forEach((textElement, i) => {
-          textElement.innerHTML = SharedData.labelsShorteningHelper.shortenLabel(base[i], true, app.shorteningMethod)
-        });
-      }
-      //   else if (/*shorteningModeInput.value*/app.shorteningMethod === "basic") {
-      //   n.forEach((textElement, i) => {
-      //     textElement.innerHTML = base[i].match(/^\s$/)
-      //       ? ""
-      //       : `${base[i].slice(0, maxLengthInput.value)}\u2026`;
-      //   });
-      // } else if (/*shorteningModeInput.value*/app.shorteningMethod  === "camel") {
-      //   n.forEach((textElement, i) => {
-      //     //const ccShortener = new camelCaseShorteningFunctions();
-      //     textElement.innerHTML = base[i].match(/^\s$/)
-      //       ? ""
-      //       : SharedData.labelsShorteningHelper.shortenLabel(base[i], false, app.shorteningMethod)//ccShortener.shortenLabel(base[i]);
-      //   });
-      // }
-
-      nodes.each((d) => {
-        const node = d3.select("#" + ontologyNodeId + d.id).select(".label");
-        d3.select("#" + ontologyNodeId + d.id)
-          .select("rect")
-          .attr("width", node.node().getBBox().width + BOX_PADDING)
-          .attr("height", node.node().getBBox().height + BOX_PADDING)
-          .attr("x", -node.node().getBBox().width / 2 - BOX_PADDING / 2)
-          .attr("y", -BOX_PADDING / 2);
-        d3.select("#" + ontologyNodeId + d.id)
-          .select(".node-eye")
-          .attr("x", -node.node().getBBox().width / 2 - BOX_PADDING / 2 + 2)
-          .attr("y", node.node().getBBox().height / 2 - 7);
-
-        node.attr(
-          "transform",
-          `translate(
-              ${-node.node().getBBox().width / 2}, 
-              13
-            )`
-        );
-      });
-    });
-    updateLabels = false;
+async function createContent(data) {
+  if (!document.getElementById("ontology-view")) {
+    const svg = document.createElement("svg");
+    svg.id = "ontology-view"
+    const c = document.getElementById(div)
+    c.innerHTML = `<div class="minimap-view-container opacity-0" id="ontology-minimap-container"></div>`;
+    c.append(svg);
   }
-  // update node size wrt content
-  nodeData.forEach(function (d) { 
-    let texts = showSignature ? d.signature.split("\n") : d.axioms.split("\n")
-    d.width = Math.max(...texts.map((line) => line.length)) * 6.5 + 20; // character width + padding
-    d.height = texts.length * 15 + 20;
+  
+  const container = document.getElementById("ontology-view");
+  container.innerHTML = "";
+
+  const elements = processData(data);
+
+  cy = cytoscape({
+    container,
+    style: stylesheet,
+    layout: params,
+    wheelSensitivity: 0.3
   });
 
-  simulation
-    .nodes(nodeData)
-    .links(edgeData);
+  const handleLayoutEvent = function (enabled) {
+    return function () {
+      cy.userZoomingEnabled(enabled);
+      cy.userPanningEnabled(enabled);
+      cy.autoungrabify(!enabled);
+    };
+  };
 
-  if (linkType === 'symmetric-diff') {
-    simulation.symmetricDiffLinkLengths(linkValue)
-  } else { // 'jaccard'
-    simulation.jaccardLinkLengths(linkValue, 0.7)
-  }
+  cy.on('layoutstart', handleLayoutEvent(false));
+  setTimeout(function () {
+    cy.on('layoutstop', handleLayoutEvent(true));
+  }, 100);
 
-  simulation.flowLayout(flowLayout, +flowLayoutValue)
-  simulation.start(...startSeeds);
+  cy.on('dragfree', 'node', function (event) {
+    const nodeId = event.target.id();
+    const newPosition = event.target.position();
+    // Store the last dragged position of the node
+    lastDraggedPositions[nodeId] = newPosition;
+  });
+
+  cy.on('tap', 'node', function (event) {
+    const clickedElement = event.originalEvent.target;
+
+    if (clickedElement && (clickedElement.classList.contains('eye-button'))) {
+      const data = event.target.data();
+
+      if (!data.revealed) {
+        data.revealed = true;
+      } else {
+        data.revealed = false;
+      }
+    }
+  });
   
-  if (nodes) {
-    nodes.call(simulation.drag);
-    tick();
+  const timeoutMap = {};
+  cy.on('mouseover', 'node', function (event) {
+    if (!showOriginal) {
+      const n = event.target.isNode() ? event.target : null
+      n.data("hovered", true)
+      clearTimeout(timeoutMap[n.data().id]) 
+    }
+  });
+
+  cy.on('mouseout', 'node', function (event) {
+    if (!showOriginal) {
+      const n = event.target.isNode() ? event.target : null
+      n.data("hovered", true)
+      timeoutMap[n.data().id] = setTimeout(() => {
+        n.data("hovered", false)  
+      }, 500);
+    }
+  });
+
+  cy.params = structuredClone(params);
+  cy.stylesheet = stylesheet;
+  cy.add(elements);
+  await initHTML();
+  bindListeners();
+  cy.layout(cy.params).run();
+  setupOntologyMinimap(cy);
+  return cy;
+}
+
+function resetStickyPositions() {
+  Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+    const node = cy.$id(nodeId);
+    node.unlock();
+    delete lastDraggedPositions[nodeId];
+  });
+  
+  labelNodes();
+}
+
+
+function rerunSimulation() {
+  labelNodes();
+}
+
+function getNodeTextList(data) {
+  let tmpText = showSignature ? data.signature.split("\n") : data.axioms.split("\n");
+  const text = showOriginal || data.revealed ? [...tmpText] : tmpText.map(x => globals.labelsShorteningHelper.shortenLabel(x, true, globals.shorteningMethod));
+  return text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
+}
+
+async function initHTML() {
+  const nodesHTML = document.getElementsByClassName(`cy-html`);
+
+  // the html layer lives here, remove it before creating a new one
+  if (nodesHTML[0] && nodesHTML[0].parentNode && nodesHTML[0].parentNode.parentNode) {
+    nodesHTML[0].parentNode.parentNode.remove();
   }
+
+  await cy.nodeHtmlLabel([
+    {
+      query: 'node',
+      tpl: function (data) {
+        //const text = getNodeText(data);
+        const text = getNodeTextList(data);
+        
+        let html = `
+          <div>
+            <img src=${
+              (data.revealed ? '../icons/eye-crossed.svg' : '../icons/eye.svg')} 
+              class="eye-button ${
+              (data.hovered ? "eye-on" : "eye-off") 
+              }" width='14' height='14'>
+          </div>
+          <div class='node-title ${data.hovered ? "eye-on-text" : "eye-off-text"}'>`;
+
+        let longestn = 1;
+        for (let i = 0; i < text.length; i++) {
+          let color = 'black';
+          if (cy.justification && cy.justification.has(text[i])) {
+            color = colors.justNodeStroke;
+          }
+          if (cy.diagnoses && cy.diagnoses.has(text[i])) {
+            color = colors.diagNodeStroke;
+          }
+
+          html += `<p style="color:${color};margin:0;padding:0"> ${text[i]} </p>`;
+
+          if (text[i].length > longestn) {
+            longestn = text[i].length;
+          }
+        }
+        
+        html += `</div>`;
+        data.boxH = calcBoxHeight(text);
+        data.boxW = calcBoxWidth(longestn);
+
+        const template = `
+          <div class="cy-html node ontNode bg-box prevent-select" id="${ontologyNodeId + data.id}"> 
+            <div id="frontRect" style="padding: 5px; white-space:nowrap;">
+              ${html}
+            </div>
+          </div>
+        `;
+
+        return template;
+      }
+    },
+  ]);
+}
+
+function calcBoxWidth(longestString) {
+  return (longestString * globals.fontCharacterWidth + 25) + "px";
+}
+
+function calcBoxHeight(stringList) {
+  return (stringList.length * 20 + 15) + "px";
 }
 
 function processData(data) {
   // Compute edges
-  const edgeData = [].map.call(data.querySelectorAll("edge"), (d) => {
+  const edges = [].map.call(data.querySelectorAll("edge"), (d) => {
     const id = d.getAttribute("id");
     const source = d.getAttribute("source");
     const target = d.getAttribute("target");
 
-    return { id, source, target };
+    return { data: { id, source, target } };
   });
 
-  //const coorX = 100, coorY = 30;
-  const nodeData = [].map.call(data.querySelectorAll("node"), (d) => {
-    let dataNodes, signature, axioms, axiomsMap, id, parentId;
-    //let asserted = true;
+  const nodes = [].map.call(data.querySelectorAll("node"), (d) => {
+    let dataNodes, signature, axioms, axiomsMap, id;
 
     id = d.getAttribute("id");
 
     dataNodes = d.querySelectorAll("data");
-
     dataNodes.forEach((item) => {
       if (item.getAttribute("key") === "signature") {
         signature = item.textContent;
@@ -218,398 +259,164 @@ function processData(data) {
       }
     });
 
-    const edgeFromParent = edgeData.find((edge) => edge.source === id);
+    const edgeFromParent = edges.find((edge) => edge.source === id);
+    const parentId = edgeFromParent == null ? "" : edgeFromParent.target;
 
-    parentId = edgeFromParent == null ? "" : edgeFromParent.target;
-
-    return { id, signature, axioms, axiomsMap, parentId }; //, x:coorX+=20, y:coorY+=60};
-  });
-
-  // Add the nodeData to the edgeData
-  edgeData.forEach((d) => {
-    d.source = nodeData.find((b) => b.id === d.source);
-    d.target = nodeData.find((b) => b.id === d.target);
-  });
-
-  return {
-    nodes: nodeData,
-    edges: edgeData,
-  };
-}
-
-function update() {
-  // Clear the SVG content
-  app.svgOntologyRootLayer.selectAll("*").remove();
-
-  // define arrowheads
-  const arrowPoints = [
-    [0, 0],
-    [0, 20],
-    [20, 10],
-  ];
-  app.svgOntologyRootLayer
-    .append("defs")
-    .append("marker")
-    .attr("id", "arrowhead")
-    .attr("viewBox", [0, 0, 20, 20])
-    .attr("refX", 20)
-    .attr("refY", 10)
-    .attr("markerWidth", 8)
-    .attr("markerHeight", 8)
-    .attr("markerUnits", "userSpaceOnUse")
-    .attr("orient", "auto-start-reverse")
-    .append("path")
-    .attr("d", d3.line()(arrowPoints))
-    .attr("fill", "darkgrey");
-
-  drawGraph();
-}
-
-function drawGraph() {
-  const linksG = app.svgOntologyRootLayer
-    .append("g")
-    .attr("id", "links")
-    .attr("cursor", "pointer")
-    .attr("pointer-events", "all");
-
-  links = linksG
-    .selectAll()
-    .data(edgeData)
-    .join("line")
-    .attr("marker-end", (d) => {
-      return "url(#arrowhead)";
-    })
-    .attr("class", "link ontLink")
-    .attr("id", (d) => "L" + d.id);
-
-  const nodesG = app.svgOntologyRootLayer
-    .append("g")
-    .attr("id", "nodes")
-    .attr("cursor", "pointer")
-    .attr("pointer-events", "all");
-
-  nodes = nodesG
-    .selectAll()
-    .data(nodeData)
-    .join("g")
-    .classed("node ontNode", true)
-    .attr("id", (d) => ontologyNodeId + d.id)
-    .call(simulation.drag)
-    .on("contextmenu", function (d, i) {
-      d3.event.preventDefault();
-      d.fixed = !d.fixed;
-      d3.select(this)
-        .classed("fixed-repairs", d.fixed);
-      restoreColor();
-      filterRepairs();
-    })
-    .on("mouseover", function (d) {
-      if (/*shorteningModeInput.value !== "none"*/!showOriginal) {
-        d3.select(this).select(".node-eye").transition().style("opacity", 1);
-        d3.select(this)
-          .selectAll("text")
-          .transition()
-          .style("transform", "translate(8px, 0)");
-
-        d3.select(this).select(".node-eye").attr(
-          "href",
-          d.revealed ? "../icons/eye-crossed.svg" : "../icons/eye.svg"
-        );
+    const text = getNodeTextList({ signature, axioms });
+    let longest = 1;
+    text.forEach(l => {
+      if (l.length > longest) {
+        longest = l.length;
       }
-    })
-    .on("mouseout", function () {
-      d3.select(this).select(".node-eye").transition().style("opacity", 0);
-      d3.select(this)
-        .select(".label")
-        .selectAll("text")
-        .transition()
-        .style("transform", "translate(0, 0)");
-    })
-    .on("click", function (d) {
-      d.revealed = !d.revealed;
-      d3.select(this).select(".node-eye").attr(
-        "href",
-        d.revealed ? "../icons/eye-crossed.svg" : "../icons/eye.svg"
-      );
-      updateLabels = true;
-      simulate();
     });
 
-  nodes
-    .append("rect")
-    .attr("id", "frontRect")
-    .attr("class", "bg-box")
-    .attr("x", -170 / 2)
-    .attr("y", 0)
-    .attr("width", 170)
-    .attr("height", 30);
-
-  nodes
-    .append("image")
-    .attr("class", "node-eye")
-    .attr("x", 0)
-    .attr("y", -10)
-    .attr("width", 14)
-    .attr("height", 14)
-    .attr("href", "../icons/eye-crossed.svg")
-    .style("opacity", 0)
-
-  let lockSigns = nodes.append("g")
-    .attr("class", "lock-sign");
-  lockSigns.append("circle")
-    .attr("cy", -10)
-    .attr("r", 10)
-    .attr("fill", "var(--color-node-rule-stroke)")
-  lockSigns.append("text")
-    .attr("text-anchor", "middle")
-    .attr("y", -3)
-    .attr("font-size", "5px")
-    .attr("class", "material-icons")
-    .text("\ue897")
-
-  nodes.append("g").attr("class", "label");
-
-  labelNodes();
-
-  // Start the force directed layout
-  simulation.on("tick", tick);
-  simulation.on("end", () => document.dispatchEvent(eventDrawEnd));
-}
-
-function labelNodes() {
-  nodes.each((d) => {
-    const node = d3.select("#" + ontologyNodeId + d.id).select(".label");
-
-    node.text("");
-
-    let tmpText = showSignature ? d.signature.split("\n") : d.axioms.split("\n");
-
-    let text = [];
-    if (showOriginal)
-      text = [...tmpText];
-    else
-      tmpText.forEach(x=>text.push(SharedData.labelsShorteningHelper.shortenLabel(x, true, app.shorteningMethod)));
-
-    let dy = 0.3;
-
-    text = text.sort((e1, e2) => e1.length - e2.length || e1.localeCompare(e2));
-    let index = 0;
-    let axiomCount = 0;
-    let first = true;
-
-    for (let i = 0; i < text.length; i++) {
-      if (index < text.length) {
-        if (first && index === 0)
-          node.append("text").attr("fill", "black").text(text[index]);
-        else {
-          node.attr("dy", (dy -= 0.6) + "em");
-          node
-            .append("text")
-            .attr("dy", axiomCount * 1.2 + "em")
-            .attr("x", 0)
-            .attr("fill", "black")
-            .text(text[index]);
-        }
+    return {
+      data: {
+        id,
+        signature,
+        axioms,
+        axiomsMap,
+        parentId,
+        boxH: calcBoxHeight(text),
+        boxW: calcBoxWidth(longest)
       }
-
-      index += 2;
-
-      if (index >= text.length) {
-        if (first) {
-          text = text.sort(function (e1, e2) {
-            return e2.length - e1.length || e2.localeCompare(e1);
-          });
-          if (text.length % 2 === 0) index = 0;
-          else index = 1;
-        } else {
-          break;
-        }
-        first = false;
-      }
-      axiomCount++;
-    }
-
-    node.attr(
-      "transform",
-      `translate(
-        ${-node.node().getBBox().width / 2}, 
-        13
-      )`
-    );
-
-    // adjust rectangle
-    d3.select("#" + ontologyNodeId + d.id)
-      .select("rect")
-      .attr("width", node.node().getBBox().width + (2 * BOX_PADDING) / 2)
-      .attr("height", node.node().getBBox().height + BOX_PADDING)
-      .attr("x", -node.node().getBBox().width / 2 - BOX_PADDING / 2)
-      .attr("y", -BOX_PADDING / 2);
-    d3.select("#" + ontologyNodeId + d.id)
-      .select(".node-eye")
-      .attr("x", -node.node().getBBox().width / 2 - BOX_PADDING / 2 + 2)
-      .attr("y", node.node().getBBox().height / 2 - 7);
-
-    //d3.select("#" + ontologyNodeId + d.id).select("ellipse").transition().duration(500).attr("ry", numOfAxioms * 11).attr("rx", longestLength * 3.5);//.attr("rx", longestLength*6);
+    };
   });
-}
-
-function getSourceAndTarget(d) {
-  // Calculate point on box
-  const { height: sHeight, width: sWidth } = nodes
-    .nodes()
-    .find((node) => node.id === ontologyNodeId + d.source.id)
-    .getBBox();
-  const { height: tHeight, width: tWidth } = nodes
-    .nodes()
-    .find((node) => node.id === ontologyNodeId + d.target.id)
-    .getBBox();
-
-  // Source Reference
-  const sRef = {
-    x: d.source.x,
-    y: d.source.y - BOX_PADDING / 2,
-  };
-  const tRef = {
-    x: d.target.x,
-    y: d.target.y - BOX_PADDING / 2,
-  };
-
-  // Source
-  const sCenter = {
-    x: sRef.x,
-    y: sRef.y + sHeight / 2,
-  };
-  // Target
-  const tCenter = {
-    x: tRef.x,
-    y: tRef.y + tHeight / 2,
-  };
-  // Vector Source -> Target
-  const vecTS = {
-    x: sCenter.x - tCenter.x,
-    y: sCenter.y - tCenter.y,
-  };
-  const vecV = {
-    x: 0,
-    y: -1,
-  };
-
-  const angCrit = Math.atan(tWidth / tHeight);
-  const angBeta = Math.acos(
-    (vecTS.y * vecV.y) / Math.sqrt(vecTS.x ** 2 + vecTS.y ** 2)
-  );
-
-  const tContact = {};
-  if (angBeta <= angCrit) {
-    // 1
-    tContact.x = (tCenter.x - ((tCenter.x - sCenter.x) * (tHeight / 2)) / (tCenter.y - sCenter.y));
-    tContact.y = tCenter.y - tHeight / 2;
-  } else if (angBeta >= Math.PI - angCrit) {
-    // 3
-    tContact.x = (tCenter.x + ((tCenter.x - sCenter.x) * (tHeight / 2)) / (tCenter.y - sCenter.y));
-    tContact.y = tCenter.y + tHeight / 2;
-  } else {
-    if (sCenter.x > tCenter.x) {
-      // 2
-      tContact.x = tCenter.x + tWidth / 2;
-      tContact.y = (tCenter.y + ((tCenter.y - sCenter.y) * (tWidth / 2)) / (tCenter.x - sCenter.x));
-    } else {
-      // 4
-      tContact.x = tCenter.x - tWidth / 2;
-      tContact.y = (tCenter.y - ((tCenter.y - sCenter.y) * (tWidth / 2)) / (tCenter.x - sCenter.x));
-    }
-  }
 
   return {
-    source: { height: sHeight, width: sWidth, contact: sCenter },
-    target: { height: tHeight, width: tWidth, contact: tContact }
+    nodes,
+    edges,
   };
 }
 
-function tick() {
-  links
-    .each((d) => {
-      d.link = getSourceAndTarget(d);
-    })
-    .attr("x1", (d) => d.link.source.contact.x)
-    .attr("y1", (d) => d.link.source.contact.y)
-    .attr("x2", (d) => d.link.target.contact.x)
-    .attr("y2", (d) => d.link.target.contact.y);
+function bindListeners() {
+  cy.nodes().forEach(function (n) {
+    n.bind('mouseover', function (e) {
+      if (n.selected()) {
+        n.preSelected = true;
+      } else {
+        n.preSelected = false;
+      }
+      n.json({ selected: true });
+    });
 
-  nodes.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
+    n.bind('mouseout', function (e) {
+      if (!n.preSelected) {
+        n.json({ selected: false });
+      }
+    });
 
-  
-  newSim && document.dispatchEvent(eventDrawEnd);
-  newSim = false;
-}
+    n.on('cxttap', function (e) {
+      n.toggleClass('fixed-diagnosis');
+      n.fixed = !n.fixed;
 
-function resetLayout() {
-  simulation.nodes().forEach((d) => {
-    d.fx = null;
-    d.fy = null;
+      restoreColor(true, cy);
+      filterRepairs(cy);
+    });
+
+    n.on('dblclick', function (e) {
+      const d = n.data();
+      socket.emit("euler view", { id: d.id, parent: d.parentId, axioms: d.axioms.split("\n") })
+    });
   });
 }
 
-function saveLayout() {
-  const data = {
-    ontology: `${adOntologyFile.name}`,
-    nodes: [],
+async function labelNodes(layout = true) {
+  cy.startBatch();
+  const nodesHTML = [...document.getElementsByClassName(`cy-html`)];
+  nodesHTML.forEach(node => {
+    if (node.parentNode && node.parentNode.parentNode) {
+      node.parentNode.parentNode.remove();
+    }
+  });
+  cy.nodes().forEach(function (node) {
+    node.removeStyle();
+    const d = node.data();
+    const text = getNodeTextList(d);
+    let longest = 1;
+    text.forEach(l => {
+      if (l.length > longest) {
+        longest = l.length;
+      }
+    });
+    d.boxH = calcBoxHeight(text);
+    d.boxW = calcBoxWidth(longest);
+    d.revealed = false;
+  });
+  await initHTML();
+  cy.style().update();
+  cy.endBatch();
+  if (layout) {
+    keepNodes();
   }
-  simulation.nodes().forEach(({ id, x, y }) => {
-    data.nodes.push({ id, x, y });
-  })
-
-  saveAs(
-    new Blob([JSON.stringify(data)], { type: "data:application/json;charset=utf-8," }),
-    adOntologyFile.name.substring(0, adOntologyFile.name.indexOf(".")) + "_layout.json"
-  );
 }
 
-export function loadOntology(e) {
+export function getCDName() {
+  if (reasonerChoice.value === ReasonerName.elkCD())
+    return document.getElementById('concreteDomain').value;
+  return "";
+}
+
+function loadOntology(e) {
   const ontology = e.target.files[0];
   progress('Uploading...');
-  upload(ontology, uploaded => {
-    console.log('Uploaded: ', uploaded);
+  upload(ontology, _ => {
     progress('Ontology uploaded.');
     progress('Extracting concept names...');
-    
-    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + ontology.name + '&reasoner=' +
-        document.getElementById('classificationReasoner').value)
-    .then(computed => {
-      console.log('concepts extracted: ', computed);
-      progress('Concepts extracted.');
-      progress('Redirecting....');
 
-      setTimeout(() => {
-        window.location.replace("/?id=" + getSessionId());
-      }, 2000);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  });
+    //Ontology file name changes after translating to OWL/XML format
+    fetch('/extract-names/?id=' + getSessionId() + '&ontology=' + owlFunctions.getOWlFileName(ontology.name) +
+        '&reasoner=' + reasonerChoice.value +
+        '&cd='+ getCDName())
+      .then(computed => {
+        console.log('concepts extracted: ', computed);
+        progress('Concepts extracted.');
+        progress('Redirecting....');
+
+        setTimeout(() => {
+          window.location.replace("/?id=" + getSessionId());
+        }, 2000);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    //document.getElementById("reasonerChoiceUpload").style.display = "none";
+  }, 'ontology' );
 }
 
-export function loadAtomicDecomposition(e) {
+function loadAtomicDecomposition(e) {
   adOntologyFile = e.target.files[0];
-  upload(adOntologyFile, result => {
-    console.log('Success:', result);
+  upload(adOntologyFile, _ => {
     d3.xml("../data/" + getSessionId() + "/" + adOntologyFile.name).then((xml) => {
-      app.svgOntologyRootLayer.selectAll("*").remove();
       createContent(xml);
     });
   });
 }
 
-export function loadLayout(e) {
+function saveLayout() {
+  const json = cy.json();
+  const data = {
+    ontology: `${adOntologyFile.name}`,
+    cyExport: { elements: json.elements },
+    flags: { signature: showSignature, original: showOriginal, wrap: wrapLines }
+  }
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+  const dl = document.getElementById('download');
+  dl.setAttribute("href", dataStr);
+  dl.setAttribute("download", adOntologyFile.name.substring(0, adOntologyFile.name.indexOf(".")) + "_layout.json");
+  dl.click();
+}
+
+function loadLayout(e) {
   layoutFile = e.target.files[0];
 
   const reader = new FileReader();
 
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     const result = JSON.parse(e.target.result);
 
-    if (!result.ontology || !result.nodes) {
+    if (!result.ontology || !result.cyExport) {
       M.toast({ html: 'Warning: JSON file is malformed' })
       console.error('JSON file is malformed')
       return;
@@ -620,221 +427,237 @@ export function loadLayout(e) {
       return;
     }
 
-    result.nodes.forEach(({ id, x, y }) => {
-      simulation.nodes().forEach(sNode => {
-        if (sNode.id === id) {
-          sNode.fx = x;
-          sNode.fy = y;
-        }
-      })
-
-      simulate();
-    })
+    showOriginal = result.flags.original;
+    showSignature = result.flags.signature;
+    wrapLines = result.flags.wrap;
+    await labelNodes(false);
+    cy.json(result.cyExport);
   }
 
   reader.readAsText(layoutFile);
 }
 
-export function init_ontology(ad_file_name, ontology_file_param) {
-  //Remove listeners of types
-  removeListeners("click",thingsWithClickListeners);
-  removeListeners("input",thingsWithInputListeners);
-  removeListeners("change",thingsWithChangeListeners);
-  removeListeners("restart",thingsWithRestartListeners);
+function init_ontology({
+  ad,
+  ontology,
+  container = "ontology-container",
+}) {
+  div = container;
 
   adOntologyFile = {
-    name: ontology_file_param ? ad_file_name : 'atomic ontology.xml'
+    name: ontology ? ad : 'atomic ontology.xml'
   };
 
   ontologyFile = {
-    name: ontology_file_param
+    name: ontology
   };
 
-  socket.on("highlight axioms", (data) => {
-    restoreColor();
+  socket.on('highlight axioms', (data) => {
+    restoreColor(false, cy);
     if (data && data.id === getSessionId()) {
-      highlightNodesOf(data.pre);
+      highlightNodesOf(data.pre, cy);
     }
   });
 
-  socket.on("set ontology", (data) => {
+  socket.on('set ontology', (data) => {
     if (data && data.id === getSessionId()) {
       if (!adOntologyFile) {
         computingRepairsFailed("Please select an ontology file");
       } else {
         showRepairsTab(false); // from controls.js
         computingRepairs();
-        socket.emit("get repairs", {
+        socket.emit('get repairs', {
           id: data.id,
           axiom: data.axiom,
           readableAxiom: data.readableAxiom,
           ontologyFile: ontologyFile.name,
-          reasoner:document.getElementById('diagnosesReasoner').value
+          reasoner: document.getElementById('diagnosesReasoner').value
         });
       }
     }
   });
 
-  socket.on("read repairs", (data) => {
+  socket.on('read repairs', (data) => {
     if (data && data.id === getSessionId()) {
       if (data.msg === "mDs.txt is now available!") {
-        readRepairs({ axiom: data.axiom, file: "../data/" + data.id + "/mDs_" + data.id + ".txt" });
+        readRepairs({ axiom: data.axiom, file: "../data/" + data.id + "/mDs_" + data.id + ".txt", cy });
       } else {
         computingRepairsFailed(data.msg);
       }
     }
   });
 
-  // Configure SVG
-  //TODO this is just a quick fix, the rest of the vars should be handled in the same way
-  if(!app.svgOntology) {
-    app.svgOntology = document.getElementById("ontology-view")
-    margin = {top: 30, right: 10, bottom: 30, left: 10};
-    contentWidth = app.svgOntology.clientWidth - margin.left - margin.right;
-    contentHeight = app.svgOntology.clientHeight - margin.top - margin.bottom;
-
-    app.svgOntologyRootLayer = d3
-        .select("#ontology-view")
-        .attr("width", contentWidth + margin.left + margin.right)
-        .attr("height", contentHeight + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`)
-        .style("user-select", "none");
-  }
-  document.addEventListener("restart", documentFunctionClick)
-
   // CONTROLS ==========================================
-
   btnShowSignature.checked = true;
-  btnShowSignature.addEventListener("click", btnShowSignatureFunction);
-
   btnWrapLines.checked = false;
-  btnWrapLines.addEventListener("click", btnWrapLinesFunction);
-
+  btnAnimation.checked = true;
   lineLengthInput.closest(".modal-option.modal-option-range").style.display = "none";
-  lineLengthInput.addEventListener("input", changeFunction);
-
-  resetLayoutButton.addEventListener("click", resetLayout);
-  saveLayoutButton.addEventListener("click", saveLayout);
-  showRepairsMenuButton.addEventListener("click", showRepairsTab);
-
-  maxLengthInput.addEventListener("input", maxLengthInputFunction);
-
   maxLengthInput.closest(".input-range-wrapper").style.display = "none";
-
-  // shorteningModeInput.addEventListener("change", function () {
-  //   maxLengthInput.closest(".input-range-wrapper").style.display = this.value === "basic" ? "block" : "none";
-  //   updateLabels = true;
-  //   simulate();
-  // });
-
-  linkLengthFunctionInput.addEventListener("change", changeFunction);
-  linkLengthIdealValue.max = 300;
-  linkLengthIdealValue.min = 10;
-  linkLengthIdealValue.value = 50;
-  linkLengthIdealValue.addEventListener("input", simulate);
-  linkLengthIdealValueReset.addEventListener("click", linkLengthIdealValueResetFunction);
-
-  flowDirection.addEventListener("change", changeFunction);
   flowStrength.max = 500;
   flowStrength.min = 10;
-  flowStrength.value = 50;
-  flowStrength.addEventListener("input", simulate);
-  flowStrengthReset.addEventListener("click", flowStrengthResetFunction);
+  flowStrength.value = params.flow.minSeparation;
 
   document.querySelectorAll("input[type=range]").forEach(range => {
-    range.closest(".modal-option-range").querySelector("span.new.badge").innerText = range.value;
-
     function rangeFunction() {
-        range.closest(".modal-option-range").querySelector("span.new.badge").innerText = range.value;
+      range.closest(".modal-option-range").querySelector("span.new.badge").innerText = range.value;
     }
-    range.removeEventListener("input", rangeFunction)
-    range.addEventListener("input", rangeFunction)
-  })
 
+    rangeFunction();
 
-  openProof.addEventListener('click', openProofFunction);
+    range.removeEventListener("input", rangeFunction);
+    range.addEventListener("input", rangeFunction);
+  });
 
   d3.xml("../data/" + getSessionId() + "/" + adOntologyFile.name).then((xml) => {
     createContent(xml);
-    thumbnailViewer({ mainViewId: "ontology-view", containerSelector: "#ontology-container" });
   });
 
   showOriginal = true;
   updateShorteningButton();
-  shortenAllInOntologyBtn.addEventListener("click", shortenAllInOntology);
+
+  // set listeners
+  thingsWithListeners.forEach(twl => {
+    twl.thing.removeEventListener(twl.type, twl.fn);
+    twl.thing.addEventListener(twl.type, twl.fn);
+  });
 }
 
-function shortenAllInOntology(){
+function shortenAllInOntology() {
+  // Removing all the nodes which will be reseted by LabelNodes
+  const nodesHTML = [...document.getElementsByClassName(`cy-html`)];
+  nodesHTML.forEach(node => {
+    if (node.parentNode && node.parentNode.parentNode) {
+      node.parentNode.parentNode.remove();
+    }
+  });
   //Update shortening button
   showOriginal = !showOriginal
+  !showOriginal ? document.getElementById('ontology-view').classList.remove("complete-ontology") : document.getElementById('ontology-view').classList.add("complete-ontology");
   updateShorteningButton(this);
-
-  updateLabels = true;
-
-  simulate();
   labelNodes();
 }
 
+function resetLayout() {
+  cy.params = structuredClone(params);
+  cy.layout(cy.params).run()
+}
+
 function updateShorteningButton() {
-  if (showOriginal){
+  if (showOriginal) {
     shortenAllInOntologyBtn.textContent = "Shorten all";
     shortenAllInOntologyBtn.title = "Shorten all text in the ontology";
-  }else{
+  } else {
     shortenAllInOntologyBtn.textContent = "Undo shortening";
     shortenAllInOntologyBtn.title = "Undo shortening effect in the ontology";
   }
 }
 
-function btnShowSignatureFunction () {
+function btnShowSignatureFunction() {
   showSignature = this.checked;
-  if (SharedData.labelsShorteningHelper instanceof BasicSophisticatedShorteningFunctions)
-    SharedData.labelsShorteningHelper.resetAll();
-  updateLabels = true;
-  simulate();
+  if (globals.labelsShorteningHelper instanceof BasicShorteningFunctions) {
+    globals.labelsShorteningHelper.resetAll();
+  }
   labelNodes();
 }
 
-function btnWrapLinesFunction () {
+function btnWrapLinesFunction() {
   wrapLines = this.checked;
   lineLengthInput.closest(".modal-option.modal-option-range").style.display = this.checked ? "block" : "none";
-  updateLabels = true;
-  simulate();
   labelNodes();
 }
 
 function maxLengthInputFunction() {
   if (!showOriginal) {
-    updateLabels = true;
-    simulate();
     labelNodes();
   }
 }
 
-function linkLengthIdealValueResetFunction(){
-  linkLengthIdealValue.value = 50;
-  simulate();
-}
-
 function flowStrengthResetFunction() {
-  flowStrength.value = 50;
-  simulate();
+  flowStrength.value = params.flow.minSeparation;
+  rerunLayout();
 }
 
 function openProofFunction() {
   window.open('/proof?id=' + getSessionId())
 }
 
-function changeFunction(){
-  updateLabels = true;
-  simulate();
+function keepNodes() {
+  if (btnAnimation.checked === false) {
+    cy.params.maxSimulationTime = 1;
+    cy.params.animate = true,
+      cy.params.animationDuration = undefined,
+      cy.params.animationThreshold = 1,
+      cy.params.fit = false;
+    cy.params.centerGraph = false;
+  }
+  else {
+    cy.params.animate = true,
+      cy.params.animationDuration = 500,
+      cy.params.maxSimulationTime = 2000;
+    cy.params.fit = false;
+    cy.params.centerGraph = true;
+  }
+  Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+    const node = cy.$id(nodeId);
+    const lastPosition = lastDraggedPositions[nodeId];
+    // Set the position of the node to its last dragged position
+    node.position(lastPosition);
+    // Lock the position to maintain it even after layout
+    node.lock();
+  });
+  cy.layout(cy.params).run();
+  let layoutStopTimer;
+
+  cy.on('layoutstart', function (event) {
+    clearTimeout(layoutStopTimer); // Clear any existing timer
+    handleLayoutEvent(false);
+  });
+
+  cy.on('layoutstop', function (event) {
+    clearTimeout(layoutStopTimer); // Clear any existing timer
+    layoutStopTimer = setTimeout(function () {
+      handleLayoutEvent(true);
+    }, 500);
+  });
+
+  const handleLayoutEvent = function (enabled) {
+    cy.userZoomingEnabled(enabled);
+    cy.userPanningEnabled(enabled);
+    cy.autoungrabify(!enabled);
+    if (enabled === true) {
+      Object.keys(lastDraggedPositions).forEach(function (nodeId) {
+        const node = cy.$id(nodeId);
+        node.unlock();
+      });
+    };
+  };
 }
 
-function documentFunction(e){
-  console.log("here");
-  console.log(e)
-  if (e.detail) {
-    updateLabels = e.detail.updateLabels;
+function rerunLayout(e) {
+  cy.params.flow = {
+    axis: flowDirection.value,
+    minSeparation: +flowStrength.value,
   }
-  simulate();
+  keepNodes();
 }
+
+
+function setupOntologyMinimap(cy) {
+  let defaults = {
+    container: "#ontology-minimap-container",
+    viewLiveFramerate: 0,
+    thumbnailEventFramerate: 60,
+    thumbnailLiveFramerate: true,
+    dblClickDelay: 200,
+    removeCustomContainer: false,
+    rerenderDelay: 100
+  };
+
+  cy.navigator(defaults);
+}
+
+function loadConstraints(event) {
+  upload(event.target.files[0], undefined, 'constraints');
+}
+
+export { loadOntology, loadAtomicDecomposition, loadLayout, init_ontology, loadConstraints }

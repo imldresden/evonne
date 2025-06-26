@@ -1,6 +1,6 @@
-
-import { loadOntology, loadLayout, loadAtomicDecomposition } from '../ontology/ontology.js';
-import {loadProof, loadSignature} from '../proof/proof.js';
+import {loadOntology, loadLayout, loadAtomicDecomposition, loadConstraints} from '../ontology/ontology.js';
+import { loadProof, loadSignature} from '../main/main.js';
+import {ReasonerName} from "./ReasonerName.js";
 
 const listenerFunctions = [loadProof, loadOntology, loadLayout];
 const fileUploadInput = document.getElementById('browseButton');
@@ -17,12 +17,50 @@ function adaptUploadFileModal(whatToUpload) {
   M.Modal.getInstance(document.getElementById('uploadFileModal')).open();
 }
 
+// blank project 
+const createBlankProject = document.getElementById("createBlank");
+createBlankProject && createBlankProject.addEventListener("click", async () => {
+  const id = await (await fetch("/uuid")).text();
+  const response = await fetch("/create?id=" + id);
+  
+  if (response.ok) {
+    window.location.href = "/?id=" + id;
+  } else {
+    console.error("Something went wrong. Please reload this page and try again. If the problem persists, feel free to contact the authors");
+  }
+});
+
+function setReasonerOptionValues() {
+  document.getElementById("elkOption").value = ReasonerName.elk();
+  document.getElementById("elkCDOption").value = ReasonerName.elkCD();
+  document.getElementById("hermitOption").value = ReasonerName.hermit();
+}
+
 // for uploading the actual ontology, project menu 
 const uploadOntologyTriggers = Array.from(document.getElementsByClassName("uploadOntologyTrigger"));
 uploadOntologyTriggers.forEach(trigger => {
+  setReasonerOptionValues();
+
+  const loadConstraintsTextField = document.getElementById("browseConstraintsFilePath");
+  loadConstraintsTextField.value = "";
+
+  const reasonerChoice = document.getElementById('classificationReasoner');
+  const CDChoiceDiv = document.getElementById("CDChoice");
+  reasonerChoice.addEventListener("change",()=>{
+    if (reasonerChoice.value === ReasonerName.elkCD()){
+      CDChoiceDiv.style.display = "block";
+    }else{
+      CDChoiceDiv.style.display = "none";
+    }
+  });
+
+  const loadConstraintsFileBtn = document.getElementById("browseConstraintsButton");
+  loadConstraintsFileBtn.addEventListener("change",loadConstraints);
+
   trigger.addEventListener("click", () => {
     adaptUploadFileModal('n ontology for a new project');
-    fileUploadInput.accept = '.xml, .owl';
+    //We now allow the user to upload any file format. We internally convert to OWL XML format
+    fileUploadInput.accept = '';//'.xml, .owl';
     fileUploadInput.addEventListener("change", loadOntology);
   });
 });
@@ -57,10 +95,11 @@ uploadSignatureTrigger && uploadSignatureTrigger.addEventListener("click", () =>
   uploadSignatureTrigger.addEventListener("change", loadSignature);
 });
 
-export function upload(file, fn) {
+export function upload(file, fn, type = '') {
   const formData = new FormData();
   formData.append('id', getSessionId());
   formData.append('file', file);
+  formData.append('type', type);
 
   fetch('/upload', {
     method: 'POST',

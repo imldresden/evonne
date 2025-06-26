@@ -1,0 +1,22 @@
+<li>
+  <a class="dropdown dropdown-trigger tooltipped" data-target="submenu-compute" data-tooltip="Project">
+    <i class="material-icons">computer</i>
+  </a>
+</li>
+
+<ul id="submenu-compute" class="dropdown-content">
+  <li>
+    <div type="button" class="menu-entry tooltipped modal-trigger" data-target="selectAxiomModal" data-tooltip="Specify Axiom">
+      <a id="define-axiom" >
+        <i class="large material-icons" style="font-size: x-large">dvr</i>
+      </a>
+    </div>
+  </li>
+  <li id="split-view-menu">
+    <div type="button" class="menu-entry tooltipped" data-tooltip="Open Split View (Proof | Ontology)">
+      <a id="openSplitInNew">
+        <i class="material-icons">flip</i>
+      </a>
+    </div>
+  </li>
+</ul>

@@ -1,4 +1,7 @@
-@import "tooltip.css";
+/* single point of entry to load styles - do not duplicate @imports in other .css files! */ 
+@import "../colors.css";
+@import "../nodes.css";
+@import "explanation.css";
 @import "minimap.css";
 @import "sidebar.css";
 @import "splitview.css";
@@ -6,50 +9,14 @@
 @import "context-menu.css";
 
 :root {
-	--color-primary: #799c78 !important;
-	--color-primary-light: #a6c0a5 !important;
-	--color-primary-transparent-70: hsla(118, 26%, 74%, 0.7) !important;
-	--color-primary-transparent-20: hsla(118, 26%, 74%, 0.2) !important;
-	--color-secondary: #93ad93 !important;
-	--color-secondary-light: #b1beb1 !important;
-
-	--color-red-light: #ffebee;
-	--color-red: #ef9a9a;
-	--color-red-dark: #e77272;
-	--color-red-darker: #b34343;
-	--color-purple-light: #fdebff;
-	--color-purple: #b89aef;
-	--color-purple-dark: #9172e7;
-	--color-blue-light: #e3f2fd;
-	--color-blue: #64b5f6;
-	--color-yellow-light: #fdfde3;
-	--color-yellow: #ffd900;
-	--color-yellow-dark: #b89c00;
-	--color-orange-light: #fdefe3;
-	--color-orange: #f6ab64;
-  	--color-orange-dark: #bb6b20;
-	--color-teal-light: #e0f2f1;
-	--color-teal: #80cbc4;
-	--color-teal-dark: #36afa3;
-	--color-teal-darker: #3ca096;
-	--color-gray-light: #eceff1;
-	--color-gray: #b0bec5;
-	--color-gray-dark: #9e9e9e;
-	--color-gray-darker:#757575;
-	--color-lime-light: #f0f4c3;
-	--color-lime: #cddc39;
-
 	--anim-short: 100ms;
 	--anim-long: 200ms;
 }
 
 main {
 	position: absolute;
-	overflow: hidden;
-
 	width: 100vw;
 	height: 100vh;
-	display: flex;
 	align-items: stretch;
 }
 
@@ -81,8 +48,8 @@ nav a.sidenav-trigger {
 }
 
 #project-id-div {
-  width:350px;
-  margin-left:calc(25% + 80px);
+  width:20%;
+  margin-left:calc(30% + 80px);
   position:absolute;
 }
 
@@ -118,6 +85,7 @@ fieldset {
 
 .container-flex {
     display: flex;
+	height: 100%;
 }
 
 .welcome-container {
@@ -130,13 +98,19 @@ fieldset {
 
 /* Typography */
 body {
-	font-family: Roboto;
 	font-size: 16px;
 	font-weight: 300;
 }
 
-button {
-	font-family: Roboto;
+body, 
+.brand-logo, 
+.menuEntry text, 
+.ui, h1, h2, h3, h4, h5, 
+button, input, optgroup, select, textarea,
+.select-wrapper input.select-dropdown,
+.custom-menu-item,
+.node {
+	font-family: Hack, monospace;
 }
 
 .modal h2 {
@@ -200,10 +174,6 @@ label {
 	margin-top: 9px;
 	margin-left: 2px;
 	fill: white;
-}
-
-.brand-logo {
-	font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 .menu-entry,
@@ -277,7 +247,6 @@ section.modal-section:not(:last-of-type) {
 
 .select-wrapper input.select-dropdown {
 	margin: 0;
-	font-family: Roboto;
 	padding-bottom: 8px;
 }
 .select-wrapper input.select-dropdown:focus {
@@ -356,12 +325,15 @@ fieldset {
 	height: unset;
 	margin-bottom: 0;
 }
-.modal .modal-footer .modal-close {
+
+.modal-button {
 	margin: 0;
-	color: var(--color-primary);
+	color: var(--color-gray-darker);
 }
-.modal .modal-footer .modal-close:hover {
-	color: var(--color-primary-light);
+
+.modal-button:hover {
+	color: var(--color-gray-dark);
+	cursor: pointer;
 	background-color: transparent;
 	border-color: transparent;
 }
@@ -387,6 +359,10 @@ input[type="range"]::-moz-range-thumb {
 input[type="range"]::-ms-thumb {
 	background: var(--color-primary);
 	box-shadow: none !important;
+}
+input[type="checkbox"].filled-in:checked + span:not(.lever):after {
+	background: var(--color-primary);
+	border-color: var(--color-primary);
 }
 input[type="range"] + .thumb {
 	display: none;
@@ -443,14 +419,10 @@ span.badge.new {
 
 .slidering {
 	overflow: hidden;
-	max-height: 100%;
-
-	transition-property: all;
-	transition-duration: 0.5s;
 }
 
 .slidering.closed {
-	max-height: 0;
+	display: none;
 }
 
 .tall-card {
@@ -465,4 +437,16 @@ span.badge.new {
 
 .wide-row {
 	width: 55%;
+}
+
+.option-rhs-true {
+	background-color: var(--color-teal-light);
+}
+
+.option-rhs-false {
+	background-color: var(--color-orange-light);
+}
+
+.linearActive, .compactActive {
+	display: none;
 }

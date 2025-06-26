@@ -1,0 +1,25 @@
+/* uses colors from @import "./nodes.css"; */
+
+#inference-view {
+    width: 100%;
+    text-align: center;
+}
+
+#inference-view-children-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#inference-view-parent-container, #inference-view-children-container{
+    margin-top: 2rem;
+}
+
+#inference-view-rule {
+    width: max-content;
+    margin: auto;
+    padding: 10px;
+    background-color: var(--color-node-rule-fill);
+    border: 1px solid var(--color-node-rule-stroke);
+    border-radius: 10px;
+}

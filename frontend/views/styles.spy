@@ -1,14 +1,6 @@
 <link rel="shortcut icon" type="image/svg" href="/favicon.svg"/>
-
-<!-- <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> 
-<link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">  
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,600,700">
---> 
-
-<link rel="stylesheet" href="/style/lib/normalize.css">
-<link rel="stylesheet" href="/style/lib/materialize.min.css">
-<link rel="stylesheet" href="/style/font/material-icons.css">  
-<link rel="stylesheet" href="/style/font/roboto-latin.css">
-
+<link rel="stylesheet" href="/libs/materialize-css/dist/css/materialize.css">
+<link rel="stylesheet" href="/libs/hack-font/build/web/hack.css">
+<link rel="stylesheet" href="/libs/material-icons/iconfont/material-icons.css">
 <link rel="stylesheet" href="/style/widgets/general.css">
+<link rel="stylesheet" href="/libs/cytoscape-context-menus/cytoscape-context-menus.css">

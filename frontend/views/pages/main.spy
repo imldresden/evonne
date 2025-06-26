@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html lang="en">
+
+<head>
+  <title>{{ title }}</title>
+
+  << styles >>
+
+  <link rel="stylesheet" href="/style/proof.css">
+  <link rel="stylesheet" href="/style/ontology.css">
+  <link rel="stylesheet" href="/style/ce.css">
+</head>
+
+<body>
+  
+  << widgets/menus/menu >>
+  << widgets/modals/file-upload >>
+  << widgets/modals/advanced-settings >>
+  << widgets/modals/axiom >>
+
+  <main id="container-main">
+    <!-- everything gets added via main.js -->
+  </main>
+
+  << widgets/menus/settings >>
+  
+  << scripts >>
+  <script src="/js/ontology/repairs.js"></script>
+  <script src="/js/main/main.js" type="module"></script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+function init() {
   let tabs = document.querySelectorAll(".tabs");
   M.Tabs.init(tabs);
 
@@ -14,13 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   let dropdowns = document.querySelectorAll(".dropdown");
-  M.Dropdown.init(dropdowns, { 
-    coverTrigger: false 
+  M.Dropdown.init(dropdowns, {
+    coverTrigger: false
   });
 
   let selects = document.querySelectorAll("select");
-  M.FormSelect.init(selects, { 
-    coverTrigger: false 
+  M.FormSelect.init(selects, {
+    coverTrigger: false
   });
 
   let tooltips = document.querySelectorAll(".tooltipped");
@@ -35,8 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
   for (const toggle of document.getElementsByClassName('toggles-content')) {
     toggle.addEventListener('click', () => {
       const toggeable = document.getElementById(toggle.getAttribute('target'));
-      
-      const icon = toggle.querySelector("i"); 
+
+      const icon = toggle.querySelector("i");
       if (icon.textContent === "arrow_drop_down") {
         icon.textContent = "arrow_drop_up";
       } else {
@@ -47,15 +47,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   for (const toggle of document.getElementsByClassName('toggle-map')) {
-    toggle.addEventListener('click', () => {
-      document.querySelector('#' + toggle.getAttribute('target') + '-container .minimap-view-container').classList.toggle('scale-out');
+    toggle.addEventListener("click", () => {
+      document.querySelector("#" + toggle.getAttribute("target") + "-container .minimap-view-container").classList.toggle("opacity-0");
     });
   }
 
-});
+  for (const c of document.getElementsByClassName("toggles-sidebar")) {
+    c.addEventListener("click", toggleSidebar);
+  }
 
-const sidebarToggles = document.getElementsByClassName("toggles-sidebar");
-const btnToggleSideBar = document.getElementById("btnToggleSideBar");
+  const settingsSidebar = document.getElementById("sidebarSettings");
+  const settingsButton = document.getElementById("showSettingsMenuButton");
+
+  if (settingsButton) {
+    if (settingsSidebar !== null) {
+      settingsButton.addEventListener("click", showSettingsTab);
+    } else {
+      settingsButton.style.display = "none";
+    }
+  }
+}
 
 function slideIn() {
   const sidebar = document.getElementById("sidebar");
@@ -78,19 +89,21 @@ function slideOut() {
 }
 
 function toggleSidebar() {
+  const btnToggleSideBar = document.getElementById("btnToggleSideBar");
   if (btnToggleSideBar.classList.contains("active")) {
     slideOut();
   } else {
     slideIn();
   }
   btnToggleSideBar.classList.toggle("active");
-  
+
   setTimeout(() => {
     document.dispatchEvent(new CustomEvent("reinit-minimap"));
   }, 250); // wait for animation to finish
 }
 
-function setTabFromDirectControl(srcID, toggleIfOpen=true) {
+function setTabFromDirectControl(srcID, toggleIfOpen = true) {
+  const btnToggleSideBar = document.getElementById("btnToggleSideBar");
   if (document.getElementById(srcID).classList.contains("active") && toggleIfOpen) {
     toggleSidebar();
   } else {
@@ -100,25 +113,12 @@ function setTabFromDirectControl(srcID, toggleIfOpen=true) {
   }
 }
 
-function showRepairsTab(toggleIfOpen=true) {  
+function showRepairsTab(toggleIfOpen = true) {
   setTabFromDirectControl("sidebarRepairs", toggleIfOpen);
 }
 
-function showSettingsTab(toggleIfOpen=true) {
+function showSettingsTab(toggleIfOpen = true) {
   setTabFromDirectControl("sidebarSettings", toggleIfOpen);
-}
-
-for (const c of sidebarToggles) {
-  c.addEventListener("click", toggleSidebar);
-}
-
-const settingsSidebar = document.getElementById("sidebarSettings");
-const settingsButton = document.getElementById("showSettingsMenuButton");
-
-if (settingsSidebar) { 
-  settingsButton.addEventListener("click", showSettingsTab);
-} else {
-  settingsButton.style.display = "none";
 }
 
 function startRedrawCSS() {
@@ -128,118 +128,113 @@ function startRedrawCSS() {
 function finishRedrawCSS() {
   document.querySelectorAll('.svg-pan-zoom-control').forEach(e => e.classList.remove("redraw"));
   document.dispatchEvent(new CustomEvent("reinit-minimap"));
+  dispatchEvent(new CustomEvent("view_resize", {}));
 }
 
-function resizable(resizer) {
-  const direction = resizer.getAttribute('data-direction') || 'horizontal';
-  const prevSibling = resizer.previousElementSibling;
-  const nextSibling = resizer.nextElementSibling;
+function init_resizer() {
+  // Query all resizers
+  document.querySelectorAll('.resizer').forEach(function (ele) {
+    resizable(ele);
 
-  // The current position of mouse
-  let x = 0;
-  let y = 0;
-  let prevSiblingHeight = 0;
-  let prevSiblingWidth = 0;
+    function resizable(resizer) {
+      const direction = resizer.getAttribute('data-direction') || 'horizontal';
+      const prevSibling = resizer.previousElementSibling;
+      const nextSibling = resizer.nextElementSibling;
 
-  // Handle the mousedown event
-  // that's triggered when user drags the resizer
-  const mouseDownHandler = function (e) {
-      // Get the current mouse position
-      x = e.clientX;
-      y = e.clientY;
-      const rect = prevSibling.getBoundingClientRect();
-      prevSiblingHeight = rect.height;
-      prevSiblingWidth = rect.width;
+      // The current position of mouse
+      let x = 0;
+      let y = 0;
+      let prevSiblingHeight = 0;
+      let prevSiblingWidth = 0;
 
-      // Attach the listeners to `document`
-      document.addEventListener('mousemove', mouseMoveHandler);
-      document.addEventListener('mouseup', mouseUpHandler);
-  };
+      // Handle the mousedown event
+      // that's triggered when user drags the resizer
+      const mouseDownHandler = function (e) {
+        // Get the current mouse position
+        x = e.clientX;
+        y = e.clientY;
+        const rect = prevSibling.getBoundingClientRect();
+        prevSiblingHeight = rect.height;
+        prevSiblingWidth = rect.width;
 
-  const mouseMoveHandler = function (e) {
-      // How far the mouse has been moved
-      const dx = e.clientX - x;
-      const dy = e.clientY - y;
+        // Attach the listeners to `document`
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+      };
 
-      switch (direction) {
+      const mouseMoveHandler = function (e) {
+        // How far the mouse has been moved
+        const dx = e.clientX - x;
+        const dy = e.clientY - y;
+
+        switch (direction) {
           case 'vertical':
-              const h =
-                  ((prevSiblingHeight + dy) * 100) /
-                  resizer.parentNode.getBoundingClientRect().height;
-              prevSibling.style.height = `${h}%`;
-              break;
+            const h =
+              ((prevSiblingHeight + dy) * 100) /
+              resizer.parentNode.getBoundingClientRect().height;
+            prevSibling.style.height = `${h}%`;
+            break;
           case 'horizontal':
           default:
-              const w =
-                  ((prevSiblingWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
-              prevSibling.style.width = `${w}%`;
-              break;
+            const w =
+              ((prevSiblingWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
+            prevSibling.style.width = `${w}%`;
+            break;
+        }
+
+        const cursor = direction === 'horizontal' ? 'col-resize' : 'row-resize';
+        resizer.style.cursor = cursor;
+        document.body.style.cursor = cursor;
+
+        prevSibling.style.userSelect = 'none';
+        prevSibling.style.pointerEvents = 'none';
+
+        nextSibling.style.userSelect = 'none';
+        nextSibling.style.pointerEvents = 'none';
+        startRedrawCSS();
+      };
+
+      const mouseUpHandler = function () {
+        resizer.style.removeProperty('cursor');
+        document.body.style.removeProperty('cursor');
+
+        prevSibling.style.removeProperty('user-select');
+        prevSibling.style.removeProperty('pointer-events');
+
+        nextSibling.style.removeProperty('user-select');
+        nextSibling.style.removeProperty('pointer-events');
+
+        // Remove the handlers of `mousemove` and `mouseup`
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+        finishRedrawCSS();
+      };
+
+      document.onkeydown = function (e) {
+        if (e.altKey) { // option for mac, must be disabled on windows
+          e.preventDefault();
+        }
+
+        if (e.key === "Escape" || e.key === "Esc") {
+          document.dispatchEvent(new CustomEvent("destroy_explanation", {}));
+        }
       }
 
-      const cursor = direction === 'horizontal' ? 'col-resize' : 'row-resize';
-      resizer.style.cursor = cursor;
-      document.body.style.cursor = cursor;
+      document.onkeyup = function (e) {
+        startRedrawCSS();
+        const which = e.which || e.buttons;
+        if ((e.ctrlKey || e.altKey) && which === 39) {
+          prevSibling.style.width = '100%';
+        } else if ((e.ctrlKey || e.altKey) && which === 37) {
+          prevSibling.style.width = '0%';
+        }
+        finishRedrawCSS();
+      };
 
-      prevSibling.style.userSelect = 'none';
-      prevSibling.style.pointerEvents = 'none';
+      // Attach the handler
+      resizer.addEventListener('mousedown', mouseDownHandler);
+    };
+  });
+}
 
-      nextSibling.style.userSelect = 'none';
-      nextSibling.style.pointerEvents = 'none';
-      startRedrawCSS();
-  };
-
-  const mouseUpHandler = function () {
-      resizer.style.removeProperty('cursor');
-      document.body.style.removeProperty('cursor');
-
-      prevSibling.style.removeProperty('user-select');
-      prevSibling.style.removeProperty('pointer-events');
-
-      nextSibling.style.removeProperty('user-select');
-      nextSibling.style.removeProperty('pointer-events');
-
-      // Remove the handlers of `mousemove` and `mouseup`
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-      finishRedrawCSS();  
-  };
-
-  document.onkeydown = function(e) {
-    if (e.altKey) { // option for mac, must be disabled on windows
-      e.preventDefault();
-    }
-  }
-  document.onkeyup = function(e) {
-    startRedrawCSS();
-    const which = e.which || e.buttons;
-    if ( (e.ctrlKey || e.altKey) && which == 39) {
-      prevSibling.style.width = '100%';
-    } else if ( (e.ctrlKey || e.altKey) && which == 37) {
-      prevSibling.style.width = '0%';
-    }
-    finishRedrawCSS();
-  };
-
-  // Attach the handler
-  resizer.addEventListener('mousedown', mouseDownHandler);
-};
-
-// Query all resizers
-document.querySelectorAll('.resizer').forEach(function (ele) {
-  resizable(ele);
-});
-
-// redirection for demos
-async function loadExample(name, id) {
-  document.getElementById("examples").classList.add("hidden");
-  document.getElementById("generating-example").classList.remove("hidden");
-  
-  const response = await fetch("/create?example=" + name + "&id=" + id);
-  console.log(response)
-  console.log(response.ok)
-  if (response.ok) {
-    window.location.href = "/?id=" + id;
-  } else {
-    document.getElementById("generating-example").innerHTML = "Something went wrong. Please reload this page and try again. If the problem persists, feel free to contact the authors";
-  }
-} 
+export { showRepairsTab, init, init_resizer }

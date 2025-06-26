@@ -6,9 +6,10 @@ package-lock.json
 **/*.pyc
 **/ocrs.txt
 **.log
+log.txt
 **/repairs/*.txt
 
-frontend/public/data/*
+frontend/public/data
 frontend/public/examples
 
 frontend/public/js/lib

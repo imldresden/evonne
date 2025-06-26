@@ -1,4 +1,4 @@
-@import "./nodes.css";
+/* uses colors from @import "./nodes.css"; */
 
 :root {
 	--color-conn-rule: var(--color-gray);
@@ -11,10 +11,6 @@
 	--color-text-red: var(--color-red-darker);
 	--color-text-black: black;
 	--color-text-white: white;
-}
-
-svg#proof-view {
-	flex: 1;
 }
 
 .connector.ruleConnector {
@@ -78,5 +74,10 @@ svg#proof-view {
 .text-red {
 	color: var(--color-text-red);
 	font-weight: bold;
+	background-color: transparent !important;
+}
+
+.text-popover {
+	font-weight: normal;
 	background-color: transparent !important;
 }

@@ -1,0 +1,125 @@
+#counter-view {
+	flex: 1;
+}
+.tippy-box {
+    background-color: #e3f2fd; /* Background color */
+    color: #000; /* Text color */
+    border: 1px solid #64b5f6; /* Border */
+    border-radius: 4px; /* Border radius */
+    padding: 3px 5px; /* Padding */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Box shadow */
+  }
+#counter-view {
+  position: relative;
+}
+.indicator {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 100%;
+  background-color: #999999; /* Default color */
+  cursor: pointer;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.hidden-nodes {
+  background-color: #e0f2f1; 
+  border: 1px solid #80cbc4 ;
+}
+
+.showing-nodes {
+  background-color: #80cbc4; 
+  border: 1px solid #e0f2f1 ;
+}
+
+input#group_name {
+  border:1px solid #767676;
+  width:80%;
+  line-height:2px;
+  height:24px;
+  border-radius:2px;
+  font-size:14px;
+}
+input#group_name::placeholder {
+  color:#000;
+}
+.custom-menu-item {
+  border-color: white !important;
+  color:rgba(0,0,0,0.87) !important;
+  filter:drop-shadow( 2px 2px 2px rgba(0, 0, 0, .5));
+  font-size: 16px;
+  font-weight: 300;
+  background-color: #f2f2f2;
+}
+.custom-menu-item:hover {
+  background-color: #dddddd;
+}
+.custom-context-menu {
+  border-color: #f2f2f2 !important;   
+  z-index: 9999;   
+  padding: 0;
+  margin: 0;
+  width: auto;                
+}  
+.counterexample #sidebar{
+  z-index: 9999;
+  width: 300px;
+  right:calc(0px - 300px);
+}
+.counter-modal-option{
+  display: inline-block;
+  margin: 4px 0px;
+}
+.counter-modal-option button{
+  margin: 3px 0px;
+}
+.modal-option-range form:has(#shortening_mode_value) {
+  width: 100%;
+}
+
+#search-container {
+  position: relative;
+}
+
+#search-bar:focus{
+  border-bottom: 1px solid #799c78;
+  -webkit-box-shadow: 0 1px 0 0 #799c78;
+  box-shadow: 0 1px 0 0 #799c78;
+}
+
+#search-results:not(:empty) {
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background-color: white;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+#search-results div {
+  padding: 5px;
+  cursor: pointer;
+}
+
+#search-results div:hover {
+  background-color: #f0f0f0;
+}
+
+.counter-search-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 2px;
+  border-radius: 50px;
+  color: white;
+  cursor: pointer;
+}
+
+#subgraph canvas {
+  left:0;
+}
+
+#counter-container {
+ display: none;
+}

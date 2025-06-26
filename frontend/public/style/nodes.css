@@ -19,29 +19,48 @@
 }
 
 .node {
-	font-size: smaller;
-	font-family: Roboto;
+	font-size: 12px;
 }
 
-.node.rule text {
+.node.rule text,
+.node.DLRule text,
+.node.CDRule text {
 	fill: #696969;
 }
 
-.node.rest * {
+.node.rest circle{
 	fill: var(--color-node-axiom-conclusion-fill);
 	stroke: var(--color-node-axiom-conclusion-stroke);
 	stroke-width: 1;
 }
-.node.rest *:not(circle:first-of-type) {
-	display: none;
+
+
+.node.rest text {
+	fill: var(--color-node-axiom-conclusion-stroke);
 }
 
 svg g.node > rect.bg-box {
 	fill: var(--color-node-rule-fill);
 	stroke: var(--color-node-rule-stroke);
 	stroke-width: 1;
-	rx: 3px;
-	ry: 3px;
+}
+
+.rounded-box {
+	rx: 6px;
+	ry: 6px;	
+}
+
+.lock-sign {
+	display: none;
+}
+
+.lock-sign text {
+	font-size: 16px;
+	fill: white !important;
+}
+
+svg g.node.fixed-repairs > .lock-sign {
+	display: inline-block;
 }
 
 svg g.node:hover > rect.bg-box {
@@ -52,22 +71,6 @@ svg g.node:hover > rect.bg-box {
 svg g.node.hovered > rect.bg-box {
 	stroke-width: 3;
 	animation: none !important;
-}
-
-svg g.node.fixed-repairs > rect.bg-box {
-	stroke-width: 5;
-	stroke: var(--color-node-rule-stroke) !important;
-}
-
-.lock-sign {
-	display: none;
-}
-.lock-sign text {
-	font-size: 16px;
-	fill: white !important;
-}
-svg g.node.fixed-repairs > .lock-sign {
-	display: inline-block;
 }
 
 svg g.node.axiom > rect.bg-box {
@@ -97,11 +100,6 @@ svg g.node.krule > rect.bg-box {
 
 svg g.node text.linear-icon {
 	font-family: "Linearicons-Free";
-	font-size: 1em;
-}
-
-svg g.node text.material-icon {
-	font-family: "Material Icons";
 	font-size: 1em;
 }
 
@@ -146,11 +144,16 @@ svg g.node > g.btn-extend > rect {
 }
 
 svg g.node > g.btn-round > text {
-	color: white;
-	fill: white !important;
+	fill: white;
 	text-anchor: middle;
 	dominant-baseline: central;
 	font-size: 0.9em;
+}
+
+svg g.node > g.btn-borderless > text {
+	text-anchor: middle;
+	dominant-baseline: central;
+	font-size: 2em;
 }
 
 text.rotated {
@@ -181,9 +184,15 @@ svg g.node > g.btn-view > text {
 .conclusion .axiomButton {
 	fill: var(--color-purple-dark);
 }
+
 .asserted .axiomButton {
 	fill: #36afa3;
 }
+
+.node.rule .axiomButton {
+	fill: #797979;
+}
+
 .axiom:not(.asserted, .conclusion) .axiomButton {
 	fill: #2196f3;
 }
@@ -191,9 +200,11 @@ svg g.node > g.btn-view > text {
 .axiomButton.btn-highlight.active {
 	fill: var(--color-btn-highlight);
 }
+
 .axiomButton.btn-repairs.active {
 	fill: var(--color-btn-repairs);
 }
+
 .axiomButton.btn-repairs.spinning text {
 	animation: processing 1s linear 0s infinite normal forwards;
 }
@@ -223,7 +234,12 @@ svg g.node > g.btn-view > text {
 	fill: none;
 }
 
-#proof-view .link.from-axiom:hover {
+.link.dim {
+	stroke: #d6d5d5;
+	stroke-width: 1px;
+}
+
+#proof-view .link.cuttable:hover {
 	stroke-width: 5px !important;
 	stroke: var(--color-remove-link);
 }

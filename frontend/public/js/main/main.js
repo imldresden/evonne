@@ -1,6 +1,9 @@
-import {init_proof, removeListeners} from '../proof/proof.js';
+import { init_proof, proof } from '../proof/proof.js';
 import { init_ontology } from '../ontology/ontology.js';
-import { APP_GLOBALS as app } from "../shared-data.js";
+import { init_counter } from '../ce/ce.js';
+import { upload } from '../utils/upload-file.js';
+import { init as init_controls, init_resizer } from '../utils/controls.js'
+import {ReasonerName} from "../utils/ReasonerName.js";
 
 let status = {};
 let interval = undefined;
@@ -10,15 +13,23 @@ const signaturePathFile = document.getElementById("uploadSignatureTrigger");
 const browseFilePathText = document.getElementById("browseFilePath");
 const clearSigFilePath = document.getElementById("clearSignatureFile");
 const computeAxiomsBtn = document.getElementById('computeAxiomPairBtn');
+const openSplit = document.getElementById('openSplitInNew');
 
 window.onload = function () {
-  //Mapping elements with click event to their functions
-  let thingsWithClickListeners = new Map();
-  thingsWithClickListeners.set(clearSigFilePath,clearSigFilePathFunction);
-  thingsWithClickListeners.set(computeAxiomsBtn,computeAxiomsBtnFunction);
+  //Mapping elements with events to their functions
+  cytoscape.warnings(false);
+  const thingsWithListeners = [
+    { type: 'click', thing: clearSigFilePath, fn: clearSigFilePathFunction },
+    { type: 'click', thing: computeAxiomsBtn, fn: computeAxiomsBtnFunction },
+    { type: 'click', thing: openSplit, fn: openSplitFunction },
+  ];
 
-  //Remove listeners of types
-  removeListeners("click",thingsWithClickListeners);
+  // Remove listeners
+  thingsWithListeners.forEach(twl => {
+    if (twl && twl.thing) {
+      twl.thing.removeEventListener(twl.type, twl.fn);
+    }
+  });
 
   const projects = document.getElementById("current-projects");
   projects && fetch('/projects')
@@ -30,7 +41,7 @@ window.onload = function () {
 
         project.innerHTML = proj;
         project.onclick = () => {
-          window.location.replace("/?id=" + proj);
+          window.location.replace("/proof?id=" + proj); // TODO only for study, remove `proof`
         }
 
         projects.appendChild(project);
@@ -47,46 +58,108 @@ window.onload = function () {
     signaturePathText.value = "";
     signaturePathFile.value = "";
     signaturePathText.classList.remove("valid");
-    app.signatureFile = undefined;
-  
+    proof.signatureFile = undefined;
+
     browseFilePathText.value = "";
     browseFilePathText.classList.remove("valid");
-    app.proofFile = undefined;
+    proof.proofFile = undefined;
   }
 
+  if (clearSigFilePath) {
+    clearSigFilePath.addEventListener("click", clearSigFilePathFunction);
+  }
+
+  if (openSplit) {
+    openSplit.addEventListener("click", openSplitFunction)
+  }
+
+  init_controls();
   init_views();
 }
 
 function createConceptDropdowns(concepts) {
   const lhs = document.getElementById('lhsConcepts');
-  lhs.innerHTML = '';
+  const rhs = document.getElementById('rhsConcepts');
 
-  Object.entries(concepts).sort(([,s1], [,s2]) => sortNames(s1.conceptNameShort,s2.conceptNameShort)).forEach(
-      entry => {
-    if (entry[0]!== "owl:Nothing" && entry[1].rhs && entry[1].rhs.length > 0) {
+  lhs.innerHTML = '';
+  const cl = Object.keys(concepts); // sorted in server.js  
+
+  const toProof = document.createElement('optgroup')
+  const toCE = document.createElement('optgroup')
+
+  toProof.label = "...lead to proofs or counterexamples:"
+  toCE.label = "...only lead to counterexamples:";
+
+  cl.forEach(k => {
+    if (k !== "owl:Nothing") {
       const concept = document.createElement('option');
-      concept.value = entry[0];
-      concept.innerHTML =  entry[1].conceptNameShort;
-      lhs.appendChild(concept);
+      concept.value = k;
+      concept.innerHTML = concepts[k].short;
+      if (concepts[k].rhs && concepts[k].rhs.length > 0) {
+        concept.classList.add('option-rhs-true');
+        toProof.appendChild(concept);
+      } else {
+        concept.classList.add('option-rhs-false');
+        toCE.appendChild(concept);
+      }
     }
   });
 
-  const updateRHS = function () {
-    const rhs = document.getElementById('rhsConcepts');
+  lhs.appendChild(toProof);
+  lhs.appendChild(toCE);
+
+  function updateRHS() {
     rhs.innerHTML = '';
 
     const key = lhs.options[lhs.selectedIndex].value;
-    Object.entries(concepts[key].rhs).sort(([,s1], [,s2]) => sortNames(s1,s2)).forEach(rhsName => {
+    const currentConcept = concepts[key];
+
+    // decodes the encoding done on server.js to send less data
+    const ccs = new Set(currentConcept.rhs.map(ek => cl[ek - 100]));
+
+    const toProof = document.createElement('optgroup')
+    const toCE = document.createElement('optgroup')
+
+    toProof.label = "...lead to a proof:";
+    toCE.label = "...lead to a counterexample:";
+
+    cl.forEach(rhsKey => {
       const rhsC = document.createElement('option');
-      rhsC.value = rhsName[1];
-      rhsC.innerHTML = concepts[rhsName[1]].conceptNameShort;
-      rhs.appendChild(rhsC);
+      rhsC.value = rhsKey;
+      rhsC.innerHTML = concepts[rhsKey].short;
+      if (ccs.has(rhsKey)) {
+        rhsC.type = "pr";
+        rhsC.classList.add('option-rhs-true');
+        toProof.appendChild(rhsC);
+      } else {
+        rhsC.type = "ce";
+        rhsC.classList.add('option-rhs-false');
+        toCE.appendChild(rhsC);
+      }
     });
+
+    rhs.appendChild(toProof);
+    rhs.appendChild(toCE);
+    updateModal();
   }
+
+  function updateModal() {
+    if (rhs.options[rhs.selectedIndex].type === "pr") {
+      document.getElementById('proof-more-settings').style.display = 'block'
+      document.getElementById('lead-to').innerHTML = "...will lead to a proof."
+    } else {
+      document.getElementById('proof-more-settings').style.display = 'none'
+      document.getElementById('lead-to').innerHTML = "...will lead to a counterexample."
+    };
+  }
+
   updateRHS();
 
   lhs.removeEventListener('change', updateRHS);
   lhs.addEventListener('change', updateRHS);
+
+  rhs.removeEventListener('change', updateModal);
+  rhs.addEventListener('change', updateModal);
 }
 
 function init_views(loop = false) {
@@ -101,10 +174,11 @@ function init_views(loop = false) {
     .then(res => res.json())
     .then(res => {
       status = res;
-      console.log(res)
-      if (res.status === 'corrupt') {
+      //console.log(status);
+
+      if (res.status === 'custom' || res.reasoner === 'n/a') { // blank project
         clearInterval(interval);
-        throw Error('This project is beyond salvation');
+        return;
       }
 
       blockProofMethods(res.reasoner);
@@ -113,18 +187,17 @@ function init_views(loop = false) {
         if (res.names && Object.keys(res.names).length > 0) {
           createConceptDropdowns(res.names);
         } else {
-          console.log('concept names not available! extract them first')
+          console.error('concept names not available! extract them first')
         }
       }
 
       if (res.status === 'busy') {
         console.log('project is busy...')
-        return;
       } else if (res.status === 'pending') {
         if (res.axioms && res.axioms.length === 1) {
-          console.log('atomic decomposition missing');
+          console.error('atomic decomposition missing');
         } else {
-          console.log('proofs + ad missing');
+          console.error('proofs + ad missing');
         }
 
         modal.open();
@@ -132,22 +205,73 @@ function init_views(loop = false) {
         clearInterval(interval);
         modal.close();
 
-        if (document.getElementById('proof-view')) {
-          if (app.svgProofRootLayer) {
-            app.svgProofRootLayer.selectAll("*").remove();
-          }
-          init_proof(res.proofs[0]);
-        }
-        if (document.getElementById('ontology-view')) {
-          if (app.svgOntologyRootLayer)
-            app.svgOntologyRootLayer.selectAll("*").remove();
+        function displaySettings({ proof = 'block', ad = 'block', ce = 'block' }) {
+          const pswh = document.getElementById('proof-settings-with-header');
+          const pm = document.getElementById('proof-menu');
+          const oswh = document.getElementById('ontology-settings-with-header');
+          const om = document.getElementById('ontology-menu');
+          const rm = document.getElementById('repairs-menu');
+          const cswh = document.getElementById('ce-settings-with-header');
+          const gswh = document.getElementById('general-settings-with-header');
+          const svm = document.getElementById('split-view-menu');
 
-          init_ontology(res.ad, res.ontology);
+          //Set values for the reasoner user for the diagnoses
+          document.getElementById("elkOptionDiagnoses").value = ReasonerName.elk();
+          document.getElementById("hermitOptionDiagnoses").value = ReasonerName.hermit();
+
+
+          if (pswh) { pswh.style.display = proof; }
+          if (pm) { pm.style.display = proof; }
+          if (oswh) { oswh.style.display = ad; }
+          if (om) { om.style.display = ad; }
+          if (rm) { rm.style.display = ad; }
+          if (cswh) { cswh.style.display = ce; }
+          if (gswh) {
+            gswh.style.display = ce === 'block' ? 'none' : 'block';
+          }
+          if (svm) {
+            svm.style.display = ce !== 'block' && (ad === 'none' || proof === 'none') ? 'block' : 'none';
+          }
+        }
+
+        const container = document.getElementById('container-main')
+        if (res.explanation.type === 'pr') {
+          const onlyProof = window.location.href.includes('/proof')
+          const onlyAD = window.location.href.includes('/ontology')
+
+          if (!onlyProof && !onlyAD) {
+            container.innerHTML = `
+                    <div class="container container-split container-flex">
+                      <div class="container-left" id="proof-container"></div>
+                      <div class="resizer" data-direction="horizontal"></div>
+                      <div class="container-right" id="ontology-container"></div>
+                    </div>`
+            init_proof({ file: res.explanation.proof, ruleNamesMap: res.ruleNamesMap });
+            init_ontology({ ad: res.explanation.ad, ontology: res.ontology });
+            displaySettings({ ce: 'none' });
+            init_resizer();
+          }
+
+          if (onlyProof) {
+            container.innerHTML = `<div class="container container-flex" id="proof-container"></div>`
+            init_proof({ file: res.explanation.proof, ruleNamesMap: res.ruleNamesMap });
+            displaySettings({ ad: 'none', ce: 'none' });
+          }
+
+          if (onlyAD) {
+            container.innerHTML = `<div class="container container-flex" id="ontology-container"></div>`
+            init_ontology({ ad: res.explanation.ad, ontology: res.ontology });
+            displaySettings({ proof: 'none', ce: 'none' });
+          }
+
+        } else if (res.explanation.type === 'ce') {
+          container.innerHTML = `<div class="container container-flex" id="ce-container"></div>`;
+          init_counter({ model: res.explanation.model, mapper: res.explanation.mapper, ontology: res.ontology });
+          displaySettings({ proof: 'none', ad: 'none' });
         }
 
         //Hide computing indicator
         document.getElementById('computingGif').style.display = "none";
-
       }
     })
     .catch(error => {
@@ -156,65 +280,63 @@ function init_views(loop = false) {
     });
 }
 
+
 // for progress.spy
-export function progress(message) {
+function progress(message) {
   document.getElementById('custom-messages').innerHTML += "<br>" + message;
 }
 
-if (clearSigFilePath) {
-  clearSigFilePath.addEventListener("click", clearSigFilePathFunction);
-}
-
-function sortNames (c1, c2) {
-  let arg1 = c1.substring(c1.indexOf("#") + 1).toLowerCase();
-  let arg2 = c2.substring(c2.indexOf("#") + 1).toLowerCase();
-
-  if (arg1 < arg2){
-    return -1;
-  }
-  if (arg1 > arg2){
-    return 1;
-  }
-  return 0;
-}
-
-
-function clearSigFilePathFunction () {
+function clearSigFilePathFunction() {
   signaturePathText.value = "";
   signaturePathFile.value = "";
   signaturePathText.classList.remove("valid");
-  app.signatureFile = undefined;
+  proof.signatureFile = undefined;
 }
 
-function computeAxiomsBtnFunction(){
-
+function computeAxiomsBtnFunction() {
   //Show computing indicator
   document.getElementById('computingGif').style.display = "inline-block";
+
   const body = new FormData();
   body.append('id', getSessionId());
   body.append('ontology', status.ontology);
-  body.append('lhs', document.getElementById('lhsConcepts').value);
-  body.append('rhs', document.getElementById('rhsConcepts').value);
+  const lhs = document.getElementById('lhsConcepts');
+  const rhs = document.getElementById('rhsConcepts');
+
+  body.append('lhs', lhs.value);
+  body.append('rhs', rhs.value);
   body.append('method', document.getElementById('methodsList').value);
-  body.append('signaturePath', app.signatureFile
-      ? "frontend/public/data/" + getSessionId() + "/" + app.signatureFile.name
-      : "NoSignature");
+  if (rhs.options[rhs.selectedIndex].classList.contains('option-rhs-true')) {
+    body.append('type', 'pr')
+  } else { // if (rhs.options[rhs.selectedIndex].classList.contains('option-rhs-false')) {
+    body.append('type', 'ce')
+  }
+  body.append('signaturePath', proof.signatureFile
+    ? "frontend/public/data/" + getSessionId() + "/sig.txt"
+    : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 
-  fetch('/axiom', {
+  if (status.reasoner === ReasonerName.elkCD()){
+    body.append('constraintsFile', status.concreteDomainConstraints)
+    body.append('concreteDomainName', status.concreteDomainName)
+  }
+
+  fetch('/explain', {
     method: 'POST',
     body,
-  })
-      .then(res => res.json())
-      .then(res => {
-        console.log(res)
-        interval = setInterval(() => {
-          init_views(true);
-        }, 2000)
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+  }).then(res => res.json())
+    .then(_ => {
+      interval = setInterval(() => {
+        init_views(true);
+      }, 2000)
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+}
+
+function openSplitFunction() {
+  window.open('/?id=' + getSessionId())
 }
 
 function blockProofMethods(reasoner) {
@@ -224,17 +346,34 @@ function blockProofMethods(reasoner) {
   if (!reasoner)
     return;
 
-  if (reasoner.toLowerCase() === "hermit"){
-     valuesToBlock = ["1","2","3"];
-     options[3].selected = true;
+  if (reasoner === ReasonerName.hermit()) {
+    valuesToBlock = ["1", "2", "3", "13"];
+    options[3].selected = true;
   }
 
-  else if(reasoner.toLowerCase() === "elk"){
-     valuesToBlock = ["4","5","6","7","8","9","10","11","12"];
-     options[0].selected = true;
+  else if (reasoner === ReasonerName.elk()) {
+    valuesToBlock = ["4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
+    options[0].selected = true;
+  }
+
+  else if (reasoner === ReasonerName.elkCD()){
+    valuesToBlock = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+    options[12].selected = true;
   }
 
   for (let i = 0; i < options.length; i++) {
-    options[i].disabled =  valuesToBlock.includes((i + 1).toString());
+    options[i].disabled = valuesToBlock.includes((i + 1).toString());
   }
 }
+
+function loadProof(event) {
+  proof.proofFile = event.target.files[0];
+  upload(proof.proofFile, _ => init_proof());
+}
+
+function loadSignature(event) {
+  proof.signatureFile = event.target.files[0];
+  upload(proof.signatureFile, undefined, 'signature');
+}
+
+export { progress, loadProof, loadSignature }
