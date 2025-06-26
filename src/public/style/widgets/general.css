@@ -84,7 +84,7 @@ fieldset {
 }
 
 .container-flex {
-    display: flex;
+  display: flex;
 	height: 100%;
 }
 

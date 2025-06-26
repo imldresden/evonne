@@ -88,29 +88,11 @@ const conf = {
     }
   },
 
-  load_trace: function (path, query) {
-    // TODO: replace with broadcast channel query
-    const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
-    
-
-    if (file.endsWith(".json")) {
-      d3.json(file).then(json => {
-        query.payload.childInformation = json.payload.childInformation
-        proof.trace = query.payload;
-        proof.tree.init(getProofFromJSONTrace(json));
-        proof.printType2Query = function () {
-          console.log(proof.trace)
-        }
-      });
-    } else {
-      try { // file.endsWith(".t.xml"), or blob
-        d3.xml(file).then(xml => {
-          console.log(xml)
-          proof.tree.init(getTreeFromXML(xml));
-        });
-      } catch (e) {
-        console.error(e)
-      }
+  load_trace: function (trace) {
+    proof.trace = trace.payload;
+    proof.tree.init(getProofFromJSONTrace(trace));
+    proof.printType2Query = function () {
+      console.log(proof.trace)
     }
   },
 
@@ -130,6 +112,7 @@ function setDefinedProperty(srcObj, targetObj, prop) {
 function setFromExternal(external) {
   proof.div = external.div || proof.div,
   [
+    'div',
     'isZoomPan',
     'isMagic',
     'isLinear',
@@ -172,8 +155,9 @@ function addArrowheads(svg) {
 
 function init_trace(params = {}) {
 
-  d3.select(`#${proof.div}`).selectAll("*").remove();
+  
   setFromExternal(params);
+  d3.select(`#${proof.div}`).selectAll("*").remove()
 
   if (proof.svgRootLayer) {
     proof.svgRootLayer.selectAll("*").remove();
@@ -193,7 +177,7 @@ function init_trace(params = {}) {
   proof.svgRootLayer = proof.svg.append('g').attr("id", "pViewport").attr("transform", "translate(0, 10)");
   addArrowheads(proof.svg);
 
-  proof.load_trace(params.path, params.query);
+  proof.load_trace(params.trace);
   
   if (params.isZoomPan) {
     svgPanZoom("#proof-view", {

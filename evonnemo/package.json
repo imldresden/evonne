@@ -1,0 +1,25 @@
+{
+  "name": "evonnemo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "docker": "cd ../ && docker build . -t evonnemo -f ./evonnemo/Dockerfile && docker rm -f evonnemo && docker run --name=evonnemo -dp 8000:5173 evonnemo",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+  },
+  "dependencies": {
+    "d3": "7.8.5"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.1.0",
+    "@tsconfig/svelte": "^5.0.4",
+    "@types/d3": "^7.4.3",
+    "svelte": "^5.34.7",
+    "svelte-check": "^4.2.2",
+    "typescript": "~5.8.3",
+    "vite": "^6.0.0"
+  }
+}
