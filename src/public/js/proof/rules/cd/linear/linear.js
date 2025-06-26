@@ -219,29 +219,32 @@ function visByType(solution, domains = false) {
     question.setAttribute("class", "bar-button");
     question.setAttribute("data-position", "top");
     question.innerHTML = `<i class="material-icons" style="font-size: 23px;margin:5px">help_outline</i>`;
-        
+    
+    let text;
     switch (solution.type) {
         case 'unique solution':
-            question.setAttribute("data-tooltip", 
+            text = 
                 `The conclusion equation shares, (and therefore intersects) <br> 
-                the solution of the premise equation system.`
-            );
+                the solution of the premise equation system.`;
+            question.setAttribute("text", text);
+            question.setAttribute("data-tooltip", text);
             visualizeUniqueSolution(plot, solution);
             break;
         case 'infinite solutions':
-            question.setAttribute("data-tooltip", 
+            text = 
                 `The conclusion equation shares (and therefore intersects) <br> 
-                the solution of the premise equation system. <br>
-                This holds regardless of which variables are selected as free.`
-            );
-            visualizeEquations(plot, solution, domains);
+                the solution of the premise equation system.`;
+            question.setAttribute("text", text);
+            question.setAttribute("data-tooltip", text);
+            visualizeEquations(plot, solution, domains, question);
             break;
         case 'no solution':
-            question.setAttribute("data-tooltip", 
+            text = 
                 `The premise equation system has no solution, so the lines in the plot <br>
                 either don't all intersect in the same point, or an equation will show <br> 
                 a false equivalence (i.e., number = other number).`
-            );
+            question.setAttribute("text", text);
+            question.setAttribute("data-tooltip", text);
             visualizeNoSolutions(plot, solution, domains);
             break;
     }
@@ -412,7 +415,7 @@ function getFreeVariables(data) {
     return { dependent, free }
 }
 
-function visualizeEquations(plot, _data, domains = false) {
+function visualizeEquations(plot, _data, domains = false, q) {
     const matrix = _data.matrix;
     const { dependent, free } = getFreeVariables(_data);
     const solutions = _data.solutions;
@@ -427,6 +430,7 @@ function visualizeEquations(plot, _data, domains = false) {
     document.getElementById(plot).innerHTML = '';
     
     const dependentValues = {}; // Store computed values for dependent variables
+    const printedSolution = [];
 
     // Iterate over solutions in reverse to handle dependencies correctly
     for (let i = solutions.length - 1; i >= 0; i--) {
@@ -439,7 +443,7 @@ function visualizeEquations(plot, _data, domains = false) {
         let debug = [];
         let equationPreviewParts = [];
         let dependentCoef;
-        
+
         terms.forEach(term => {
             const coef = term.c;
             const varName = term.v;
@@ -457,14 +461,16 @@ function visualizeEquations(plot, _data, domains = false) {
                 equationParts.push(coef.mul(value));
                 equationPreviewParts.push(`${f(coef)}${varName}`);
                 debug.push(`(${f(coef)})*(${f(value)})`);
+                
             }
         });
 
         // Build the function string for preview
         const varName = dependentVar;
         const independentTermsPreview = equationPreviewParts.join(" + ");
-
         let solved = independentTermsPreview;
+
+        printedSolution.unshift(`${dependentCoef}${varName} + ${independentTermsPreview} = ${constantTerm}`);
         
         if (equationPreviewParts.length !== 0) {
             if (equationPreviewParts.length === 1) {
@@ -493,6 +499,13 @@ function visualizeEquations(plot, _data, domains = false) {
             dependentValues[dependentVar] = fn; // Store the calculated value
         }
     }
+
+    q.setAttribute("data-tooltip", 
+        `${q.getAttribute("text")} <br><br>
+        The system solution (without conclusion) is: <br>
+        ${printedSolution.join('<br>')} <br>
+        Below, we give concrete values to the chosen free variables to solve for all variables.`
+    );
 
     const select1 = document.querySelector(`#var1`);
     const select2 = document.querySelector(`#var2`);
