@@ -39,15 +39,8 @@
         "webcola": "3.3.8"
     },
     "scripts": {
-        "download-all": "npm run download-examples && npm run download-jars",
-        "start": "npm run download-all && node server.js",
-        "dev": "node server.js",
-        "start-ci": "PORT=7007 forever start server.js",
-        "stop-ci": "forever stopall",
-        "download-jars": "mkdir \"./externalTools\" & curl -L \"https://cloud.perspicuous-computing.science/s/tDkfjWiDoXWf4P5/download\" -o ./tools.zip && npm run extract-jars",
-        "extract-jars": "unzip -o \"./tools.zip\" && recursive-delete \"./externalTools\" && move-file \"./backend-tools-dev/\" \"./externalTools/\" ",
-        "download-examples": "mkdir \"./frontend/public/examples\" & curl -L \"https://cloud.perspicuous-computing.science/s/ecz5srM7mDMwP2t/download\" -o ./examples.zip && npm run extract-examples",
-        "extract-examples": "unzip -o \"./examples.zip\" && recursive-delete \"./frontend/public/data\" && move-file \"./examples-dev/\" \"./frontend/public/data\" ./ && unzip -o \"./examples.zip\" && recursive-delete \"./frontend/public/examples\" && move-file \"./examples-dev/\" \"./frontend/public/examples\" "
+        "build": "./build.sh",
+        "start": "node server.js"
     },
     "main": "server.js",
     "devDependencies": {

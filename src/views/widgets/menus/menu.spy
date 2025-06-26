@@ -10,7 +10,7 @@
       padding: 0.45em 0em 0.4em 0em;
       display: inline;"
     >
-      <a href="" > {{ title }} </a>
+      <a href="/" > {{ title }} </a>
     </div>  
     <div>
       <span class="white-text text-darken-2" id="project-id-span">Project ID: </span>  

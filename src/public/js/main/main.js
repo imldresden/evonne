@@ -312,7 +312,7 @@ function computeAxiomsBtnFunction() {
     body.append('type', 'ce')
   }
   body.append('signaturePath', proof.signatureFile
-    ? "frontend/public/data/" + getSessionId() + "/sig.txt"
+    ? "src/public/data/" + getSessionId() + "/sig.txt"
     : "NoSignature");
   body.append('translate2NL', document.getElementById('checkboxT2NL').checked);
 

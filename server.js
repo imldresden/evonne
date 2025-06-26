@@ -16,9 +16,9 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from "module";
 import * as path from 'path';
-import { owlFunctions } from "./frontend/public/js/utils/myOWL.js";
-import { ReasonerName } from "./frontend/public/js/utils/ReasonerName.js";
-import {ProofType} from "./frontend/public/js/utils/ProofType.js";
+import { owlFunctions } from "./src/public/js/utils/myOWL.js";
+import { ReasonerName } from "./src/public/js/utils/ReasonerName.js";
+import {ProofType} from "./src/public/js/utils/ProofType.js";
 
 const require = createRequire(import.meta.url);
 require('dotenv').config();
@@ -33,12 +33,12 @@ console.log("Environment: " + MODE);
 
 const app = express();
 app.engine('spy', sprightly);
-app.set('views', './frontend/views');
+app.set('views', './src/views');
 app.set('view engine', 'spy');
 
 const router = express.Router()
 app.use(BASE, router);
-app.use('/', express.static('./frontend/public'));
+app.use('/', express.static('./src/public'));
 app.use('/libs', express.static('./node_modules'));
 app.use(upload());
 
@@ -46,8 +46,8 @@ const http_ = http.createServer(app);
 const io_ = new Server(http_);
 const title = "evonne";
 const sessions = {};
-const dataDir = './frontend/public/data/';
-const examplesDir = './frontend/public/examples/';
+const dataDir = './src/public/data/';
+const examplesDir = './src/public/examples/';
 const fs = require('fs');
 
 const proofFileName = 'proof';
@@ -371,7 +371,7 @@ router.get('/extract-names', (req, res) => {
   //TODO: progress bar (consider spawnSync)
   const names = req.query.reasoner === ReasonerName.elkCD() ?
       spawn('java', [
-          '-jar', 'externalTools/extractNames.jar',
+          '-jar', 'tools/extractNames.jar',
           '-o', ontPath,
           '-od', projPath,
           '-r', 'elk',
@@ -379,7 +379,7 @@ router.get('/extract-names', (req, res) => {
           '-c', constraintsPath
   ]) :
       spawn('java', [
-          '-jar', 'externalTools/extractNames.jar',
+          '-jar', 'tools/extractNames.jar',
           '-o', ontPath,
           '-od', projPath,
           '-r', req.query.reasoner
@@ -491,7 +491,7 @@ io_.on('connection', function (socket) {
       clearFile(path.join(projectPath, "mDs_" + id + ".txt"));
 
       const repairs = spawn('java', [
-        '-jar', 'externalTools/explain.jar',
+        '-jar', 'tools/explain.jar',
         '-a', axiom,
         '-o', ontologyPath,
         '-mds', id, reasoner,
@@ -629,7 +629,7 @@ function copyFolderRecursiveSync(source, target) {
 function convertOntology(ontFile, ontDir) {
   const owlFileName = owlFunctions.getOWlFileName(ontFile.name);
   const exitCode = spawn('java', [
-    '-jar', 'externalTools/explain.jar',
+    '-jar', 'tools/explain.jar',
     '-o', ontFile.name,
     '-od', ontDir,
     '-on', owlFileName,
@@ -672,7 +672,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
 
     const outputLabel = "module_" + path.parse(ontology).name;
     const module = spawn('java', [
-      '-jar', 'externalTools/explain.jar',
+      '-jar', 'tools/explain.jar',
       '-o', ontPath,
       '-a', axiom,
       '-mod',
@@ -692,7 +692,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
       console.log('computing atomic decomposition...');
 
       const ad = spawn('java', [
-        '-cp', 'externalTools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
+        '-cp', 'tools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
         path.join(projPath, outputLabel),
         projPath, //outDir
         'atomic ' + outputLabel
@@ -750,7 +750,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
       console.log("GENERATION METHOD -> Concrete Domain Proof!");
 
       return spawn('java', [
-        '-jar', 'externalTools/explain.jar',
+        '-jar', 'tools/explain.jar',
         '--ontology-path', ontPath,
         '--constraints-path', constraintsPath,
         '--concrete-domain-name', cdName,
@@ -774,7 +774,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
     const elkOpts = ["1", "2", "3"];
     if (elkOpts.includes(genMethod)) {
       return spawn('java', [
-        '-jar', 'externalTools/explain.jar',
+        '-jar', 'tools/explain.jar',
         '--ontology-path', ontPath,
         '--conclusion-axiom', axiom,
         '--output-type', 'graph',
@@ -793,7 +793,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
       axiom = axiom.replace("owl:Nothing", "BOTTOM")
 
     //LETHE Forgetting-Based Proof
-    let generator = 'externalTools/evee-elimination-proofs-lethe.jar';
+    let generator = 'tools/evee-elimination-proofs-lethe.jar';
     let cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedHeuristicProofGenerator';
 
     //LETHE Forgetting-Based Symbol Minimal Proof
@@ -813,31 +813,31 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
 
     //LETHE Proof
     if (genMethod === "8") {
-      generator = 'externalTools/evee-lethe-proof-extractor.jar';
+      generator = 'tools/evee-lethe-proof-extractor.jar';
       cls = 'de.tu_dresden.inf.lat.evee.proofs.lethe.LetheProofGenerator';
     }
 
     //FAME Forgetting-Based Proof
     if (genMethod === "9") {
-      generator = 'externalTools/evee-elimination-proofs-fame.jar';
+      generator = 'tools/evee-elimination-proofs-fame.jar';
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedHeuristicProofGenerator';
     }
 
     //FAME Forgetting-Based Symbol Minimal Proof
     if (genMethod === "10") {
-      generator = 'externalTools/evee-elimination-proofs-fame.jar';
+      generator = 'tools/evee-elimination-proofs-fame.jar';
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSymbolMinimalProofGenerator';
     }
 
     //FAME Forgetting-Based Size Minimal Proof
     if (genMethod === "11") {
-      generator = 'externalTools/evee-elimination-proofs-fame.jar';
+      generator = 'tools/evee-elimination-proofs-fame.jar';
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSizeMinimalProofGenerator';
     }
 
     //FAME Forgetting-Based Weighted Size Minimal Proof
     if (genMethod === "12") {
-      generator = 'externalTools/evee-elimination-proofs-fame.jar';
+      generator = 'tools/evee-elimination-proofs-fame.jar';
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedWeightedSizeMinimalProofGenerator';
     }
 
@@ -853,7 +853,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
         return process;
 
       if(exitCode === 0){
-        const draw = spawn('java', ['-cp', 'externalTools/explain.jar',
+        const draw = spawn('java', ['-cp', 'tools/explain.jar',
           'de.tu_dresden.lat.evonne.EvonneInputGenerator',
           '--proof-path', path.join(projPath, externalProofFileName),
           '--output-directory', projPath,
@@ -878,7 +878,7 @@ function counter({ id, axiom, projPath, ontPath } = {}) {
   console.log('producing counterexample for' + axiom)
 
   const process = spawn('java', [
-    '-jar', 'externalTools/explain.jar',
+    '-jar', 'tools/explain.jar',
     '--ontology-path', ontPath,
     '--conclusion-axiom', axiom,
     '--output-directory', projPath,

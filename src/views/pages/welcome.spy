@@ -18,7 +18,7 @@
       <div id="welcome-content " class="vert-centered">
 
         <header style="font-size:20px">
-          <span href="" class="brand-logo" style="margin-left:0; font-size:30px">{{ title }} </span> is a tool for explaining logical consequences of OWL ontologies as well as debugging unwanted consequences.
+          <span href="/" class="brand-logo" style="margin-left:0; font-size:30px">{{ title }} </span> is a tool for explaining logical consequences of OWL ontologies as well as debugging unwanted consequences.
         </header>
 
         <br>

@@ -15,7 +15,7 @@
     <div class="row" style="display: table;">
       <div style="display: table-cell; vertical-align: middle;">
         <header>
-          <h3> Welcome to the <span href="" class="brand-logo" style="margin-left:0;font-size:55px">{{ title }}</span>  demo!</h3>
+          <h3> Welcome to the <span href="/" class="brand-logo" style="margin-left:0;font-size:55px">{{ title }}</span>  demo!</h3>
           
         </header>
   

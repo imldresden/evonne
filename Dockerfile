@@ -16,28 +16,20 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-### 3. pip
-RUN apt-get update && apt install python3-pip -y 
-
-### 4. clingo
-RUN python3 -m pip install --user --upgrade --break-system-packages clingo
+### 3. python
+RUN apt-get update && \ 
+    apt install python3-pip -y && \
+    python3 -m pip install --user --upgrade --break-system-packages clingo
 
 ### 5. install evonne 
-COPY package.json ./
-RUN npm install pm2 -g
-RUN npm install extract-zip-relative-path -g
-RUN npm install --omit=dev
+COPY . ./
+RUN npm install pm2 -g && \ 
+    npm install --omit=dev
 
-COPY frontend ./frontend/
-COPY .env ./
-COPY server.js ./
-
-### 6. jars and external libs
-RUN npm run download-all 
-
-### 7. ensure fs permissions
 USER root
-RUN chmod -R 777 ./frontend/public/examples
+
+### 6. download jars and data
+RUN chmod 777 build.sh && npm run build 
 
 EXPOSE 3000
 CMD ["pm2-runtime", "start", "node server.js --name evonne --log evonne.log"]
