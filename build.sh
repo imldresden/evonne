@@ -6,6 +6,7 @@ unzip -o ./tools.zip
 
 # replaces destination
 rm -rf ./tools
+rm -rf ./externalTools # TODO: explain.jar fails to compute repairs if this folder is renamed.
 mv ./tools-dev ./externalTools
 
 # downloads example data
