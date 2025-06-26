@@ -24,20 +24,15 @@ const require = createRequire(import.meta.url);
 require('dotenv').config();
 const upload = require('express-fileupload');
 
-const MODE = process.env.MODE || 'demo';
 const PORT = process.env.PORT || 3000;
 const BASE = process.env.BASE || '/';
-
 const EXAMPLES = process.env.EXAMPLES || 'study';
-console.log("Environment: " + MODE);
 
 const app = express();
 app.engine('spy', sprightly);
 app.set('views', './src/views');
 app.set('view engine', 'spy');
 
-const router = express.Router()
-app.use(BASE, router);
 app.use('/', express.static('./src/public'));
 app.use('/libs', express.static('./node_modules'));
 app.use(upload());
@@ -60,29 +55,9 @@ if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
 }
 
-router.get('/test', (req, res) => {
-  res.render('pages/test.spy', {
-    title: "evonne lib",
-    uuid: uuidv4(),
-  });
-});
-
-router.get('/uuid', (req, res) => {
+app.get('/uuid', (req, res) => {
   res.status(200).send(uuidv4());
 });
-
-function listExamples() {
-  // TODO-REMOVE: Specific to benchmark
-  let html = ''
-  readdirSync(examplesDir).forEach(example => {
-    if ((+example) >=0 && (+example) < 100) {
-      html += `<div onclick="loadExample('${example}', '${example}')" class="collection-item">
-          [BENCHMARK]: Case ${example}
-      </div>`
-    }
-  })
-  return html;
-}
 
 // pages
 const page = (req, res) => {
@@ -97,22 +72,21 @@ const page = (req, res) => {
       settings_specific: '<< proof/settings >> << ontology/settings >> << ce/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
-      menu_specific: `${MODE === 'demo' ? '' : '<< widgets/menus/projects >> << widgets/menus/compute >>'} << proof/menu >> << ontology/menu >>`,
-      general_settings: '<< widgets/menus/shortening >>',
-      other_examples: listExamples(),
+      menu_specific: `<< widgets/menus/projects >> << widgets/menus/compute >> << proof/menu >> << ontology/menu >>`,
+      general_settings: '<< widgets/menus/shortening >>'
     });
   }
 }
 
-router.get('/', page);
-router.get('/ontology', page);
-router.get('/proof', page);
+app.get('/', page);
+app.get('/ontology', page);
+app.get('/proof', page);
 
-router.get('/euler', (_, response) => {
+app.get('/euler', (_, response) => {
   response.render('euler/euler.spy')
 });
 
-router.get('/inference', (_, response) => {
+app.get('/inference', (_, response) => {
   response.render('inference/inference.spy');
 });
 
@@ -128,7 +102,7 @@ function parseMap(mapStr) {
 }
 
 // resources
-router.get('/project', (req, res) => {
+app.get('/project', (req, res) => {
   const id = req.query.id;
   const target = path.join(dataDir, id);
 
@@ -271,14 +245,14 @@ router.get('/project', (req, res) => {
   res.status(200).send(status);
 });
 
-router.get('/projects', (req, res) => {
+app.get('/projects', (req, res) => {
   const projects = readdirSync(dataDir).filter(
     f => lstatSync(path.join(dataDir, f)).isDirectory()
   );
   res.status(200).send({ projects });
 });
 
-router.post('/upload', (req, res) => {
+app.post('/upload', (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
@@ -306,6 +280,7 @@ router.post('/upload', (req, res) => {
     }
 
     if (req.body.type === 'ontology') {
+      console.log('here')
       //Try to translate the ontology file to OWL XML format.
       const owlFileName = convertOntology(file, uploadsDir)
 
@@ -330,7 +305,7 @@ router.post('/upload', (req, res) => {
   });
 });
 
-router.get('/create', (req, res) => {
+app.get('/create', (req, res) => {
   const id = req.query.id;
   const dest = path.join(dataDir, id);
   if (!existsSync(dest)) {
@@ -355,7 +330,7 @@ router.get('/create', (req, res) => {
   res.status(200).send("done");
 });
 
-router.get('/extract-names', (req, res) => {
+app.get('/extract-names', (req, res) => {
   const id = req.query.id;
 
   if (sessions[id]) {
@@ -371,7 +346,7 @@ router.get('/extract-names', (req, res) => {
   //TODO: progress bar (consider spawnSync)
   const names = req.query.reasoner === ReasonerName.elkCD() ?
       spawn('java', [
-          '-jar', 'tools/extractNames.jar',
+          '-jar', 'externalTools/extractNames.jar',
           '-o', ontPath,
           '-od', projPath,
           '-r', 'elk',
@@ -379,7 +354,7 @@ router.get('/extract-names', (req, res) => {
           '-c', constraintsPath
   ]) :
       spawn('java', [
-          '-jar', 'tools/extractNames.jar',
+          '-jar', 'externalTools/extractNames.jar',
           '-o', ontPath,
           '-od', projPath,
           '-r', req.query.reasoner
@@ -400,7 +375,7 @@ router.get('/extract-names', (req, res) => {
   });
 });
 
-router.post('/explain', (req, res) => {
+app.post('/explain', (req, res) => {
   const id = req.body.id;
 
   if (sessions[id]) {
@@ -490,8 +465,15 @@ io_.on('connection', function (socket) {
       //Added this to make sure that previous result does not interfere with current computation
       clearFile(path.join(projectPath, "mDs_" + id + ".txt"));
 
+      console.log(axiom)
+      console.log(['-jar', 'externalTools/explain.jar',
+        '-a', axiom,
+        '-o', ontologyPath,
+        '-mds', id, reasoner,
+        '-od', projectPath,].join(' '))
+
       const repairs = spawn('java', [
-        '-jar', 'tools/explain.jar',
+        '-jar', 'externalTools/explain.jar',
         '-a', axiom,
         '-o', ontologyPath,
         '-mds', id, reasoner,
@@ -559,22 +541,12 @@ function getExamples(req) {
 }
 
 function renderMain(req, res) {
-  if (MODE === 'demo') {
-    res.render('pages/demo.spy', {
-      title,
-      uuid: uuidv4(),
-      examples: getExamples(req),
-      other_examples: listExamples(),
-    });
-  } else {
-    res.render('pages/welcome.spy', {
-      title,
-      uuid: uuidv4(),
-      menu_specific: '<< widgets/menus/projects >>',
-      examples: getExamples(req),
-      other_examples: listExamples(),
-    });
-  }
+  res.render('pages/welcome.spy', {
+    title,
+    uuid: uuidv4(),
+    menu_specific: '<< widgets/menus/projects >>',
+    examples: getExamples(req)
+  });
 }
 
 function removeFile(filePath) {
@@ -629,7 +601,7 @@ function copyFolderRecursiveSync(source, target) {
 function convertOntology(ontFile, ontDir) {
   const owlFileName = owlFunctions.getOWlFileName(ontFile.name);
   const exitCode = spawn('java', [
-    '-jar', 'tools/explain.jar',
+    '-jar', 'externalTools/explain.jar',
     '-o', ontFile.name,
     '-od', ontDir,
     '-on', owlFileName,
@@ -672,7 +644,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
 
     const outputLabel = "module_" + path.parse(ontology).name;
     const module = spawn('java', [
-      '-jar', 'tools/explain.jar',
+      '-jar', 'externalTools/explain.jar',
       '-o', ontPath,
       '-a', axiom,
       '-mod',
@@ -692,7 +664,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
       console.log('computing atomic decomposition...');
 
       const ad = spawn('java', [
-        '-cp', 'tools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
+        '-cp', 'externalTools/AD/adStarGenerator.jar', 'EverythingForGivenOntology',
         path.join(projPath, outputLabel),
         projPath, //outDir
         'atomic ' + outputLabel
@@ -750,7 +722,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
       console.log("GENERATION METHOD -> Concrete Domain Proof!");
 
       return spawn('java', [
-        '-jar', 'tools/explain.jar',
+        '-jar', 'externalTools/explain.jar',
         '--ontology-path', ontPath,
         '--constraints-path', constraintsPath,
         '--concrete-domain-name', cdName,
@@ -774,7 +746,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
     const elkOpts = ["1", "2", "3"];
     if (elkOpts.includes(genMethod)) {
       return spawn('java', [
-        '-jar', 'tools/explain.jar',
+        '-jar', 'externalTools/explain.jar',
         '--ontology-path', ontPath,
         '--conclusion-axiom', axiom,
         '--output-type', 'graph',
@@ -793,7 +765,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
       axiom = axiom.replace("owl:Nothing", "BOTTOM")
 
     //LETHE Forgetting-Based Proof
-    let generator = 'tools/evee-elimination-proofs-lethe.jar';
+    let generator = 'externalTools/evee-elimination-proofs-lethe.jar';
     let cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.LetheBasedHeuristicProofGenerator';
 
     //LETHE Forgetting-Based Symbol Minimal Proof
@@ -813,31 +785,31 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
 
     //LETHE Proof
     if (genMethod === "8") {
-      generator = 'tools/evee-lethe-proof-extractor.jar';
+      generator = 'externalTools/evee-lethe-proof-extractor.jar';
       cls = 'de.tu_dresden.inf.lat.evee.proofs.lethe.LetheProofGenerator';
     }
 
     //FAME Forgetting-Based Proof
     if (genMethod === "9") {
-      generator = 'tools/evee-elimination-proofs-fame.jar';
+      generator = 'externalTools/evee-elimination-proofs-fame.jar';
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedHeuristicProofGenerator';
     }
 
     //FAME Forgetting-Based Symbol Minimal Proof
     if (genMethod === "10") {
-      generator = 'tools/evee-elimination-proofs-fame.jar';
+      generator = 'externalTools/evee-elimination-proofs-fame.jar';
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSymbolMinimalProofGenerator';
     }
 
     //FAME Forgetting-Based Size Minimal Proof
     if (genMethod === "11") {
-      generator = 'tools/evee-elimination-proofs-fame.jar';
+      generator = 'externalTools/evee-elimination-proofs-fame.jar';
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedSizeMinimalProofGenerator';
     }
 
     //FAME Forgetting-Based Weighted Size Minimal Proof
     if (genMethod === "12") {
-      generator = 'tools/evee-elimination-proofs-fame.jar';
+      generator = 'externalTools/evee-elimination-proofs-fame.jar';
       cls = 'de.tu_dresden.inf.lat.evee.eliminationProofs.FameBasedWeightedSizeMinimalProofGenerator';
     }
 
@@ -853,7 +825,7 @@ function prove({ id, req, axiom, projPath, ontology, ontPath, cdName } = {}) {
         return process;
 
       if(exitCode === 0){
-        const draw = spawn('java', ['-cp', 'tools/explain.jar',
+        const draw = spawn('java', ['-cp', 'externalTools/explain.jar',
           'de.tu_dresden.lat.evonne.EvonneInputGenerator',
           '--proof-path', path.join(projPath, externalProofFileName),
           '--output-directory', projPath,
@@ -878,7 +850,7 @@ function counter({ id, axiom, projPath, ontPath } = {}) {
   console.log('producing counterexample for' + axiom)
 
   const process = spawn('java', [
-    '-jar', 'tools/explain.jar',
+    '-jar', 'externalTools/explain.jar',
     '--ontology-path', ontPath,
     '--conclusion-axiom', axiom,
     '--output-directory', projPath,

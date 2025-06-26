@@ -3,7 +3,7 @@ function getSessionId() {
 }
 
 // redirection for demos
-async function loadExample(name, id) {
+async function loadExample(name, id, onlyProof=false) {
   document.getElementById("examples").classList.add("hidden");
   document.getElementById("generating-example").classList.remove("hidden");
   
@@ -11,7 +11,7 @@ async function loadExample(name, id) {
   console.log(response)
   console.log(response.ok)
   if (response.ok) {
-    window.location.href = "proof?id=" + id; // TODO remove `proof`
+    window.location.href = (onlyProof?"proof":"") + "?id=" + id;
   } else {
     document.getElementById("generating-example").innerHTML = "Something went wrong. Please reload this page and try again. If the problem persists, feel free to contact the authors";
   }

@@ -1,28 +1,74 @@
 <div class="collection" id="examples">
-    <div onclick="loadExample('diff-inf', 'diff-inf')" class="collection-item">
-        1. Difference Equations - Infinite Solutions (1)
+    <div onclick="loadExample('sic-elk-size', '{{ uuid }}')" class="collection-item">
+        There is no spicy ice cream
+        (From "Modified Pizza Ontology" - Using ELK Size Minimal Proof)
     </div>
-    <div onclick="loadExample('diff-unsat', 'diff-unsat')" class="collection-item">
-        2. Difference Equations - Unsatisfiable (1)
+    <div onclick="loadExample('sic-elk-wsize-con', '{{ uuid }}')" class="collection-item">
+        There is no spicy ice cream
+        (From "Modified Pizza Ontology" - Using ELK Weighted Size Minimal Proof - condensed)
     </div>
-    <div onclick="loadExample('diff-inf-2', 'diff-inf-2')" class="collection-item">
-        3. Difference Equations - Infinite Solutions (2)
+    <div onclick="loadExample('sg-lethe', '{{ uuid }}')" class="collection-item">
+        Every sebaceous gland is a holocrine gland
+        (From "Skin Physiology Ontology" - Using LETHE Proof)
     </div>
-    <div onclick="loadExample('diff-unsat-2', 'diff-unsat-2')" class="collection-item">
-        4. Difference Equations - Unsatisfiable (2)
+    <div onclick="loadExample('sg-detailedProof', '{{ uuid }}')" class="collection-item">
+        Every sebaceous gland is a holocrine gland
+        (From "Skin Physiology Ontology" - Using LETHE Detailed Proof)
     </div>
-    <div onclick="loadExample('linear-inf', 'linear-inf')" class="collection-item">
-        5. Linear Equations - Infinite Solutions (1)
+    <div onclick="loadExample('sg-fame-size', '{{ uuid }}')" class="collection-item">
+        Sebaceous glands are entities
+        (From "Skin Physiology Ontology" - Using FAME Size Minimal Proof)
     </div>
-    <div onclick="loadExample('linear-unsat', 'linear-unsat')" class="collection-item">
-        6. Linear Equations - No solution (1)
+    <div onclick="loadExample('sg-fame-size-con', '{{ uuid }}')" class="collection-item">
+        Sebaceous glands are entities
+        (From "Skin Physiology Ontology" - Using FAME Size Minimal Proof - condensed)
     </div>
-    <div onclick="loadExample('linear-inf-2', 'linear-inf-2')" class="collection-item">
-        7. Linear Equations - Infinite Solutions (2)
+    <div onclick="loadExample('pp-elk-size', '{{ uuid }}')" class="collection-item">
+        Every pathological process of urinary tract is a non-canonical processual entity
+        (From "Dispedia Core Ontology" - Using ELK Size Minimal Proof)
     </div>
-    <div onclick="loadExample('linear-unsat-2', 'linear-unsat-2')" class="collection-item">
-        8. Linear Equations - No solution (2)
+    <div onclick="loadExample('pp-elk-depth-con', '{{ uuid }}')" class="collection-item">
+        Every pathological process of urinary tract is a non-canonical processual entity
+        (From "Dispedia Core Ontology" - Using ELK Depth Minimal Proof - condensed)
     </div>
-
-    {{ other_examples }}
+    <div onclick="loadExample('tc-lethe', '{{ uuid }}')" class="collection-item">
+        Every Transcription corepressor is a continuant
+        (From "Gene Regulation Ontology" - Using LETHE Proof)
+    </div>
+    <div onclick="loadExample('tc-detailedProof', '{{ uuid }}')" class="collection-item">
+        Every Transcription corepressor is a continuant
+        (From "Gene Regulation Ontology" - Using LETHE Detailed Proof)
+    </div>
+    <div onclick="loadExample('tc-fame', '{{ uuid }}')" class="collection-item">
+        Every Transcription corepressor is a continuant
+        (From "Gene Regulation Ontology" - Using FAME Proof)
+    </div>
+    <div onclick="loadExample('tc-fame-con', '{{ uuid }}')" class="collection-item">
+        Every Transcription corepressor is a continuant
+        (From "Gene Regulation Ontology" - Using FAME Proof - condensed)
+    </div>
+    <div onclick="loadExample('diff-inf', 'diff-inf', true)" class="collection-item">
+        Difference Equations - Infinite Solutions (1)
+    </div>
+    <div onclick="loadExample('diff-unsat', 'diff-unsat', true)" class="collection-item">
+        Difference Equations - Unsatisfiable (1)
+    </div>
+    <div onclick="loadExample('diff-inf-2', 'diff-inf-2', true)" class="collection-item">
+        Difference Equations - Infinite Solutions (2)
+    </div>
+    <div onclick="loadExample('diff-unsat-2', 'diff-unsat-2', true)" class="collection-item">
+        Difference Equations - Unsatisfiable (2)
+    </div>
+    <div onclick="loadExample('linear-inf', 'linear-inf', true)" class="collection-item">
+        Linear Equations - Infinite Solutions (1)
+    </div>
+    <div onclick="loadExample('linear-unsat', 'linear-unsat', true)" class="collection-item">
+        Linear Equations - No solution (1)
+    </div>
+    <div onclick="loadExample('linear-inf-2', 'linear-inf-2', true)" class="collection-item">
+        Linear Equations - Infinite Solutions (2)
+    </div>
+    <div onclick="loadExample('linear-unsat-2', 'linear-unsat-2', true)" class="collection-item">
+        Linear Equations - No solution (2)
+    </div>
 </div>
