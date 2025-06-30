@@ -90,6 +90,7 @@ export class DifferenceCD {
                 let first = true;
                 Object.keys(terms).forEach(variable => {
                     const term = terms[variable];
+                    const eterm = +term;
 
                     if (term.includes(EPSILON)) {
                         where.append("span").attr("class", "text-black").text(term);
@@ -97,20 +98,20 @@ export class DifferenceCD {
                         return;
                     }
 
-                    if (!showObvious && eval(term) === 0 && variable !== "constant") {
+                    if (!showObvious && eterm === 0 && variable !== "constant") {
                         return; // don't print, don't set first to false
                     }
 
-                    const plus = first ? "" : (eval(term) < 0 ? " " : " + ");
+                    const plus = first ? "" : (eterm < 0 ? " " : " + ");
                     where.append("span").attr("class", "text-black").text(plus);
                     length += plus.length;
 
-                    if (!showObvious && (eval(term) !== 1 || variable === "constant")) {
-                        if (eval(term) === -1 && variable !== "constant") {
+                    if (!showObvious && (eterm !== 1 || variable === "constant")) {
+                        if (eterm === -1 && variable !== "constant") {
                             where.append("span").attr("class", "text-black").text("- ");
                             length += 1;
                         } else {
-                            if (eval(term) < 0) {
+                            if (eterm < 0) {
                                 where.append("span").attr("class", "text-black").text("- ");
                                 length += 1;
                             }

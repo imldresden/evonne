@@ -337,7 +337,9 @@ export class TreeNavigation {
             input
                 .attr("marker-end", "")
                 .attr("class", d => `link cuttable dim ${(d.source.data.source.type === "rest" ? "torest" : "")
-                } ${(d.source.data.target === "" || ruleUtils.isRule(d.source.data.target.type) ? " hidden " : "")
+                } ${(d.source.data.target === "" 
+                    || ruleUtils.isRule(d.source.data.target.type)
+                    || d.source.data.target.type == 'rest' ? "hidden" : "")
                 }`)
         } else {
             input

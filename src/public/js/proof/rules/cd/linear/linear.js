@@ -2,8 +2,14 @@ import { controls, createVisContainer } from "../cd-rules.js";
 import { utils } from "../../rules.js";
 import { throttle } from "../../../../utils/throttle.js";
 
+// returns string versions of the fraction (eg 1/3)
 function f(number) {
     return Fraction(number).toFraction();
+}
+
+// only used for annotations in the plotting lib (eg 0.111)
+function dv(number) { 
+    return Fraction(number).valueOf();
 }
 
 const tip = {
@@ -296,7 +302,7 @@ function visualizeUniqueSolution(plot, _data) {
             if (!Fraction(independentTerm).equals(0)) {
                 const v = Fraction(row[row.length - 1]).sub(Fraction(constantTerm)).div(Fraction(independentTerm));
                 // f(v) === f(solutions[independentIndex]), could use either
-                annotations.push({ x: eval(f(v)), color });
+                annotations.push({ x: dv(v), color });
                 const ind = annotations.length-1
                 hl[id] = { 
                     svg: () => document.querySelectorAll(`#${plot} .annotations path`)[ind], 
@@ -501,8 +507,8 @@ function visualizeEquations(plot, _data, domains = false) {
     const y = { varName: select2.value, fn: dependentValues[select2.value] || independent[select2.value] };
 
     const annotations = [
-        { x: eval(f(x.fn)), text: `${x.varName} = ${f(x.fn)}` },
-        { y: eval(f(y.fn)), text: `${y.varName} = ${f(y.fn)}` }
+        { x: dv(x.fn), text: `${x.varName} = ${f(x.fn)}` },
+        { y: dv(y.fn), text: `${y.varName} = ${f(y.fn)}` }
     ];
 
     const data = [];
@@ -547,7 +553,7 @@ function visualizeEquations(plot, _data, domains = false) {
                 // solve for x because y is canceled (0f(x)): x = (c - sum)/A 
                 
                 const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(xCoef));
-                annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
+                annotations.push({ x: dv(v), text: `${x.varName} = ${f(v)}`, color });
                 const ind = annotations.length-1;
                 hl[id] = { 
                     svg: () => document.querySelectorAll(`#${plot} .annotations path`)[ind], 
@@ -579,8 +585,8 @@ function visualizeEquations(plot, _data, domains = false) {
 
     // center plot on the intersection point
     const doms = { 
-        x: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10], 
-        y: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10]
+        x: [dv(x.fn) - 10, dv(x.fn) + 10], 
+        y: [dv(y.fn) - 10, dv(y.fn) + 10]
     }
 
     let xDomain = doms.x;
@@ -682,7 +688,7 @@ function visualizeNoSolutions(plot, _data, domains) {
                 // solve for x because y is canceled (0f(x)): x = (c - sum)/A 
                 
                 const v = Fraction(constantTerm).sub(Fraction(replacedSum)).div(Fraction(xCoef));
-                annotations.push({ x: eval(f(v)), text: `${x.varName} = ${f(v)}`, color });
+                annotations.push({ x: dv(v), text: `${x.varName} = ${f(v)}`, color });
                 const ind = annotations.length-1;
                 hl[id] = { 
                     svg: () => document.querySelectorAll(`#${plot} .annotations path`)[ind], 
@@ -715,8 +721,8 @@ function visualizeNoSolutions(plot, _data, domains) {
 
     // center plot on the intersection point
     const doms = { 
-        x: [eval(f(x.fn)) - 10, eval(f(x.fn)) + 10], 
-        y: [eval(f(y.fn)) - 10, eval(f(y.fn)) + 10]
+        x: [dv(x.fn) - 10, dv(x.fn) + 10], 
+        y: [dv(y.fn) - 10, dv(y.fn) + 10]
     }
 
     let xDomain = doms.x;
@@ -992,6 +998,7 @@ export class LinearCD {
                     }
 
                     const term = eq[variable].replace(/\s+/g, '');
+                    const eterm = +term;
 
                     if (variable === "_rhs") {
                         where.append("span").attr("class", "text-black").text(" = " + term)
@@ -999,15 +1006,15 @@ export class LinearCD {
                         return;
                     }
 
-                    if (!showObvious && eval(term) === 0) {
+                    if (!showObvious && eterm === 0) {
                         return; // don't print, don't set first to false
                     }
 
                     const plus = first ? "" : " + ";
                     where.append("span").attr("class", "text-black").text(plus)
 
-                    if (!showObvious && eval(term) !== 1) {
-                        if (eval(term) === -1) {
+                    if (!showObvious && eterm !== 1) {
+                        if (eterm === -1) {
                             where.append("span").attr("class", "text-black").text("-");
                             length += 1;
                         } else {
