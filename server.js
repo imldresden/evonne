@@ -280,7 +280,6 @@ app.post('/upload', (req, res) => {
     }
 
     if (req.body.type === 'ontology') {
-      console.log('here')
       //Try to translate the ontology file to OWL XML format.
       const owlFileName = convertOntology(file, uploadsDir)
 

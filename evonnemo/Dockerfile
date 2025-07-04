@@ -18,6 +18,7 @@ RUN git clone --branch ${BRANCH} https://github.com/knowsys/nemo.git && \
 # rust 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y 
 ENV PATH=/root/.cargo/bin:$PATH
+RUN rustup default 1.85.0
 RUN cargo install wasm-pack
 
 # node
@@ -25,6 +26,7 @@ RUN curl -sL https://deb.nodesource.com/setup_21.x | bash && \
     apt-get install nodejs -y && \
     node -v && npm -v
 
+RUN rustc --version
 # compile nemo
 RUN cd /usr/src/nemo-all/nemo/nemo-wasm && \
     wasm-pack build --out-dir nemoWASMBundler --target bundler --weak-refs --release && \
