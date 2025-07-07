@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "docker": "vite build && cd ../ && docker build . -t evonnemo -f ./evonnemo/Dockerfile --progress=plain  && docker rm -f evonnemo && docker run --name=evonnemo -dp 8000:5173 evonnemo",
+    "docker": "vite build && cd ../ && docker build . -t evonnemo -f ./evonnemo/Dockerfile --progress=plain  && docker rm -f evonnemo && docker run --name=evonnemo -dp 8000:80 evonnemo",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },
   "dependencies": {

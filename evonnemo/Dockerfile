@@ -1,59 +1,39 @@
-FROM ubuntu:25.04
-WORKDIR /usr/src/nemo-all
-
+FROM nixos/nix:latest AS rust
 ARG BRANCH="feature/nemo-trace-visualization"
+WORKDIR /nemo
 
-RUN apt update && \
-    apt install -y git && \
-    apt install -y curl && \
-    apt install -y build-essential 
+RUN git clone --branch ${BRANCH} https://github.com/knowsys/nemo.git
 
-RUN git config --global user.name "docker" && \
-    git config --global user.email "docker@not-an-email.com"
+RUN cd nemo && \
+    nix --extra-experimental-features "nix-command flakes" build .\#{nemo-wasm-bundler,nemo-wasm-web}
 
-RUN git clone --branch ${BRANCH} https://github.com/knowsys/nemo.git && \
-    git clone --branch ${BRANCH} https://github.com/knowsys/nemo-web.git && \
-    git clone https://github.com/knowsys/nemo-vscode-extension.git
+FROM node:20-alpine AS node-builder
 
-# rust 
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y 
-ENV PATH=/root/.cargo/bin:$PATH
-RUN rustup default 1.85.0
-RUN cargo install wasm-pack
+RUN apk update && apk add git 
 
-# node
-RUN curl -sL https://deb.nodesource.com/setup_21.x | bash && \
-    apt-get install nodejs -y && \
-    node -v && npm -v
+FROM node-builder AS vscode-extension 
+WORKDIR /vsx 
 
-RUN rustc --version
-# compile nemo
-RUN cd /usr/src/nemo-all/nemo/nemo-wasm && \
-    wasm-pack build --out-dir nemoWASMBundler --target bundler --weak-refs --release && \
-    wasm-pack build --out-dir nemoWASMWeb --target web --weak-refs --release 
+RUN git clone https://github.com/knowsys/nemo-vscode-extension.git nemo-vsx
 
-# compile vs extension
-RUN cd /usr/src/nemo-all/nemo-vscode-extension && \
-    cp -r /usr/src/nemo-all/nemo/nemo-wasm/nemoWASMWeb . && \
-    npm install && \
-    npm run package
+COPY --from=rust /nemo/nemo/result-1/lib/node_modules/nemo-wasm /vsx/nemo-vsx/nemoWASMWeb
 
-# nemo-web
-WORKDIR /usr/src/nemo-all/nemo-web/
+RUN cd nemo-vsx && npm i
+RUN cd nemo-vsx && npm run package
 
-RUN mkdir nemoVSIX && \ 
-    cp -r /usr/src/nemo-all/nemo-vscode-extension/nemo-0.0.17.vsix ./nemoVSIX/nemo.vsix && \
-    cp -r /usr/src/nemo-all/nemo/nemo-wasm/nemoWASMBundler ./nemoWASMBundler && \
-    npm install 
+FROM node-builder AS nemo-web 
+ARG BRANCH="feature/nemo-trace-visualization"
+WORKDIR /web
 
-ENV NODE_OPTIONS=--max_old_space_size=4096
-RUN npm run build
+RUN git clone --branch ${BRANCH} https://github.com/knowsys/nemo-web.git
 
-# evonne on vite
-RUN npm install serve -g 
-WORKDIR /usr/src/evonnemo
-RUN mv /usr/src/nemo-all/nemo-web/dist /usr/src/evonnemo/nemo
-COPY ./evonnemo/dist /usr/src/evonnemo/evonne
+COPY --from=vscode-extension /vsx/nemo-vsx/nemo-0.0.17.vsix /web/nemo-web/nemoVSIX/nemo.vsix
+COPY --from=rust /nemo/nemo/result/lib/node_modules/nemo-wasm /web/nemo-web/nemoWASMBundler
 
-EXPOSE 8000
-ENTRYPOINT [ "serve", "-p", "5173" ]
+RUN cd nemo-web && npm i
+RUN cd nemo-web && NODE_OPTIONS=--max_old_space_size=4096 npm run build
+
+FROM nginx
+
+COPY --from=nemo-web /web/nemo-web/dist /usr/share/nginx/html/nemo
+COPY ./evonnemo/dist /usr/share/nginx/html/evonne
