@@ -34,6 +34,10 @@ export class TreeNavigation {
         this._entire = this.createHierarchy(this._edges);
 
         this.restart();
+
+        this.root = computeTreeLayout(this.hierarchy);
+        this.root.children = null;
+
         this.update();
     }
 
@@ -72,7 +76,7 @@ export class TreeNavigation {
         }
 
         if (!proof.showRules) {
-            data = this.hideRules(data); 
+            data = this.hideRules(data);
         }
         return data;
     }

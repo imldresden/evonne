@@ -281,7 +281,7 @@ export class NodeVisualsHelper {
 
     //These functions are for showing / hiding the buttons associated with axiom nodes
     hideButtons(nodeID) {
-        let buttons = d3.selectAll(`#${nodeID} .axiomButton:not(#B01,#B02,#B06,#B04,#B05)`);
+        let buttons = d3.selectAll(`#${nodeID} .axiomButton:not(#B1,#B01,#B02,#B06,#B04,#B05)`);
         buttons.transition()
             .duration(150)
             .ease(d3.easeLinear)
@@ -319,7 +319,7 @@ export class NodeVisualsHelper {
 
         if (!proof.isCompact) {
             proof.svg.selectAll(".node")
-            .selectAll(".axiomButton")
+            .selectAll(".axiomButton:not(#B1)")
             .attr("cursor", "pointer")
             .attr("pointer-events", "all")
             .style("opacity", 0);

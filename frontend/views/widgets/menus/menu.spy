@@ -21,6 +21,12 @@
     </div>
     <ul id="nav-mobile" class="right">
 
+      <li>
+        <a id="saveClicksCounter" class="tooltipped" type="button" data-tooltip="Done">
+          <i class="large material-icons">done</i>
+        </a>
+      </li>
+
       {{ menu_specific }}
       
       <li>
