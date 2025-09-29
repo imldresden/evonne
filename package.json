@@ -39,7 +39,7 @@
         "webcola": "3.3.8"
     },
     "scripts": {
-        "build": "./build.sh",
+        "build": "build.sh",
         "start": "node server.js"
     },
     "main": "server.js",

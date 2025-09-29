@@ -43,9 +43,7 @@ export class ContextMenu {
 
         const xF = () => { return x - (orient[0] ? 0 : maxWidth) };
         const yF = (d, i) => y + calcHeight(menuItems.filter((e, ie) => ie < i)) - (orient[1] ? 0 : totalHeight);
-        
-  
-          
+
         entries.style({ 'cursor': 'pointer' });
 
         entries
