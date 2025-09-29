@@ -31,7 +31,7 @@ COPY --from=vscode-extension /vsx/nemo-vsx/nemo-0.0.17.vsix /web/nemo-web/nemoVS
 COPY --from=rust /nemo/nemo/result/lib/node_modules/nemo-wasm /web/nemo-web/nemoWASMBundler
 
 RUN cd nemo-web && npm i
-RUN cd nemo-web && NODE_OPTIONS=--max_old_space_size=4096 npm run build
+RUN cd nemo-web && NODE_OPTIONS=--max_old_space_size=4096 npm run docker-build
 
 FROM nginx
 

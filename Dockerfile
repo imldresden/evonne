@@ -29,7 +29,7 @@ RUN npm install pm2 -g && \
 USER root
 
 ### 6. download jars and data
-RUN chmod 777 build.sh && npm run build 
+RUN chmod 777 build.sh && npm run docker-build 
 
 EXPOSE 3000
 CMD ["pm2-runtime", "start", "node server.js --name evonne --log evonne.log"]
