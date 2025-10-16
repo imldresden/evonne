@@ -583,11 +583,11 @@ io_.on('connection', function (socket) {
   });
 
   socket.on('save counter', async function (data) {
-    console.log("User ID = " + data.userID + ", Click Counter = " + data.counter)
+    // console.log("User ID = " + data.userID + ", Click Counter = " + data.counter)
     if(data.userID !== "missingUID"){
       const filePath = path.join(countersDir, "lsUID_"+data.userID+".txt");
 
-      fs.writeFile(filePath, data.counter.toString(), (err) => {
+      fs.writeFile(filePath, data.counter.toString() + "," + data.example, (err) => {
         if (err)
           console.error('Failed to save file:', err);
       });

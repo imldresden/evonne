@@ -304,10 +304,12 @@ function getFileName() {
 d3.select("#saveClicksCounter").on("click", (_) => {
   const params = new URLSearchParams(window.location.search);
   const limeSurveyUserID = params.get('lsUID') || 'missingUID';
+  const currentExample = params.get('id') || 'missing project ID';
 
   io().emit("save counter", {
     userID: limeSurveyUserID,
-    counter: proof.clicksCounter
+    counter: proof.clicksCounter,
+    example: currentExample
   });
 })
 
