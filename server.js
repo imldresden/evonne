@@ -51,7 +51,7 @@ const externalProofFileName = proofFileName+'.json';
 const constraintsFileName = 'constraints.txt';
 const concreteDomainFileName = 'concreteDomain.txt';
 
-const countersDir = "countersDir";
+const countersDir = "./src/public/countersDir";
 
 if (!fs.existsSync(countersDir)) {
   fs.mkdirSync(countersDir);

@@ -1,4 +1,13 @@
 <div class="collection" id="examples">
+    <div onclick="loadExample('Banana Bread - Training', '{{ uuid }}')" class="collection-item">
+        Banana Bread - Training
+    </div>
+    <div onclick="loadExample('Artifact', '{{ uuid }}')" class="collection-item">
+        Artifact
+    </div>
+    <div onclick="loadExample('SciFi', '{{ uuid }}')" class="collection-item">
+        SciFi
+    </div>
     <div onclick="loadExample('sic-elk-size', '{{ uuid }}')" class="collection-item">
         There is no spicy ice cream
         (From "Modified Pizza Ontology" - Using ELK Size Minimal Proof)
