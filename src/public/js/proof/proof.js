@@ -63,6 +63,8 @@ const conf = {
 
   ruleNameMapHelper : new RuleNameMapHelper(),
 
+  clicksCounter:0,
+
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
 
@@ -298,5 +300,16 @@ function getFileName() {
 
   return fileName;
 }
+
+d3.select("#saveClicksCounter").on("click", (_, d) => {
+  const params = new URLSearchParams(window.location.search);
+  console.log( params.get('lsUID'))
+  const limeSurveyUserID = params.get('lsUID') || 'missingUID';
+
+  io().emit("save counter", {
+    userID: limeSurveyUserID,
+    counter: proof.clicksCounter
+  });
+})
 
 export { init_proof, init_trace, conf as proof }

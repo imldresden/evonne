@@ -51,6 +51,12 @@ const externalProofFileName = proofFileName+'.json';
 const constraintsFileName = 'constraints.txt';
 const concreteDomainFileName = 'concreteDomain.txt';
 
+const countersDir = "countersDir";
+
+if (!fs.existsSync(countersDir)) {
+  fs.mkdirSync(countersDir);
+}
+
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
 }
@@ -514,6 +520,18 @@ io_.on('connection', function (socket) {
     io_.sockets.emit('inference view', data);
   });
 
+  socket.on('save counter', async function (data) {
+    console.log("User ID = " + data.userID + ", Click Counter = " + data.counter)
+    if(data.userID !== "missingUID"){
+      const filePath = path.join(countersDir, "lsUID_"+data.userID+".txt");
+
+      fs.writeFile(filePath, data.counter.toString(), (err) => {
+        if (err)
+          console.error('Failed to save file:', err);
+      });
+    }
+  });
+
 });
 
 // 141.76.67.176
@@ -855,7 +873,8 @@ function counter({ id, axiom, projPath, ontPath } = {}) {
     '--output-directory', projPath,
     '-output-type', 'graph',
     '--export-mapper',
-    '--no-image'
+    '--no-image',
+    // '--model-type', 'alpha'
   ], { encoding: 'utf-8' });
 
   printOutput(process);

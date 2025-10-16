@@ -18,9 +18,9 @@ export class AxiomsHelper {
 		this.nodes = proof.svg.selectAll(proof.stepNavigator ? ".axiom" : ".node:not(.rest)");
 
 		//Collapse node children
-		this.addCollapse();
+		//this.addCollapse();
 		//Expand node children
-		this.addExpand();
+		//this.addExpand();
 
 
 		//Show rule name and premise that led to this conclusion
@@ -132,6 +132,10 @@ export class AxiomsHelper {
 		if (proof.isDrawing) {
 			return;
 		}
+
+		proof.clicksCounter++;
+		console.log("Counter= " + proof.clicksCounter);
+
 		proof.nodeInteracted = treeRoot;
 		if (!treeRoot.children) {
 			treeRoot.children = treeRoot._children;
@@ -148,7 +152,7 @@ export class AxiomsHelper {
 			} else {
 				treeRoot.children[0].children = treeRoot.children[0]._children;
 				treeRoot.children[0].children.forEach(child => {
-					if (child.children) { //&& child.children[0].children to not collapse Asserted Conclusions
+					if (child.children 	) { //&& child.children[0].children to not collapse Asserted Conclusions
 						child.children = null
 					}
 				});
@@ -761,25 +765,25 @@ export class AxiomsHelper {
 			action: (e, d) => this.collapse(d, e),
 			filter: (d) => this.conditionToCollapse(d)
 		},
-		{
-			title: 'Expand',
-			type: 'button',
-			action: (e, d) => this.expand(d, e),
-			filter: (d) => this.conditionToExpand(d)
-		},
+		// {
+		// 	title: 'Expand',
+		// 	type: 'button',
+		// 	action: (e, d) => this.expand(d, e),
+		// 	filter: (d) => this.conditionToExpand(d)
+		// },
 		{
 			title: 'Show Step',
 			type: 'button',
 			action: (_, d) => this.showPrevious(d),
 			filter: (d) => this.conditionToShowPrevious(d)
 		},
-		{
-			title: 'Expand All',
-			type: 'button',
-			action: (e, d) => this.showAllPrevious(d, e),
-			filter: (d) => this.conditionToShowAllPrevious(d)
-
-		},
+		// {
+		// 	title: 'Expand All',
+		// 	type: 'button',
+		// 	action: (e, d) => this.showAllPrevious(d, e),
+		// 	filter: (d) => this.conditionToShowAllPrevious(d)
+		//
+		// },
 		{
 			title: 'Axiom Transformations',
 			type: 'section'
