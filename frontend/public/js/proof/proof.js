@@ -238,9 +238,8 @@ function getFileName() {
   return fileName;
 }
 
-d3.select("#saveClicksCounter").on("click", (_, d) => {
+d3.select("#saveClicksCounter").on("click", (_) => {
   const params = new URLSearchParams(window.location.search);
-  console.log( params.get('lsUID'))
   const limeSurveyUserID = params.get('lsUID') || 'missingUID';
 
   io().emit("save counter", {

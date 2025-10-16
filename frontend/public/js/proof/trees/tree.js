@@ -358,7 +358,8 @@ export class TreeNavigation {
             .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
             .on("click", (_, d) => {
                 if (!proof.isMagic && d.source.data.target.type === "axiom") {
-                    proof.tree.showSubTree(d.target);
+                    //Commented this to disable cutting sub-proofs
+                    //proof.tree.showSubTree(d.target);
                 }
             })
     }
