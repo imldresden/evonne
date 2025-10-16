@@ -16,24 +16,24 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from "module";
 import * as path from 'path';
-import { owlFunctions } from "./frontend/public/js/utils/myOWL.js";
-import { ReasonerName } from "./frontend/public/js/utils/ReasonerName.js";
-import {ProofType} from "./frontend/public/js/utils/ProofType.js";
+import { owlFunctions } from "./src/public/js/utils/myOWL.js";
+import { ReasonerName } from "./src/public/js/utils/ReasonerName.js";
+import {ProofType} from "./src/public/js/utils/ProofType.js";
 
 const require = createRequire(import.meta.url);
 require('dotenv').config();
 const upload = require('express-fileupload');
 
-const MODE = process.env.MODE || 'demo';
 const PORT = process.env.PORT || 3000;
-const EXAMPLES = process.env.EXAMPLES || 'ijcar';
-console.log("Environment: " + MODE);
+const BASE = process.env.BASE || '/';
+const EXAMPLES = process.env.EXAMPLES || 'study';
 
 const app = express();
 app.engine('spy', sprightly);
-app.set('views', './frontend/views');
+app.set('views', './src/views');
 app.set('view engine', 'spy');
-app.use('/', express.static('./frontend/public'));
+
+app.use('/', express.static('./src/public'));
 app.use('/libs', express.static('./node_modules'));
 app.use(upload());
 
@@ -41,8 +41,8 @@ const http_ = http.createServer(app);
 const io_ = new Server(http_);
 const title = "evonne";
 const sessions = {};
-const dataDir = './frontend/public/data/';
-const examplesDir = './frontend/public/examples/';
+const dataDir = './src/public/data/';
+const examplesDir = './src/public/examples/';
 const fs = require('fs');
 
 const proofFileName = 'proof';
@@ -51,7 +51,7 @@ const externalProofFileName = proofFileName+'.json';
 const constraintsFileName = 'constraints.txt';
 const concreteDomainFileName = 'concreteDomain.txt';
 
-const countersDir = "countersDir";
+const countersDir = "./src/public/countersDir";
 
 if (!fs.existsSync(countersDir)) {
   fs.mkdirSync(countersDir);
@@ -60,13 +60,6 @@ if (!fs.existsSync(countersDir)) {
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
 }
-
-app.get('/test', (req, res) => {
-  res.render('pages/test.spy', {
-    title: "evonne lib",
-    uuid: uuidv4(),
-  });
-});
 
 app.get('/uuid', (req, res) => {
   res.status(200).send(uuidv4());
@@ -85,7 +78,7 @@ const page = (req, res) => {
       settings_specific: '<< proof/settings >> << ontology/settings >> << ce/settings >>',
       advanced_settings_specific: '<< proof/advanced-settings >>',
       sidebars_specific: '<< ontology/repairs >>',
-      menu_specific: `${MODE === 'demo' ? '' : '<< widgets/menus/projects >> << widgets/menus/compute >>'} << proof/menu >> << ontology/menu >>`,
+      menu_specific: `<< widgets/menus/projects >> << widgets/menus/compute >> << proof/menu >> << ontology/menu >>`,
       general_settings: '<< widgets/menus/shortening >>'
     });
   }
@@ -477,6 +470,13 @@ io_.on('connection', function (socket) {
       //Added this to make sure that previous result does not interfere with current computation
       clearFile(path.join(projectPath, "mDs_" + id + ".txt"));
 
+      console.log(axiom)
+      console.log(['-jar', 'externalTools/explain.jar',
+        '-a', axiom,
+        '-o', ontologyPath,
+        '-mds', id, reasoner,
+        '-od', projectPath,].join(' '))
+
       const repairs = spawn('java', [
         '-jar', 'externalTools/explain.jar',
         '-a', axiom,
@@ -558,20 +558,12 @@ function getExamples(req) {
 }
 
 function renderMain(req, res) {
-  if (MODE === 'demo') {
-    res.render('pages/demo.spy', {
-      title,
-      uuid: uuidv4(),
-      examples: getExamples(req),
-    });
-  } else {
-    res.render('pages/welcome.spy', {
-      title,
-      uuid: uuidv4(),
-      menu_specific: '<< widgets/menus/projects >>',
-      examples: getExamples(req),
-    });
-  }
+  res.render('pages/welcome.spy', {
+    title,
+    uuid: uuidv4(),
+    menu_specific: '<< widgets/menus/projects >>',
+    examples: getExamples(req)
+  });
 }
 
 function removeFile(filePath) {

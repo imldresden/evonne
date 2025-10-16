@@ -1,0 +1,30 @@
+<fieldset>
+  <h4>Shortening</h4>      
+  <label>Method</label>
+  <div class="input-wrapper modal-option">
+    
+    <div>
+      <select id="shorteningMode" class="browser-default">
+      <option value="camel">Camel case shortening</option>
+      <option value="basic">Fixed length shortening</option>
+      </select>
+    </div>
+  </div>
+  <!-- Slider for max length for fixed length shortening -->
+  <div class="input-wrapper input-range-wrapper modal-option modal-option-range">
+    <label>Maximum concept name length</label>
+    <div>
+      <button class="btn btn-small btn-primary btn-range-reset waves-effect waves-light tooltipped"
+        data-position="right" data-tooltip="Reset Maximum Length" id="maximumLengthReset">
+        <i class="material-icons">replay</i>
+      </button>
+      <form action="#">
+        <span class="new badge" id="maximumLengthLabel" data-badge-caption="characters">4</span>
+        <p class="range-field">
+          <input type="range" id="maximumLength" style="border-color: transparent" min="3" max="30" value="7"
+            step="1" />
+        </p>
+      </form>
+    </div>
+  </div>
+</fieldset>

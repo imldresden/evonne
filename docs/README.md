@@ -62,7 +62,7 @@ the Project menu.
 To upload your own proofs (e.g., for debugging purposes), you can use the <img src="resources/upload.png"  style="width:16px"/> button under the Proof and Ontology menus. 
 Both of these can be specified in GraphML format, with some slight particularities. For example, custom labels and parseable axioms need to be considered. 
 To see examples of these formats, you can look at the files generated from Evonne for any of the example projects, in the `See examples` menu from the welcome screen. 
-If you installed evonne locally, you can access the examples files from the `frontend/public/examples` directory where they are copied after `npm start`. Similarly, the files for your active projects are stored under `frontend/public/data`. 
+If you installed evonne locally, you can access the examples files from the `src/public/examples` directory where they are copied after `npm start`. Similarly, the files for your active projects are stored under `src/public/data`. 
 
 ---
 
