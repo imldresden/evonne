@@ -336,12 +336,12 @@ export class NodeVisualsHelper {
     // Mouse Events function     
     activeNodes = {};
     addShowHideMouseEvents() {
-        proof.svg.selectAll(".axiom")
-            .on("dblclick", (e, d) => {
-                if (!proof.isDrawing && (proof.trays.upper || proof.trays.lower)) {
-                    this.expandCollapseNode(e.currentTarget.id, d);
-                }
-            });
+        // proof.svg.selectAll(".axiom")
+        //     .on("dblclick", (e, d) => {
+        //         if (!proof.isDrawing && (proof.trays.upper || proof.trays.lower)) {
+        //             this.expandCollapseNode(e.currentTarget.id, d);
+        //         }
+        //     });
 
         proof.svg.selectAll(".node:not(.rest)")
             .on("mouseenter", (e, d) => {

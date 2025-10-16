@@ -760,10 +760,10 @@ export class AxiomsHelper {
 			type: 'section'
 		},
 		{
-			title: 'Collapse',
-			type: 'button',
-			action: (e, d) => this.collapse(d, e),
-			filter: (d) => this.conditionToCollapse(d)
+			// title: 'Collapse',
+			// type: 'button',
+			// action: (e, d) => this.collapse(d, e),
+			// filter: (d) => this.conditionToCollapse(d)
 		},
 		// {
 		// 	title: 'Expand',
@@ -772,10 +772,10 @@ export class AxiomsHelper {
 		// 	filter: (d) => this.conditionToExpand(d)
 		// },
 		{
-			title: 'Show Step',
-			type: 'button',
-			action: (_, d) => this.showPrevious(d),
-			filter: (d) => this.conditionToShowPrevious(d)
+			// title: 'Show Step',
+			// type: 'button',
+			// action: (_, d) => this.showPrevious(d),
+			// filter: (d) => this.conditionToShowPrevious(d)
 		},
 		// {
 		// 	title: 'Expand All',
@@ -789,22 +789,22 @@ export class AxiomsHelper {
 			type: 'section'
 		},
 		{
-			title: 'Show original',
-			type: 'button',
-			action: (_, d) => this.setAxiomOriginal(d),
-			filter: (d) => this.conditionToShowAxiomOriginal(d)
+			// title: 'Show original',
+			// type: 'button',
+			// action: (_, d) => this.setAxiomOriginal(d),
+			// filter: (d) => this.conditionToShowAxiomOriginal(d)
 		},
 		{
-			title: 'Show shortened',
-			type: 'button',
-			action: (_, d) => this.setAxiomShortened(d),
-			filter: (d) => this.conditionToShowShortened(d)
+			// title: 'Show shortened',
+			// type: 'button',
+			// action: (_, d) => this.setAxiomShortened(d),
+			// filter: (d) => this.conditionToShowShortened(d)
 		},
 		{
-			title: 'Show textual',
-			type: 'button',
-			action: (_, d) => this.setAxiomNaturalLanguage(d),
-			filter: (d) => this.conditionToShowNaturalLanguage(d)
+			// title: 'Show textual',
+			// type: 'button',
+			// action: (_, d) => this.setAxiomNaturalLanguage(d),
+			// filter: (d) => this.conditionToShowNaturalLanguage(d)
 		},
 		{
 			title: 'Ontology Actions',

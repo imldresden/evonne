@@ -214,7 +214,7 @@ export class TreeNavigation {
         }
 
         // add popovers to rules
-        proof.rules.addPopoverToNodes();
+        // proof.rules.addPopoverToNodes();
     }
 
     createHierarchy(data) {
