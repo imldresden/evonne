@@ -1,6 +1,6 @@
 <div class="collection" id="examples">
-    <div onclick="loadExample('Banana Bread - Training', '{{ uuid }}')" class="collection-item">
-        Banana Bread - Training
+    <div onclick="loadExample('Training', '{{ uuid }}')" class="collection-item">
+        Training
     </div>
     <div onclick="loadExample('Artifact', '{{ uuid }}')" class="collection-item">
         Artifact
