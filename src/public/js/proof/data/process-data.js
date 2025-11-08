@@ -218,12 +218,11 @@ function computeTreeLayout(hierarchy) {
             .separation((a, b) => separation(a, b))
             (hierarchy);
     } else {
-        tree_layout = d3.tree()
-            .nodeSize([
-                proof.nodeVisuals.maxNodeWidth, 
-                proof.nodeVisuals.maxNodeHeight * (proof.isCompact ? 2 : 2.5)
+        tree_layout = d3.flextree()
+            .nodeSize(node => [
+                node.width + 30, 
+                node.height + (proof.isCompact ? 10 : 30)
             ])
-            .separation((a, b) => separation(a, b))
             (hierarchy);
         
         tree_layout.each(d => {

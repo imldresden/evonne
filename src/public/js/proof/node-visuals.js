@@ -256,17 +256,23 @@ export class NodeVisualsHelper {
             //remove labels text
             elements[i].selectAll("text").remove();
             //add new ones
-            /*elements[i].append("foreignObject")
-                .attr("x", d => -(d.width) / 2 + TEXT_PAD)
-                .attr("y", 0)
-                .attr("width", d=> d.width)
-                .attr("height", d=> d.height)
-                .append("xhtml:div")
-                .style("font-size", "10px")
-                .html((d, i, nodes) => {
-                    
-                    return "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu enim quam. "
-                });*/
+            // elements[i].append("foreignObject")
+            //     .attr("x", d => -(d.width) / 2 + TEXT_PAD)
+            //     .attr("y", 5)
+            //     .attr("width", d => d.width)
+            //     .attr("height", d => d.height)
+            //     .html((d, i, nodes) => {
+            //         const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
+
+            //         let label = this.getLabel(d.data.source, display)
+            //         if (display && display === "shortened" && !label.includes('[')) {
+            //             label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
+            //         }
+
+            //         return `<div style="inline-size: ${d.width}; overflow-wrap: break-word;"> 
+            //             ${label}
+            //         </div>`
+            //     });
 
             elements[i].append("text")
                 .attr("id", elementsID[i])
@@ -282,7 +288,7 @@ export class NodeVisualsHelper {
                     }
 
                     return label;
-                }); /**/
+                }); 
         }
     }
 
@@ -367,7 +373,7 @@ export class NodeVisualsHelper {
             })
             .on("contextmenu", (e, d) => {
                 const menuItems = proof.axioms.menuItems;
-                e.preventDefault();
+                // e.preventDefault();
                 globals.contextMenu.create(e, d, menuItems.filter(m => m.filter && m.filter(d)), "#proof-view");
             })
     }

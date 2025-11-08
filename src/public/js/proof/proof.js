@@ -301,7 +301,11 @@ function getFileName() {
   return fileName;
 }
 
-d3.select("#saveClicksCounter").on("click", (_) => {
+d3.select("#saveClicksCounter").on("click", async (e) => {
+  const h = e.target.parentElement;
+  const t = M.Tooltip.getInstance(h);
+  t.close();
+  
   const params = new URLSearchParams(window.location.search);
   const limeSurveyUserID = params.get('lsUID') || 'missingUID';
   const currentExample = params.get('id') || 'missing project ID';
@@ -310,6 +314,12 @@ d3.select("#saveClicksCounter").on("click", (_) => {
     userID: limeSurveyUserID,
     counter: proof.clicksCounter,
     example: currentExample
+  }, (resp) => {
+    console.log(resp.status);
+    setTimeout(() => {
+      h.setAttribute("data-tooltip", "Done");
+      t.open();
+    }, 200)
   });
 })
 

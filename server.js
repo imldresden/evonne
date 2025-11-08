@@ -582,18 +582,19 @@ io_.on('connection', function (socket) {
     io_.sockets.emit('inference view', data);
   });
 
-  socket.on('save counter', async function (data) {
+  socket.on('save counter', async function (data, callback) {
     // console.log("User ID = " + data.userID + ", Click Counter = " + data.counter)
     if(data.userID !== "missingUID"){
       const filePath = path.join(countersDir, "lsUID_" + data.userID + "_" + data.example + ".txt");
 
       fs.writeFile(filePath, data.counter.toString(), (err) => {
-        if (err)
+        if (err) {
           console.error('Failed to save file:', err);
+        }
       });
+      callback({ status: "Counter saved successfully." });
     }
   });
-
 });
 
 // 141.76.67.176
