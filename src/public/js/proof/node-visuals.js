@@ -1,4 +1,5 @@
 import { globals } from "../shared-data.js";
+import { LineBreakChars } from "../shortening/common.js";
 import { proof } from "./proof.js";
 import { utils as ruleUtils } from "./rules/rules.js"
 
@@ -47,7 +48,7 @@ export class NodeVisualsHelper {
     nodesCurrentDisplayFormat = new Map()
     nodesDisplayFormat = new Map()
     maxNodeWidth = 20;
-    nodeLineHeight = 20;
+    nodeLineHeight = 18.5;
     maxNodeHeight = 20;
     totalHeight = 0;
 
@@ -97,21 +98,21 @@ export class NodeVisualsHelper {
         const directions = {
             "Up": {
                 cx: 0,
+                cy: (d) => -d.height,
+                x: - CONNECTOR_SIZE / 2,
+                y: (d) => -d.height - CONNECTOR_SIZE / 2,
+            },
+
+            "Down": {
+                cx: 0,
                 cy: 0,
                 x: - CONNECTOR_SIZE / 2,
                 y: - CONNECTOR_SIZE / 2,
             },
 
-            "Down": {
-                cx: 0,
-                cy: (d) => d.height,
-                x: - CONNECTOR_SIZE / 2,
-                y: (d) => d.height - CONNECTOR_SIZE / 2
-            },
-
             "Right": {
                 cx: (d) => d.width / 2,
-                cy: (d) => d.height / 2,
+                cy: (d) => - d.height / 2,
                 x: (d) => d.width / 2 - CONNECTOR_SIZE / 2,
                 y: (d) => d.height / 2 - CONNECTOR_SIZE / 2
             },
@@ -120,7 +121,7 @@ export class NodeVisualsHelper {
                 cx: (d) => - d.width / 2,
                 cy: (d) => d.height / 2,
                 x: (d) => - d.width / 2 - CONNECTOR_SIZE / 2,
-                y: (d) => d.height / 2 - CONNECTOR_SIZE / 2
+                y: (d) => - d.height / 2 - CONNECTOR_SIZE / 2
             },
         };
 
@@ -229,8 +230,8 @@ export class NodeVisualsHelper {
 
         [r, nr].forEach(n => n
             .attr("id", "frontRect")
-            .attr("x", d=> (-d.width) / 2)
-            .attr("y", 0)
+            .attr("x", d => (-d.width) / 2)
+            .attr("y", d => (-d.height))
             .attr("width", d => d.width)
             .attr("height", d => d.height)
             .classed("expanded", false));
@@ -254,41 +255,21 @@ export class NodeVisualsHelper {
 
         for (let i = 0; i < elements.length; i++) {
             //remove labels text
-            elements[i].selectAll("text").remove();
+            elements[i].selectAll("foreignObject").remove();
             //add new ones
-            // elements[i].append("foreignObject")
-            //     .attr("x", d => -(d.width) / 2 + TEXT_PAD)
-            //     .attr("y", 5)
-            //     .attr("width", d => d.width)
-            //     .attr("height", d => d.height)
-            //     .html((d, i, nodes) => {
-            //         const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
+            elements[i].append("foreignObject")
+                .attr("x", d => -(d.width) / 2 + TEXT_PAD)
+                .attr("y", d => -d.height + TEXT_PAD / 2)
+                .attr("width", d => d.width)
+                .attr("height", d => d.height)
+                .html(d => `<div> ${this.getLabel(d.data.source)} </div>`);
 
-            //         let label = this.getLabel(d.data.source, display)
-            //         if (display && display === "shortened" && !label.includes('[')) {
-            //             label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
-            //         }
-
-            //         return `<div style="inline-size: ${d.width}; overflow-wrap: break-word;"> 
-            //             ${label}
-            //         </div>`
-            //     });
-
-            elements[i].append("text")
-                .attr("id", elementsID[i])
-                .attr("class", elementsClass[i])
-                .attr("x", d => (-d.width / 2) + (TEXT_PAD / (proof.isCompact ? 2 : 1)))
-                .attr("y", d => d.height / 1.5)
-                .text((d, i, nodes) => {
-                    const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
-
-                    let label = this.getLabel(d.data.source, display)
-                    if (display && display === "shortened" && !label.includes('[')) {
-                        label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
-                    }
-
-                    return label;
-                }); 
+            // elements[i].append("text")
+            //     .attr("id", elementsID[i])
+            //     .attr("class", elementsClass[i])
+            //     .attr("x", d => (-d.width / 2) + (TEXT_PAD / (proof.isCompact ? 2 : 1)))
+            //     .attr("y", d => d.height / 1.5)
+            //     .text(d => this.getLabel(d.data.source)); 
         }
     }
 
@@ -578,16 +559,12 @@ export class NodeVisualsHelper {
 
     getNodeDims(node) {
         // estimation of the size of each character
-        const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.data.source.id}`);
-        
-        let label = this.getLabel(node.data.source, display);
-        
-        if (display && display === "shortened" && !label.includes('[')) {
-            label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
-        }
+        let label = this.getLabel(node.data.source);
+        let maxLine = 0; 
+        const lines = label.split("<br>");
+        lines.forEach(l => maxLine = Math.max(maxLine, l.length));
 
-        const lines = label.split('\n');
-        node.width = label.length * globals.fontCharacterWidth;
+        node.width = maxLine * globals.fontCharacterWidth;
         node.height = lines.length * this.nodeLineHeight;
 
         if (!proof.isCompact) {
@@ -653,14 +630,79 @@ export class NodeVisualsHelper {
         proof.svg.selectAll("g.node,line.link,path.link").style("opacity", 1);
     }
 
-    getLabel(node, display = "original") {
+    getLabel(node, forceOriginal = false) {
+        const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.id}`);
+        let label; 
+
         if (node.labels) {
             if (display === "textual") {
-                return node.labels.naturalLanguage;
+                label =  node.labels.naturalLanguage;
+            } else {
+                label = node.labels.default;
             }
-            return node.labels.default;
+        } else {
+            //Assuming node.labels is undefined for rule name nodes
+            label = proof.ruleNameMapHelper.getAlternativeName(node.element);
         }
-        //Assuming node.labels is undefined for rule name nodes
-        return proof.ruleNameMapHelper.getAlternativeName(node.element);
+
+        if (forceOriginal) {
+            return label; // don't mess with it
+        }
+
+        if (display !== "shortened") {
+            // return selected label
+            return this.splitLabelMultiLine(label);
+        } else { 
+            // apply currently active shortening to label
+            return this.splitLabelMultiLine(
+                globals
+                    .labelsShorteningHelper
+                    .shortenLabel(
+                        label, 
+                        proof.isRuleShort, 
+                        globals.shorteningMethod
+                    )
+            );
+        }
+    }
+
+    splitLabelMultiLine(label, display) {
+        const maxLength = 30;
+        if (maxLength > label.length || proof.isCompact) { 
+            return label; // no need to break it. 
+        }
+
+        const br = "<br>"
+        let ret = [];
+        let lineCount = 0;
+        for (let char of label) {
+            if (LineBreakChars.beforeOnly.has(char)) {
+                ret.push(br);
+                ret.push(char);
+                lineCount = 1;
+            } else if (LineBreakChars.beforeAndAfter.has(char)) {
+                ret.push(br);
+                ret.push(char);
+                ret.push(br);
+                lineCount = 0;
+            } else if (LineBreakChars.afterOnly.has(char)) {
+                ret.push(char);
+                ret.push(br);
+                lineCount = 0;
+            } else if (lineCount > maxLength && char === " ") {
+                ret.push(br);
+                lineCount = 0;
+            } else {
+                ret.push(char);
+                lineCount += 1;
+            }
+
+            if (lineCount > (maxLength * 2)) {
+                ret.push(br);
+                lineCount = 0;
+            }
+        }
+
+        return ret.join("");
     }
 }

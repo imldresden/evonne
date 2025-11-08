@@ -98,7 +98,7 @@ export class AxiomsHelper {
 			.filter(d => this.conditionToShowPrevious(d))
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2}, ${d.height})`)
+			.attr("transform", d => `translate(${d.width / 2}, 0)`)
 			.on("click", (_, d) => this.showPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -527,11 +527,20 @@ export class AxiomsHelper {
 			.attr("class", "material-icons")
 			.attr("x", BOX_PADDING)
 			.attr("y", 0)
-			.text((d, i, nodes) =>
-				proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "\ue8f5" : "\ue8f4");
+			.text((d, i, nodes) => proof.nodeVisuals
+				.nodesCurrentDisplayFormat
+				.get(nodes[i].parentNode.parentNode.id) === "original" ? 
+					"\ue8f5" : 
+					"\ue8f4"
+				);
 
 		group.append("title")
-			.text((d, i, nodes) => proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "Show formatted axiom" : "Show original axiom")
+			.text((d, i, nodes) => proof.nodeVisuals
+				.nodesCurrentDisplayFormat
+				.get(nodes[i].parentNode.parentNode.id) === "original" ? 
+					"Show formatted axiom" : 
+					"Show original axiom"
+				);
 	}
 
 	repairing = false;
@@ -569,8 +578,8 @@ export class AxiomsHelper {
 	}
 
 	highlightJustificationInOntology(treeRoot) {
-		let pre = [proof.nodeVisuals.getLabel(treeRoot.data.source)];
-		this.getAllPreviousAxioms(treeRoot, pre, (node) => proof.nodeVisuals.getLabel(node));
+		let pre = [proof.nodeVisuals.getLabel(treeRoot.data.source, true)];
+		this.getAllPreviousAxioms(treeRoot, pre, (node) => proof.nodeVisuals.getLabel(node, true));
 		this._socket.emit("highlight in ontology", { id: getSessionId(), pre });
 	}
 
@@ -665,7 +674,7 @@ export class AxiomsHelper {
 			.append("g").attr("id", "H1")
 			.attr("class", "axiomButton btn-round btn-help")
 			.attr("transform", d => proof.isCompact ?
-				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${d.height / 2})` :
+				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${-d.height / 2})` :
 				`translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")

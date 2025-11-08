@@ -224,6 +224,13 @@ function computeTreeLayout(hierarchy) {
                 node.height + (proof.isCompact ? 10 : 30)
             ])
             (hierarchy);
+
+            // .tree()
+            // .nodeSize([
+            //     proof.nodeVisuals.maxNodeWidth, 
+            //     proof.nodeVisuals.maxNodeHeight * (proof.isCompact ? 2 : 2.5)
+            // ])
+            // .separation((a, b) => separation(a, b))
         
         tree_layout.each(d => {
             d.x += proof.width / 2; // center proof in view

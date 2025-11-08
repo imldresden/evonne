@@ -446,14 +446,14 @@ export class TreeNavigation {
                         // move to destinations (expand, pull)
                         .transition(t)
                         .attr("x1", d => d.target.x)
-                        .attr("y1", d => proof.height - d.target.y + d.target.height + 1)
+                        .attr("y1", d => proof.height - d.target.y)
                         .attr("x2", d => d.source.x)
-                        .attr("y2", d => proof.height - d.source.y),
+                        .attr("y2", d => proof.height - d.source.y - d.source.height),
                     update => update.transition(t)
                         .attr("x1", d => d.target.x)
-                        .attr("y1", d => proof.height - d.target.y + d.target.height + 1)
+                        .attr("y1", d => proof.height - d.target.y)
                         .attr("x2", d => d.source.x)
-                        .attr("y2", d => proof.height - d.source.y),
+                        .attr("y2", d => proof.height - d.source.y - d.source.height),
                     exit => {
                         // return nodes to the source of the interaction (collapse, push)
                         exit.transition(t)
