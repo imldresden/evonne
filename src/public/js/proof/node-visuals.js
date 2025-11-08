@@ -204,7 +204,7 @@ export class NodeVisualsHelper {
             .attr("id", "backRect")
             .attr("class", "bg-box tray")
             .attr("x", -BOTTOM_TRAY_WIDTH / 2)
-            .attr("y", 0)
+            .attr("y", d => -d.height / 2)
             .attr("width", BOTTOM_TRAY_WIDTH)
             .attr("height", TRAY_HEIGHT)
             .style("opacity", 0);
@@ -214,7 +214,7 @@ export class NodeVisualsHelper {
             .attr("id", "topRect")
             .attr("class", "bg-box tray")
             .attr("x", -TOP_TRAY_WIDTH / 2)
-            .attr("y", 0)
+            .attr("y", d => -d.height / 2)
             .attr("width", TOP_TRAY_WIDTH)
             .attr("height", TRAY_HEIGHT)
             .style("opacity", 0);
@@ -354,7 +354,7 @@ export class NodeVisualsHelper {
             })
             .on("contextmenu", (e, d) => {
                 const menuItems = proof.axioms.menuItems;
-                // e.preventDefault();
+                e.preventDefault();
                 globals.contextMenu.create(e, d, menuItems.filter(m => m.filter && m.filter(d)), "#proof-view");
             })
     }
@@ -387,7 +387,7 @@ export class NodeVisualsHelper {
     }
 
     collapseNode(node, d) {
-        const { EXPANSION_COLLAPSING_DURATION } = nodeVisualsDefaults;
+        const { EXPANSION_COLLAPSING_DURATION, TRAY_HEIGHT } = nodeVisualsDefaults;
         let t = proof.svg.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .on("start", () => { this.hideCommunicationButtons(node); })
@@ -397,7 +397,7 @@ export class NodeVisualsHelper {
         node.classed("expanded", false)
             .selectAll(".tray") 
             .transition(t)
-            .attr("y", 0)
+            .attr("y", -TRAY_HEIGHT)
             .style("opacity", 0);
 
         //Move right bottom buttons to new position
@@ -468,8 +468,8 @@ export class NodeVisualsHelper {
                 .selectAll("#backRect")
                 .style("opacity", 1)
                 .transition(t)
-                .attr("y", d => d.height - 5)
-            bottomConnectorTranslate = `translate(0, ${TRAY_HEIGHT / 2 + CONNECTOR_SIZE / 2 + 2})`;
+                .attr("y", 0)
+            bottomConnectorTranslate = `translate(0, ${TRAY_HEIGHT})`;
         }
 
         //move the down connector to the new position
@@ -492,8 +492,8 @@ export class NodeVisualsHelper {
                 .selectAll("#topRect")
                 .style("opacity", 1)
                 .transition(t)
-                .attr("y", -TRAY_HEIGHT + 5)
-            topConnectorTranslate = `translate(0, ${-TRAY_HEIGHT + 5})`;
+                .attr("y", -node.height - TRAY_HEIGHT)
+            topConnectorTranslate = `translate(0, ${-node.height - TRAY_HEIGHT})`;
         }
 
         // move upper connector
@@ -524,9 +524,9 @@ export class NodeVisualsHelper {
         }
 
         const oldY = parseFloat(line.attr("y1"));
-        let newY = oldY - (TRAY_HEIGHT - 5);
+        let newY = oldY - (TRAY_HEIGHT);
         if (node.classed("expanded")) {
-            newY = oldY + (TRAY_HEIGHT - 5);
+            newY = oldY + (TRAY_HEIGHT);
         }
 
         line.transition()
