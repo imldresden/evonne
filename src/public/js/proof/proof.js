@@ -303,9 +303,9 @@ function getFileName() {
 
 d3.select("#saveClicksCounter").on("click", async (e) => {
   const h = e.target.parentElement;
-  if (h.getAttribute("data-tooltip") === "Done") {
-    return;
-  }
+  // if (h.getAttribute("data-tooltip") === "Done") {
+  //   return;
+  // }
   const t = M.Tooltip.getInstance(h);
   t.close();
   
