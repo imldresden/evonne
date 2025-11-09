@@ -632,21 +632,22 @@ export class NodeVisualsHelper {
 
     getLabel(node, forceOriginal = false) {
         const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.id}`);
+        
+        if (forceOriginal && node.labels) {
+            return node.labels.default; // don't mess with it
+        }
+
         let label; 
 
         if (node.labels) {
             if (display === "textual") {
                 label =  node.labels.naturalLanguage;
             } else {
-                label = node.labels.default;
+                label = node.labels.default;        
             }
         } else {
             //Assuming node.labels is undefined for rule name nodes
             label = proof.ruleNameMapHelper.getAlternativeName(node.element);
-        }
-
-        if (forceOriginal) {
-            return label; // don't mess with it
         }
 
         if (display !== "shortened") {
@@ -666,7 +667,7 @@ export class NodeVisualsHelper {
         }
     }
 
-    splitLabelMultiLine(label, display) {
+    splitLabelMultiLine(label) {
         const maxLength = 30;
         if (maxLength > label.length || proof.isCompact) { 
             return label; // no need to break it. 
@@ -675,30 +676,37 @@ export class NodeVisualsHelper {
         const br = "<br>"
         let ret = [];
         let lineCount = 0;
+        let lastWasBreak = false;
         for (let char of label) {
             if (LineBreakChars.beforeOnly.has(char)) {
-                ret.push(br);
+                !lastWasBreak && ret.push(br);
                 ret.push(char);
+                lastWasBreak = false;
                 lineCount = 1;
             } else if (LineBreakChars.beforeAndAfter.has(char)) {
-                ret.push(br);
+                !lastWasBreak && ret.push(br);
                 ret.push(char);
                 ret.push(br);
+                lastWasBreak = true;
                 lineCount = 0;
             } else if (LineBreakChars.afterOnly.has(char)) {
                 ret.push(char);
                 ret.push(br);
+                lastWasBreak = true;
                 lineCount = 0;
             } else if (lineCount > maxLength && char === " ") {
-                ret.push(br);
+                !lastWasBreak && ret.push(br);
+                lastWasBreak = true;
                 lineCount = 0;
             } else {
                 ret.push(char);
+                lastWasBreak = false;
                 lineCount += 1;
             }
 
             if (lineCount > (maxLength * 2)) {
-                ret.push(br);
+                !lastWasBreak && ret.push(br);
+                lastWasBreak = true;
                 lineCount = 0;
             }
         }

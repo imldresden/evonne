@@ -1,6 +1,6 @@
 export const LineBreakChars = {
     beforeOnly: new Set([ ]),
-    beforeAndAfter: new Set([ "⊑", "⊓", "⊔" ]),
+    beforeAndAfter: new Set([ "⊑", "⊓", "⊔", "≡", "=" ]),
     afterOnly: new Set([ "," ]),
 };
 
