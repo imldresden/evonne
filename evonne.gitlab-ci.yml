@@ -8,7 +8,7 @@ stages:
 deploy:
   stage: deploy
   script:
-    - docker system prune -a -f --volumes --silent
+    - docker system prune -a -f --volumes
     - docker ps -q --filter ancestor="gitlab-runner/evonne" | xargs -r docker stop
     - docker build . -t gitlab-runner/evonne
     - docker run -dp 7007:3000 gitlab-runner/evonne:latest
