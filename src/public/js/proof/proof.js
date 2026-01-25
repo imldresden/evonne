@@ -321,7 +321,7 @@ d3.select("#saveClicksCounter").on("click", async (e) => {
     console.log(resp.status);
     setTimeout(() => {
       h.setAttribute("data-tooltip", "Done");
-      t.open();
+      //t.open();
     }, 200)
   });
 })
