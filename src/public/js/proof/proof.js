@@ -306,8 +306,8 @@ d3.select("#saveClicksCounter").on("click", async (e) => {
   // if (h.getAttribute("data-tooltip") === "Done") {
   //   return;
   // }
-  const t = M.Tooltip.getInstance(h);
-  t.close();
+  // const t = M.Tooltip.getInstance(h);
+  // t.close();
   
   const params = new URLSearchParams(window.location.search);
   const limeSurveyUserID = params.get('lsUID') || 'missingUID';
@@ -321,7 +321,7 @@ d3.select("#saveClicksCounter").on("click", async (e) => {
     console.log(resp.status);
     setTimeout(() => {
       h.setAttribute("data-tooltip", "Done");
-      t.open();
+      //t.open();
     }, 200)
   });
 })
