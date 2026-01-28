@@ -166,6 +166,7 @@ export class AxiomsHelper {
 			});
 		}
 
+		proof.saveCounter();
 		proof.update();
 	}
 
