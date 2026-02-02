@@ -1,5 +1,5 @@
 <li>
-  <a class="dropdown dropdown-trigger tooltipped" data-target="submenu-compute" data-tooltip="Project">
+  <a class="dropdown dropdown-trigger tooltipped" data-target="submenu-compute" data-tooltip="Project" style="pointer-events:none">
     <i class="material-icons">computer</i>
   </a>
 </li>
