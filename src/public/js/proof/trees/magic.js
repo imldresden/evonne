@@ -84,7 +84,7 @@ export class MagicNavigation {
 			.append("g")
 			.attr("id", "B4")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2}, 0)`)
+			.attr("transform", d => `translate(${d.width / 2}, ${d.height})`)
 			.on("click", (_, d) => this.pushDown(d))
 			.on("hover", (_, d) => this.pushDownHover(d));
 
@@ -97,7 +97,7 @@ export class MagicNavigation {
 			.append("g")
 			.attr("id", "B3")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d =>`translate(${-d.width / 2}, ${-d.height})`)
+			.attr("transform", d =>`translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (_, d) => this.pullUp(d))
 			.on("hover", (_, d) => this.pullUpHover(d));
 
@@ -111,7 +111,7 @@ export class MagicNavigation {
 			.append("g")
 			.attr("id", "B2")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2}, ${-d.height})`)
+			.attr("transform", d => `translate(${d.width / 2}, 0)`)
 			.on("click", (_, d) => this.pushUp(d))
 			.on("hover", (_, d) => this.pushUpHover(d));
 

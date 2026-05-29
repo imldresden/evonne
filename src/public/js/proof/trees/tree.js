@@ -34,10 +34,6 @@ export class TreeNavigation {
         this._entire = this.createHierarchy(this._edges);
 
         this.restart();
-
-        this.root = computeTreeLayout(this.hierarchy);
-        this.root.children = null;
-
         this.update();
     }
 
@@ -75,7 +71,7 @@ export class TreeNavigation {
         }
 
         if (!proof.showRules) {
-            data = this.hideRules(data);
+            data = this.hideRules(data); 
         }
         return data;
     }
@@ -214,7 +210,7 @@ export class TreeNavigation {
         }
 
         // add popovers to rules
-        // proof.rules.addPopoverToNodes();
+        proof.rules.addPopoverToNodes();
     }
 
     createHierarchy(data) {
@@ -356,10 +352,9 @@ export class TreeNavigation {
         return input
             .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
             .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
-            .on("click", (_, d) => {
-                if (!proof.isMagic && d.source.data.target.type === "axiom") {
-                    //Commented this to disable cutting sub-proofs
-                    //proof.tree.showSubTree(d.target);
+            .on("click", (e, d) => {
+                if (e.ctrlKey && !proof.isMagic && d.source.data.target.type === "axiom") {
+                    proof.tree.showSubTree(d.target);
                 }
             })
     }
@@ -446,14 +441,14 @@ export class TreeNavigation {
                         // move to destinations (expand, pull)
                         .transition(t)
                         .attr("x1", d => d.target.x)
-                        .attr("y1", d => proof.height - d.target.y)
+                        .attr("y1", d => proof.height - d.target.y + d.target.height + 1)
                         .attr("x2", d => d.source.x)
-                        .attr("y2", d => proof.height - d.source.y - d.source.height),
+                        .attr("y2", d => proof.height - d.source.y),
                     update => update.transition(t)
                         .attr("x1", d => d.target.x)
-                        .attr("y1", d => proof.height - d.target.y)
+                        .attr("y1", d => proof.height - d.target.y + d.target.height + 1)
                         .attr("x2", d => d.source.x)
-                        .attr("y2", d => proof.height - d.source.y - d.source.height),
+                        .attr("y2", d => proof.height - d.source.y),
                     exit => {
                         // return nodes to the source of the interaction (collapse, push)
                         exit.transition(t)

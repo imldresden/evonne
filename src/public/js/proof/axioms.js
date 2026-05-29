@@ -18,9 +18,9 @@ export class AxiomsHelper {
 		this.nodes = proof.svg.selectAll(proof.stepNavigator ? ".axiom" : ".node:not(.rest)");
 
 		//Collapse node children
-		//this.addCollapse();
+		this.addCollapse();
 		//Expand node children
-		//this.addExpand();
+		this.addExpand();
 
 
 		//Show rule name and premise that led to this conclusion
@@ -98,7 +98,7 @@ export class AxiomsHelper {
 			.filter(d => this.conditionToShowPrevious(d))
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2}, 0)`)
+			.attr("transform", d => `translate(${d.width / 2}, ${d.height})`)
 			.on("click", (_, d) => this.showPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -132,10 +132,6 @@ export class AxiomsHelper {
 		if (proof.isDrawing) {
 			return;
 		}
-
-		proof.clicksCounter++;
-		console.log("Counter= " + proof.clicksCounter);
-
 		proof.nodeInteracted = treeRoot;
 		if (!treeRoot.children) {
 			treeRoot.children = treeRoot._children;
@@ -152,7 +148,7 @@ export class AxiomsHelper {
 			} else {
 				treeRoot.children[0].children = treeRoot.children[0]._children;
 				treeRoot.children[0].children.forEach(child => {
-					if (child.children 	) { //&& child.children[0].children to not collapse Asserted Conclusions
+					if (child.children) { //&& child.children[0].children to not collapse Asserted Conclusions
 						child.children = null
 					}
 				});
@@ -166,7 +162,6 @@ export class AxiomsHelper {
 			});
 		}
 
-		proof.saveCounter();
 		proof.update();
 	}
 
@@ -342,7 +337,7 @@ export class AxiomsHelper {
 			.style("display", "none")
 			.attr("id", "B01")
 			.attr("class", "axiomButton btn-round btn-highlight")
-			.attr("transform", d => `translate(${-BOTTOM_TRAY_WIDTH / 2 + 6 * BOX_PADDING}, ${BTN_CIRCLE_SIZE - 2})`)
+			.attr("transform", d => `translate(${-BOTTOM_TRAY_WIDTH / 2 + 6 * BOX_PADDING}, ${d.height + BTN_CIRCLE_SIZE / 2 + 2})`)
 			.on("click", (_, d) => this.showJustification(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -365,7 +360,7 @@ export class AxiomsHelper {
 			.style("display", "none")
 			.attr("id", "B02")
 			.attr("class", "axiomButton btn-round btn-repairs")
-			.attr("transform", d => `translate(${-BOTTOM_TRAY_WIDTH / 2 + 2 * BOX_PADDING}, ${BTN_CIRCLE_SIZE - 2})`)
+			.attr("transform", d => `translate(${-BOTTOM_TRAY_WIDTH / 2 + 2 * BOX_PADDING}, ${d.height + BTN_CIRCLE_SIZE - 5})`)
 			.on("click", (_, d) => this.showAxiomRepairs(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -528,20 +523,11 @@ export class AxiomsHelper {
 			.attr("class", "material-icons")
 			.attr("x", BOX_PADDING)
 			.attr("y", 0)
-			.text((d, i, nodes) => proof.nodeVisuals
-				.nodesCurrentDisplayFormat
-				.get(nodes[i].parentNode.parentNode.id) === "original" ? 
-					"\ue8f5" : 
-					"\ue8f4"
-				);
+			.text((d, i, nodes) =>
+				proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "\ue8f5" : "\ue8f4");
 
 		group.append("title")
-			.text((d, i, nodes) => proof.nodeVisuals
-				.nodesCurrentDisplayFormat
-				.get(nodes[i].parentNode.parentNode.id) === "original" ? 
-					"Show formatted axiom" : 
-					"Show original axiom"
-				);
+			.text((d, i, nodes) => proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.parentNode.id) === "original" ? "Show formatted axiom" : "Show original axiom")
 	}
 
 	repairing = false;
@@ -579,8 +565,8 @@ export class AxiomsHelper {
 	}
 
 	highlightJustificationInOntology(treeRoot) {
-		let pre = [proof.nodeVisuals.getLabel(treeRoot.data.source, true)];
-		this.getAllPreviousAxioms(treeRoot, pre, (node) => proof.nodeVisuals.getLabel(node, true));
+		let pre = [proof.nodeVisuals.getLabel(treeRoot.data.source)];
+		this.getAllPreviousAxioms(treeRoot, pre, (node) => proof.nodeVisuals.getLabel(node));
 		this._socket.emit("highlight in ontology", { id: getSessionId(), pre });
 	}
 
@@ -675,8 +661,8 @@ export class AxiomsHelper {
 			.append("g").attr("id", "H1")
 			.attr("class", "axiomButton btn-round btn-help")
 			.attr("transform", d => proof.isCompact ?
-				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${-d.height / 2})` :
-				`translate(${-d.width / 2}, 0)`)
+				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${d.height / 2})` :
+				`translate(${-d.width / 2}, ${d.height})`)
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
@@ -770,51 +756,51 @@ export class AxiomsHelper {
 			type: 'section'
 		},
 		{
-			// title: 'Collapse',
-			// type: 'button',
-			// action: (e, d) => this.collapse(d, e),
-			// filter: (d) => this.conditionToCollapse(d)
+			title: 'Collapse',
+			type: 'button',
+			action: (e, d) => this.collapse(d, e),
+			filter: (d) => this.conditionToCollapse(d)
 		},
-		// {
-		// 	title: 'Expand',
-		// 	type: 'button',
-		// 	action: (e, d) => this.expand(d, e),
-		// 	filter: (d) => this.conditionToExpand(d)
-		// },
 		{
-			// title: 'Show Step',
-			// type: 'button',
-			// action: (_, d) => this.showPrevious(d),
-			// filter: (d) => this.conditionToShowPrevious(d)
+			title: 'Expand',
+			type: 'button',
+			action: (e, d) => this.expand(d, e),
+			filter: (d) => this.conditionToExpand(d)
 		},
-		// {
-		// 	title: 'Expand All',
-		// 	type: 'button',
-		// 	action: (e, d) => this.showAllPrevious(d, e),
-		// 	filter: (d) => this.conditionToShowAllPrevious(d)
-		//
-		// },
+		{
+			title: 'Show Step',
+			type: 'button',
+			action: (_, d) => this.showPrevious(d),
+			filter: (d) => this.conditionToShowPrevious(d)
+		},
+		{
+			title: 'Expand All',
+			type: 'button',
+			action: (e, d) => this.showAllPrevious(d, e),
+			filter: (d) => this.conditionToShowAllPrevious(d)
+
+		},
 		{
 			title: 'Axiom Transformations',
 			type: 'section'
 		},
 		{
-			// title: 'Show original',
-			// type: 'button',
-			// action: (_, d) => this.setAxiomOriginal(d),
-			// filter: (d) => this.conditionToShowAxiomOriginal(d)
+			title: 'Show original',
+			type: 'button',
+			action: (_, d) => this.setAxiomOriginal(d),
+			filter: (d) => this.conditionToShowAxiomOriginal(d)
 		},
 		{
-			// title: 'Show shortened',
-			// type: 'button',
-			// action: (_, d) => this.setAxiomShortened(d),
-			// filter: (d) => this.conditionToShowShortened(d)
+			title: 'Show shortened',
+			type: 'button',
+			action: (_, d) => this.setAxiomShortened(d),
+			filter: (d) => this.conditionToShowShortened(d)
 		},
 		{
-			// title: 'Show textual',
-			// type: 'button',
-			// action: (_, d) => this.setAxiomNaturalLanguage(d),
-			// filter: (d) => this.conditionToShowNaturalLanguage(d)
+			title: 'Show textual',
+			type: 'button',
+			action: (_, d) => this.setAxiomNaturalLanguage(d),
+			filter: (d) => this.conditionToShowNaturalLanguage(d)
 		},
 		{
 			title: 'Ontology Actions',

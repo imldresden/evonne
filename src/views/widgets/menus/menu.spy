@@ -21,12 +21,6 @@
     </div>
     <ul id="nav-mobile" class="right">
 
-      <li>
-        <a id="saveClicksCounter" class="waves-effect waves-light pulse yellow darken-3 z-depth-5" type="button">
-          Click here when you are done!
-        </a>
-      </li>
-
       {{ menu_specific }}
       
       <li>

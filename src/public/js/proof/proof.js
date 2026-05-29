@@ -63,8 +63,6 @@ const conf = {
 
   ruleNameMapHelper : new RuleNameMapHelper(),
 
-  clicksCounter:0,
-
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
 
@@ -101,32 +99,7 @@ const conf = {
   update: function ({ reset=false, ext=undefined } = {}) {
     ext && setFromExternal(ext);
     proof.tree.update(reset);
-  },
-
-  saveCounter: function (){
-  //const h = e.target.parentElement;
-  // if (h.getAttribute("data-tooltip") === "Done") {
-  //   return;
-  // }
-  // const t = M.Tooltip.getInstance(h);
-  // t.close();
-
-  const params = new URLSearchParams(window.location.search);
-  const limeSurveyUserID = params.get('lsUID') || 'missingUID';
-  const currentExample = params.get('id') || 'missing project ID';
-
-  io().emit("save counter", {
-    userID: limeSurveyUserID,
-    counter: proof.clicksCounter,
-    example: currentExample
-  }, (resp) => {
-    console.log(resp.status);
-    // setTimeout(() => {
-    //   h.setAttribute("data-tooltip", "Done");
-    //   //t.open();
-    // }, 200)
-  });
-}
+  }
 }
 
 function setDefinedProperty(srcObj, targetObj, prop) {
@@ -325,9 +298,5 @@ function getFileName() {
 
   return fileName;
 }
-
-d3.select("#saveClicksCounter").on("click", async (_) => {
-  conf.saveCounter()
-})
 
 export { init_proof, init_trace, conf as proof }

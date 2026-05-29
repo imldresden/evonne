@@ -51,77 +51,9 @@ const externalProofFileName = proofFileName+'.json';
 const constraintsFileName = 'constraints.txt';
 const concreteDomainFileName = 'concreteDomain.txt';
 
-const countersDir = "./src/public/countersDir";
-const downloadCountersDirName = "countersDir"
-
-if (!fs.existsSync(countersDir)) {
-  fs.mkdirSync(countersDir);
-}
-
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir);
 }
-
-const archiver = require('archiver');
-
-app.get('/downloadCounters', (_req, res) => {
-  res.send(`
-    <html>
-      <body>
-        <p>Your download is starting…</p>
-        <script>location.href='/download';</script>
-      </body>
-    </html>
-  `);
-});
-
-app.get('/download', async (req, res) => {
-  try {
-    const folderPath = path.resolve(countersDir);
-
-    // Validate folder
-    if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) {
-      return res.status(404).send('Counters folder not found.');
-    }
-
-    // Build timestamped filename
-    const now = new Date();
-    const timestamp = now
-        .toISOString()
-        .replace(/[:.]/g, '-')
-        .replace('T', '_')
-        .split('Z')[0];
-    const downloadFileName =  `${downloadCountersDirName}_${timestamp}.zip`;
-
-    // Set response headers
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename="${downloadFileName}"`);
-    res.setHeader('Cache-Control', 'no-store');
-
-    // Create archive and pipe to response
-    const archive = archiver('zip', { zlib: { level: 9 } });
-
-    archive.on('warning', (err) => console.warn('Archiver warning:', err));
-    archive.on('error', (err) => {
-      console.error('Archiver error:', err);
-      if (!res.headersSent) res.status(500).end('Archiving failed.');
-      else res.end();
-    });
-
-    archive.pipe(res);
-
-    // Add the folder contents to the zip
-    archive.directory(folderPath, path.basename(folderPath));
-
-    // Finalize (start streaming)
-    await archive.finalize();
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Failed to prepare download.');
-  }
-});
-
 
 app.get('/uuid', (req, res) => {
   res.status(200).send(uuidv4());
@@ -582,19 +514,6 @@ io_.on('connection', function (socket) {
     io_.sockets.emit('inference view', data);
   });
 
-  socket.on('save counter', async function (data, callback) {
-    // console.log("User ID = " + data.userID + ", Click Counter = " + data.counter)
-    if(data.userID !== "missingUID"){
-      const filePath = path.join(countersDir, "lsUID_" + data.userID + "_" + data.example + ".txt");
-
-      fs.writeFile(filePath, data.counter.toString(), (err) => {
-        if (err) {
-          console.error('Failed to save file:', err);
-        }
-      });
-      callback({ status: "Counter saved successfully." });
-    }
-  });
 });
 
 // 141.76.67.176
@@ -936,8 +855,7 @@ function counter({ id, axiom, projPath, ontPath } = {}) {
     '--output-directory', projPath,
     '-output-type', 'graph',
     '--export-mapper',
-    '--no-image',
-    // '--model-type', 'alpha'
+    '--no-image'
   ], { encoding: 'utf-8' });
 
   printOutput(process);

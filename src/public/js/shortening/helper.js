@@ -23,8 +23,6 @@ export class LabelsShorteningHelper {
 
     shortenLabel(label, includeRuleNames, style) {
         const shortening = this.chooseShortening(style);
-        console.log(label)
-        console.log(shortening.shortenLabel(label, includeRuleNames))
         return shortening ? shortening.shortenLabel(label, includeRuleNames) : label;
     }
 }

@@ -19,4 +19,4 @@
 
 ## Deployment: 
 * An example of continuous integration for gitlab, using docker: `evonne.gitlab-ci.yml`.
-* Add the remote `git remote add deploy <the_gitlab_repo>`, then deploy with `git push deploy main`.
+* Add the remote `git remote add deploy <the_gitlab_repo>`, then deploy with `git push deploy <source_branch>:<remote_branch>`.

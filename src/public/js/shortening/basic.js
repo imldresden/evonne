@@ -76,10 +76,8 @@ export class BasicShorteningFunctions {
 
             fillMaps(res, text, this);
             return this._FullToCC.get(text);
-        } else {
-            return this.getFirstNChars(text);
         }
-        
+        return text;
     }
 
     getMultiFirstNChars(match) {

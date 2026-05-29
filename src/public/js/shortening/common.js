@@ -1,9 +1,3 @@
-export const LineBreakChars = {
-    beforeOnly: new Set([ ]),
-    beforeAndAfter: new Set([ "⊑", "⊓", "⊔", "≡", "=" ]),
-    afterOnly: new Set([ "," ]),
-};
-
 export const ShorteningCommonData = {
     subsumes : "⊑",
     exists : "∃",

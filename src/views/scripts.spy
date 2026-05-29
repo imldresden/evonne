@@ -13,7 +13,6 @@
 
 <!-- other libs -->
 <script src="/libs/d3/dist/d3.min.js"></script>
-<script src="/libs/d3-flextree/build/d3-flextree.min.js"></script>
 <script src="/libs/sweetalert2/dist/sweetalert2.all.min.js"></script>
 <script src="/libs/materialize-css/dist/js/materialize.min.js"></script>
 <script src="/libs/svg-pan-zoom/dist/svg-pan-zoom.min.js"></script>
