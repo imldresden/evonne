@@ -1,6 +1,6 @@
 import { globals } from "../shared-data.js";
-import { proof } from "./proof.js";
 import { LineBreakChars } from "../shortening/common.js";
+import { proof } from "./proof.js";
 import { utils as ruleUtils } from "./rules/rules.js"
 
 export const nodeVisualsDefaults = {
@@ -114,7 +114,7 @@ export class NodeVisualsHelper {
                 cx: (d) => d.width / 2,
                 cy: (d) => - d.height / 2,
                 x: (d) => d.width / 2 - CONNECTOR_SIZE / 2,
-                y: (d) => - d.height / 2 - CONNECTOR_SIZE / 2,
+                y: (d) => d.height / 2 - CONNECTOR_SIZE / 2,
             },
 
             "Left": {
