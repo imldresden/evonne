@@ -565,8 +565,8 @@ export class AxiomsHelper {
 	}
 
 	highlightJustificationInOntology(treeRoot) {
-		let pre = [proof.nodeVisuals.getLabel(treeRoot.data.source)];
-		this.getAllPreviousAxioms(treeRoot, pre, (node) => proof.nodeVisuals.getLabel(node));
+		let pre = [proof.nodeVisuals.getLabel(treeRoot.data.source, true)];
+		this.getAllPreviousAxioms(treeRoot, pre, (node) => proof.nodeVisuals.getLabel(node, true));
 		this._socket.emit("highlight in ontology", { id: getSessionId(), pre });
 	}
 
@@ -661,8 +661,8 @@ export class AxiomsHelper {
 			.append("g").attr("id", "H1")
 			.attr("class", "axiomButton btn-round btn-help")
 			.attr("transform", d => proof.isCompact ?
-				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${d.height / 2})` :
-				`translate(${-d.width / 2}, ${d.height})`)
+				`translate(${d.width / 2 + BTN_CIRCLE_SIZE}, ${-d.height / 2})` :
+				`translate(${-d.width / 2}, 0)`)
 			.on("click", (e, d) => this.highlightCurrentInference(e, d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)

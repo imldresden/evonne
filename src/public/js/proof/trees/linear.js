@@ -116,7 +116,7 @@ export class LinearNavigation {
             sourceY = d.source.y - 0.01;
         }
 
-        y2 = proof.height - targetY + d.target.height / 2;
+        y2 = proof.height - targetY - d.target.height / 2;
         
         if (proof.isCompact) { 
             x2 = targetX - .5 * d.target.width;
@@ -126,7 +126,7 @@ export class LinearNavigation {
             return "M" + x1 + "," + y1 + "V" + y2;
         }
 
-        y1 = proof.height - sourceY + d.source.height / 2;
+        y1 = proof.height - sourceY - d.source.height / 2;
 
         if (proof.showRules) { // showing rules
             if (ruleUtils.isRule(d.source.data.source.type)) { // src is rule

@@ -213,9 +213,11 @@ function computeTreeLayout(hierarchy) {
 
     if (proof.allowOverlap) {
         // tries to fit to screen 
-        tree_layout = d3.tree()
-            .size([proof.width, proof.height])
-            .separation((a, b) => separation(a, b))
+        tree_layout = d3.flextree()
+            .nodeSize(node => [
+                node.width + 30, 
+                node.height + (proof.isCompact ? 10 : 30)
+            ])
             (hierarchy);
     } else {
         tree_layout = d3.tree()
