@@ -98,7 +98,7 @@ export class AxiomsHelper {
 			.filter(d => this.conditionToShowPrevious(d))
 			.append("g").attr("id", "B1")
 			.attr("class", "axiomButton btn-round")
-			.attr("transform", d => `translate(${d.width / 2}, ${d.height})`)
+			.attr("transform", d => `translate(${d.width / 2}, 0)`)
 			.on("click", (_, d) => this.showPrevious(d))
 		group.append("circle")
 			.attr("r", BTN_CIRCLE_SIZE / 2)
