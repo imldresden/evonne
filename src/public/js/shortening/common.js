@@ -18,6 +18,12 @@ export const ShorteningCommonData = {
     regInnerPar : /\([^()]+\)/g,
 }
 
+export const LineBreakChars = {
+    beforeOnly: new Set([ ]),
+    beforeAndAfter: new Set([ "⊑", "⊓", "⊔", "≡", "=" ]),
+    afterOnly: new Set([ "," ]),
+};
+
 export function fillMaps(ccString, originalString, obj) {
     if (obj._FullToCC.has(originalString)) {
         return;

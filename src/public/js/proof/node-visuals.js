@@ -1,4 +1,5 @@
 import { globals } from "../shared-data.js";
+import { LineBreakChars } from "../shortening/common.js";
 import { proof } from "./proof.js";
 import { utils as ruleUtils } from "./rules/rules.js"
 
@@ -47,7 +48,7 @@ export class NodeVisualsHelper {
     nodesCurrentDisplayFormat = new Map()
     nodesDisplayFormat = new Map()
     maxNodeWidth = 20;
-    nodeLineHeight = 20;
+    nodeLineHeight = 18.5;
     maxNodeHeight = 20;
     totalHeight = 0;
 
@@ -97,30 +98,30 @@ export class NodeVisualsHelper {
         const directions = {
             "Up": {
                 cx: 0,
+                cy: (d) => -d.height,
+                x: - CONNECTOR_SIZE / 2,
+                y: (d) => -d.height - CONNECTOR_SIZE / 2,
+            },
+
+            "Down": {
+                cx: 0,
                 cy: 0,
                 x: - CONNECTOR_SIZE / 2,
                 y: - CONNECTOR_SIZE / 2,
             },
 
-            "Down": {
-                cx: 0,
-                cy: (d) => d.height,
-                x: - CONNECTOR_SIZE / 2,
-                y: (d) => d.height - CONNECTOR_SIZE / 2
-            },
-
             "Right": {
                 cx: (d) => d.width / 2,
-                cy: (d) => d.height / 2,
+                cy: (d) => - d.height / 2,
                 x: (d) => d.width / 2 - CONNECTOR_SIZE / 2,
-                y: (d) => d.height / 2 - CONNECTOR_SIZE / 2
+                y: (d) => d.height / 2 - CONNECTOR_SIZE / 2,
             },
 
             "Left": {
                 cx: (d) => - d.width / 2,
                 cy: (d) => d.height / 2,
                 x: (d) => - d.width / 2 - CONNECTOR_SIZE / 2,
-                y: (d) => d.height / 2 - CONNECTOR_SIZE / 2
+                y: (d) => - d.height / 2 - CONNECTOR_SIZE / 2,
             },
         };
 
@@ -203,7 +204,7 @@ export class NodeVisualsHelper {
             .attr("id", "backRect")
             .attr("class", "bg-box tray")
             .attr("x", -BOTTOM_TRAY_WIDTH / 2)
-            .attr("y", 0)
+            .attr("y", d => -d.height / 2)
             .attr("width", BOTTOM_TRAY_WIDTH)
             .attr("height", TRAY_HEIGHT)
             .style("opacity", 0);
@@ -213,7 +214,7 @@ export class NodeVisualsHelper {
             .attr("id", "topRect")
             .attr("class", "bg-box tray")
             .attr("x", -TOP_TRAY_WIDTH / 2)
-            .attr("y", 0)
+            .attr("y", d => -d.height / 2)
             .attr("width", TOP_TRAY_WIDTH)
             .attr("height", TRAY_HEIGHT)
             .style("opacity", 0);
@@ -229,8 +230,8 @@ export class NodeVisualsHelper {
 
         [r, nr].forEach(n => n
             .attr("id", "frontRect")
-            .attr("x", d=> (-d.width) / 2)
-            .attr("y", 0)
+            .attr("x", d => (-d.width) / 2)
+            .attr("y", d => (-d.height))
             .attr("width", d => d.width)
             .attr("height", d => d.height)
             .classed("expanded", false));
@@ -254,41 +255,26 @@ export class NodeVisualsHelper {
 
         for (let i = 0; i < elements.length; i++) {
             //remove labels text
-            elements[i].selectAll("text").remove();
+            elements[i].selectAll("foreignObject").remove();
             //add new ones
-            /*elements[i].append("foreignObject")
+            elements[i].append("foreignObject")
                 .attr("x", d => -(d.width) / 2 + TEXT_PAD)
-                .attr("y", 0)
-                .attr("width", d=> d.width)
-                .attr("height", d=> d.height)
-                .append("xhtml:div")
-                .style("font-size", "10px")
-                .html((d, i, nodes) => {
-                    
-                    return "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu enim quam. "
-                });*/
-
-            elements[i].append("text")
-                .attr("id", elementsID[i])
-                .attr("class", elementsClass[i])
-                .attr("x", d => (-d.width / 2) + (TEXT_PAD / (proof.isCompact ? 2 : 1)))
-                .attr("y", d => d.height / 1.5)
-                .text((d, i, nodes) => {
-                    const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(nodes[i].parentNode.id);
-
-                    let label = this.getLabel(d.data.source, display)
-                    if (display && display === "shortened" && !label.includes('[')) {
-                        label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
-                    }
-
-                    return label;
-                }); /**/
+                .attr("y", d => -d.height + TEXT_PAD / 2)
+                .attr("width", d => d.width)
+                .attr("height", d => d.height)
+                .html(d => `<div> ${this.getLabel(d.data.source)} </div>`);
+            // elements[i].append("text")
+            //     .attr("id", elementsID[i])
+            //     .attr("class", elementsClass[i])
+            //     .attr("x", d => (-d.width / 2) + (TEXT_PAD / (proof.isCompact ? 2 : 1)))
+            //     .attr("y", d => d.height / 1.5)
+            //     .text(d => this.getLabel(d.data.source)); 
         }
     }
 
     //These functions are for showing / hiding the buttons associated with axiom nodes
     hideButtons(nodeID) {
-        let buttons = d3.selectAll(`#${nodeID} .axiomButton:not(#B01,#B02,#B06,#B04,#B05)`);
+        let buttons = d3.selectAll(`#${nodeID} .axiomButton:not(#B1,#B01,#B02,#B06,#B04,#B05)`);
         buttons.transition()
             .duration(150)
             .ease(d3.easeLinear)
@@ -326,7 +312,7 @@ export class NodeVisualsHelper {
 
         if (!proof.isCompact) {
             proof.svg.selectAll(".node")
-            .selectAll(".axiomButton")
+            .selectAll(".axiomButton:not(#B1)")
             .attr("cursor", "pointer")
             .style("opacity", 0);
         }
@@ -400,7 +386,7 @@ export class NodeVisualsHelper {
     }
 
     collapseNode(node, d) {
-        const { EXPANSION_COLLAPSING_DURATION } = nodeVisualsDefaults;
+        const { EXPANSION_COLLAPSING_DURATION, TRAY_HEIGHT } = nodeVisualsDefaults;
         let t = proof.svg.transition()
             .duration(EXPANSION_COLLAPSING_DURATION).ease(d3.easeLinear)
             .on("start", () => { this.hideCommunicationButtons(node); })
@@ -410,7 +396,7 @@ export class NodeVisualsHelper {
         node.classed("expanded", false)
             .selectAll(".tray") 
             .transition(t)
-            .attr("y", 0)
+            .attr("y", -TRAY_HEIGHT)
             .style("opacity", 0);
 
         //Move right bottom buttons to new position
@@ -481,8 +467,8 @@ export class NodeVisualsHelper {
                 .selectAll("#backRect")
                 .style("opacity", 1)
                 .transition(t)
-                .attr("y", d => d.height - 5)
-            bottomConnectorTranslate = `translate(0, ${TRAY_HEIGHT / 2 + CONNECTOR_SIZE / 2 + 2})`;
+                attr("y", 0)
+            bottomConnectorTranslate = `translate(0, ${TRAY_HEIGHT})`;
         }
 
         //move the down connector to the new position
@@ -505,8 +491,8 @@ export class NodeVisualsHelper {
                 .selectAll("#topRect")
                 .style("opacity", 1)
                 .transition(t)
-                .attr("y", -TRAY_HEIGHT + 5)
-            topConnectorTranslate = `translate(0, ${-TRAY_HEIGHT + 5})`;
+                .attr("y", -node.height - TRAY_HEIGHT)
+            topConnectorTranslate = `translate(0, ${-node.height - TRAY_HEIGHT})`;
         }
 
         // move upper connector
@@ -537,9 +523,9 @@ export class NodeVisualsHelper {
         }
 
         const oldY = parseFloat(line.attr("y1"));
-        let newY = oldY - (TRAY_HEIGHT - 5);
+        let newY = oldY - (TRAY_HEIGHT);
         if (node.classed("expanded")) {
-            newY = oldY + (TRAY_HEIGHT - 5);
+            newY = oldY + (TRAY_HEIGHT);
         }
 
         line.transition()
@@ -572,16 +558,11 @@ export class NodeVisualsHelper {
 
     getNodeDims(node) {
         // estimation of the size of each character
-        const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.data.source.id}`);
-        
-        let label = this.getLabel(node.data.source, display);
-        
-        if (display && display === "shortened" && !label.includes('[')) {
-            label = globals.labelsShorteningHelper.shortenLabel(label, proof.isRuleShort, globals.shorteningMethod);
-        }
-
-        const lines = label.split('\n');
-        node.width = label.length * globals.fontCharacterWidth;
+        let label = this.getLabel(node.data.source);
+        let maxLine = 0; 
+        const lines = label.split("<br>");
+        lines.forEach(l => maxLine = Math.max(maxLine, l.length));
+        node.width = maxLine * globals.fontCharacterWidth;
         node.height = lines.length * this.nodeLineHeight;
 
         if (!proof.isCompact) {
@@ -647,14 +628,87 @@ export class NodeVisualsHelper {
         proof.svg.selectAll("g.node,line.link,path.link").style("opacity", 1);
     }
 
-    getLabel(node, display = "original") {
+    getLabel(node, forceOriginal = false) {
+        const display = proof.nodeVisuals.nodesCurrentDisplayFormat.get(`N${node.id}`);
+        
+        if (forceOriginal && node.labels) {
+            return node.labels.default; // don't mess with it
+        }
+
+        let label; 
         if (node.labels) {
             if (display === "textual") {
-                return node.labels.naturalLanguage;
+                label =  node.labels.naturalLanguage;
+            } else {
+                label = node.labels.default;        
             }
-            return node.labels.default;
+        } else {
+            //Assuming node.labels is undefined for rule name nodes
+            label = proof.ruleNameMapHelper.getAlternativeName(node.element);
         }
-        //Assuming node.labels is undefined for rule name nodes
+        if (display !== "shortened") {
+            // return selected label
+            return this.splitLabelMultiLine(label);
+        } else { 
+            // apply currently active shortening to label
+            return this.splitLabelMultiLine(
+                globals
+                    .labelsShorteningHelper
+                    .shortenLabel(
+                        label, 
+                        proof.isRuleShort, 
+                        globals.shorteningMethod
+                    )
+            );
+        }
+    }
+
+    splitLabelMultiLine(label) {
+        const maxLength = 30;
+        if (maxLength > label.length || proof.isCompact) { 
+            return label; // no need to break it. 
+        }
+
+        const br = "<br>"
+        let ret = [];
+        let lineCount = 0;
+        let lastWasBreak = false;
+        for (let char of label) {
+            if (LineBreakChars.beforeOnly.has(char)) {
+                !lastWasBreak && ret.push(br);
+                ret.push(char);
+                lastWasBreak = false;
+                lineCount = 1;
+            } else if (LineBreakChars.beforeAndAfter.has(char)) {
+                !lastWasBreak && ret.push(br);
+                ret.push(char);
+                ret.push(br);
+                lastWasBreak = true;
+                lineCount = 0;
+            } else if (LineBreakChars.afterOnly.has(char)) {
+                ret.push(char);
+                ret.push(br);
+                lastWasBreak = true;
+                lineCount = 0;
+            } else if (lineCount > maxLength && char === " ") {
+                !lastWasBreak && ret.push(br);
+                lastWasBreak = true;
+                lineCount = 0;
+            } else {
+                ret.push(char);
+                lastWasBreak = false;
+                lineCount += 1;
+            }
+
+            if (lineCount > (maxLength * 2)) {
+                !lastWasBreak && ret.push(br);
+                lastWasBreak = true;
+                lineCount = 0;
+            }
+        }
+
+        return ret.join("");
+        
         return proof.ruleNameMapHelper.getAlternativeName(node.element);
     }
 }
