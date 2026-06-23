@@ -76,8 +76,8 @@ export class NodeVisualsHelper {
             circle.attr("cy", 10).attr("cx", -15);
             text.attr("y", 14).attr("x", -19);
         } else {
-            circle.attr("cy", 15).attr("cx", 0);
-            text.attr("y", 19).attr("x", -4);
+            circle.attr("cy", -15).attr("cx", 0);
+            text.attr("y", -10).attr("x", -4);
         }
 
         this.renderBoxes(); 
