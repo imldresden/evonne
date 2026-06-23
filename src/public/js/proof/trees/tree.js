@@ -341,7 +341,7 @@ export class TreeNavigation {
                 .attr("class", d => `link cuttable dim ${(d.source.data.source.type === "rest" ? "torest" : "")
                 } ${(d.source.data.target === "" 
                     || ruleUtils.isRule(d.source.data.target.type)
-                    || d.source.data.target.type == 'rest' ? "hidden" : "")
+                    || d.source.data.target.type === 'rest' ? "hidden" : "")
                 }`)
         } else {
             input
@@ -355,7 +355,7 @@ export class TreeNavigation {
             .attr("id", d => `L${d.source.data.source.id}*${d.target.data.source.id}`)
             .attr("cursor", d => d.source.data.target.type === "axiom" ? "pointer" : "auto")
             .on("click", (e, d) => {
-                if (e.ctrlKey && !proof.isMagic && d.source.data.target.type === "axiom") {
+                if ((e.ctrlKey|| e.metaKey) && !proof.isMagic && d.source.data.target.type === "axiom") {
                     proof.tree.showSubTree(d.target);
                 }
             })
