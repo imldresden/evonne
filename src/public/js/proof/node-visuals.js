@@ -467,7 +467,7 @@ export class NodeVisualsHelper {
                 .selectAll("#backRect")
                 .style("opacity", 1)
                 .transition(t)
-                attr("y", 0)
+                .attr("y", 0)
             bottomConnectorTranslate = `translate(0, ${TRAY_HEIGHT})`;
         }
 
