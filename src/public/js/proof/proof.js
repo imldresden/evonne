@@ -32,7 +32,7 @@ const conf = {
   
   drawTime: 750,
   trays: {upper: false, lower: true},
-  stepNavigator: true, 
+  stepNavigator: false, 
 
   proofFile: undefined,
   signatureFile: undefined,

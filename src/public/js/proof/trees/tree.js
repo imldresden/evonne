@@ -35,7 +35,6 @@ export class TreeNavigation {
 
         this.restart();
         this.root = computeTreeLayout(this.hierarchy);
-        this.root.children = null;
         this.update();
     }
 

@@ -291,7 +291,7 @@ class RulesHelper {
             
             if (node._children) { // _children queries the tree regardless of collapsing or expanding
                 node._children.forEach(child => {
-                    premises.push(proof.nodeVisuals.getLabel(child.data.source));
+                    premises.push(proof.nodeVisuals.getLabel(child.data.source, true));
                     iDsToHighlight.push(child.data.source.id);
                 });
             }
