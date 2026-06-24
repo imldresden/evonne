@@ -15,7 +15,7 @@ export class AxiomsHelper {
 	addFunctionButtonsToNodes() {
 		//Remove old buttons
 		d3.selectAll(".axiomButton, .edge-button").remove();
-		this.nodes = proof.svg.selectAll(proof.stepNavigator ? ".axiom" : ".node:not(.rest)");
+		this.nodes = proof.svg.selectAll(".axiom.node:not(.rest)");
 
 		//Collapse node children
 		this.addCollapse();
@@ -179,7 +179,7 @@ export class AxiomsHelper {
 
 		if (proof.isCompact) {
 			group.attr("class", "axiomButton btn-borderless")
-				.attr("transform", d => `translate(${- d.width / 2 - BTN_CARET_SIZE}, ${d.height / 2})`)
+				.attr("transform", d => `translate(${- d.width / 2 - BTN_CARET_SIZE}, ${-d.height / 2})`)
 
 			group.filter(d => !ruleUtils.isRule(d.data.source.type))
 				.append("text")
@@ -239,7 +239,7 @@ export class AxiomsHelper {
 
 		if (proof.isCompact) {
 			group.attr("class", "axiomButton btn-borderless")
-				.attr("transform", d => `translate(${- d.width / 2 - BTN_CARET_SIZE}, ${d.height / 2})`)
+				.attr("transform", d => `translate(${- d.width / 2 - BTN_CARET_SIZE}, ${-d.height / 2})`)
 
 			group.filter(d => !ruleUtils.isRule(d.data.source.type))
 				.append("text")
@@ -510,7 +510,7 @@ export class AxiomsHelper {
 			})
 			.append("g").attr("opacity", 0).attr("id", "B03")
 			.attr("class", "axiomButton btn-view")
-			.attr("transform", d => `translate(${-(d.width / 2) - 20}, -7)`)
+			.attr("transform", d => `translate(${(d.width / 2) + 10}, -7)`)
 			.on("click", (e, d) => {
 				showFullAxiom(e.currentTarget.parentNode);
 				proof.update();

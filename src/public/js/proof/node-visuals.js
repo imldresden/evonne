@@ -73,8 +73,8 @@ export class NodeVisualsHelper {
         const text = r.append("text").text(proof.tree.cuts.length);
         
         if (proof.isCompact) {
-            circle.attr("cy", 10).attr("cx", -15);
-            text.attr("y", 14).attr("x", -19);
+            circle.attr("cy", -10).attr("cx", -10);
+            text.attr("y", -6).attr("x", -14);
         } else {
             circle.attr("cy", -15).attr("cx", 0);
             text.attr("y", -10).attr("x", -4);
@@ -258,8 +258,8 @@ export class NodeVisualsHelper {
             elements[i].selectAll("foreignObject").remove();
             //add new ones
             elements[i].append("foreignObject")
-                .attr("x", d => -(d.width) / 2 + TEXT_PAD)
-                .attr("y", d => -d.height + TEXT_PAD / 2)
+                .attr("x", d => -(d.width) / 2 + (proof.isCompact? 3 : TEXT_PAD))
+                .attr("y", d => -d.height + (proof.isCompact? -1 : TEXT_PAD / 2 ))
                 .attr("pointer-events", "none") // foreign objects capture the clicks 
                 .attr("width", d => d.width)
                 .attr("height", d => d.height)
