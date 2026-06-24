@@ -291,7 +291,7 @@ class RulesHelper {
             
             if (node._children) { // _children queries the tree regardless of collapsing or expanding
                 node._children.forEach(child => {
-                    premises.push(proof.nodeVisuals.getLabel(child.data.source));
+                    premises.push(proof.nodeVisuals.getLabel(child.data.source, true));
                     iDsToHighlight.push(child.data.source.id);
                 });
             }
@@ -303,10 +303,6 @@ class RulesHelper {
     }
 
     openExplanation(_params, nodes) {
-        if (!proof.showPopover) {
-            return;
-        }
-        
         if (_params.event.ctrlKey && proof.compactInteraction) {
 			nodes[0].children = nodes[0]._children; // expand rule
             nodes[0].children?.forEach(c => {

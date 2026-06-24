@@ -510,7 +510,7 @@ export class AxiomsHelper {
 			})
 			.append("g").attr("opacity", 0).attr("id", "B03")
 			.attr("class", "axiomButton btn-view")
-			.attr("transform", d => `translate(${-(d.width / 2) + BOX_PADDING}, 15)`) //${d.height - 7}
+			.attr("transform", d => `translate(${-(d.width / 2) - 20}, -7)`)
 			.on("click", (e, d) => {
 				showFullAxiom(e.currentTarget.parentNode);
 				proof.update();

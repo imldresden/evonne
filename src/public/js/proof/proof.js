@@ -22,7 +22,6 @@ const conf = {
   allowOverlap: false,
   showRules: true,
   showSubProofs: false,
-  showPopover: true,
   isMagic: false,
   isRuleShort: false,
   isLinear: false,
@@ -33,7 +32,7 @@ const conf = {
   
   drawTime: 750,
   trays: {upper: false, lower: true},
-  stepNavigator: true, 
+  stepNavigator: false, 
 
   proofFile: undefined,
   signatureFile: undefined,
@@ -65,12 +64,6 @@ const conf = {
 
   load: function (path) {
     const file = path ? path : "../data/" + getSessionId() + "/" + getFileName();
-
-    const url = new URL(window.location.toLocaleString()).searchParams;
-    if (url.get("cond") === "sp") { // TODO remove this, and extra extract-examples in package.json
-      proof.showSubProofs = true;
-      proof.showPopover = false;
-    }
 
     if (file.endsWith(".json")) {
       d3.json(file).then(json => {

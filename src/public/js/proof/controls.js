@@ -25,11 +25,13 @@ const magicToggleBtn = document.getElementById("toggleMagicMode");
 const layoutToggleBtn = document.getElementById("toggleLayoutMode");
 const compactToggleBtn = document.getElementById("toggleCompactMode");
 const shortenRules = document.getElementById("toggleRuleNamesShortening");
+const toggleStepNavigatorBtn = document.getElementById("toggleStepNavigator");
 const planarToggleBtn = document.getElementById("togglePlanar");
 const overlapAllowingSettings = document.getElementById("proof-overlap-allowing-settings");
 
 //Buttons
 const collapseAll = document.getElementById("collapseAll");
+const expandAll = document.getElementById("expandAll");
 const shortenAllBtn = document.getElementById("shortenAllInProofBtn");
 const proofWidthRangeResetBtn = document.getElementById("proofWidthRangeReset");
 const proofHeightRangeResetBtn = document.getElementById("proofHeightRangeReset");
@@ -57,6 +59,12 @@ const controls = [
         name: "collapseAll",
         el: collapseAll,
         fn: collapseAllBtnFunction,
+        type: 'click'
+    },
+    {
+        name: "expandAll",
+        el: expandAll,
+        fn: expandAllBtnFunction,
         type: 'click'
     },
     {
@@ -93,6 +101,12 @@ const controls = [
         name: "shortenRules",
         el: shortenRules,
         fn: shortenRulesFunction,
+        type: 'click'
+    },
+    {
+        name: "toggleStepNavigator",
+        el: toggleStepNavigatorBtn,
+        fn: toggleStepNavigatorFunction,
         type: 'click'
     },
     {
@@ -204,11 +218,26 @@ function showSubProofsBtnFunction() {
 }
 
 function collapseAllBtnFunction() {
+    if (proof.isDrawing) {
+        return;
+    }
     // disable magic mode
     magicToggleBtn.checked = false;
     proof.isMagic = false;
     proof.magic.currentMagicAction = "";
     proof.axioms.showConclusionOnly();
+}
+
+function expandAllBtnFunction() {
+    if (proof.isDrawing) {
+        return;
+    }
+    // disable magic mode
+    magicToggleBtn.checked = false;
+    proof.isMagic = false;
+    proof.magic.currentMagicAction = "";
+    proof.axioms.resetAllChildren(proof.tree.root);
+    proof.update()
 }
 
 function getShowRulesWrapper() {
@@ -332,6 +361,11 @@ function shorten() {
 function shortenRulesFunction() {
     proof.isRuleShort = shortenRules.checked;
     shorten();
+}
+
+function toggleStepNavigatorFunction() {
+    proof.stepNavigator = !proof.stepNavigator;
+    proof.update();
 }
 
 function shortenAllBtnFunction() {
@@ -491,6 +525,7 @@ function init() {
     allowOverlapBtn.checked = proof.allowOverlap || false;
     overlapAllowingSettings.style.display = proof.allowOverlap ? "block" : "none";
     shortenRules.checked = proof.shortenRules || false;
+    toggleStepNavigatorBtn.checked = proof.stepNavigator || false;
 
     magicToggleBtn.checked = proof.isMagic || false;
     layoutToggleBtn.checked = proof.isLinear || false;

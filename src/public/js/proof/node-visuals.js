@@ -260,15 +260,10 @@ export class NodeVisualsHelper {
             elements[i].append("foreignObject")
                 .attr("x", d => -(d.width) / 2 + TEXT_PAD)
                 .attr("y", d => -d.height + TEXT_PAD / 2)
+                .attr("pointer-events", "none") // foreign objects capture the clicks 
                 .attr("width", d => d.width)
                 .attr("height", d => d.height)
-                .html(d => `<div> ${this.getLabel(d.data.source)} </div>`);
-            // elements[i].append("text")
-            //     .attr("id", elementsID[i])
-            //     .attr("class", elementsClass[i])
-            //     .attr("x", d => (-d.width / 2) + (TEXT_PAD / (proof.isCompact ? 2 : 1)))
-            //     .attr("y", d => d.height / 1.5)
-            //     .text(d => this.getLabel(d.data.source)); 
+                .html(d => `${this.getLabel(d.data.source)}`);
         }
     }
 
@@ -673,7 +668,22 @@ export class NodeVisualsHelper {
         let ret = [];
         let lineCount = 0;
         let lastWasBreak = false;
+        let bypass = false;
         for (let char of label) {
+
+            if (char === "[") { // do not break until ]
+                bypass = true
+            }
+
+            if (bypass) {
+                ret.push(char);
+                if (char === "]") {
+                    bypass = false;
+                }
+                continue;
+            }
+
+
             if (LineBreakChars.beforeOnly.has(char)) {
                 !lastWasBreak && ret.push(br);
                 ret.push(char);
