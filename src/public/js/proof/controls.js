@@ -389,7 +389,7 @@ function maxLengthInputLabelUpdate() {
         && maxLengthInput.parentNode.parentNode.querySelector("span.badge")
 
     if (badge) {
-        badge.innerHTML = maxLengthInput.value
+        badge.innerHTML = maxLengthInput.value.toString()
     }
 }
 

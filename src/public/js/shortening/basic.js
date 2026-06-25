@@ -20,12 +20,13 @@ export class BasicShorteningFunctions {
 
     getMaxLengthValue () {
         return document.getElementById("maximumLength") ? 
-            document.getElementById("maximumLength").value : this_maxLength;
+            document.getElementById("maximumLength").value : this._maxLength;
     }
 
     resetIfNewMax() {
         const currentMaxLength = this.getMaxLengthValue();
         if (currentMaxLength !== this._maxLength) {
+            this._maxLength = currentMaxLength
             this.resetAll();
             return true;
         }
@@ -116,8 +117,9 @@ export class BasicShorteningFunctions {
     createTextWithPlaceHolders(text) {
         let tmp = text.match(data.regInnerPar);
         if (!tmp) {
-            if (text.split(data.sepReg).length > 2) {
-                tmp = text.split(data.sepReg);
+            let current = text.split(data.sepReg)
+            if (current.length > 2) {
+                tmp = current;
             } else {
                 return this.getShort(text);
             }  
